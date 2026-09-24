@@ -11,8 +11,13 @@ config_version=5
 [application]
 
 config/name="Fantasy Guild Manager"
+run/main_scene="uid://cbre2l6kj08ep"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+ExternalContentContainer="*uid://bae36g2i7jnyo"
 
 [display]
 
