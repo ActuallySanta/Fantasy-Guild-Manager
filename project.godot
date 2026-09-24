@@ -14,6 +14,10 @@ config/name="Fantasy Guild Manager"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+ExternalContentContainer="*uid://bae36g2i7jnyo"
+
 [display]
 
 window/stretch/mode="canvas_items"
