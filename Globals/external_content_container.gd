@@ -29,11 +29,11 @@ func _process(delta: float) -> void:
 func _get_character_name(gender: GuildCharacter.CharacterGender) -> String:
 	match gender:
 		GuildCharacter.CharacterGender.MALE:
-			return male_character_names[randi_range(0, male_character_names.size())]
+			return male_character_names[randi_range(0, male_character_names.size()-1)]
 		GuildCharacter.CharacterGender.FEMALE:
-			return female_character_names[randi_range(0, female_character_names.size())]
+			return female_character_names[randi_range(0, female_character_names.size()-1)]
 		GuildCharacter.CharacterGender.ANDROGYNOUS:
-			return andro_character_names[randi_range(0, andro_character_names.size())]
+			return andro_character_names[randi_range(0, andro_character_names.size()-1)]
 		_:
 			return ""
 	pass
