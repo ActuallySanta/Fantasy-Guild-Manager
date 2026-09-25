@@ -1,14 +1,21 @@
 extends Resource
+
 class_name GuildCharacter
 
-enum CHARACTER_ROLE{
+enum CharacterGender {
+	FEMALE = 0,
+	MALE = 1,
+	ANDROGYNOUS = 2,
+}
+
+enum CharacterRole {
 	KNIGHT,
 	PRIEST,
 	PATHFINDER,
 	MAGE,
 }
 
-enum INJURY_LEVEL{
+enum InjuryLevel {
 	HEALTHY = 0,
 	SORE = 1,
 	LIGHTLY_INJURED = 2,
@@ -16,17 +23,31 @@ enum INJURY_LEVEL{
 	DEAD = 4,
 }
 
-var name:String
+enum StatType {
+	STRENGTH,
+	DEFENSE,
+	WISDOM,
+	PLUCK,
+}
 
-var role:CHARACTER_ROLE
+var name: String
 
-var injury_level:INJURY_LEVEL
+var role: CharacterRole
 
-var strength : int = 0
-var defense: int = 0 
-var wisdom : int = 0
-var pluck : int = 0
+var injury_level: InjuryLevel
+
+var stats: Dictionary[StatType, int] = {
+	StatType.STRENGTH: 0,
+	StatType.DEFENSE: 0,
+	StatType.WISDOM: 0,
+	StatType.PLUCK: 0,
+}
+var gender: CharacterGender
+
 
 #The constructor, called when the object is created
 func _init() -> void:
+	gender = randi_range(0, 2)
+
+	name = ExternalContentContainer._get_character_name(gender)
 	pass

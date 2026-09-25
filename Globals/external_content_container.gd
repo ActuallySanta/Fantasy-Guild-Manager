@@ -24,3 +24,16 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+
+
+func _get_character_name(gender: GuildCharacter.CharacterGender) -> String:
+	match gender:
+		GuildCharacter.CharacterGender.MALE:
+			return male_character_names[randi_range(0, male_character_names.size())]
+		GuildCharacter.CharacterGender.FEMALE:
+			return female_character_names[randi_range(0, female_character_names.size())]
+		GuildCharacter.CharacterGender.ANDROGYNOUS:
+			return andro_character_names[randi_range(0, andro_character_names.size())]
+		_:
+			return ""
+	pass
