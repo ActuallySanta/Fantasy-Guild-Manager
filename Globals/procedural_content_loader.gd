@@ -2,11 +2,11 @@ extends Node
 
 class_name ProceduralContentLoader
 
-static func _load_info_from_file(file_path: String) -> Array[String]:
+static func _load_info_from_file(_file_path: String, _columns) -> Array[String]:
 	var arr: Array[String]
 
 	# Open the file
-	var file := FileAccess.open(file_path, FileAccess.READ)
+	var file := FileAccess.open(_file_path, FileAccess.READ)
 
 	# Check if the file opened successfully
 	if not file:
@@ -20,8 +20,8 @@ static func _load_info_from_file(file_path: String) -> Array[String]:
 			continue
 
 		#there should only ever be a single entry in each array
-		var entry = row[0]
-		arr.append(entry)
+		for entry in row:
+			arr.append(entry)
 
 	file.close()
 	return arr
