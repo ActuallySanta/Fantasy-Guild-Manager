@@ -52,15 +52,18 @@ var gender: CharacterGender
 
 #The constructor, called when the object is created
 func _init() -> void:
-	gender = randi_range(0, CharacterGender.size()) as CharacterGender
-	role = randi_range(0,CharacterRole.size()) as CharacterRole
+	# Get a random gender, role, and name
+	gender = randi_range(0, CharacterGender.size()-1) as CharacterGender
+	role = randi_range(0,CharacterRole.size()-1) as CharacterRole
 	name = ExternalContentContainer._get_character_name(gender)
 	
+	# Generate the main stat
 	_generate_stat_spread(stats,total_points)
 	
 	injury_level = InjuryLevel.HEALTHY
 	pass
 
+## Generate the stats using normalized random number sampling
 func _generate_stat_spread(_stats : Dictionary[StatType,int], _total_points : int)-> void:
 	var _stat_weights : Array[float]
 	# Make sure that the stat weights are the same size as the amount of stats

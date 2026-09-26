@@ -20,12 +20,7 @@ func _ready() -> void:
 	andro_character_names = ProceduralContentLoader._load_info_from_file(character_a_names_file_path)
 	pass # Replace with function body.
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
-
-
+## Get a random name from the array based on the gender
 func _get_character_name(gender: GuildCharacter.CharacterGender) -> String:
 	match gender:
 		GuildCharacter.CharacterGender.MALE:
