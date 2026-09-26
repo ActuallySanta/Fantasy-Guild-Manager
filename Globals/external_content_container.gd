@@ -29,10 +29,10 @@ var pronoun_object: Array[String] = [
 	"them",
 ]
 
-var pronoun_personal: Array[String] = [
+var pronoun_personal_object: Array[String] = [
 	"he",
 	"she",
-	"them",
+	"they",
 ]
 
 var location_names: Array[String]
@@ -44,6 +44,7 @@ func _ready() -> void:
 	female_character_names = ProceduralContentLoader._load_info_from_file(character_f_names_file_path, 1)
 	andro_character_names = ProceduralContentLoader._load_info_from_file(character_a_names_file_path, 1)
 	pass # Replace with function body.
+
 
 ## Get a random name from the array based on the gender
 func _get_character_name(gender: GuildCharacter.CharacterGender) -> String:
