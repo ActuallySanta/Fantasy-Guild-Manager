@@ -27,7 +27,7 @@ enum StatType {
 	STRENGTH,
 	DEFENSE,
 	WISDOM,
-	PLUCK,
+	SLEAZINESS,
 }
 
 var name: String
@@ -40,8 +40,10 @@ var stats: Dictionary[StatType, int] = {
 	StatType.STRENGTH: 0,
 	StatType.DEFENSE: 0,
 	StatType.WISDOM: 0,
-	StatType.PLUCK: 0,
+	StatType.SLEAZINESS: 0,
 }
+
+var pluck: int = 0
 
 var total_points:int = 20
 
@@ -67,13 +69,13 @@ func _generate_stat_spread(_stats : Dictionary[StatType,int], _total_points : in
 	var stat_sum : float
 	
 	#Generate random numbers and sum them all up
-	for stat in _stat_weights:
-		stat = randf()
-		stat_sum +=stat
+	for stat in _stat_weights.size():
+		_stat_weights[stat] = randf()
+		stat_sum +=_stat_weights[stat]
 	
 	#After all the stats are added together, make them proportional to the total points
-	for stat in _stat_weights:
-		var _proportion : float = stat/stat_sum
-		stat = (_proportion*_total_points)
+	for stat in _stats.size():
+		var _proportion : float = _stat_weights[stat]/stat_sum
+		_stats[stat] = (_proportion*_total_points)
 		
 	pass
