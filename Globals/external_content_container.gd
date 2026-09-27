@@ -12,26 +12,26 @@ var andro_character_names: Array[String]
 
 #Used for text replacement
 var child_gender: Array[String] = [
-	"son",
 	"daughter",
+	"son",
 	"child",
 ]
 
 var pronoun_possesive: Array[String] = [
-	"his",
 	"hers",
+	"his",
 	"theirs",
 ]
 
 var pronoun_object: Array[String] = [
-	"him",
 	"her",
+	"him",
 	"them",
 ]
 
 var pronoun_personal_object: Array[String] = [
-	"he",
 	"she",
+	"he",
 	"they",
 ]
 
