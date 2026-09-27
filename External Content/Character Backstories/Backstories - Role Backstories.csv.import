@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bvjkteqml8oq1"
+
+[deps]
+
+files=["res://External Content/Character Backstories/Backstories - Role Backstories.Priest.translation", "res://External Content/Character Backstories/Backstories - Role Backstories.Pathfinder.translation", "res://External Content/Character Backstories/Backstories - Role Backstories.Mage.translation"]
+
+source_file="res://External Content/Character Backstories/Backstories - Role Backstories.csv"
+dest_files=["res://External Content/Character Backstories/Backstories - Role Backstories.Priest.translation", "res://External Content/Character Backstories/Backstories - Role Backstories.Pathfinder.translation", "res://External Content/Character Backstories/Backstories - Role Backstories.Mage.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true
