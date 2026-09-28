@@ -7,8 +7,6 @@ func _ready() -> void:
 	thisQuest = CreatedQuest.new()
 	var adventurerArray : Array[GuildCharacter]
 	adventurerArray = thisQuest.generatePartyDuo()
-	print(adventurerArray[0].name)
-	print(adventurerArray[1].name)
 	
 	var questResults : String
 	questResults = thisQuest.generateResults(adventurerArray, 80.0)

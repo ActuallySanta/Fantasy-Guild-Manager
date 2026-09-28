@@ -81,7 +81,7 @@ _successChance: float) -> String:
 	returnString = str(returnString, "", _questingAdventurers[0].name, " and ", _questingAdventurers[1].name, 
 	" raided the ", location, ".\n")
 	
-	var loopbreaker = 10
+	var loopbreaker = 12
 	while randi_range(-1, 10) < loopbreaker:
 		match randi_range(0, 1):
 			0:
@@ -92,6 +92,8 @@ _successChance: float) -> String:
 	
 	returnString = str(returnString, "", _questingAdventurers[0].name, " and ", _questingAdventurers[1].name, 
 	" reached the bottom of the ", location, ".\n")
+	
+	returnString = str(returnString, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward," gold.")
 	
 	#loop with size based on difficulty -> higher difficulty more loops
 	#each iteration picks combat, search, or to move on faster (starts as very
@@ -134,7 +136,9 @@ _successChance: float) -> String:
 	var returnString = ""
 	match randi_range(0, 1):
 		0:
-			returnString = str(returnString, "The PARTY discovered an old chest containing 17 gold.\n")
+			var extraGold = randi_range(11, 29)
+			goldReward += extraGold
+			returnString = str(returnString, "The PARTY discovered an old chest containing ", extraGold, " gold.\n")
 		1:
 			returnString = str(returnString, _questingAdventurers[1].name, " tripped on a rock and gained 1 INJURY.\n")
 	return returnString
