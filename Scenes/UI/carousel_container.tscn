@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://bxocktk8nys8x"]
+
+[ext_resource type="Script" uid="uid://2oa65ssg1gcf" path="res://Scripts/UI/carousel_container.gd" id="1_hvkyt"]
+[ext_resource type="PackedScene" uid="uid://dbb4tq65rvpax" path="res://Scenes/UI/carousel_element.tscn" id="1_pbvg6"]
+
+[node name="Carousel Container" type="CenterContainer" unique_id=130441287]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_hvkyt")
+swipe_sens = 100.0
+
+[node name="Carousel Element" parent="." unique_id=40479288 instance=ExtResource("1_pbvg6")]
+layout_mode = 2
+
+[node name="Carousel Element2" parent="." unique_id=867961042 instance=ExtResource("1_pbvg6")]
+layout_mode = 2
+
+[node name="TextureRect" parent="Carousel Element2" index="0" unique_id=1314059417]
+modulate = Color(0.5053333, 1, 0.47000003, 1)
+
+[node name="Carousel Element3" parent="." unique_id=491996498 instance=ExtResource("1_pbvg6")]
+layout_mode = 2
+
+[node name="TextureRect" parent="Carousel Element3" index="0" unique_id=1314059417]
+modulate = Color(0.34272197, 0.744667, 0.8930535, 1)
+
+[node name="Carousel Element4" parent="." unique_id=134081699 instance=ExtResource("1_pbvg6")]
+layout_mode = 2
+
+[node name="TextureRect" parent="Carousel Element4" index="0" unique_id=1314059417]
+modulate = Color(1, 0.7261667, 0.47000003, 1)
+
+[node name="Carousel Element5" parent="." unique_id=882807255 instance=ExtResource("1_pbvg6")]
+layout_mode = 2
+
+[node name="TextureRect" parent="Carousel Element5" index="0" unique_id=1314059417]
+modulate = Color(0.47000003, 0.6908334, 1, 1)
+
+[node name="Carousel Element6" parent="." unique_id=616556565 instance=ExtResource("1_pbvg6")]
+layout_mode = 2
+
+[node name="TextureRect" parent="Carousel Element6" index="0" unique_id=1314059417]
+modulate = Color(0.47000003, 1, 0.49650002, 1)
+
+[editable path="Carousel Element2"]
+[editable path="Carousel Element3"]
+[editable path="Carousel Element4"]
+[editable path="Carousel Element5"]
+[editable path="Carousel Element6"]
