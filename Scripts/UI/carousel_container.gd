@@ -38,7 +38,7 @@ func _input(event: InputEvent) -> void:
 	if(event is InputEventScreenDrag and is_finger_pressed and !has_already_swiped):
 		print(event.velocity)
 		#Make sure the swipe was fast enough (prevent unintended swipes)
-		if(event.velocity.x < -swipe_sens): #Swiping left
+		if(event.screen_velocity.x < -swipe_sens): #Swiping left
 			
 			get_children()[curr_index].visible = false
 			if(curr_index>0):
@@ -48,9 +48,9 @@ func _input(event: InputEvent) -> void:
 			get_child(curr_index).visible = true
 			has_already_swiped = true
 			
-		elif(event.velocity.x >swipe_sens): #Swipe Right
+		elif(event.screen_velocity.x >swipe_sens): #Swipe Right
 			get_children()[curr_index].visible = false
-			if(curr_index<get_child_count()):
+			if(curr_index<get_child_count()-1):
 				curr_index+=1
 			else:
 				curr_index = 0
