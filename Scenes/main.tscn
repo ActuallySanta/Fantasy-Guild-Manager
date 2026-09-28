@@ -1,13 +1,8 @@
 [gd_scene format=3 uid="uid://cbre2l6kj08ep"]
 
-[ext_resource type="Script" uid="uid://2a60tdtp51bo" path="res://Scripts/Character Generator/character_container.gd" id="1_bo1nx"]
 [ext_resource type="PackedScene" uid="uid://ca7d3fdaphs4v" path="res://Scenes/Characters/character_generator.tscn" id="1_jjgbg"]
 
 [node name="Main" type="Node2D" unique_id=418361766]
-
-[node name="Character Container" type="Node2D" parent="." unique_id=1174445194]
-position = Vector2(491, 366)
-script = ExtResource("1_bo1nx")
 
 [node name="Character Generator" parent="." unique_id=1008846978 instance=ExtResource("1_jjgbg")]
 position = Vector2(491, 366)
