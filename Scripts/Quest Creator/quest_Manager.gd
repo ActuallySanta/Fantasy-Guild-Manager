@@ -9,6 +9,10 @@ func _ready() -> void:
 	adventurerArray = thisQuest.generatePartyDuo()
 	print(adventurerArray[0].name)
 	print(adventurerArray[1].name)
+	
+	var questResults : String
+	questResults = thisQuest.generateResults(adventurerArray, 80.0)
+	print(questResults)
 	pass
 
 
