@@ -51,8 +51,10 @@ func _init() -> void:
 #what & where I'm leaving it on void
 #this is the main root method for deciding and generating results I'll have
 #methods branch off to decide certain parts of the results
-func _generateResults(_questingAdventurers: Array[GuildCharacter], 
-_successChance: float) -> void:
+func generateResults(_questingAdventurers: Array[GuildCharacter], 
+_successChance: float) -> String:
+	#generate characters for now
+	
 	#put in start text
 	
 	#loop with size based on difficulty -> higher difficulty more loops
@@ -65,7 +67,9 @@ _successChance: float) -> void:
 	
 	#once the loop moves on we are done here
 	#put in end text
-	pass
+	return ""
+	
+	#FUNCTION FOR SUCCESS CHANCE
 		
 func _combatEncounter(_fightingAdventurers: Array[GuildCharacter], 
 _successChance: float) -> String:
@@ -82,3 +86,14 @@ _successChance: float) -> String:
 	#more success, gold, etc, low value is worse, injuries or death
 	#then it adds to a string and returns the string to the main method
 	return ""
+
+func generatePartyDuo() -> Array[GuildCharacter]:
+	var party : Array[GuildCharacter]
+	
+	var firstAdventurer = GuildCharacter.new()
+	var secondAdventurer = GuildCharacter.new()
+	
+	party.append(firstAdventurer)
+	party.append(secondAdventurer)
+	
+	return party
