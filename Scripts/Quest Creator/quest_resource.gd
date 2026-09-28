@@ -36,6 +36,17 @@ var type: QuestType
 #var for preffered stat I spelled that wrong
 #var for modifier(s) if we ever choose to do that
 
+#need to pull a bunch of stuff out of spreadsheet somehow at some time
+#start, middle, end, location, and flavors all need to be pulled out, probably
+#at generation - monsters can be pulled out later but only if that's realistic
+
+#don't know yet if this needs to be sent somewhere either, but I assume we want
+#this as void regardless
+func _init() -> void:
+	#set variables
+	#generate description -> I don't know if that will be held here or not
+	pass
+
 #I assume this should be sending something somewhere but until we figure out
 #what & where I'm leaving it on void
 #this is the main root method for deciding and generating results I'll have
@@ -54,7 +65,7 @@ _successChance: float) -> void:
 	
 	#once the loop moves on we are done here
 	#put in end text
-		pass
+	pass
 		
 func _combatEncounter(_fightingAdventurers: Array[GuildCharacter], 
 _successChance: float) -> String:
@@ -62,7 +73,7 @@ _successChance: float) -> String:
 	#deals with any changes to the characters based on value, high value means
 	#more success, stat ups, etc, low value is worse, injuries or death
 	#then it adds to a string and returns the string to the main method
-		return ""
+	return ""
 		
 func _search(_fightingAdventurers: Array[GuildCharacter], 
 _successChance: float) -> String:
@@ -70,4 +81,4 @@ _successChance: float) -> String:
 	#deals with any changes to the characters based on value, high value means
 	#more success, gold, etc, low value is worse, injuries or death
 	#then it adds to a string and returns the string to the main method
-		return ""
+	return ""
