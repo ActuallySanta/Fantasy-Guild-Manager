@@ -62,7 +62,7 @@ horizontal_alignment = 1
 [node name="Drag Drop Grid" parent="MarginContainer/VBoxContainer" unique_id=1209773775 instance=ExtResource("1_y883n")]
 layout_mode = 2
 size_flags_vertical = 3
-columns = 10
+columns = 4
 
 [node name="Close Button" parent="." unique_id=1203562834 instance=ExtResource("4_rio15")]
 layout_mode = 1
