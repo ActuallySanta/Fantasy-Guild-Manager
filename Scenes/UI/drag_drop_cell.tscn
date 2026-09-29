@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://chyn34twdfvas"]
+
+[ext_resource type="Script" uid="uid://b46h3jvs2j8sm" path="res://Scripts/UI/Drag and Drop System/drag_drop_cell.gd" id="1_m1m5p"]
+
+[node name="Drag Drop Cell" type="Button" unique_id=1633830713]
+offset_right = 8.0
+offset_bottom = 8.0
+script = ExtResource("1_m1m5p")
