@@ -1,8 +1,14 @@
 [gd_scene format=3 uid="uid://chyn34twdfvas"]
 
-[ext_resource type="Script" uid="uid://b46h3jvs2j8sm" path="res://Scripts/UI/Drag and Drop System/drag_drop_cell.gd" id="1_m1m5p"]
+[ext_resource type="Texture2D" uid="uid://deis7oxw14qbl" path="res://icon.svg" id="1_h0q4y"]
+[ext_resource type="Script" uid="uid://cw4tn8gisspu" path="res://Scripts/UI/Drag and Drop System/character_icon_button.gd" id="2_h0q4y"]
 
 [node name="Drag Drop Cell" type="Button" unique_id=1633830713]
+custom_minimum_size = Vector2(64, 64)
 offset_right = 8.0
 offset_bottom = 8.0
-script = ExtResource("1_m1m5p")
+text = "This is a text"
+icon = ExtResource("1_h0q4y")
+icon_alignment = 1
+vertical_icon_alignment = 0
+script = ExtResource("2_h0q4y")

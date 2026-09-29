@@ -30,12 +30,12 @@ enum StatType {
 	SLEAZINESS,
 }
 
-enum CharacterStatus{
+enum CharacterStatus {
 	IDLE,
 	ON_QUEST,
 	TRAINING,
 	HEALING,
-	DEAD
+	DEAD,
 }
 
 var name: String
@@ -59,7 +59,10 @@ var total_points: int = 20
 
 var gender: CharacterGender
 
-var status:CharacterStatus
+var status: CharacterStatus
+
+var title: String
+
 
 #The constructor, called when the object is created
 func _init() -> void:
@@ -73,6 +76,9 @@ func _init() -> void:
 
 	injury_level = InjuryLevel.HEALTHY
 	status = CharacterStatus.IDLE
+
+	title = name + " the " + str(CharacterRole.find_key(role))
+
 	pass
 
 

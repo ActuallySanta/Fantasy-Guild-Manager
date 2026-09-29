@@ -1,7 +1,8 @@
 extends Control
+
 class_name CharacterUICard
 
-var loaded_character:GuildCharacter
+var loaded_character: GuildCharacter
 
 #Get a reference to every UI element
 @onready var character_description_label: Label = $"Stat Block/HBoxContainer/Character Description Label"
@@ -19,9 +20,9 @@ var loaded_character:GuildCharacter
 func _ready() -> void:
 	# Generate a random character
 	loaded_character = GuildCharacter.new()
-	
+
 	# Set all the text based off the character
-	character_name_label.text = "%s the %s"%[loaded_character.name,GuildCharacter.CharacterRole.find_key(loaded_character.role)]
+	character_name_label.text = loaded_character.title
 	strength_label.text = "Strength: " + str(loaded_character.stats[GuildCharacter.StatType.STRENGTH])
 	defense_label.text = "Defense: " + str(loaded_character.stats[GuildCharacter.StatType.DEFENSE])
 	wisdom_label.text = "Wisdom: " + str(loaded_character.stats[GuildCharacter.StatType.WISDOM])
