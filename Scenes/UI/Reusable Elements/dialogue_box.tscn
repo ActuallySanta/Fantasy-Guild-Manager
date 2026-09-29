@@ -46,7 +46,7 @@ grow_vertical = 2
 
 [node name="Banner Title" type="Label" parent="Background/VBoxContainer" unique_id=1148823556]
 layout_mode = 2
-size_flags_vertical = 2
+size_flags_vertical = 0
 text = "DAILY LOG"
 label_settings = SubResource("LabelSettings_u27lg")
 horizontal_alignment = 1
