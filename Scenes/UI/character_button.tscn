@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://dpm6emiryhpli"]
+
+[ext_resource type="Script" uid="uid://cavuwmefgps7k" path="res://Scripts/UI/character_button.gd" id="1_adgl6"]
+
+[node name="CharacterButton" type="Button" unique_id=392331668]
+custom_minimum_size = Vector2(120, 120)
+script = ExtResource("1_adgl6")
