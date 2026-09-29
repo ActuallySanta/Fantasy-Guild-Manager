@@ -36,7 +36,7 @@ custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 color = Color(0.6452097, 0.6452098, 0.6452097, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="VBoxContainer/Name Background" unique_id=1547128288]
+[node name="CenterContainer" type="MarginContainer" parent="VBoxContainer/Name Background" unique_id=1011052685]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 1
 anchors_preset = 15
@@ -44,11 +44,16 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
 
 [node name="Character Name Label" type="Label" parent="VBoxContainer/Name Background/CenterContainer" unique_id=718164899]
 layout_mode = 2
 text = "This is a test"
 label_settings = SubResource("LabelSettings_g4v7s")
+horizontal_alignment = 1
 
 [node name="Character Icon" type="TextureRect" parent="VBoxContainer" unique_id=1782823202]
 layout_mode = 2

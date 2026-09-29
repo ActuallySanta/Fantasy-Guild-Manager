@@ -19,3 +19,7 @@ func _load_characters_onto_page():
 		_char_icon.text = characters.title
 		drag_drop_grid.add_child(_char_icon)
 		pass
+
+
+func _on_close_button_pressed() -> void:
+	queue_free()
