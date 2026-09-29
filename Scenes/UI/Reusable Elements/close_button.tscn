@@ -3,11 +3,11 @@
 [ext_resource type="Texture2D" uid="uid://do5kjvfstulyu" path="res://Sprites/32x32-Tilesheet.png" id="1_gtcrq"]
 [ext_resource type="Script" uid="uid://dppccbdtrjiuo" path="res://Scripts/UI/ui_button.gd" id="2_m5hli"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_iyv5j"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_o1qxv"]
 atlas = ExtResource("1_gtcrq")
-region = Rect2(64, 224, 32, 32)
+region = Rect2(72, 232, 16, 16)
 
-[node name="Close Button" type="TextureButton" unique_id=340347144]
+[node name="Close Button" type="Button" unique_id=1203562834]
 custom_minimum_size = Vector2(50, 50)
 custom_maximum_size = Vector2(50, 50)
 anchors_preset = 8
@@ -23,8 +23,10 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture_normal = SubResource("AtlasTexture_iyv5j")
-stretch_mode = 0
+icon = SubResource("AtlasTexture_o1qxv")
+flat = true
+icon_alignment = 1
+expand_icon = true
 script = ExtResource("2_m5hli")
 
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
