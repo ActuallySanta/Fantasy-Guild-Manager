@@ -12,8 +12,8 @@ enum QuestDifficulty{
 }
 
 enum QuestType{
-	DungeonClear = 0,
-	#skip 1 for now
+	#skip 0 for now
+	DungeonClear = 1,
 	Escort = 2,
 }
 
@@ -64,6 +64,9 @@ func _init() -> void:
 	monsters.append("Goblin")
 	monsters.append("Orc")
 	monsters.append("Troll")
+	monsters.append("Dragon")
+	monsters.append("Skeleton Warrior")
+	monsters.append("Nathaniel Klubek")
 	
 	#set variables
 	#generate description -> I don't know if that will be held here or not
@@ -90,10 +93,19 @@ _successChance: float) -> String:
 				returnString = str(returnString, _search(_questingAdventurers, _successChance))
 		loopbreaker = loopbreaker - 1;
 	
-	returnString = str(returnString, "", _questingAdventurers[0].name, " and ", _questingAdventurers[1].name, 
-	" reached the bottom of the ", location, ".\n")
-	
-	returnString = str(returnString, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward," gold.")
+	var successDetermination = randi_range(0, 100)
+	match true:
+		_ when successDetermination >= _successChance:
+			returnString = str(returnString, "", _questingAdventurers[0].name, " and ", _questingAdventurers[1].name, 
+	" DID NOT manage to reach the bottom of the ", location, ".\n")
+			returnString = str(returnString, "Summary: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
+			
+			if(goldReward > 200):
+				returnString = str(returnString, "However, your adventurers did bring back ", goldReward - 200, " gold")
+		_:
+			returnString = str(returnString, "", _questingAdventurers[0].name, " and ", _questingAdventurers[1].name, 
+	" REACHED the bottom of the ", location, ".\n")
+			returnString = str(returnString, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward," gold.")
 	
 	#loop with size based on difficulty -> higher difficulty more loops
 	#each iteration picks combat, search, or to move on faster (starts as very
@@ -116,13 +128,21 @@ _successChance: float) -> String:
 	#more success, stat ups, etc, low value is worse, injuries or death
 	#then it adds to a string and returns the string to the main method
 	
+	#gotta be a better way of doing this but I'm tired
+	var combatChance = _successChance / 100
+	combatChance = combatChance * combatChance
+	combatChance *= 100
+	if(combatChance > 90):
+		combatChance = 90
+	
 	var returnString = ""
-	match randi_range(0, 1):
-		0:
-			returnString = str(returnString, "The PARTY was attacked by a group of ", monsters[randi_range(0, 2)],
+	var successDetermination = randi_range(0, 100)
+	match true:
+		_ when combatChance >= successDetermination:
+			returnString = str(returnString, "The PARTY was ATTACKED by a group of ", monsters[randi_range(0, 5)],
 			"s, but defeated them WITHOUT SUSTAINING ANY INJURIES.\n")
-		1:
-			returnString = str(returnString, _questingAdventurers[0].name, " was attacked by a ", monsters[randi_range(0, 2)],
+		_:
+			returnString = str(returnString, _questingAdventurers[0].name, " was ATTACKED by a ", monsters[randi_range(0, 5)],
 			". They managed to fight the monster off but was INJURED in the process.\n")
 	return returnString
 		
@@ -132,14 +152,21 @@ _successChance: float) -> String:
 	#deals with any changes to the characters based on value, high value means
 	#more success, gold, etc, low value is worse, injuries or death
 	#then it adds to a string and returns the string to the main method
+	#gotta be a better way of doing this but I'm tired
+	var searchChance = _successChance / 100
+	searchChance = searchChance * searchChance
+	searchChance *= 100
+	if(searchChance > 90):
+		searchChance = 90
 	
 	var returnString = ""
-	match randi_range(0, 1):
-		0:
+	var successDetermination = randi_range(0, 100)
+	match true:
+		_ when searchChance >= successDetermination:
 			var extraGold = randi_range(11, 29)
 			goldReward += extraGold
-			returnString = str(returnString, "The PARTY discovered an old chest containing ", extraGold, " gold.\n")
-		1:
+			returnString = str(returnString, "The PARTY discovered an old chest containing ", extraGold, " GOLD.\n")
+		_ :
 			returnString = str(returnString, _questingAdventurers[1].name, " tripped on a rock and gained 1 INJURY.\n")
 	return returnString
 
