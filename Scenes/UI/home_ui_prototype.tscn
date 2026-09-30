@@ -1,6 +1,9 @@
 [gd_scene format=3 uid="uid://dq7cb1c5woaat"]
 
-[ext_resource type="Script" uid="uid://bhe1jngvui4kr" path="res://Scripts/Test Scripts/test_quests.gd" id="1_dh3ed"]
+[ext_resource type="Script" uid="uid://cmlplktrs1fb0" path="res://Scripts/UI/quest_list.gd" id="1_prqkl"]
+[ext_resource type="PackedScene" uid="uid://cawb7mk4rfspb" path="res://Scenes/UI/quest_card.tscn" id="2_xsnmc"]
+[ext_resource type="Script" uid="uid://djvjacwit4hlu" path="res://Scripts/UI/char_roster.gd" id="3_oscj5"]
+[ext_resource type="PackedScene" uid="uid://dpm6emiryhpli" path="res://Scenes/UI/character_button.tscn" id="4_brb4x"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
 bg_color = Color(0.87635714, 0.47655976, 0.26507115, 1)
@@ -76,7 +79,8 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
-script = ExtResource("1_dh3ed")
+script = ExtResource("1_prqkl")
+quest_card_scene = ExtResource("2_xsnmc")
 
 [node name="Roster" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1362079796]
 layout_mode = 2
@@ -87,10 +91,12 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_dh3ed")
 layout_mode = 2
 horizontal_scroll_mode = 0
 
-[node name="CharList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Roster/RosterScroll" unique_id=160377349]
+[node name="CharList" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Roster/RosterScroll" unique_id=699248054]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
+script = ExtResource("3_oscj5")
+character_button_scene = ExtResource("4_brb4x")
 
 [node name="NavBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=529664223]
 custom_minimum_size = Vector2(0, 140)

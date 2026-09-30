@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cawb7mk4rfspb"]
 
 [ext_resource type="Script" uid="uid://xg2v4wui5u2f" path="res://Scripts/UI/quest_card.gd" id="1_2l84y"]
+[ext_resource type="PackedScene" uid="uid://dg4nof6agukj8" path="res://Scenes/UI/character_slot.tscn" id="2_en17o"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
 content_margin_left = 16.0
@@ -24,6 +25,7 @@ grow_horizontal = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
 script = ExtResource("1_2l84y")
+slot_scene = ExtResource("2_en17o")
 
 [node name="Columns" type="VBoxContainer" parent="." unique_id=176634260]
 layout_mode = 2

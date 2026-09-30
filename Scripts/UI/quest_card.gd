@@ -39,7 +39,7 @@ func setup(data) -> void:
 
 	# make a slot for each slot the quest needs
 	for i in int(quest.get("slots")):
-		var slot: CharacterSlot = slot_scene_instantiate()
+		var slot: CharacterSlot = slot_scene.instantiate()
 		_slot_row.add_child(slot)
 		slot.changed.connect(_on_slot_changed)
 		slots.append(slot)
