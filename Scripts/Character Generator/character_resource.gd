@@ -30,6 +30,14 @@ enum StatType {
 	SLEAZINESS,
 }
 
+enum CharacterStatus {
+	IDLE,
+	ON_QUEST,
+	TRAINING,
+	HEALING,
+	DEAD,
+}
+
 var name: String
 var hometown: String
 var description: String
@@ -51,6 +59,10 @@ var total_points: int = 20
 
 var gender: CharacterGender
 
+var status: CharacterStatus
+
+var title: String
+
 
 #The constructor, called when the object is created
 func _init() -> void:
@@ -63,6 +75,10 @@ func _init() -> void:
 	_generate_stat_spread(stats, total_points)
 
 	injury_level = InjuryLevel.HEALTHY
+	status = CharacterStatus.IDLE
+
+	title = name + " the " + str(CharacterRole.find_key(role))
+
 	pass
 
 

@@ -37,6 +37,14 @@ var pronoun_personal_object: Array[String] = [
 
 var location_names: Array[String]
 
+#Replace these with the actual UID of the icon
+var character_icons: Dictionary[GuildCharacter.CharacterRole, Texture2D] = {
+	GuildCharacter.CharacterRole.KNIGHT: preload("uid://deis7oxw14qbl"),
+	GuildCharacter.CharacterRole.PRIEST: preload("uid://deis7oxw14qbl"),
+	GuildCharacter.CharacterRole.PATHFINDER: preload("uid://deis7oxw14qbl"),
+	GuildCharacter.CharacterRole.MAGE: preload("uid://deis7oxw14qbl"),
+}
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -58,6 +66,10 @@ func _get_character_name(gender: GuildCharacter.CharacterGender) -> String:
 		_:
 			return ""
 	pass
+
+
+func _get_character_icon(_role: GuildCharacter.CharacterRole) -> Texture2D:
+	return character_icons[_role]
 
 
 func _get_role_backstory(role: GuildCharacter.CharacterRole) -> String:

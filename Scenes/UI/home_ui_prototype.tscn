@@ -1,0 +1,109 @@
+[gd_scene format=3 uid="uid://dq7cb1c5woaat"]
+
+[ext_resource type="Script" uid="uid://bhe1jngvui4kr" path="res://Scripts/Test Scripts/test_content.gd" id="1_dh3ed"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
+bg_color = Color(0.87635714, 0.47655976, 0.26507115, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yf5fn"]
+bg_color = Color(0.37345314, 0.61593235, 0.87967634, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_57qmd"]
+bg_color = Color(0.29879028, 0.69022816, 0.47103286, 1)
+
+[node name="home_ui_prototype" type="Control" unique_id=655754682]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=2056262714]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=40666266]
+layout_mode = 2
+
+[node name="TopBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=168263758]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
+
+[node name="TopBarRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TopBar" unique_id=2127575527]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="DayLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=1815111058]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Day"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="GoldLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=1468207839]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Gold"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="StanLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=510686645]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Standing"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Content" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=776379136]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_yf5fn")
+
+[node name="ContentScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Content" unique_id=1648529177]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="ContentList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Content/ContentScroll" unique_id=1248711653]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+script = ExtResource("1_dh3ed")
+
+[node name="NavBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=529664223]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_57qmd")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/NavBar" unique_id=1453415893]
+layout_mode = 2
+
+[node name="Button" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=491293372]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Characters"
+
+[node name="Button2" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2100987524]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Quest Log"
+
+[node name="Button3" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2031683743]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Home"
+
+[node name="Button4" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=97551426]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Upgrades"
+
+[node name="Button5" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=1987690344]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Settings"
