@@ -96,9 +96,7 @@ func _generate_description() -> String:
 	
 	for i in max_rand_backstories:
 		var temp = ExternalContentContainer._get_random_backstory(self)+"\n"
-		if(_description.contains(temp)):
-			continue
-		else:
-			description +=temp
+		if(!_description.containsn(temp)):
+			_description +=temp
 	
 	return _description
