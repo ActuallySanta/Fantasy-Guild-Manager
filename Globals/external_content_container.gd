@@ -58,7 +58,7 @@ var location_names: Array[String]
 
 #Replace these with the actual UID of the icon
 var character_icons: Dictionary[GuildCharacter.CharacterRole, Texture2D] = {
-	GuildCharacter.CharacterRole.KNIGHT: preload("uid://deis7oxw14qbl"),
+	GuildCharacter.CharacterRole.KNIGHT: preload("uid://0nieya7vg7ir"),
 	GuildCharacter.CharacterRole.PRIEST: preload("uid://deis7oxw14qbl"),
 	GuildCharacter.CharacterRole.PATHFINDER: preload("uid://deis7oxw14qbl"),
 	GuildCharacter.CharacterRole.MAGE: preload("uid://deis7oxw14qbl"),
