@@ -7,9 +7,9 @@ extends Node2D
 
 func _ready() -> void:
 	for i in max_characters:
-		_generate_new_character()
+		generate_new_character()
 
-func _generate_new_character()->void:
+func generate_new_character()->void:
 	if(active_characters.size()== max_characters):
 		return
 	
@@ -18,7 +18,7 @@ func _generate_new_character()->void:
 	print("NEW CHARACTER GENERATED: " + _new_char.name)
 	pass
 
-func _add_character_to_guild(_character : GuildCharacter) -> bool:
+func add_character_to_guild(_character : GuildCharacter) -> bool:
 	if(active_characters.size()== max_characters):
 		return false
 	
