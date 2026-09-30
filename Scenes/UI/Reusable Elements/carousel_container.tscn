@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bxocktk8nys8x"]
 
 [ext_resource type="Script" uid="uid://2oa65ssg1gcf" path="res://Scripts/UI/carousel_container.gd" id="1_hvkyt"]
-[ext_resource type="PackedScene" uid="uid://dbb4tq65rvpax" path="res://Scenes/UI/carousel_element.tscn" id="1_pbvg6"]
+[ext_resource type="PackedScene" uid="uid://dbb4tq65rvpax" path="res://Scenes/UI/Reusable Elements/carousel_element.tscn" id="1_pbvg6"]
 
 [node name="Carousel Container" type="CenterContainer" unique_id=130441287]
 anchors_preset = 15
