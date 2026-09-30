@@ -1,0 +1,8 @@
+[gd_scene format=3 uid="uid://crdeav1go6l0y"]
+
+[ext_resource type="Script" uid="uid://c238wpxqy2oea" path="res://Scripts/UI/Drag and Drop System/drag_drop_grid.gd" id="1_p5ayd"]
+
+[node name="Drag Drop Grid" type="GridContainer" unique_id=1209773775]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_p5ayd")
