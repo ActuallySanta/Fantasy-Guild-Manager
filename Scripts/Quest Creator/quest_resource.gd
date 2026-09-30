@@ -45,6 +45,10 @@ var favStat: FavoredStat
 
 var monsters: Array[String] #temp array for monsters for early testing
 
+var questTitle: String:
+	get:
+		return questTitle
+		
 #need to pull a bunch of stuff out of spreadsheet somehow at some time
 #start, middle, end, location, and flavors all need to be pulled out, probably
 #at generation - monsters can be pulled out later but only if that's realistic
@@ -66,6 +70,8 @@ func _init() -> void:
 	monsters.append("Dragon")
 	monsters.append("Skeleton Warrior")
 	monsters.append("Nathaniel Klubek")
+	
+	questTitle = str("Raid the ", location)
 	
 	print("")
 	

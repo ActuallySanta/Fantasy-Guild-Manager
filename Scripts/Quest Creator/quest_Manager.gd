@@ -20,6 +20,7 @@ func _ready() -> void:
 	adventurerArray = thisQuest.generatePartyDuo()
 	questResults = thisQuest.generateResults(adventurerArray, 80.0)
 	print(questResults, "\n")
+	print(thisQuest.questTitle)
 	pass
 
 
