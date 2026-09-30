@@ -57,7 +57,6 @@ func _get_character_name(gender: GuildCharacter.CharacterGender) -> String:
 			return andro_character_names[randi_range(0, andro_character_names.size() - 1)]
 		_:
 			return ""
-	pass
 
 
 func _get_role_backstory(role: GuildCharacter.CharacterRole) -> String:
