@@ -41,6 +41,7 @@ enum CharacterStatus {
 var name: String
 var hometown: String
 var description: String
+var max_rand_backstories : int = 3
 
 var role: CharacterRole
 
