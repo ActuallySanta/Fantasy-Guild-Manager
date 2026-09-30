@@ -26,7 +26,6 @@ var pathfinder_backstories : Array[String]
 var priest_backstories:Array[String]
 var random_backstories:Array[String]
 
-var random_backstories:Array[String]
 var monster_test_names: Array[String] #test array for monsters
 var dungeon_locations: Array[String] #test array for locations
 
@@ -84,7 +83,7 @@ func _ready() -> void:
 
 
 ## Get a random name from the array based on the gender
-func _get_character_name(gender: GuildCharacter.CharacterGender) -> String:
+func get_character_name(gender: GuildCharacter.CharacterGender) -> String:
 	match gender:
 		GuildCharacter.CharacterGender.MALE:
 			return male_character_names[randi_range(0, male_character_names.size() - 1)]
@@ -105,11 +104,11 @@ func get_Dungeon_Name() -> String:
 	return location_names[randDungeon]
 
 
-func _get_character_icon(_role: GuildCharacter.CharacterRole) -> Texture2D:
+func get_character_icon(_role: GuildCharacter.CharacterRole) -> Texture2D:
 	return character_icons[_role]
 
 
-func _get_role_backstory(_char:GuildCharacter) -> String:
+func get_role_backstory(_char:GuildCharacter) -> String:
 	var _backstory = ""
 	
 	#Pick a random background template
@@ -124,17 +123,17 @@ func _get_role_backstory(_char:GuildCharacter) -> String:
 			_backstory = mage_backstories.pick_random()
 	
 	#Replace all the stand-ins
-	_backstory = _replace_standins(_backstory,_char)
+	_backstory = replace_standins(_backstory,_char)
 	
 	return _backstory
 
 #Pick a random backstory, sanitize it, and return it, based on the character
-func _get_random_backstory(_char:GuildCharacter) -> String:
+func get_random_backstory(_char:GuildCharacter) -> String:
 	var _backstory= random_backstories.pick_random()
-	_backstory = _replace_standins(_backstory,_char)
+	_backstory = replace_standins(_backstory,_char)
 	return _backstory
 
-func _replace_standins(_backstory:String,_char:GuildCharacter)->String:
+func replace_standins(_backstory:String,_char:GuildCharacter)->String:
 		#Replace all the stand-ins
 	_backstory = _backstory.replace("[NAME]",_char.name)
 	_backstory = _backstory.replace("[GENDER_CHILD]",child_gender[_char.gender])
