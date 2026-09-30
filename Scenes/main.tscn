@@ -8,5 +8,5 @@
 [node name="Character Generator" parent="." unique_id=1008846978 instance=ExtResource("1_jjgbg")]
 position = Vector2(491, 366)
 
-[node name="Node2D" type="Node2D" parent="." unique_id=12970794]
+[node name="QuestManager" type="Node2D" parent="." unique_id=12970794]
 script = ExtResource("2_bo1nx")

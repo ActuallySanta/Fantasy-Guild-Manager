@@ -4,10 +4,10 @@ class_name CreatedQuest
 
 enum QuestDifficulty{
 	F = 0,
-	D = 2,
-	C = 3,
-	B = 4,
-	A = 5,
+	D = 1,
+	C = 2,
+	B = 3,
+	A = 4,
 	S = 5
 }
 
