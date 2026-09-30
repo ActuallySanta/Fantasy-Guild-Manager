@@ -73,7 +73,7 @@ func _init() -> void:
 	name = ExternalContentContainer._get_character_name(gender)
 
 	# Generate the main stat
-	_generate_stat_spread(stats, total_points)
+	generate_stat_spread(stats, total_points)
 	description = generate_description()
 
 	injury_level = InjuryLevel.HEALTHY
@@ -85,7 +85,7 @@ func _init() -> void:
 
 
 ## Generate the stats using normalized random number sampling
-func _generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int) -> void:
+func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int) -> void:
 	var _stat_weights: Array[float]
 	# Make sure that the stat weights are the same size as the amount of stats
 	_stat_weights.resize(_stats.size())
