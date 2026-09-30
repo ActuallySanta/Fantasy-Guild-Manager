@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://gcxfn6xut6eu"]
+
+[ext_resource type="Texture2D" uid="uid://deis7oxw14qbl" path="res://icon.svg" id="1_tngf3"]
+[ext_resource type="Script" uid="uid://cw4tn8gisspu" path="res://Scripts/UI/Drag and Drop System/character_icon_button.gd" id="2_c2cf1"]
+
+[node name="Character Draggable Icon Button" type="Button" unique_id=655139661]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "This is Text"
+icon = ExtResource("1_tngf3")
+icon_alignment = 1
+vertical_icon_alignment = 0
+script = ExtResource("2_c2cf1")
