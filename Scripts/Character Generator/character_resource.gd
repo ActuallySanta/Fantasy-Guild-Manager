@@ -70,10 +70,10 @@ func _init() -> void:
 	# Get a random gender, role, and name
 	gender = randi_range(0, CharacterGender.size() - 1) as CharacterGender
 	role = randi_range(0, CharacterRole.size() - 1) as CharacterRole
-	name = ExternalContentContainer._get_character_name(gender)
+	name = ExternalContentContainer.get_character_name(gender)
 
 	# Generate the main stat
-	_generate_stat_spread(stats, total_points)
+	generate_stat_spread(stats, total_points)
 	description = generate_description()
 
 	injury_level = InjuryLevel.HEALTHY
@@ -85,7 +85,7 @@ func _init() -> void:
 
 
 ## Generate the stats using normalized random number sampling
-func _generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int) -> void:
+func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int) -> void:
 	var _stat_weights: Array[float]
 	# Make sure that the stat weights are the same size as the amount of stats
 	_stat_weights.resize(_stats.size())
@@ -106,10 +106,10 @@ func _generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int
 
 func generate_description() -> String:
 	
-	var _description = ExternalContentContainer._get_role_backstory(self) +"\n"
+	var _description = ExternalContentContainer.get_role_backstory(self) +"\n"
 	
 	for i in max_rand_backstories:
-		var temp = ExternalContentContainer._get_random_backstory(self)+"\n"
+		var temp = ExternalContentContainer.get_random_backstory(self)+"\n"
 		if(!_description.containsn(temp)):
 			_description +=temp
 	
