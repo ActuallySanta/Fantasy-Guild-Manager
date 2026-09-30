@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://do5kjvfstulyu" path="res://Sprites/32x32-Tilesheet.png" id="1_aqnsx"]
 [ext_resource type="Script" uid="uid://svptgj03vqkp" path="res://Scripts/UI/guild_character_page.gd" id="1_rio15"]
-[ext_resource type="PackedScene" uid="uid://crdeav1go6l0y" path="res://Scenes/UI/drag_drop_grid.tscn" id="1_y883n"]
+[ext_resource type="PackedScene" uid="uid://crdeav1go6l0y" path="res://Scenes/UI/Drag and Drop System/drag_drop_grid.tscn" id="1_y883n"]
 [ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="4_rio15"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g4v7s"]

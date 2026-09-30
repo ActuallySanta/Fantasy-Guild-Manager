@@ -24,6 +24,7 @@ func _ready() -> void:
 	wisdom_label.text = "Wisdom: " + str(loaded_character.stats[GuildCharacter.StatType.WISDOM])
 	sleaziness_label.text = "Sleaziness: " + str(loaded_character.stats[GuildCharacter.StatType.SLEAZINESS])
 	pluck_label.text = "Pluck: " + str(loaded_character.pluck)
+	character_description_label.text = loaded_character.description
 	pass # Replace with function body.
 
 
