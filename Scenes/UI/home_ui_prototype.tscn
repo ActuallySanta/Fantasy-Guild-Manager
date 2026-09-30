@@ -75,12 +75,13 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_yf5fn")
 layout_mode = 2
 horizontal_scroll_mode = 0
 
-[node name="ContentList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Content/ContentScroll" unique_id=1248711653]
+[node name="ContentList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Content/ContentScroll" unique_id=1248711653 node_paths=PackedStringArray("roster_panel")]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
 script = ExtResource("1_prqkl")
 quest_card_scene = ExtResource("2_xsnmc")
+roster_panel = NodePath("../../../Roster")
 
 [node name="Roster" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1362079796]
 layout_mode = 2
@@ -88,13 +89,15 @@ size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_dh3ed")
 
 [node name="RosterScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Roster" unique_id=827291821]
+custom_minimum_size = Vector2(0, 270)
 layout_mode = 2
 horizontal_scroll_mode = 0
 
-[node name="CharList" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Roster/RosterScroll" unique_id=699248054]
+[node name="CharList" type="HFlowContainer" parent="MarginContainer/VBoxContainer/Roster/RosterScroll" unique_id=291949744]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
 script = ExtResource("3_oscj5")
 character_button_scene = ExtResource("4_brb4x")
 

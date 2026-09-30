@@ -5,6 +5,7 @@ extends PanelContainer
 
 # triggers when play accepts quest
 signal accepted(quest)
+signal closed(quest)
 
 # triggers when a character is added or removed from quest
 # the party array is the characters that are in the slots
@@ -16,6 +17,9 @@ signal party_changed(quest, party: Array)
 
 # quest data
 var quest
+
+# check if quest is open
+var is_open := false
 
 # get slots for the quests for reading and writing
 var slots: Array[CharacterSlot] = []
@@ -46,7 +50,7 @@ func setup(data) -> void:
 
 # toggles card between open and closed
 func _on_accept_pressed() -> void:
-	var is_open := not _slot_row.visible
+	is_open = not is_open
 	_slot_row.visible = is_open
 	_accept_button.text = "Cancel" if is_open else "Accept"
 	

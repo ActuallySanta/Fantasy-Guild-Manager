@@ -48,3 +48,6 @@ func assign (new_character) -> void:
 	character = new_character
 	text = EMPTY_TEXT if character == null else str(character.get("name"))
 	changed.emit(self)
+	
+	# hide placed characters and show free ones
+	get_tree().call_group("roster", "refresh")
