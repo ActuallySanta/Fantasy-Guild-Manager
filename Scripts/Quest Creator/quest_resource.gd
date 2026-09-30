@@ -49,6 +49,10 @@ var questTitle: String:
 	get:
 		return questTitle
 		
+var questSummary: String = "":
+	get:
+		return questSummary
+		
 #need to pull a bunch of stuff out of spreadsheet somehow at some time
 #start, middle, end, location, and flavors all need to be pulled out, probably
 #at generation - monsters can be pulled out later but only if that's realistic
@@ -79,9 +83,9 @@ func _init() -> void:
 	#generate description -> I don't know if that will be held here or not
 	pass
 	
-	#******
-	#FUNCTION FOR SUCCESS CHANCE
-	#******
+func calcSuccessChance(_questingAdventurers: Array[GuildCharacter]) -> float:
+	#calc this
+	return 0.0
 
 #this is the main root method for deciding and generating results I'll have
 #methods branch off to decide certain parts of the results
@@ -109,13 +113,16 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 			returnString = str(returnString, "", _questingAdventurers[0].name, " and ", _questingAdventurers[1].name, 
 	" DID NOT manage to reach the bottom of the ", location, ".\n")
 			returnString = str(returnString, "Summary: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
+			questSummary = str(questSummary, "Summary: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
 			
 			if(goldReward > 200):
 				returnString = str(returnString, "However, your adventurers did bring back ", goldReward - 200, " gold")
+				questSummary = str(questSummary, "However, your adventurers did bring back ", goldReward - 200, " gold")
 		_:
 			returnString = str(returnString, "", _questingAdventurers[0].name, " and ", _questingAdventurers[1].name, 
 	" REACHED the bottom of the ", location, ".\n")
 			returnString = str(returnString, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward," gold.")
+			questSummary = str(questSummary, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward," gold.")
 	
 	#loop with size based on difficulty -> higher difficulty more loops 
 	#sends combat or search to its own methods

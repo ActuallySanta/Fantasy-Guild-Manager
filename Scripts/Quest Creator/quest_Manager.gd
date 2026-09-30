@@ -9,18 +9,23 @@ func _ready() -> void:
 	adventurerArray = thisQuest.generatePartyDuo()
 	var questResults : String
 	questResults = thisQuest.generateResults(adventurerArray, 80.0)
-	print(questResults, "\n")
-	
-	thisQuest = CreatedQuest.new()
-	adventurerArray = thisQuest.generatePartyDuo()
-	questResults = thisQuest.generateResults(adventurerArray, 80.0)
-	print(questResults, "\n")
-	
-	thisQuest = CreatedQuest.new()
-	adventurerArray = thisQuest.generatePartyDuo()
-	questResults = thisQuest.generateResults(adventurerArray, 80.0)
-	print(questResults, "\n")
 	print(thisQuest.questTitle)
+	print(questResults, "\n")
+	print(thisQuest.questSummary)
+	
+	thisQuest = CreatedQuest.new()
+	adventurerArray = thisQuest.generatePartyDuo()
+	questResults = thisQuest.generateResults(adventurerArray, 80.0)
+	print(thisQuest.questTitle)
+	print(questResults, "\n")
+	print(thisQuest.questSummary)
+	
+	thisQuest = CreatedQuest.new()
+	adventurerArray = thisQuest.generatePartyDuo()
+	questResults = thisQuest.generateResults(adventurerArray, 80.0)
+	print(thisQuest.questTitle)
+	print(questResults, "\n")
+	print(thisQuest.questSummary)
 	pass
 
 
