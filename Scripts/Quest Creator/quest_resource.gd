@@ -56,7 +56,7 @@ func _init() -> void:
 	type = 0;
 	favStat = 0;
 	
-	location = "Metalmarrow Mines"
+	location = ExternalContentContainer.get_Dungeon_Name()
 	goldReward = 200;
 	
 	#set here for early testing only
@@ -66,6 +66,8 @@ func _init() -> void:
 	monsters.append("Dragon")
 	monsters.append("Skeleton Warrior")
 	monsters.append("Nathaniel Klubek")
+	
+	print("")
 	
 	#set variables
 	#generate description -> I don't know if that will be held here or not
@@ -131,7 +133,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 	var successDetermination = randi_range(0, 100)
 	match true:
 		_ when combatChance >= successDetermination:
-			returnString = str(returnString, "The PARTY was ATTACKED by a group of ", monsters[randi_range(0, 5)],
+			returnString = str(returnString, "The PARTY was ATTACKED by a group of ", ExternalContentContainer.get_Monster_Name(),
 			"s, but defeated them WITHOUT SUSTAINING ANY INJURIES.\n")
 		_:
 			returnString = str(returnString, _questingAdventurers[0].name, " was ATTACKED by a ", monsters[randi_range(0, 5)],
