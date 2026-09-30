@@ -107,16 +107,17 @@ func _get_role_backstory(_char:GuildCharacter) -> String:
 
 #Pick a random backstory, sanitize it, and return it, based on the character
 func _get_random_backstory(_char:GuildCharacter) -> String:
-	return _replace_standins(random_backstories.pick_random(),_char)
-	
+	var _backstory= random_backstories.pick_random()
+	_backstory = _replace_standins(_backstory,_char)
+	return _backstory
 
 func _replace_standins(_backstory:String,_char:GuildCharacter)->String:
 		#Replace all the stand-ins
-	_backstory.replace("[NAME]",_char.name)
-	_backstory.replace("[GENDER_CHILD]",child_gender[_char.gender])
-	_backstory.replace("[PRONOUN_OBJ]",pronoun_object[_char.gender])
-	_backstory.replace("[PRONOUN_POS]",pronoun_possesive[_char.gender])
-	_backstory.replace("[PRONOUN_PERS_OBJ]",pronoun_personal_object[_char.gender])
+	_backstory = _backstory.replace("[NAME]",_char.name)
+	_backstory = _backstory.replace("[GENDER_CHILD]",child_gender[_char.gender])
+	_backstory = _backstory.replace("[PRONOUN_OBJ]",pronoun_object[_char.gender])
+	_backstory = _backstory.replace("[PRONOUN_POS]",pronoun_possesive[_char.gender])
+	_backstory = _backstory.replace("[PRONOUN_PERS_OBJ]",pronoun_personal_object[_char.gender])
 	
 	
 	

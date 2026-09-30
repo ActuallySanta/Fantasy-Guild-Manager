@@ -33,6 +33,7 @@ enum StatType {
 var name: String
 var hometown: String
 var description: String
+var max_rand_backstories : int = 3
 
 var role: CharacterRole
 
@@ -61,6 +62,8 @@ func _init() -> void:
 
 	# Generate the main stat
 	_generate_stat_spread(stats, total_points)
+	
+	description = _generate_description()
 
 	injury_level = InjuryLevel.HEALTHY
 	pass
@@ -88,4 +91,14 @@ func _generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int
 
 
 func _generate_description() -> String:
-	return ""
+	
+	var _description = ExternalContentContainer._get_role_backstory(self) +"\n"
+	
+	for i in max_rand_backstories:
+		var temp = ExternalContentContainer._get_random_backstory(self)+"\n"
+		if(_description.contains(temp)):
+			continue
+		else:
+			description +=temp
+	
+	return _description
