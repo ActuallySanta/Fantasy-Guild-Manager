@@ -1,12 +1,19 @@
 [gd_scene format=3 uid="uid://dq7cb1c5woaat"]
 
-[ext_resource type="Script" uid="uid://bhe1jngvui4kr" path="res://Scripts/Test Scripts/test_content.gd" id="1_dh3ed"]
+[ext_resource type="Script" uid="uid://cmlplktrs1fb0" path="res://Scripts/UI/quest_list.gd" id="1_prqkl"]
+[ext_resource type="PackedScene" uid="uid://cawb7mk4rfspb" path="res://Scenes/UI/quest_card.tscn" id="2_xsnmc"]
+[ext_resource type="Script" uid="uid://djvjacwit4hlu" path="res://Scripts/UI/char_roster.gd" id="3_oscj5"]
+[ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="3_xsnmc"]
+[ext_resource type="PackedScene" uid="uid://dpm6emiryhpli" path="res://Scenes/UI/character_button.tscn" id="4_brb4x"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
 bg_color = Color(0.87635714, 0.47655976, 0.26507115, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yf5fn"]
 bg_color = Color(0.37345314, 0.61593235, 0.87967634, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dh3ed"]
+bg_color = Color(0.81872517, 0.46824145, 0.6578071, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_57qmd"]
 bg_color = Color(0.29879028, 0.69022816, 0.47103286, 1)
@@ -73,7 +80,44 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
-script = ExtResource("1_dh3ed")
+script = ExtResource("1_prqkl")
+quest_card_scene = ExtResource("2_xsnmc")
+
+[node name="Roster" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1362079796]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_dh3ed")
+
+[node name="RosterColumn" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Roster" unique_id=818766545]
+layout_mode = 2
+
+[node name="RosterHeader" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Roster/RosterColumn" unique_id=339474195]
+layout_mode = 2
+
+[node name="RosterTitle" type="Label" parent="MarginContainer/VBoxContainer/Roster/RosterColumn/RosterHeader" unique_id=1819909568]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "     Characters "
+
+[node name="Close Button" parent="MarginContainer/VBoxContainer/Roster/RosterColumn/RosterHeader" unique_id=1203562834 instance=ExtResource("3_xsnmc")]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+
+[node name="RosterScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Roster/RosterColumn" unique_id=827291821]
+custom_minimum_size = Vector2(0, 270)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CharList" type="HFlowContainer" parent="MarginContainer/VBoxContainer/Roster/RosterColumn/RosterScroll" unique_id=291949744 node_paths=PackedStringArray("roster_panel", "close_button")]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+script = ExtResource("3_oscj5")
+character_button_scene = ExtResource("4_brb4x")
+roster_panel = NodePath("../../..")
+close_button = NodePath("../../RosterHeader/Close Button")
 
 [node name="NavBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=529664223]
 custom_minimum_size = Vector2(0, 140)
@@ -83,27 +127,27 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_57qmd")
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/NavBar" unique_id=1453415893]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=491293372]
+[node name="CharButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=491293372]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Characters"
 
-[node name="Button2" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2100987524]
+[node name="LogButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2100987524]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Quest Log"
 
-[node name="Button3" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2031683743]
+[node name="HomeButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2031683743]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Home"
 
-[node name="Button4" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=97551426]
+[node name="UpgrButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=97551426]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Upgrades"
 
-[node name="Button5" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=1987690344]
+[node name="SetngButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=1987690344]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Settings"
