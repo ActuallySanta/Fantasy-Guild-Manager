@@ -30,9 +30,18 @@ enum StatType {
 	SLEAZINESS,
 }
 
+enum CharacterStatus {
+	IDLE,
+	ON_QUEST,
+	TRAINING,
+	HEALING,
+	DEAD,
+}
+
 var name: String
 var hometown: String
 var description: String
+var max_rand_backstories : int = 3
 
 var role: CharacterRole
 
@@ -51,23 +60,32 @@ var total_points: int = 20
 
 var gender: CharacterGender
 
+var status: CharacterStatus
+
+var title: String
+
 
 #The constructor, called when the object is created
 func _init() -> void:
 	# Get a random gender, role, and name
 	gender = randi_range(0, CharacterGender.size() - 1) as CharacterGender
 	role = randi_range(0, CharacterRole.size() - 1) as CharacterRole
-	name = ExternalContentContainer._get_character_name(gender)
+	name = ExternalContentContainer.get_character_name(gender)
 
 	# Generate the main stat
-	_generate_stat_spread(stats, total_points)
+	generate_stat_spread(stats, total_points)
+	description = generate_description()
 
 	injury_level = InjuryLevel.HEALTHY
+	status = CharacterStatus.IDLE
+
+	title = name + " the " + str(CharacterRole.find_key(role))
+
 	pass
 
 
 ## Generate the stats using normalized random number sampling
-func _generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int) -> void:
+func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int) -> void:
 	var _stat_weights: Array[float]
 	# Make sure that the stat weights are the same size as the amount of stats
 	_stat_weights.resize(_stats.size())
@@ -86,6 +104,13 @@ func _generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int
 
 	pass
 
-
-func _generate_description() -> String:
-	return ""
+func generate_description() -> String:
+	
+	var _description = ExternalContentContainer.get_role_backstory(self) +"\n"
+	
+	for i in max_rand_backstories:
+		var temp = ExternalContentContainer.get_random_backstory(self)+"\n"
+		if(!_description.containsn(temp)):
+			_description +=temp
+	
+	return _description

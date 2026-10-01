@@ -2,43 +2,41 @@
 
 [ext_resource type="Script" uid="uid://cp5ny880jqmtd" path="res://Scripts/Character Generator/character_ui_card.gd" id="1_h6oeb"]
 [ext_resource type="Texture2D" uid="uid://deis7oxw14qbl" path="res://icon.svg" id="1_iwhsd"]
+[ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="2_8ovrn"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_g4v7s"]
-font_size = 14
+font_size = 64
 font_color = Color(0, 0, 0, 1)
 
 [sub_resource type="LabelSettings" id="LabelSettings_h6oeb"]
 font_size = 14
 font_color = Color(0, 0, 0, 1)
 
-[node name="Character UI Card" type="Control" unique_id=2036542252]
+[node name="Character UI Card" type="MarginContainer" unique_id=424955004]
 custom_minimum_size = Vector2(200, 450)
-custom_maximum_size = Vector2(200, 450)
-layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 64
+theme_override_constants/margin_top = 64
+theme_override_constants/margin_right = 64
+theme_override_constants/margin_bottom = 64
 script = ExtResource("1_h6oeb")
 
 [node name="Card background" type="ColorRect" parent="." unique_id=6135341]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 
-[node name="Name Background" type="ColorRect" parent="." unique_id=831626636]
-custom_minimum_size = Vector2(0, 50)
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-grow_horizontal = 2
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=373763784]
+layout_mode = 2
+
+[node name="Name Background" type="ColorRect" parent="VBoxContainer" unique_id=831626636]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
 color = Color(0.6452097, 0.6452098, 0.6452097, 1)
 
-[node name="CenterContainer" type="CenterContainer" parent="Name Background" unique_id=1547128288]
+[node name="CenterContainer" type="MarginContainer" parent="VBoxContainer/Name Background" unique_id=1011052685]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 1
 anchors_preset = 15
@@ -46,26 +44,40 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
 
-[node name="Character Name Label" type="Label" parent="Name Background/CenterContainer" unique_id=718164899]
+[node name="Character Name Label" type="Label" parent="VBoxContainer/Name Background/CenterContainer" unique_id=718164899]
+custom_maximum_size = Vector2(400, -1)
 layout_mode = 2
+size_flags_horizontal = 4
 text = "This is a test"
 label_settings = SubResource("LabelSettings_g4v7s")
+horizontal_alignment = 1
 
-[node name="Stat Block" type="ColorRect" parent="." unique_id=1385783921]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer" unique_id=1203854264]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 16
+
+[node name="Character Icon" type="TextureRect" parent="VBoxContainer/MarginContainer" unique_id=1782823202]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("1_iwhsd")
+expand_mode = 4
+
+[node name="Stat Block" type="ColorRect" parent="VBoxContainer" unique_id=1385783921]
 custom_minimum_size = Vector2(0, 50)
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -149.0
-offset_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 0
+layout_mode = 2
+size_flags_vertical = 3
 color = Color(0.6452097, 0.6452098, 0.6452097, 1)
 
-[node name="HBoxContainer" type="HBoxContainer" parent="Stat Block" unique_id=759025615]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Stat Block" unique_id=759025615]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -73,62 +85,64 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Character Description Label" type="Label" parent="Stat Block/HBoxContainer" unique_id=345132546]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Stat Block/HBoxContainer" unique_id=2060475274]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Character Description Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer/MarginContainer" unique_id=345132546]
+custom_maximum_size = Vector2(400, -1)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
 text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
+autowrap_mode = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Stat Block/HBoxContainer" unique_id=378746472]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Stat Block/HBoxContainer" unique_id=378746472]
 layout_mode = 2
-size_flags_horizontal = 3
 
-[node name="Strength Label" type="Label" parent="Stat Block/HBoxContainer/VBoxContainer" unique_id=1873679725]
+[node name="Strength Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer/VBoxContainer" unique_id=1873679725]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
 text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
 
-[node name="Defense Label" type="Label" parent="Stat Block/HBoxContainer/VBoxContainer" unique_id=887562557]
+[node name="Defense Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer/VBoxContainer" unique_id=887562557]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
 text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
 
-[node name="Wisdom Label" type="Label" parent="Stat Block/HBoxContainer/VBoxContainer" unique_id=814082053]
+[node name="Wisdom Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer/VBoxContainer" unique_id=814082053]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
 text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
 
-[node name="Sleaziness Label" type="Label" parent="Stat Block/HBoxContainer/VBoxContainer" unique_id=1563846041]
+[node name="Sleaziness Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer/VBoxContainer" unique_id=1563846041]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
 text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
 
-[node name="Pluck Label" type="Label" parent="Stat Block/HBoxContainer/VBoxContainer" unique_id=1229794144]
+[node name="Pluck Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer/VBoxContainer" unique_id=1229794144]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
 text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
 
-[node name="Character Icon" type="TextureRect" parent="." unique_id=1782823202]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -65.0
-offset_top = -146.0
-offset_right = 63.0
-offset_bottom = -18.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("1_iwhsd")
+[node name="Close Button" parent="." unique_id=1203562834 instance=ExtResource("2_8ovrn")]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[connection signal="pressed" from="Close Button" to="." method="_on_close_button_pressed"]
