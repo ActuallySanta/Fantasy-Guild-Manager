@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cmlplktrs1fb0" path="res://Scripts/UI/quest_list.gd" id="1_prqkl"]
 [ext_resource type="PackedScene" uid="uid://cawb7mk4rfspb" path="res://Scenes/UI/quest_card.tscn" id="2_xsnmc"]
 [ext_resource type="Script" uid="uid://djvjacwit4hlu" path="res://Scripts/UI/char_roster.gd" id="3_oscj5"]
+[ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="3_xsnmc"]
 [ext_resource type="PackedScene" uid="uid://dpm6emiryhpli" path="res://Scenes/UI/character_button.tscn" id="4_brb4x"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
@@ -75,31 +76,48 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_yf5fn")
 layout_mode = 2
 horizontal_scroll_mode = 0
 
-[node name="ContentList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Content/ContentScroll" unique_id=1248711653 node_paths=PackedStringArray("roster_panel")]
+[node name="ContentList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Content/ContentScroll" unique_id=1248711653]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
 script = ExtResource("1_prqkl")
 quest_card_scene = ExtResource("2_xsnmc")
-roster_panel = NodePath("../../../Roster")
 
 [node name="Roster" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1362079796]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_dh3ed")
 
-[node name="RosterScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Roster" unique_id=827291821]
+[node name="RosterColumn" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Roster" unique_id=818766545]
+layout_mode = 2
+
+[node name="RosterHeader" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Roster/RosterColumn" unique_id=339474195]
+layout_mode = 2
+
+[node name="RosterTitle" type="Label" parent="MarginContainer/VBoxContainer/Roster/RosterColumn/RosterHeader" unique_id=1819909568]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "     Characters "
+
+[node name="Close Button" parent="MarginContainer/VBoxContainer/Roster/RosterColumn/RosterHeader" unique_id=1203562834 instance=ExtResource("3_xsnmc")]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+
+[node name="RosterScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Roster/RosterColumn" unique_id=827291821]
 custom_minimum_size = Vector2(0, 270)
 layout_mode = 2
+size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="CharList" type="HFlowContainer" parent="MarginContainer/VBoxContainer/Roster/RosterScroll" unique_id=291949744]
+[node name="CharList" type="HFlowContainer" parent="MarginContainer/VBoxContainer/Roster/RosterColumn/RosterScroll" unique_id=291949744 node_paths=PackedStringArray("roster_panel", "close_button")]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 12
 script = ExtResource("3_oscj5")
 character_button_scene = ExtResource("4_brb4x")
+roster_panel = NodePath("../../..")
+close_button = NodePath("../../RosterHeader/Close Button")
 
 [node name="NavBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=529664223]
 custom_minimum_size = Vector2(0, 140)

@@ -19,12 +19,18 @@ func _ready() -> void:
 
 # Runs when a player taps or clicks slot
 func _on_pressed() -> void:
+	# if the roster is closed, this tap only opens it
+	var roster = get_tree().get_first_node_in_group("roster")
+	if roster and not roster.is_open():
+		roster.open()
+		return
+	
 	if CharacterButton.selected:
-		# Assign selected character from roster here
+		# A character is selected in the roster place it here
 		assign(CharacterButton.selected.character)
 		CharacterButton.clear_selection()
 	elif character != null:
-		# if nothing is selected but slot if filled empty it
+		# nothing selected but slot is filled, empty it
 		assign(null)
 
 # Godot asks this while something is dragged over the slot.

@@ -1,6 +1,8 @@
 # fills the roster with buttons that act as character
 extends HFlowContainer
 @export var character_button_scene: PackedScene
+@export var roster_panel: Control
+@export var close_button: Button
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -8,7 +10,29 @@ func _ready() -> void:
 	# get_tree().call_group("roster", "refresh").
 	# add_to_group("roster", "refresh")
 	add_to_group("roster")
+	
+	if roster_panel == null:
+		push_error("Roster: drag the Roster panel into Roster Panel in the Inspector.")
+	if close_button:
+		close_button.pressed.connect(close)
+	else:
+		push_error("Roster: drag the CloseButton into Close Button in the Inspector.")
+		
+	close()  # start hidden so the quest list gets the whole screen
 	rebuild()
+
+func open() -> void:
+	if roster_panel:
+		roster_panel.visible = true
+
+func close() -> void:
+	if roster_panel:
+		roster_panel.visible = false
+	# don't leave character highlighted when roster is hidden
+	CharacterButton.clear_selection()
+	
+func is_open() -> bool:
+	return roster_panel != null and roster_panel.visible
 	
 	# clears roster and rebuilds it from character system
 func rebuild() -> void:
