@@ -49,14 +49,13 @@ var questSummary: String = "":
 var questNum: int:
 	get:
 		return questNum
-		
 
 func _init() -> void:
 	#hard coding variables for intial testing
 	difficulty = 0;
-	type = 0;
 	favStat = 0;
 	questNum = randi_range(0, 1)
+	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
 	
 	location = ExternalContentContainer.get_Dungeon_Name()
 	goldReward = 200;
