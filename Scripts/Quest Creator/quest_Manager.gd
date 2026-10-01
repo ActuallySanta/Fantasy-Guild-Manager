@@ -1,8 +1,15 @@
 extends Node
 
+class_name QuestManager
+static var instance: QuestManager
+
 var thisQuest = CreatedQuest
 var acceptedQuests: Array[CreatedQuest]
 var acceptedQuestResults: Array[String]
+
+var testQuestNumber = 0:
+	get:
+		return testQuestNumber
 
 @onready var rich_text = $"../LogContents"
 
@@ -21,6 +28,8 @@ func _ready() -> void:
 	
 	acceptedQuestResults.append(questResults)
 	
+	testQuestNumber = testQuestNumber + 1
+	
 	print(thisQuest.questTitle)
 	print(questResults, "\n")
 	print(thisQuest.questSummary)
@@ -31,6 +40,8 @@ func _ready() -> void:
 	
 	acceptedQuestResults.append(questResults)
 	
+	testQuestNumber = testQuestNumber + 1
+
 	print(thisQuest.questTitle)
 	print(questResults, "\n")
 	print(thisQuest.questSummary)
@@ -54,3 +65,10 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
+
+func _enter_tree() -> void:
+	instance = self
+
+func _exit_tree() -> void:
+	if instance == self:
+		instance = null

@@ -13,7 +13,8 @@ extends Node
 @export var random_backstories_file_path:String = "res://External Content/Character Backstories/Backstories - Random Backstories.csv"
 @export var monsters_test_file_path: String = "res://External Content/Quest Stuff (Test)/Monsters - Sea.txt" #test path for monsters
 @export var dunegon_locations_test_path: String = "res://External Content/Quest Stuff (Test)/Dungeon Names (Locations).txt" #test path for locations
-
+@export var monsters_2D_test_path: String = "res://External Content/Quest Stuff (Test)/2D Monster Test.txt" #test path for monstrs
+	
 #Character Names
 var male_character_names: Array[String]
 var female_character_names: Array[String]
@@ -26,7 +27,7 @@ var pathfinder_backstories : Array[String]
 var priest_backstories:Array[String]
 var random_backstories:Array[String]
 
-var monster_test_names: Array[String] #test array for monsters
+var monster_test_names = []#test array for monsters
 var dungeon_locations: Array[String] #test array for locations
 
 #Used for text replacement
@@ -77,7 +78,14 @@ func _ready() -> void:
 	priest_backstories = ProceduralContentLoader._load_info_from_file(priest_backstories_file_path,1)
 	pathfinder_backstories = ProceduralContentLoader._load_info_from_file(pathfinder_backstories_file_path,1)
 	mage_backstories = ProceduralContentLoader._load_info_from_file(mage_backstories_file_path,1)
-	monster_test_names = ProceduralContentLoader._load_info_from_file(monsters_test_file_path, 1) #test using monsters
+	
+	#monster_test_names = ProceduralContentLoader._load_info_from_file(monsters_test_file_path, 1) #test using monsters
+	monster_test_names.append([])
+	monster_test_names.append([])
+	monster_test_names.append([])
+	monster_test_names[0] = MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 0) #2D test
+	monster_test_names[1] = MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 1) #2D test
+	monster_test_names[2] = MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 2) #2D test
 	location_names = ProceduralContentLoader._load_info_from_file(dunegon_locations_test_path, 1) #test using locations
 	pass # Replace with function body.
 
@@ -95,9 +103,9 @@ func get_character_name(gender: GuildCharacter.CharacterGender) -> String:
 			return ""
 
 #test functions for quest stuff
-func get_Monster_Name() -> String:
-	var randMon = randi_range(0, 3)
-	return monster_test_names[randMon]
+func get_Monster_Name(col_idx: int) -> String:
+	var randMon = randi_range(0, 2)
+	return monster_test_names[col_idx][randMon]
 	
 func get_Dungeon_Name() -> String:
 	var randDungeon = randi_range(0, 5)

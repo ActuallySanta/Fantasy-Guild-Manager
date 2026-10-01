@@ -1,0 +1,3 @@
+Ghost|Orc|Troll
+Goblin|Ogre|Titan
+Ghoul|Optimus Prime|Tiny Baby Zombie

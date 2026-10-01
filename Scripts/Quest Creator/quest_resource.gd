@@ -68,9 +68,9 @@ func _init() -> void:
 	goldReward = 200;
 	
 	#set here for early testing only
-	monsters.append("Goblin")
-	monsters.append("Orc")
-	monsters.append("Troll")
+	monsters.append("Hydra")
+	monsters.append("Gorgon")
+	monsters.append("Medusa")
 	monsters.append("Dragon")
 	monsters.append("Skeleton Warrior")
 	monsters.append("Nathaniel Klubek")
@@ -146,10 +146,11 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 	var successDetermination = randi_range(0, 100)
 	match true:
 		_ when combatChance >= successDetermination:
-			returnString = str(returnString, "[b]The Party[/b] was ATTACKED by a group of ", ExternalContentContainer.get_Monster_Name(),
+			print(QuestManager.instance.testQuestNumber)
+			returnString = str(returnString, "[b]The Party[/b] was ATTACKED by a group of ", ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
 			"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n")
 		_:
-			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] was ATTACKED by a ", monsters[randi_range(0, 5)],
+			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] was ATTACKED by a ", ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
 			". They managed to fight the monster off but was [color=red][b]INJURED[/b][/color] in the process.\n")
 	return returnString
 		
