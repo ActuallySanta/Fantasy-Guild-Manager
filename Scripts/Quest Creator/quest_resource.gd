@@ -27,11 +27,6 @@ enum FavoredStat{
 
 #enum for modifiers if we ever choose to do them
 
-#might hardcode these we will see based on scope and gdscript and whatnot
-var start: String
-var middle: String
-var end: String
-
 var goldReward: int;
 #var for statReward if applicable
 
@@ -43,8 +38,6 @@ var type: QuestType
 var favStat: FavoredStat
 #var for modifier(s) if we ever choose to do that
 
-var monsters: Array[String] #temp array for monsters for early testing
-
 var questTitle: String:
 	get:
 		return questTitle
@@ -53,34 +46,26 @@ var questSummary: String = "":
 	get:
 		return questSummary
 		
-#need to pull a bunch of stuff out of spreadsheet somehow at some time
-#start, middle, end, location, and flavors all need to be pulled out, probably
-#at generation - monsters can be pulled out later but only if that's realistic
+var questNum: int:
+	get:
+		return questNum
+		
 
-#don't know yet if this needs to be sent somewhere either, but I assume we want this as void regardless
 func _init() -> void:
 	#hard coding variables for intial testing
 	difficulty = 0;
 	type = 0;
 	favStat = 0;
+	questNum = randi_range(0, 1)
 	
 	location = ExternalContentContainer.get_Dungeon_Name()
 	goldReward = 200;
-	
-	#set here for early testing only
-	monsters.append("Hydra")
-	monsters.append("Gorgon")
-	monsters.append("Medusa")
-	monsters.append("Dragon")
-	monsters.append("Skeleton Warrior")
-	monsters.append("Nathaniel Klubek")
 	
 	questTitle = str("Raid the ", location)
 	
 	print("")
 	
 	#set variables
-	#generate description -> I don't know if that will be held here or not
 	pass
 	
 func calcSuccessChance(_questingAdventurers: Array[GuildCharacter]) -> float:
@@ -95,8 +80,9 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	var party : Array[GuildCharacter]
 	party = generatePartyDuo()
 	
-	returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
-	"[/b] raided the [b]", location, "[/b].\n")
+	var data = {"location": location}
+	returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, "[/b] ",
+	ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data))
 	
 	var loopbreaker = 12
 	while randi_range(-1, 10) < loopbreaker:
@@ -111,7 +97,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	match true:
 		_ when successDetermination >= _successChance:
 			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
-	" [color=red]DID NOT[/color][/b] manage to reach the bottom of the ", location, ".\n")
+	" ", ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data))
 			returnString = str(returnString, "Summary: The quest was [color=red][b]NOT SUCCESSFUL[/b][/color]. Your guild failed to obtain the reward.\n")
 			questSummary = str(questSummary, "Summary: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
 			
@@ -120,7 +106,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 				questSummary = str(questSummary, "However, your adventurers did bring back ", goldReward - 200, " gold")
 		_:
 			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
-	"[/b] [color=green][b]REACHED[/b][/color] the bottom of the ", location, ".\n")
+	ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data))
 			returnString = str(returnString, "Summary: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=gold][b]", goldReward," gold[/b][/color].\n")
 			questSummary = str(questSummary, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward," gold.")
 	
@@ -147,10 +133,12 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 	match true:
 		_ when combatChance >= successDetermination:
 			print(QuestManager.instance.testQuestNumber)
-			returnString = str(returnString, "[b]The Party[/b] was ATTACKED by a group of ", ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
+			returnString = str(returnString, "[b]The Party[/b] was ATTACKED by a group of ", 
+			ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
 			"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n")
 		_:
-			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] was ATTACKED by a ", ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
+			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] was ATTACKED by a ", 
+			ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
 			". They managed to fight the monster off but was [color=red][b]INJURED[/b][/color] in the process.\n")
 	return returnString
 		

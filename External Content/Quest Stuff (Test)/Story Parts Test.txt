@@ -1,0 +1,2 @@
+1|raided the [b]{location}[/b].\n|"I put the string here"|[color=red]DID NOT[/color][/b] manage to reach the bottom of the [b]{location}[/b].\n|[/b] [color=green][b]REACHED[/b][/color] the bottom of the [b]{location}[/b].\n
+1|visited the [b]{location}[/b], intending to journey down into its heart.\n|middle|[color=red]DID NOT[/color][/b] manage to reach the heart of the [b]{location}[/b].\n|[/b] [color=green][b]REACHED[/b][/color] the heart of the [b]{location}[/b].\n
