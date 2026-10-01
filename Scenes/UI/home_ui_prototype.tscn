@@ -1,10 +1,13 @@
 [gd_scene format=3 uid="uid://dq7cb1c5woaat"]
 
+[ext_resource type="Script" uid="uid://tlhfiyj5s2yd" path="res://Scripts/UI/home_ui_prototype.gd" id="1_18fsv"]
 [ext_resource type="Script" uid="uid://cmlplktrs1fb0" path="res://Scripts/UI/quest_list.gd" id="1_prqkl"]
 [ext_resource type="PackedScene" uid="uid://cawb7mk4rfspb" path="res://Scenes/UI/quest_card.tscn" id="2_xsnmc"]
 [ext_resource type="Script" uid="uid://djvjacwit4hlu" path="res://Scripts/UI/char_roster.gd" id="3_oscj5"]
 [ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="3_xsnmc"]
 [ext_resource type="PackedScene" uid="uid://dpm6emiryhpli" path="res://Scenes/UI/character_button.tscn" id="4_brb4x"]
+[ext_resource type="PackedScene" uid="uid://ca7d3fdaphs4v" path="res://Scenes/Characters/character_generator.tscn" id="6_brb4x"]
+[ext_resource type="Script" uid="uid://blul1044ocxp2" path="res://Scripts/Quest Creator/quest_Manager.gd" id="7_18fsv"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
 bg_color = Color(0.87635714, 0.47655976, 0.26507115, 1)
@@ -25,6 +28,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_18fsv")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=2056262714]
 layout_mode = 1
@@ -151,3 +155,10 @@ text = "Upgrades"
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Settings"
+
+[node name="Character Generator" parent="." unique_id=1008846978 instance=ExtResource("6_brb4x")]
+
+[node name="QuestManager" type="Node2D" parent="." unique_id=646399410]
+script = ExtResource("7_18fsv")
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/NavBar/HBoxContainer/CharButton" to="." method="_on_char_button_pressed"]
