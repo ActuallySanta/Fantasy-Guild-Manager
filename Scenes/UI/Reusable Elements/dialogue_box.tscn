@@ -3,6 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://do5kjvfstulyu" path="res://Sprites/32x32-Tilesheet.png" id="1_u27lg"]
 [ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="2_emv4w"]
 [ext_resource type="Script" uid="uid://7oe8vh0dylf0" path="res://Scripts/UI/dialogue_box.gd" id="2_h3rtp"]
+[ext_resource type="Script" uid="uid://gbwhq46vf6ad" path="res://Scripts/Quest Creator/daily_log.gd" id="3_ttidh"]
+[ext_resource type="Script" uid="uid://blul1044ocxp2" path="res://Scripts/Quest Creator/quest_Manager.gd" id="4_xdxvp"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_4alr5"]
 atlas = ExtResource("1_u27lg")
@@ -53,13 +55,21 @@ text = "DAILY LOG"
 label_settings = SubResource("LabelSettings_u27lg")
 horizontal_alignment = 1
 
-[node name="Log Contents" type="RichTextLabel" parent="Background/VBoxContainer" unique_id=2017656256]
+[node name="QuestManager" type="Node2D" parent="Background/VBoxContainer" unique_id=494484673]
+position = Vector2(-15, -15)
+script = ExtResource("4_xdxvp")
+
+[node name="LogContents" type="RichTextLabel" parent="Background/VBoxContainer" unique_id=2017656256]
+custom_minimum_size = Vector2(500, 0)
+custom_maximum_size = Vector2(650, -1)
 layout_mode = 2
 size_flags_vertical = 3
+offset_transform_enabled = true
+offset_transform_position = Vector2(20, 0)
 bbcode_enabled = true
 text = "LOREMEM"
 scroll_active = false
-horizontal_alignment = 1
+script = ExtResource("3_ttidh")
 
 [node name="Close Button" parent="Background" unique_id=340347144 instance=ExtResource("2_emv4w")]
 layout_mode = 1

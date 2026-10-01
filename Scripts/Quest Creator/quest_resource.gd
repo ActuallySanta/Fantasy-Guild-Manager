@@ -95,8 +95,8 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	var party : Array[GuildCharacter]
 	party = generatePartyDuo()
 	
-	returnString = str(returnString, "", _questingAdventurers[0].name, " and ", _questingAdventurers[1].name, 
-	" raided the ", location, ".\n")
+	returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
+	"[/b] raided the [b]", location, "[/b].\n")
 	
 	var loopbreaker = 12
 	while randi_range(-1, 10) < loopbreaker:
@@ -110,18 +110,18 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	var successDetermination = randi_range(0, 100)
 	match true:
 		_ when successDetermination >= _successChance:
-			returnString = str(returnString, "", _questingAdventurers[0].name, " and ", _questingAdventurers[1].name, 
-	" DID NOT manage to reach the bottom of the ", location, ".\n")
-			returnString = str(returnString, "Summary: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
+			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
+	" [color=red]DID NOT[/color][/b] manage to reach the bottom of the ", location, ".\n")
+			returnString = str(returnString, "Summary: The quest was [color=red][b]NOT SUCCESSFUL[/b][/color]. Your guild failed to obtain the reward.\n")
 			questSummary = str(questSummary, "Summary: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
 			
 			if(goldReward > 200):
-				returnString = str(returnString, "However, your adventurers did bring back ", goldReward - 200, " gold")
+				returnString = str(returnString, "However, your adventurers did bring back [color=gold][b]", goldReward - 200, " gold[/b][/color].\n")
 				questSummary = str(questSummary, "However, your adventurers did bring back ", goldReward - 200, " gold")
 		_:
-			returnString = str(returnString, "", _questingAdventurers[0].name, " and ", _questingAdventurers[1].name, 
-	" REACHED the bottom of the ", location, ".\n")
-			returnString = str(returnString, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward," gold.")
+			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
+	"[/b] [color=green][b]REACHED[/b][/color] the bottom of the ", location, ".\n")
+			returnString = str(returnString, "Summary: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=gold][b]", goldReward," gold[/b][/color].\n")
 			questSummary = str(questSummary, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward," gold.")
 	
 	#loop with size based on difficulty -> higher difficulty more loops 
@@ -146,11 +146,11 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 	var successDetermination = randi_range(0, 100)
 	match true:
 		_ when combatChance >= successDetermination:
-			returnString = str(returnString, "The PARTY was ATTACKED by a group of ", ExternalContentContainer.get_Monster_Name(),
-			"s, but defeated them WITHOUT SUSTAINING ANY INJURIES.\n")
+			returnString = str(returnString, "[b]The Party[/b] was ATTACKED by a group of ", ExternalContentContainer.get_Monster_Name(),
+			"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n")
 		_:
-			returnString = str(returnString, _questingAdventurers[0].name, " was ATTACKED by a ", monsters[randi_range(0, 5)],
-			". They managed to fight the monster off but was INJURED in the process.\n")
+			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] was ATTACKED by a ", monsters[randi_range(0, 5)],
+			". They managed to fight the monster off but was [color=red][b]INJURED[/b][/color] in the process.\n")
 	return returnString
 		
 func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
@@ -167,9 +167,9 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 		_ when searchChance >= successDetermination:
 			var extraGold = randi_range(11, 29)
 			goldReward += extraGold
-			returnString = str(returnString, "The PARTY discovered an old chest containing ", extraGold, " GOLD.\n")
+			returnString = str(returnString, "[b]The Party[/b] discovered an old chest containing [color=gold][b]", extraGold, " gold[/b][/color].\n")
 		_ :
-			returnString = str(returnString, _questingAdventurers[1].name, " tripped on a rock and gained 1 INJURY.\n")
+			returnString = str(returnString, "[b]", _questingAdventurers[1].name, "[/b] tripped on a rock and gained [color=red][b]1 INJURY[/b][/color].\n")
 	return returnString
 
 func generatePartyDuo() -> Array[GuildCharacter]:
