@@ -39,14 +39,48 @@ func _ready() -> void:
 # called by quest_list.gd after card is added to scene
 func setup(data) -> void:
 	quest = data
-	_title_label.text = str(quest.get("title"))
-
+	_title_label.text = get_title(quest) + "\n" + get_details(quest)
+	
+	if slot_scene == null:
+		push_error("QuestCard: drag character_slot.tscn into Slot Scene in the Inspector.")
+		return
+	
 	# make a slot for each slot the quest needs
-	for i in int(quest.get("slots")):
+	for i in get_slot_count(quest):
 		var slot: CharacterSlot = slot_scene.instantiate()
 		_slot_row.add_child(slot)
 		slot.changed.connect(_on_slot_changed)
 		slots.append(slot)
+
+# right here is the only spot where I touch quest
+# system data. Once Jacob changes things ill change
+# stuff here
+
+# quest headline, where I will add title
+static func get_title(q) -> String:
+	var title = q.get("title")
+	if title:
+		return str(title)
+	
+	match q.type:
+		CreatedQuest.QuestType.DungeonClear:
+			return "Clear the %s" % q.location
+		CreatedQuest.QuestType.Escort:
+			return "Escort a client through the %s" % q.location
+		_:
+			return "Raid the %s" % q.location
+
+# smaller info line under title for rank and rewards
+static func get_details(q) -> String:
+	var rank = CreatedQuest.QuestDifficulty.find_key(q.difficulty)
+	return "Rank %s - %d Gold" % [rank, q.goldReward]
+
+# How many character slots each quests needs, currently
+# no party size value but if its added later
+static func get_slot_count(q) -> int:
+	var size = q.get("party_size")
+	return int(size) if size != null else 2
+# -----------------------------------------------
 
 # toggles card between open and closed
 func _on_accept_pressed() -> void:
