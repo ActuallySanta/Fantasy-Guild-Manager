@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://dpm6emiryhpli" path="res://Scenes/UI/character_button.tscn" id="4_brb4x"]
 [ext_resource type="PackedScene" uid="uid://ca7d3fdaphs4v" path="res://Scenes/Characters/character_generator.tscn" id="6_brb4x"]
 [ext_resource type="Script" uid="uid://blul1044ocxp2" path="res://Scripts/Quest Creator/quest_Manager.gd" id="7_18fsv"]
+[ext_resource type="PackedScene" uid="uid://4q07bd1hkr4d" path="res://Scenes/UI/Reusable Elements/dialogue_box.tscn" id="7_jcj1f"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
 bg_color = Color(0.87635714, 0.47655976, 0.26507115, 1)
@@ -156,9 +157,20 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Settings"
 
+[node name="Intro Blurb" parent="MarginContainer" unique_id=2008083606 instance=ExtResource("7_jcj1f")]
+layout_mode = 2
+
+[node name="Banner Title" parent="MarginContainer/Intro Blurb/Background/VBoxContainer" parent_id_path=PackedInt32Array(2008083606, 1861553414) index="0" unique_id=1148823556]
+text = "WELCOME"
+
+[node name="Log Contents" parent="MarginContainer/Intro Blurb/Background/VBoxContainer" parent_id_path=PackedInt32Array(2008083606, 1861553414) index="1" unique_id=2017656256]
+text = "[font_size=45][color=black]Welcome to your new guild! You are a fledgling guild master with the goal of getting rich and defeating the demon king! To do so you must [b]HIRE[/b] guild members to [b]SEND[/b] on quests! You can choose to [b]ACCEPT[/b] or [b]DENY[/b] quests depending on what you want to prioritze. Your members will try to complete the quests to the best of their ability while trying to find [b]TREASURE[/b]. Your guild members can get [b]INJURED [/b]and will need to rest to heal back up. Try and do your best to claim your fortune and save the world![/font_size]"
+
 [node name="Character Generator" parent="." unique_id=1008846978 instance=ExtResource("6_brb4x")]
 
 [node name="QuestManager" type="Node2D" parent="." unique_id=646399410]
 script = ExtResource("7_18fsv")
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/NavBar/HBoxContainer/CharButton" to="." method="_on_char_button_pressed"]
+
+[editable path="MarginContainer/Intro Blurb"]
