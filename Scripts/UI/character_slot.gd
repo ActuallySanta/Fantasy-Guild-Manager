@@ -46,7 +46,15 @@ func assign (new_character) -> void:
 				slot.assign(null)
 	
 	character = new_character
-	text = EMPTY_TEXT if character == null else str(character.get("name"))
+ 
+	if character == null:
+		text = EMPTY_TEXT
+		icon = null
+	else:
+		# Uses the same helpers as the roster
+		text = CharacterButton.get_display_name(character)
+		icon = CharacterButton.get_icon(character)
+	
 	changed.emit(self)
 	
 	# hide placed characters and show free ones

@@ -22,6 +22,7 @@ func add_quest(quest) -> QuestCard:
 	add_child(card)		# add so nodes are ready
 	card.setup(quest)	# add data
 	card.accepted.connect(_on_quest_accepted)
+	card.closed.connect(_on_quest_closed)
 	card.party_changed.connect(_on_party_changed)
 	return card
 
@@ -63,5 +64,5 @@ func _on_quest_closed(quest) -> void:
 
 # function to get the characters on quest
 func _on_party_changed(quest, party: Array) -> void:
-	var names := party.map(func(c): return c.get("name"))
+	var names := party.map(func(c): return CharacterButton.get_display_name(c))
 	print(quest.get("title"), " party: ", names)

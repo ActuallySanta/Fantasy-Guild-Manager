@@ -59,6 +59,7 @@ func _on_accept_pressed() -> void:
 	else:
 		for slot in slots: 
 			slot.assign(null)
+		closed.emit(quest)
 
 # returns characters currently placed on this quest
 func get_party() -> Array:

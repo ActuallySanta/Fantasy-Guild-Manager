@@ -18,7 +18,15 @@ func _ready() -> void:
 # fills in button with character data
 func setup(data) -> void:
 	character = data
-	text = str(character.get("name"))
+	text = get_display_name(character)
+	icon = get_icon(character)
+
+# functions to read character info
+static func get_display_name(c) -> String:
+	return str(c.get("title"))
+
+static func get_icon(c) -> Texture2D:
+	return ExternalContentContainer.get_character_icon(c.role)
 
 # Runs when player taps this character
 func _on_pressed() -> void:
@@ -41,8 +49,10 @@ static func clear_selection() -> void:
 
 # function calls when a player starts to drag this button
 func _get_drag_data(_at_position: Vector2) -> Variant:
-	var preview := Label.new()
-	preview.text = text
+	var preview := TextureRect.new()
+	preview.texture = icon
+	preview.custom_minimum_size = Vector2(80, 80)
+	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	preview.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	set_drag_preview(preview)
-	# if we use "type" it lets us reject anything that isnt a characcter
 	return {"type": "character", "character": character}
