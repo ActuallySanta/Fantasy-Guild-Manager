@@ -27,7 +27,8 @@ enum FavoredStat{
 
 #enum for modifiers if we ever choose to do them
 
-var goldReward: int;
+var numAdventurers: int
+var goldReward: int
 #var for statReward if applicable
 
 var location: String
@@ -71,20 +72,43 @@ func _init() -> void:
 	pass
 	
 func calcSuccessChance(_questingAdventurers: Array[GuildCharacter]) -> float:
-	#calc this
-	return 0.0
+	var statHitNum = 60 + (20 * difficulty)
+	var statTotal = 0
+	
+	for adventurer in _questingAdventurers:
+		print(adventurer.StatType.STRENGTH)
+		print(adventurer.StatType.DEFENSE)
+		print(adventurer.StatType.WISDOM)
+		print(adventurer.StatType.SLEAZINESS)
+		statTotal += adventurer.StatType.STRENGTH +  adventurer.StatType.DEFENSE +  adventurer.StatType.WISDOM +  adventurer.StatType.SLEAZINESS
+		match favStat:
+			0:
+				statTotal += adventurer.StatType.STRENGTH
+			1:
+				statTotal += adventurer.StatType.DEFENSE
+			2:
+				statTotal += adventurer.StatType.WISDOM
+			3:
+				statTotal += adventurer.StatType.SLEAZINESS
+				
+	print(statTotal)
+	return statTotal / statHitNum
 
 #this is the main root method for deciding and generating results I'll have
 #methods branch off to decide certain parts of the results
 func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
 	var returnString = ""
 	
-	var party : Array[GuildCharacter]
-	party = generatePartyDuo()
+	numAdventurers = _questingAdventurers.size()
+	print(numAdventurers)
 	
 	var data = {"location": location}
-	returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, "[/b] ",
-	ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data))
+	if(numAdventurers == 1):
+		returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] ",
+ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data))
+	else:
+		returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, "[/b] ",
+ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data))
 	
 	var loopbreaker = 12
 	while randi_range(-1, 10) < loopbreaker:
@@ -98,7 +122,10 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	var successDetermination = randi_range(0, 100)
 	match true:
 		_ when successDetermination >= _successChance:
-			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
+			if(numAdventurers == 1):
+				returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] ", ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data))
+			else:
+				returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
 	" ", ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data))
 			returnString = str(returnString, "Summary: The quest was [color=red][b]NOT SUCCESSFUL[/b][/color]. Your guild failed to obtain the reward.\n")
 			questSummary = str(questSummary, "Summary: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
@@ -107,7 +134,11 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 				returnString = str(returnString, "However, your adventurers did bring back [color=gold][b]", goldReward - 200, " gold[/b][/color].\n")
 				questSummary = str(questSummary, "However, your adventurers did bring back ", goldReward - 200, " gold")
 		_:
-			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
+			if(numAdventurers == 1):
+				returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] ",
+	ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data))
+			else:
+				returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
 	ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data))
 			returnString = str(returnString, "Summary: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=gold][b]", goldReward," gold[/b][/color].\n")
 			questSummary = str(questSummary, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward," gold.")
@@ -156,7 +187,7 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 			goldReward += extraGold
 			returnString = str(returnString, "[b]The Party[/b] discovered an old chest containing [color=gold][b]", extraGold, " gold[/b][/color].\n")
 		_ :
-			returnString = str(returnString, "[b]", _questingAdventurers[1].name, "[/b] tripped on a rock and gained [color=red][b]1 INJURY[/b][/color].\n")
+			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] tripped on a rock and gained [color=red][b]1 INJURY[/b][/color].\n")
 	return returnString
 
 func generatePartyDuo() -> Array[GuildCharacter]:
