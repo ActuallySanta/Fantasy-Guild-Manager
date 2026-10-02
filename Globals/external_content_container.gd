@@ -11,7 +11,6 @@ extends Node
 @export var mage_backstories_file_path : String = "res://External Content/Character Backstories/Backstories - Mage Backstories.csv"
 
 @export var random_backstories_file_path:String = "res://External Content/Character Backstories/Backstories - Random Backstories.csv"
-@export var monsters_test_file_path: String = "res://External Content/Quest Stuff (Test)/Monsters - Sea.txt" #test path for monsters
 @export var dunegon_locations_test_path: String = "res://External Content/Quest Stuff (Test)/Dungeon Names (Locations).txt" #test path for locations
 @export var monsters_2D_test_path: String = "res://External Content/Quest Stuff (Test)/2D Monster Test.txt" #test path for monstrs
 @export var quest_story_test_path: String = "res://External Content/Quest Stuff (Test)/Story Parts Test.txt" #test path
@@ -29,7 +28,7 @@ var priest_backstories:Array[String]
 var random_backstories:Array[String]
 
 var monster_test_names = []#test array for monsters
-var dungeon_locations: Array[String] #test array for locations
+var location_names = [] #test array for locations
 var quest_story = []
 
 #Used for text replacement
@@ -57,8 +56,6 @@ var pronoun_personal_object: Array[String] = [
 	"they",
 ]
 
-var location_names: Array[String]
-
 #Replace these with the actual UID of the icon
 var character_icons: Dictionary[GuildCharacter.CharacterRole, Texture2D] = {
 	GuildCharacter.CharacterRole.KNIGHT: preload("uid://deis7oxw14qbl"),
@@ -81,22 +78,20 @@ func _ready() -> void:
 	pathfinder_backstories = ProceduralContentLoader._load_info_from_file(pathfinder_backstories_file_path,1)
 	mage_backstories = ProceduralContentLoader._load_info_from_file(mage_backstories_file_path,1)
 	
-	#monster_test_names = ProceduralContentLoader._load_info_from_file(monsters_test_file_path, 1) #test using monsters
-	monster_test_names.append([])
-	monster_test_names.append([])
-	monster_test_names.append([])
-	
-	monster_test_names[0] = MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 0) #2D test
-	monster_test_names[1] = MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 1) #2D test
-	monster_test_names[2] = MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 2) #2D test
+	monster_test_names.append(MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 0)) #2D test
+	monster_test_names.append(MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 1)) 
+	monster_test_names.append(MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 2)) 
 	#monster_test_names[0] = MultiColumnLoader._load_info_from_rows(monsters_2D_test_path, 0) #2D test
 	#monster_test_names[1] = MultiColumnLoader._load_info_from_rows(monsters_2D_test_path, 1) #2D test
 	#monster_test_names[2] = MultiColumnLoader._load_info_from_rows(monsters_2D_test_path, 2) #2D test
 	
 	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 0)) #2D test
-	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 1)) #2D test
+	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 1)) 
+	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 2)) 
+	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 3)) 
 	
-	location_names = ProceduralContentLoader._load_info_from_file(dunegon_locations_test_path, 1) #test using locations
+	location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 0)) 
+	location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 1)) 
 	pass # Replace with function body.
 
 
@@ -117,9 +112,9 @@ func get_Monster_Name(col_idx: int) -> String:
 	var randMon = randi_range(0, 2)
 	return monster_test_names[col_idx][randMon]
 	
-func get_Dungeon_Name() -> String:
-	var randDungeon = randi_range(0, 5)
-	return location_names[randDungeon]
+func get_Location_Name(col_idx: int) -> String:
+	var randLoc = randi_range(0, 5)
+	return location_names[col_idx][randLoc]
 	
 func get_Quest_Story(quest_idx: int, story_part: int) -> String:
 	return quest_story[quest_idx][story_part]

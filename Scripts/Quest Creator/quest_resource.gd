@@ -53,18 +53,21 @@ var questNum: int:
 func _init() -> void:
 	#hard coding variables for intial testing
 	difficulty = 0;
-	favStat = 0;
-	questNum = randi_range(0, 1)
-	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
 	
-	location = ExternalContentContainer.get_Dungeon_Name()
+	questNum = randi_range(0, 3)
+	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
+	location = ExternalContentContainer.get_Location_Name(type - 1)
 	goldReward = 200;
 	
-	questTitle = str("Raid the ", location)
+	match type:
+		1:
+			favStat = FavoredStat.Attack;
+			questTitle = str("Raid the ", location)
+		2:
+			favStat = FavoredStat.Defense;
+			questTitle = str("Escort someone to ", location)
 	
 	print("")
-	
-	#set variables
 	pass
 	
 func calcSuccessChance(_questingAdventurers: Array[GuildCharacter]) -> float:
@@ -116,11 +119,9 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	#then the loop begins again (again, only if the quest has a middle)
 	
 	#once the loop moves on we are done here
-	#put in end text
 	return returnString
 		
 func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
-	#gotta be a better way of doing this but I'm tired
 	var combatChance = _successChance / 100
 	combatChance = combatChance * combatChance
 	combatChance *= 100
@@ -142,7 +143,6 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 	return returnString
 		
 func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
-	#gotta be a better way of doing this but I'm tired
 	var searchChance = _successChance / 100
 	searchChance = searchChance * searchChance
 	searchChance *= 100
