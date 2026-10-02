@@ -103,6 +103,10 @@ func get_party() -> Array:
 			party.append(slot.character)
 	return party
 
+# true if quest is accepted and every slot is filled
+func is_ready_to_send() -> bool:
+	return is_open and not slots.is_empty() and get_party().size() == slots.size()
+
 # if any slot is changed, pass the updated party along
 func _on_slot_changed(_slot: CharacterSlot) -> void:
 	party_changed.emit(quest, get_party())

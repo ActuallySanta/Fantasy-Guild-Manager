@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="3_xsnmc"]
 [ext_resource type="Texture2D" uid="uid://ccsai8aanfspa" path="res://Sprites/Character Icons/chess-rook-solid-full.svg" id="4_73enw"]
 [ext_resource type="PackedScene" uid="uid://dpm6emiryhpli" path="res://Scenes/UI/character_button.tscn" id="4_brb4x"]
+[ext_resource type="Script" uid="uid://so4dh7cytoft" path="res://Scripts/UI/day_bar.gd" id="5_58akh"]
 [ext_resource type="PackedScene" uid="uid://ca7d3fdaphs4v" path="res://Scenes/Characters/character_generator.tscn" id="6_brb4x"]
 [ext_resource type="Script" uid="uid://blul1044ocxp2" path="res://Scripts/Quest Creator/quest_Manager.gd" id="7_18fsv"]
 [ext_resource type="PackedScene" uid="uid://4q07bd1hkr4d" path="res://Scenes/UI/Reusable Elements/dialogue_box.tscn" id="7_jcj1f"]
@@ -17,6 +18,7 @@
 [ext_resource type="Texture2D" uid="uid://c178h40n2xa06" path="res://Sprites/Character Icons/house-solid-full.svg" id="12_rohuf"]
 [ext_resource type="Texture2D" uid="uid://wtb4ungnk6wg" path="res://Sprites/Character Icons/arrow-up-solid-full.svg" id="13_h2ntd"]
 [ext_resource type="Texture2D" uid="uid://ccw8frov4muxu" path="res://Sprites/Character Icons/gear-solid-full.svg" id="14_fkiig"]
+[ext_resource type="PackedScene" uid="uid://cuv2kkwbxwgjy" path="res://Scenes/UI/day_summary.tscn" id="19_73enw"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
 bg_color = Color(0.87635714, 0.47655976, 0.26507115, 1)
@@ -51,7 +53,7 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="TopBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=168263758]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(0, 70)
 custom_maximum_size = Vector2(-1, 250)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
@@ -117,6 +119,24 @@ size_flags_horizontal = 3
 text = "Standing"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="DayBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1982121986 node_paths=PackedStringArray("quest_list", "day_summary")]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+script = ExtResource("5_58akh")
+quest_list = NodePath("../Content/ContentScroll/ContentList")
+day_summary = NodePath("../../../DaySummary")
+
+[node name="DayBarRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DayBar" unique_id=1818156357]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="EndDayButton" type="Button" parent="MarginContainer/VBoxContainer/DayBar/DayBarRow" unique_id=1581358539]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 70)
+layout_mode = 2
+size_flags_horizontal = 6
+text = "End Day"
 
 [node name="Content" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=776379136]
 layout_mode = 2
@@ -237,6 +257,9 @@ text = "[font_size=45][color=black]Welcome to your new guild! You are a fledglin
 
 [node name="QuestManager" type="Node2D" parent="." unique_id=646399410]
 script = ExtResource("7_18fsv")
+
+[node name="DaySummary" parent="." unique_id=39756973 instance=ExtResource("19_73enw")]
+layout_mode = 1
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/NavBar/HBoxContainer/CharButton" to="." method="_on_char_button_pressed"]
 
