@@ -109,7 +109,7 @@ func get_character_name(gender: GuildCharacter.CharacterGender) -> String:
 
 #test functions for quest stuff
 func get_Monster_Name(col_idx: int) -> String:
-	var randMon = randi_range(0, 2)
+	var randMon = randi_range(0, 5)
 	return monster_test_names[col_idx][randMon]
 	
 func get_Location_Name(col_idx: int) -> String:

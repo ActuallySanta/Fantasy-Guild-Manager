@@ -132,7 +132,6 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 	var successDetermination = randi_range(0, 100)
 	match true:
 		_ when combatChance >= successDetermination:
-			print(QuestManager.instance.testQuestNumber)
 			returnString = str(returnString, "[b]The Party[/b] was ATTACKED by a group of ", 
 			ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
 			"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n")

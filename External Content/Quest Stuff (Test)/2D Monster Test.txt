@@ -1,3 +1,6 @@
-Ghost|Orc|Troll
-Goblin|Ogre|Titan
-Ghoul|Orchid|Tiny Baby Zombie
+Ghost|Skeleton|Troll
+Goblin|Specter|Titan
+Ghoul|Shadow|Tiny Baby Zombie
+Gorgon|Siren|Treant
+Golem|Sprite|Trogladyte
+Gremlin|Stray Cat|Tarantula
