@@ -259,6 +259,7 @@ text = "[font_size=45][color=black]Welcome to your new guild! You are a fledglin
 script = ExtResource("7_18fsv")
 
 [node name="DaySummary" parent="." unique_id=39756973 instance=ExtResource("19_73enw")]
+visible = false
 layout_mode = 1
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/NavBar/HBoxContainer/CharButton" to="." method="_on_char_button_pressed"]
