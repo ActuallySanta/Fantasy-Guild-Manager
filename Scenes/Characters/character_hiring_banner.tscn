@@ -1,0 +1,113 @@
+[gd_scene format=3 uid="uid://5kdaenkqw3iw"]
+
+[ext_resource type="Script" uid="uid://bfo5p7mxtj46t" path="res://Scripts/UI/character_hiring_banner.gd" id="1_a5py3"]
+[ext_resource type="Texture2D" uid="uid://do5kjvfstulyu" path="res://Sprites/32x32-Tilesheet.png" id="1_fna1w"]
+[ext_resource type="Texture2D" uid="uid://deis7oxw14qbl" path="res://icon.svg" id="2_dha67"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g4v7s"]
+atlas = ExtResource("1_fna1w")
+region = Rect2(0, 320, 64, 32)
+
+[sub_resource type="LabelSettings" id="LabelSettings_dha67"]
+font_size = 14
+font_color = Color(0, 0, 0, 1)
+
+[node name="Character Hiring Banner" type="MarginContainer" unique_id=207254392]
+propagate_maximum_size = false
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 3
+script = ExtResource("1_a5py3")
+
+[node name="Banner Background" type="PanelContainer" parent="." unique_id=962508161]
+layout_mode = 2
+
+[node name="TextureRect" type="NinePatchRect" parent="Banner Background" unique_id=1269700738]
+texture_filter = 1
+custom_minimum_size = Vector2(350, 200)
+layout_mode = 2
+texture = SubResource("AtlasTexture_g4v7s")
+patch_margin_left = 32
+patch_margin_top = 16
+patch_margin_right = 32
+patch_margin_bottom = 16
+axis_stretch_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=2050763135]
+layout_mode = 2
+
+[node name="MarginContainer2" type="MarginContainer" parent="HBoxContainer" unique_id=1178820541]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Character Icon" type="TextureRect" parent="HBoxContainer/MarginContainer2" unique_id=1233745196]
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("2_dha67")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="HBoxContainer" unique_id=1172690065]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Name Label" type="Label" parent="HBoxContainer/MarginContainer" unique_id=2034741027]
+layout_mode = 2
+size_flags_vertical = 1
+text = "NAME:"
+
+[node name="Stats Container" type="VBoxContainer" parent="HBoxContainer/MarginContainer" unique_id=1373282634]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="Hometown Label" type="Label" parent="HBoxContainer/MarginContainer/Stats Container" unique_id=458034073]
+layout_mode = 2
+text = "HOMETOWN"
+label_settings = SubResource("LabelSettings_dha67")
+
+[node name="Defense Label" type="Label" parent="HBoxContainer/MarginContainer/Stats Container" unique_id=226413638]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "This is a test"
+label_settings = SubResource("LabelSettings_dha67")
+
+[node name="Wisdom Label" type="Label" parent="HBoxContainer/MarginContainer/Stats Container" unique_id=79503067]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "This is a test"
+label_settings = SubResource("LabelSettings_dha67")
+
+[node name="Sleaziness Label" type="Label" parent="HBoxContainer/MarginContainer/Stats Container" unique_id=630791975]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "This is a test"
+label_settings = SubResource("LabelSettings_dha67")
+
+[node name="Pluck Label" type="Label" parent="HBoxContainer/MarginContainer/Stats Container" unique_id=40687613]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "This is a test"
+label_settings = SubResource("LabelSettings_dha67")
+
+[node name="Strength Label" type="Label" parent="HBoxContainer/MarginContainer/Stats Container" unique_id=503766291]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "This is a test"
+label_settings = SubResource("LabelSettings_dha67")
+
+[node name="Clickable Area" type="Button" parent="." unique_id=1110969674]
+layout_mode = 2
+
+[connection signal="pressed" from="Clickable Area" to="." method="_on_clickable_area_pressed"]

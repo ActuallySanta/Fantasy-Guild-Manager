@@ -1,0 +1,96 @@
+[gd_scene format=3 uid="uid://bo10juj3x7m8u"]
+
+[ext_resource type="Script" uid="uid://ckmj3toqv2oun" path="res://Scripts/UI/character_hiring_page.gd" id="1_a4nie"]
+[ext_resource type="Texture2D" uid="uid://do5kjvfstulyu" path="res://Sprites/32x32-Tilesheet.png" id="1_acicf"]
+[ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="3_xvenb"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sl3xc"]
+atlas = ExtResource("1_acicf")
+region = Rect2(0, 0, 96, 96)
+
+[sub_resource type="LabelSettings" id="LabelSettings_1gyy8"]
+font_size = 32
+
+[node name="Character Hiring Page" type="Control" unique_id=32850235]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_a4nie")
+
+[node name="NinePatchRect" type="NinePatchRect" parent="." unique_id=1188472112]
+texture_filter = 1
+layout_mode = 0
+offset_right = 720.0
+offset_bottom = 1280.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("AtlasTexture_sl3xc")
+patch_margin_left = 48
+patch_margin_top = 48
+patch_margin_right = 48
+patch_margin_bottom = 48
+axis_stretch_horizontal = 2
+axis_stretch_vertical = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="NinePatchRect" unique_id=841155042]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="NinePatchRect/MarginContainer" unique_id=1839582706]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="NinePatchRect/MarginContainer/VBoxContainer" unique_id=471488561]
+layout_mode = 2
+
+[node name="Tab Header" type="Label" parent="NinePatchRect/MarginContainer/VBoxContainer/HBoxContainer" unique_id=2128811631]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "HIRE NEW CHARACTERS"
+label_settings = SubResource("LabelSettings_1gyy8")
+horizontal_alignment = 1
+
+[node name="Character Total Display" type="Label" parent="NinePatchRect/MarginContainer/VBoxContainer/HBoxContainer" unique_id=302564331]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Total: 00/00"
+label_settings = SubResource("LabelSettings_1gyy8")
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="NinePatchRect/MarginContainer/VBoxContainer" unique_id=916691582]
+layout_mode = 2
+size_flags_vertical = 3
+scroll_hint_mode = 3
+tile_scroll_hint = true
+
+[node name="Character Banner Container" type="VBoxContainer" parent="NinePatchRect/MarginContainer/VBoxContainer/ScrollContainer" unique_id=1180277876]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Close Button" parent="." unique_id=1203562834 instance=ExtResource("3_xvenb")]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -50.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 50.0
+grow_horizontal = 0
+grow_vertical = 1
+pivot_offset = Vector2(25, 25)
+
+[connection signal="pressed" from="Close Button" to="." method="_on_close_button_pressed"]
