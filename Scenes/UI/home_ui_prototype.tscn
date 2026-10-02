@@ -2,13 +2,21 @@
 
 [ext_resource type="Script" uid="uid://tlhfiyj5s2yd" path="res://Scripts/UI/home_ui_prototype.gd" id="1_18fsv"]
 [ext_resource type="Script" uid="uid://cmlplktrs1fb0" path="res://Scripts/UI/quest_list.gd" id="1_prqkl"]
+[ext_resource type="Texture2D" uid="uid://b45od3f4bqey8" path="res://Sprites/Character Icons/sun-solid-full.svg" id="2_sufdd"]
 [ext_resource type="PackedScene" uid="uid://cawb7mk4rfspb" path="res://Scenes/UI/quest_card.tscn" id="2_xsnmc"]
+[ext_resource type="Texture2D" uid="uid://e4g7gfuo6w5i" path="res://Sprites/Character Icons/coins-solid-full.svg" id="3_58akh"]
 [ext_resource type="Script" uid="uid://djvjacwit4hlu" path="res://Scripts/UI/char_roster.gd" id="3_oscj5"]
 [ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="3_xsnmc"]
+[ext_resource type="Texture2D" uid="uid://ccsai8aanfspa" path="res://Sprites/Character Icons/chess-rook-solid-full.svg" id="4_73enw"]
 [ext_resource type="PackedScene" uid="uid://dpm6emiryhpli" path="res://Scenes/UI/character_button.tscn" id="4_brb4x"]
 [ext_resource type="PackedScene" uid="uid://ca7d3fdaphs4v" path="res://Scenes/Characters/character_generator.tscn" id="6_brb4x"]
 [ext_resource type="Script" uid="uid://blul1044ocxp2" path="res://Scripts/Quest Creator/quest_Manager.gd" id="7_18fsv"]
 [ext_resource type="PackedScene" uid="uid://4q07bd1hkr4d" path="res://Scenes/UI/Reusable Elements/dialogue_box.tscn" id="7_jcj1f"]
+[ext_resource type="Texture2D" uid="uid://c0ojxw8sauffc" path="res://Sprites/Character Icons/user-solid-full.svg" id="10_u2mag"]
+[ext_resource type="Texture2D" uid="uid://bj1hfljhsxpfe" path="res://Sprites/Character Icons/book-solid-full.svg" id="11_ewhhe"]
+[ext_resource type="Texture2D" uid="uid://c178h40n2xa06" path="res://Sprites/Character Icons/house-solid-full.svg" id="12_rohuf"]
+[ext_resource type="Texture2D" uid="uid://wtb4ungnk6wg" path="res://Sprites/Character Icons/arrow-up-solid-full.svg" id="13_h2ntd"]
+[ext_resource type="Texture2D" uid="uid://ccw8frov4muxu" path="res://Sprites/Character Icons/gear-solid-full.svg" id="14_fkiig"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
 bg_color = Color(0.87635714, 0.47655976, 0.26507115, 1)
@@ -44,6 +52,7 @@ layout_mode = 2
 
 [node name="TopBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=168263758]
 custom_minimum_size = Vector2(0, 150)
+custom_maximum_size = Vector2(-1, 250)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
 
@@ -51,21 +60,58 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="DayLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=1815111058]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=1917717664]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer" unique_id=789881013]
+custom_maximum_size = Vector2(-1, 150)
+layout_mode = 2
+texture = ExtResource("2_sufdd")
+expand_mode = 4
+stretch_mode = 5
+
+[node name="DayLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer" unique_id=1815111058]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "Day"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GoldLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=1468207839]
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=1488012171]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer2" unique_id=795115508]
+custom_maximum_size = Vector2(-1, 150)
+layout_mode = 2
+texture = ExtResource("3_58akh")
+expand_mode = 4
+stretch_mode = 5
+
+[node name="GoldLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer2" unique_id=1468207839]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Gold"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StanLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=510686645]
+[node name="VBoxContainer3" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=202743151]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer3" unique_id=662753280]
+custom_maximum_size = Vector2(-1, 150)
+layout_mode = 2
+texture = ExtResource("4_73enw")
+expand_mode = 4
+stretch_mode = 5
+
+[node name="StanLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer3" unique_id=510686645]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Standing"
@@ -136,28 +182,49 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Characters"
+icon = ExtResource("10_u2mag")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
 [node name="LogButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2100987524]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Quest Log"
+icon = ExtResource("11_ewhhe")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
 [node name="HomeButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2031683743]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Home"
+icon = ExtResource("12_rohuf")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
 [node name="UpgrButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=97551426]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Upgrades"
+icon = ExtResource("13_h2ntd")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
 [node name="SetngButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=1987690344]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Settings"
+icon = ExtResource("14_fkiig")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
 [node name="Intro Blurb" parent="MarginContainer" unique_id=2008083606 instance=ExtResource("7_jcj1f")]
+visible = false
 layout_mode = 2
 
 [node name="Banner Title" parent="MarginContainer/Intro Blurb/Background/VBoxContainer" parent_id_path=PackedInt32Array(2008083606, 1861553414) index="0" unique_id=1148823556]
