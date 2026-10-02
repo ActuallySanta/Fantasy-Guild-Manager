@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="3_xsnmc"]
 [ext_resource type="Texture2D" uid="uid://ccsai8aanfspa" path="res://Sprites/Character Icons/chess-rook-solid-full.svg" id="4_73enw"]
 [ext_resource type="PackedScene" uid="uid://dpm6emiryhpli" path="res://Scenes/UI/character_button.tscn" id="4_brb4x"]
+[ext_resource type="Script" uid="uid://so4dh7cytoft" path="res://Scripts/UI/day_bar.gd" id="5_58akh"]
 [ext_resource type="PackedScene" uid="uid://ca7d3fdaphs4v" path="res://Scenes/Characters/character_generator.tscn" id="6_brb4x"]
 [ext_resource type="Script" uid="uid://blul1044ocxp2" path="res://Scripts/Quest Creator/quest_Manager.gd" id="7_18fsv"]
 [ext_resource type="PackedScene" uid="uid://4q07bd1hkr4d" path="res://Scenes/UI/Reusable Elements/dialogue_box.tscn" id="7_jcj1f"]
@@ -51,7 +52,7 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="TopBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=168263758]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(0, 70)
 custom_maximum_size = Vector2(-1, 250)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
@@ -117,6 +118,22 @@ size_flags_horizontal = 3
 text = "Standing"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="DayBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1982121986]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+script = ExtResource("5_58akh")
+
+[node name="DayBarRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DayBar" unique_id=1818156357]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="EndDayButton" type="Button" parent="MarginContainer/VBoxContainer/DayBar/DayBarRow" unique_id=1581358539]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 70)
+layout_mode = 2
+size_flags_horizontal = 6
+text = "End Day"
 
 [node name="Content" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=776379136]
 layout_mode = 2

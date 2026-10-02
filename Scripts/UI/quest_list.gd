@@ -1,4 +1,5 @@
 # this script is what fills content with sample quest cards
+class_name QuestList
 extends VBoxContainer
 @export var quest_card_scene: PackedScene
 @export var quests_per_day: int = 5
@@ -63,3 +64,12 @@ func _on_quest_closed(quest) -> void:
 func _on_party_changed(quest, party: Array) -> void:
 	var names := party.map(func(c): return CharacterButton.get_display_name(c))
 	print(QuestCard.get_title(quest), " party: ", names)
+
+# returns every quest card thats ready to go out for the day
+func get_dispatched_card() -> Array[QuestCard]:
+	var dispatched: Array[QuestCard] = []
+	for card in get_children():
+		if card is QuestCard and card.is_ready_to_send():
+			dispatched.append(card)
+	return dispatched
+	

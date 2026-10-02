@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://cuv2kkwbxwgjy"]
+
+[ext_resource type="Script" uid="uid://cwabtoyr1uy6k" path="res://Scripts/UI/day_summary.gd" id="1_wie7t"]
+[ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="2_art7y"]
+
+[node name="DaySummary" type="Control" unique_id=39756973]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wie7t")
+
+[node name="Dim" type="ColorRect" parent="." unique_id=901239224]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5411765)
+
+[node name="SummaryMargin" type="MarginContainer" parent="." unique_id=233027091]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SummaryPanel" type="PanelContainer" parent="SummaryMargin" unique_id=514205563]
+layout_mode = 2
+
+[node name="SummaryColumn" type="VBoxContainer" parent="SummaryMargin/SummaryPanel" unique_id=1704250852]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SummaryHeader" type="HBoxContainer" parent="SummaryMargin/SummaryPanel/SummaryColumn" unique_id=1581783167]
+layout_mode = 2
+
+[node name="SummaryTitle" type="Label" parent="SummaryMargin/SummaryPanel/SummaryColumn/SummaryHeader" unique_id=1475620274]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Day Summary"
+
+[node name="Close Button" parent="SummaryMargin/SummaryPanel/SummaryColumn/SummaryHeader" unique_id=1203562834 instance=ExtResource("2_art7y")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EmptyLabel" type="Label" parent="SummaryMargin/SummaryPanel/SummaryColumn" unique_id=1593576361]
+unique_name_in_owner = true
+layout_mode = 2
+text = "No qeusts went out today. "
+
+[node name="SummaryScroll" type="ScrollContainer" parent="SummaryMargin/SummaryPanel/SummaryColumn" unique_id=1697673759]
+layout_mode = 2
+
+[node name="EntryList" type="VBoxContainer" parent="SummaryMargin/SummaryPanel/SummaryColumn/SummaryScroll" unique_id=414700040]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
