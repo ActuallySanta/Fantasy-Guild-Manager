@@ -72,27 +72,22 @@ func _init() -> void:
 	pass
 	
 func calcSuccessChance(_questingAdventurers: Array[GuildCharacter]) -> float:
-	var statHitNum = 60 + (20 * difficulty)
-	var statTotal = 0
+	var statHitNum = 60.0 + (20 * difficulty)
+	var statTotal = 0.0
 	
 	for adventurer in _questingAdventurers:
-		print(adventurer.StatType.STRENGTH)
-		print(adventurer.StatType.DEFENSE)
-		print(adventurer.StatType.WISDOM)
-		print(adventurer.StatType.SLEAZINESS)
-		statTotal += adventurer.StatType.STRENGTH +  adventurer.StatType.DEFENSE +  adventurer.StatType.WISDOM +  adventurer.StatType.SLEAZINESS
+		statTotal += adventurer.stats[0] +  adventurer.stats[1] +  adventurer.stats[2] +  adventurer.stats[3]
 		match favStat:
 			0:
-				statTotal += adventurer.StatType.STRENGTH
+				statTotal += adventurer.stats[0]
 			1:
-				statTotal += adventurer.StatType.DEFENSE
+				statTotal += adventurer.stats[1]
 			2:
-				statTotal += adventurer.StatType.WISDOM
+				statTotal += adventurer.stats[2]
 			3:
-				statTotal += adventurer.StatType.SLEAZINESS
+				statTotal += adventurer.stats[3]
 				
-	print(statTotal)
-	return statTotal / statHitNum
+	return snapped((statTotal / statHitNum), 0.01)
 
 #this is the main root method for deciding and generating results I'll have
 #methods branch off to decide certain parts of the results

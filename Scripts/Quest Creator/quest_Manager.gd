@@ -22,9 +22,11 @@ func _ready() -> void:
 		
 	adventurerArray = thisQuest.generatePartyDuo()
 	adventurerArrayAgain.append(adventurerArray[0])
-	print(thisQuest.calcSuccessChance(adventurerArray))
 	
-	questResults = thisQuest.generateResults(adventurerArrayAgain, 80.0)
+	var successChance = thisQuest.calcSuccessChance(adventurerArray)
+	print(successChance)
+	
+	questResults = thisQuest.generateResults(adventurerArrayAgain, successChance)
 	acceptedQuestResults.append(questResults)
 
 	testQuestNumber = testQuestNumber + 1
@@ -32,9 +34,11 @@ func _ready() -> void:
 	
 	thisQuest = CreatedQuest.new()
 	adventurerArray = thisQuest.generatePartyDuo()
-	print(thisQuest.calcSuccessChance(adventurerArray))
 	
-	questResults = thisQuest.generateResults(adventurerArray, 80.0)
+	successChance = thisQuest.calcSuccessChance(adventurerArray)
+	print(successChance)
+	
+	questResults = thisQuest.generateResults(adventurerArray, successChance)
 	acceptedQuestResults.append(questResults)
 	
 	testQuestNumber = testQuestNumber + 1
@@ -42,9 +46,11 @@ func _ready() -> void:
 	
 	thisQuest = CreatedQuest.new()
 	adventurerArray = thisQuest.generatePartyDuo()
-	print(thisQuest.calcSuccessChance(adventurerArray))
 
-	questResults = thisQuest.generateResults(adventurerArray, 80.0)
+	successChance = thisQuest.calcSuccessChance(adventurerArray)
+	print(successChance)
+
+	questResults = thisQuest.generateResults(adventurerArray, successChance)
 	acceptedQuestResults.append(questResults)
 	
 	print(questResults, "\n")
