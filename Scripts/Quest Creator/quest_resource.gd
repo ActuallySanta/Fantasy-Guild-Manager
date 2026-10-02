@@ -15,6 +15,8 @@ enum QuestType{
 	#skip 0 for now
 	DungeonClear = 1,
 	Escort = 2,
+	ScoutTerrain = 3,
+	GatherIntel = 4,
 }
 
 enum FavoredStat{
@@ -55,7 +57,7 @@ func _init() -> void:
 	#hard coding variables for intial testing
 	difficulty = 0;
 	
-	questNum = randi_range(0, 3)
+	questNum = randi_range(0, 5)
 	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
 	location = ExternalContentContainer.get_Location_Name(type - 1)
 	goldReward = 200;
@@ -67,6 +69,12 @@ func _init() -> void:
 		2:
 			favStat = FavoredStat.Defense;
 			questTitle = str("Escort someone to ", location)
+		3:
+			favStat = FavoredStat.Wisdom;
+			questTitle = str("Explore ", location)
+		4:
+			favStat = FavoredStat.Sleaze;
+			questTitle = str("Gather information on ", location)
 	
 	print("")
 	pass

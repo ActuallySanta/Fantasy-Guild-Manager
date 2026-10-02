@@ -1,6 +1,6 @@
-Metalmarrow Mines|Sunbrook
-Stormbreak Castle|the Capital City
-Midnight Manor|Ba Sing Se
-Temple of Time|Rocburg
-Blacksun Citadel|Raven's Landing
-Nathaniel's House (Spooky :O)|Oryx Port
+Metalmarrow Mines|Sunbrook|Cragfield Canyon|the Hash-Slinging Slasher
+Stormbreak Castle|the Capital City|Blue Lake Basin|a possible Necromancer
+Midnight Manor|Ba Sing Se|Mistwater Marsh|The Hat Man
+Temple of Time|Rocburg|the Abandoned Acropolis|John Doe
+Blacksun Citadel|Raven's Landing|Sunveil Strip|the Hellfiller Huntrix
+Nathaniel's House (Spooky :O)|Oryx Port|Greyfog Gravefield|Nathaniel (he got lost :p)
