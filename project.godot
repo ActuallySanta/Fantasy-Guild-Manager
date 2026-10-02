@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Fantasy Guild Manager"
-run/main_scene="uid://cbre2l6kj08ep"
+run/main_scene="uid://dq7cb1c5woaat"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 

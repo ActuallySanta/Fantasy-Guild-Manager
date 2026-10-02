@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://i3jep15b6byf"]
+
+[ext_resource type="Script" uid="uid://crvq4f5cjtf07" path="res://Scripts/UI/summary_entry.gd" id="1_evdin"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.78, 0.44303998, 0.21839997, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="SummaryEntry" type="PanelContainer" unique_id=2128185150]
+offset_right = 1.0
+offset_bottom = 77.0
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
+script = ExtResource("1_evdin")
+
+[node name="EntryColumn" type="VBoxContainer" parent="." unique_id=1379890285]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HeaderLabel" type="Label" parent="EntryColumn" unique_id=917094200]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+autowrap_mode = 3
+
+[node name="PartyLabel" type="Label" parent="EntryColumn" unique_id=19493753]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="StoryLabel" type="Label" parent="EntryColumn" unique_id=967886022]
+unique_name_in_owner = true
+layout_mode = 2
+autowrap_mode = 3

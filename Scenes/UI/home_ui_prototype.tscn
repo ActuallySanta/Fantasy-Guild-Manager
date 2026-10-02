@@ -1,12 +1,33 @@
 [gd_scene format=3 uid="uid://dq7cb1c5woaat"]
 
-[ext_resource type="Script" uid="uid://bhe1jngvui4kr" path="res://Scripts/Test Scripts/test_content.gd" id="1_dh3ed"]
+[ext_resource type="Script" uid="uid://tlhfiyj5s2yd" path="res://Scripts/UI/home_ui_prototype.gd" id="1_18fsv"]
+[ext_resource type="Script" uid="uid://cmlplktrs1fb0" path="res://Scripts/UI/quest_list.gd" id="1_prqkl"]
+[ext_resource type="Texture2D" uid="uid://b45od3f4bqey8" path="res://Sprites/Character Icons/sun-solid-full.svg" id="2_sufdd"]
+[ext_resource type="PackedScene" uid="uid://cawb7mk4rfspb" path="res://Scenes/UI/quest_card.tscn" id="2_xsnmc"]
+[ext_resource type="Texture2D" uid="uid://e4g7gfuo6w5i" path="res://Sprites/Character Icons/coins-solid-full.svg" id="3_58akh"]
+[ext_resource type="Script" uid="uid://djvjacwit4hlu" path="res://Scripts/UI/char_roster.gd" id="3_oscj5"]
+[ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="3_xsnmc"]
+[ext_resource type="Texture2D" uid="uid://ccsai8aanfspa" path="res://Sprites/Character Icons/chess-rook-solid-full.svg" id="4_73enw"]
+[ext_resource type="PackedScene" uid="uid://dpm6emiryhpli" path="res://Scenes/UI/character_button.tscn" id="4_brb4x"]
+[ext_resource type="Script" uid="uid://so4dh7cytoft" path="res://Scripts/UI/day_bar.gd" id="5_58akh"]
+[ext_resource type="PackedScene" uid="uid://ca7d3fdaphs4v" path="res://Scenes/Characters/character_generator.tscn" id="6_brb4x"]
+[ext_resource type="Script" uid="uid://blul1044ocxp2" path="res://Scripts/Quest Creator/quest_Manager.gd" id="7_18fsv"]
+[ext_resource type="PackedScene" uid="uid://4q07bd1hkr4d" path="res://Scenes/UI/Reusable Elements/dialogue_box.tscn" id="7_jcj1f"]
+[ext_resource type="Texture2D" uid="uid://c0ojxw8sauffc" path="res://Sprites/Character Icons/user-solid-full.svg" id="10_u2mag"]
+[ext_resource type="Texture2D" uid="uid://bj1hfljhsxpfe" path="res://Sprites/Character Icons/book-solid-full.svg" id="11_ewhhe"]
+[ext_resource type="Texture2D" uid="uid://c178h40n2xa06" path="res://Sprites/Character Icons/house-solid-full.svg" id="12_rohuf"]
+[ext_resource type="Texture2D" uid="uid://wtb4ungnk6wg" path="res://Sprites/Character Icons/arrow-up-solid-full.svg" id="13_h2ntd"]
+[ext_resource type="Texture2D" uid="uid://ccw8frov4muxu" path="res://Sprites/Character Icons/gear-solid-full.svg" id="14_fkiig"]
+[ext_resource type="PackedScene" uid="uid://cuv2kkwbxwgjy" path="res://Scenes/UI/day_summary.tscn" id="19_73enw"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
 bg_color = Color(0.87635714, 0.47655976, 0.26507115, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yf5fn"]
 bg_color = Color(0.37345314, 0.61593235, 0.87967634, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dh3ed"]
+bg_color = Color(0.81872517, 0.46824145, 0.6578071, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_57qmd"]
 bg_color = Color(0.29879028, 0.69022816, 0.47103286, 1)
@@ -18,6 +39,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_18fsv")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=2056262714]
 layout_mode = 1
@@ -31,7 +53,8 @@ grow_vertical = 2
 layout_mode = 2
 
 [node name="TopBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=168263758]
-custom_minimum_size = Vector2(0, 150)
+custom_minimum_size = Vector2(0, 70)
+custom_maximum_size = Vector2(-1, 250)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
 
@@ -39,26 +62,81 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="DayLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=1815111058]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=1917717664]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer" unique_id=789881013]
+custom_maximum_size = Vector2(-1, 150)
+layout_mode = 2
+texture = ExtResource("2_sufdd")
+expand_mode = 4
+stretch_mode = 5
+
+[node name="DayLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer" unique_id=1815111058]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 text = "Day"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="GoldLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=1468207839]
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=1488012171]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer2" unique_id=795115508]
+custom_maximum_size = Vector2(-1, 150)
+layout_mode = 2
+texture = ExtResource("3_58akh")
+expand_mode = 4
+stretch_mode = 5
+
+[node name="GoldLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer2" unique_id=1468207839]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Gold"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StanLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=510686645]
+[node name="VBoxContainer3" type="VBoxContainer" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow" unique_id=202743151]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer3" unique_id=662753280]
+custom_maximum_size = Vector2(-1, 150)
+layout_mode = 2
+texture = ExtResource("4_73enw")
+expand_mode = 4
+stretch_mode = 5
+
+[node name="StanLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer3" unique_id=510686645]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Standing"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="DayBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1982121986 node_paths=PackedStringArray("quest_list", "day_summary")]
+custom_minimum_size = Vector2(0, 90)
+layout_mode = 2
+script = ExtResource("5_58akh")
+quest_list = NodePath("../Content/ContentScroll/ContentList")
+day_summary = NodePath("../../../DaySummary")
+
+[node name="DayBarRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DayBar" unique_id=1818156357]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="EndDayButton" type="Button" parent="MarginContainer/VBoxContainer/DayBar/DayBarRow" unique_id=1581358539]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 70)
+layout_mode = 2
+size_flags_horizontal = 6
+text = "End Day"
 
 [node name="Content" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=776379136]
 layout_mode = 2
@@ -73,7 +151,44 @@ horizontal_scroll_mode = 0
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
-script = ExtResource("1_dh3ed")
+script = ExtResource("1_prqkl")
+quest_card_scene = ExtResource("2_xsnmc")
+
+[node name="Roster" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1362079796]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_dh3ed")
+
+[node name="RosterColumn" type="VBoxContainer" parent="MarginContainer/VBoxContainer/Roster" unique_id=818766545]
+layout_mode = 2
+
+[node name="RosterHeader" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Roster/RosterColumn" unique_id=339474195]
+layout_mode = 2
+
+[node name="RosterTitle" type="Label" parent="MarginContainer/VBoxContainer/Roster/RosterColumn/RosterHeader" unique_id=1819909568]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "     Characters "
+
+[node name="Close Button" parent="MarginContainer/VBoxContainer/Roster/RosterColumn/RosterHeader" unique_id=1203562834 instance=ExtResource("3_xsnmc")]
+custom_minimum_size = Vector2(70, 70)
+layout_mode = 2
+
+[node name="RosterScroll" type="ScrollContainer" parent="MarginContainer/VBoxContainer/Roster/RosterColumn" unique_id=827291821]
+custom_minimum_size = Vector2(0, 270)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="CharList" type="HFlowContainer" parent="MarginContainer/VBoxContainer/Roster/RosterColumn/RosterScroll" unique_id=291949744 node_paths=PackedStringArray("roster_panel", "close_button")]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+script = ExtResource("3_oscj5")
+character_button_scene = ExtResource("4_brb4x")
+roster_panel = NodePath("../../..")
+close_button = NodePath("../../RosterHeader/Close Button")
 
 [node name="NavBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=529664223]
 custom_minimum_size = Vector2(0, 140)
@@ -83,27 +198,70 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_57qmd")
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer/NavBar" unique_id=1453415893]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=491293372]
+[node name="CharButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=491293372]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Characters"
+icon = ExtResource("10_u2mag")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
-[node name="Button2" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2100987524]
+[node name="LogButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2100987524]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Quest Log"
+icon = ExtResource("11_ewhhe")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
-[node name="Button3" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2031683743]
+[node name="HomeButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=2031683743]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Home"
+icon = ExtResource("12_rohuf")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
-[node name="Button4" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=97551426]
+[node name="UpgrButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=97551426]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Upgrades"
+icon = ExtResource("13_h2ntd")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
 
-[node name="Button5" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=1987690344]
+[node name="SetngButton" type="Button" parent="MarginContainer/VBoxContainer/NavBar/HBoxContainer" unique_id=1987690344]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Settings"
+icon = ExtResource("14_fkiig")
+icon_alignment = 1
+vertical_icon_alignment = 0
+expand_icon = true
+
+[node name="Intro Blurb" parent="MarginContainer" unique_id=2008083606 instance=ExtResource("7_jcj1f")]
+visible = false
+layout_mode = 2
+
+[node name="Banner Title" parent="MarginContainer/Intro Blurb/Background/VBoxContainer" parent_id_path=PackedInt32Array(2008083606, 1861553414) index="0" unique_id=1148823556]
+text = "WELCOME"
+
+[node name="Log Contents" parent="MarginContainer/Intro Blurb/Background/VBoxContainer" parent_id_path=PackedInt32Array(2008083606, 1861553414) index="1" unique_id=2017656256]
+text = "[font_size=45][color=black]Welcome to your new guild! You are a fledgling guild master with the goal of getting rich and defeating the demon king! To do so you must [b]HIRE[/b] guild members to [b]SEND[/b] on quests! You can choose to [b]ACCEPT[/b] or [b]DENY[/b] quests depending on what you want to prioritze. Your members will try to complete the quests to the best of their ability while trying to find [b]TREASURE[/b]. Your guild members can get [b]INJURED [/b]and will need to rest to heal back up. Try and do your best to claim your fortune and save the world![/font_size]"
+
+[node name="Character Generator" parent="." unique_id=1008846978 instance=ExtResource("6_brb4x")]
+
+[node name="QuestManager" type="Node2D" parent="." unique_id=646399410]
+script = ExtResource("7_18fsv")
+
+[node name="DaySummary" parent="." unique_id=39756973 instance=ExtResource("19_73enw")]
+visible = false
+layout_mode = 1
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/NavBar/HBoxContainer/CharButton" to="." method="_on_char_button_pressed"]
+
+[editable path="MarginContainer/Intro Blurb"]

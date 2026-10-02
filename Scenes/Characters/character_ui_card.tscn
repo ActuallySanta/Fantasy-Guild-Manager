@@ -50,15 +50,26 @@ theme_override_constants/margin_right = 32
 theme_override_constants/margin_bottom = 32
 
 [node name="Character Name Label" type="Label" parent="VBoxContainer/Name Background/CenterContainer" unique_id=718164899]
+custom_maximum_size = Vector2(400, -1)
 layout_mode = 2
+size_flags_horizontal = 4
 text = "This is a test"
 label_settings = SubResource("LabelSettings_g4v7s")
 horizontal_alignment = 1
 
-[node name="Character Icon" type="TextureRect" parent="VBoxContainer" unique_id=1782823202]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer" unique_id=1203854264]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 16
+
+[node name="Character Icon" type="TextureRect" parent="VBoxContainer/MarginContainer" unique_id=1782823202]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("1_iwhsd")
+expand_mode = 4
 
 [node name="Stat Block" type="ColorRect" parent="VBoxContainer" unique_id=1385783921]
 custom_minimum_size = Vector2(0, 50)
@@ -66,53 +77,64 @@ layout_mode = 2
 size_flags_vertical = 3
 color = Color(0.6452097, 0.6452098, 0.6452097, 1)
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Stat Block" unique_id=759025615]
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/Stat Block" unique_id=2060475274]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
 
-[node name="Character Description Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer" unique_id=345132546]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Stat Block/MarginContainer" unique_id=759025615]
+layout_mode = 2
+
+[node name="Character Description Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer" unique_id=345132546]
+custom_maximum_size = Vector2(400, -1)
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 1
 text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
+autowrap_mode = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Stat Block/HBoxContainer" unique_id=378746472]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer" unique_id=378746472]
+custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
-size_flags_horizontal = 3
 
-[node name="Strength Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer/VBoxContainer" unique_id=1873679725]
+[node name="Defense Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer" unique_id=887562557]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
 text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
 
-[node name="Defense Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer/VBoxContainer" unique_id=887562557]
+[node name="Wisdom Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer" unique_id=814082053]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
 text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
 
-[node name="Wisdom Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer/VBoxContainer" unique_id=814082053]
+[node name="Sleaziness Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1563846041]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
 text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
 
-[node name="Sleaziness Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer/VBoxContainer" unique_id=1563846041]
+[node name="Pluck Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1229794144]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
 text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
 
-[node name="Pluck Label" type="Label" parent="VBoxContainer/Stat Block/HBoxContainer/VBoxContainer" unique_id=1229794144]
+[node name="Strength Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1873679725]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6

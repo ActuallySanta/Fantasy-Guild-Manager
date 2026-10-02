@@ -6,7 +6,7 @@ const CHARACTER_UI_CARD = preload("res://Scenes/Characters/character_ui_card.tsc
 var held_character : GuildCharacter
 
 func _ready() -> void:
-	icon = ExternalContentContainer._get_character_icon(held_character.role)
+	icon = ExternalContentContainer.get_character_icon(held_character.role)
 	text = held_character.title
 
 

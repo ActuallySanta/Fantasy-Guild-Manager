@@ -3,11 +3,12 @@
 [ext_resource type="Script" uid="uid://gyr7clebk1qq" path="res://Scripts/UI/character_display_button.gd" id="1_h28qc"]
 
 [node name="Character Display Button" type="Button" unique_id=975318839]
-custom_minimum_size = Vector2(64, 64)
+custom_minimum_size = Vector2(128, 128)
 offset_right = 8.0
 offset_bottom = 8.0
 icon_alignment = 1
 vertical_icon_alignment = 0
+expand_icon = true
 script = ExtResource("1_h28qc")
 metadata/_custom_type_script = "uid://dppccbdtrjiuo"
 
