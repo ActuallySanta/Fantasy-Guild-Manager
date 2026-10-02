@@ -66,7 +66,7 @@ func _on_party_changed(quest, party: Array) -> void:
 	print(QuestCard.get_title(quest), " party: ", names)
 
 # returns every quest card thats ready to go out for the day
-func get_dispatched_card() -> Array[QuestCard]:
+func get_dispatched_cards() -> Array[QuestCard]:
 	var dispatched: Array[QuestCard] = []
 	for card in get_children():
 		if card is QuestCard and card.is_ready_to_send():

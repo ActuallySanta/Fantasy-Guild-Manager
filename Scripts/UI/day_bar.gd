@@ -16,13 +16,13 @@ func _ready() -> void:
  
 func end_day() -> void:
 	if quest_list == null or day_summary == null:
-		push_error("DayBar: drag ContentList into Quest List and DaySummary into Day Summary in the Inspector.")
+		push_error("drag ContentList into Quest List and DaySummary into Day Summary in the Inspector")
 		return
  
 	# Each result is a Dictionary the summary screen shows
 	var results := []
  
-	for card in quest_list.get_dispatched_cards():
+	for card: QuestCard in quest_list.get_dispatched_cards():
 		var party := card.get_party()
  
 		# generateResults() wants typed Array[GuildCharacter]
