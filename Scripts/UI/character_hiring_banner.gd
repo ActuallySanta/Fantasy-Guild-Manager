@@ -26,6 +26,7 @@ func _ready() -> void:
 
 pass # Replace with function body.
 
+##Add the character to the guild if there is space
 func _on_clickable_area_pressed() -> void:
 	var success: bool = CharacterContainer.add_character_to_guild(loaded_character)
 	if (success):

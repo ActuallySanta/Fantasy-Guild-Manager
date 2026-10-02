@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://svptgj03vqkp" path="res://Scripts/UI/guild_character_page.gd" id="1_rio15"]
 [ext_resource type="PackedScene" uid="uid://crdeav1go6l0y" path="res://Scenes/UI/Drag and Drop System/drag_drop_grid.tscn" id="1_y883n"]
 [ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="4_rio15"]
+[ext_resource type="PackedScene" uid="uid://bo10juj3x7m8u" path="res://Scenes/character_hiring_page.tscn" id="5_lderk"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g4v7s"]
 atlas = ExtResource("1_aqnsx")
@@ -88,6 +89,10 @@ offset_bottom = 66.0
 grow_horizontal = 0
 grow_vertical = 1
 pivot_offset = Vector2(25, 25)
+
+[node name="Character Hiring Page" parent="." unique_id=32850235 instance=ExtResource("5_lderk")]
+visible = false
+layout_mode = 1
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/Hire New Characters Button" to="." method="_on_hire_new_characters_button_pressed"]
 [connection signal="pressed" from="Close Button" to="." method="_on_close_button_pressed"]

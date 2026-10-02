@@ -1,6 +1,8 @@
 extends Control
 
 @onready var drag_drop_grid: DragDropGrid = $"MarginContainer/VBoxContainer/ScrollContainer/Drag Drop Grid"
+@onready var character_hiring_page: Control = $"Character Hiring Page"
+
 const CHARACTER_DISPLAY_BUTTON = preload("uid://byy6otbkss2ac")
 const CHARACTER_HIRING_PAGE = preload("uid://bo10juj3x7m8u")
 
@@ -14,6 +16,9 @@ func _ready() -> void:
 
 
 func _load_characters_onto_page():
+	for child in drag_drop_grid.get_children():
+		child.queue_free()
+
 	for characters in CharacterContainer.active_characters:
 		var _char_icon := CHARACTER_DISPLAY_BUTTON.instantiate()
 		_char_icon.held_character = characters
@@ -24,9 +29,9 @@ func _load_characters_onto_page():
 
 
 func _on_close_button_pressed() -> void:
-	queue_free()
+	hide()
 
 
+##Open the character hiring page
 func _on_hire_new_characters_button_pressed() -> void:
-	var hiring_page := CHARACTER_HIRING_PAGE.instantiate()
-	add_child(hiring_page)
+	character_hiring_page.show()
