@@ -17,10 +17,28 @@ var testQuestNumber = 0:
 func _ready() -> void:
 	thisQuest = CreatedQuest.new()
 	var adventurerArray : Array[GuildCharacter]
+	var adventurerArrayAgain : Array[GuildCharacter]
 	var questResults : String
 		
 	adventurerArray = thisQuest.generatePartyDuo()
-	questResults = thisQuest.generateResults(adventurerArray, 80.0)
+	adventurerArrayAgain.append(adventurerArray[0])
+	
+	var successChance = thisQuest.calcSuccessChance(adventurerArray)
+	print(successChance)
+	
+	questResults = thisQuest.generateResults(adventurerArrayAgain, successChance)
+	acceptedQuestResults.append(questResults)
+
+	testQuestNumber = testQuestNumber + 1
+	print(questResults, "\n")
+	
+	thisQuest = CreatedQuest.new()
+	adventurerArray = thisQuest.generatePartyDuo()
+	
+	successChance = thisQuest.calcSuccessChance(adventurerArray)
+	print(successChance)
+	
+	questResults = thisQuest.generateResults(adventurerArray, successChance)
 	acceptedQuestResults.append(questResults)
 	
 	testQuestNumber = testQuestNumber + 1
@@ -28,15 +46,11 @@ func _ready() -> void:
 	
 	thisQuest = CreatedQuest.new()
 	adventurerArray = thisQuest.generatePartyDuo()
-	questResults = thisQuest.generateResults(adventurerArray, 80.0)
-	acceptedQuestResults.append(questResults)
-	
-	testQuestNumber = testQuestNumber + 1
-	print(questResults, "\n")
-	
-	thisQuest = CreatedQuest.new()
-	adventurerArray = thisQuest.generatePartyDuo()
-	questResults = thisQuest.generateResults(adventurerArray, 80.0)
+
+	successChance = thisQuest.calcSuccessChance(adventurerArray)
+	print(successChance)
+
+	questResults = thisQuest.generateResults(adventurerArray, successChance)
 	acceptedQuestResults.append(questResults)
 	
 	print(questResults, "\n")

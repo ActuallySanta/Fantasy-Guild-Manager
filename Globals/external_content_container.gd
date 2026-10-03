@@ -89,9 +89,15 @@ func _ready() -> void:
 	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 1)) 
 	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 2)) 
 	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 3)) 
+	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 4))
+	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 5))
+	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 6))
+	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 7))
 	
 	location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 0)) 
 	location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 1)) 
+	location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 2)) 
+	location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 3)) 
 	pass # Replace with function body.
 
 
