@@ -80,13 +80,26 @@ static func get_title(q) -> String:
 static func get_details(q) -> String:
 	# Once difficulty is added ill add the rank in: 
 	# var rank = CreatedQuest.QuestDifficulty.find_key(q.difficulty)
-	
 	var stat = CreatedQuest.FavoredStat.find_key(q.favStat)
-
+	
 	var count := get_slot_count(q)
 	var adventurers := "1 Adventurer" if count == 1 else "%d Adventurers" % count
 
-	return "%d Gold  -  %s\nFavors: %s" % [q.goldReward, adventurers, stat]
+	return "%s\n%d Gold  -  %s\nFavors: %s" % [get_type_name(q), q.goldReward, adventurers, stat]
+
+# turns the QuestType enum into a name players can read
+static func get_type_name(q: CreatedQuest) -> String:
+	match q.type:
+		CreatedQuest.QuestType.DungeonClear:
+			return "Clear Dungeon"
+		CreatedQuest.QuestType.Escort:
+			return "Escort"
+		CreatedQuest.QuestType.ScoutTerrain:
+			return "Scout Terrain"
+		CreatedQuest.QuestType.GatherIntel:
+			return "Gather Intel"
+		_:
+			return "Unknown Quest"
 
 # How many character slots each quests needs, currently
 # no party size value but if its added later
