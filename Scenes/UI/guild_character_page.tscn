@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://svptgj03vqkp" path="res://Scripts/UI/guild_character_page.gd" id="1_rio15"]
 [ext_resource type="PackedScene" uid="uid://crdeav1go6l0y" path="res://Scenes/UI/Drag and Drop System/drag_drop_grid.tscn" id="1_y883n"]
 [ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="4_rio15"]
+[ext_resource type="PackedScene" uid="uid://bo10juj3x7m8u" path="res://Scenes/character_hiring_page.tscn" id="5_lderk"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_g4v7s"]
 atlas = ExtResource("1_aqnsx")
@@ -22,6 +23,7 @@ grow_vertical = 2
 script = ExtResource("1_rio15")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="." unique_id=1858814743]
+texture_filter = 1
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -29,11 +31,10 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = SubResource("AtlasTexture_g4v7s")
-region_rect = Rect2(0, 0, 96, 96)
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
+patch_margin_left = 48
+patch_margin_top = 48
+patch_margin_right = 48
+patch_margin_bottom = 48
 axis_stretch_horizontal = 2
 axis_stretch_vertical = 2
 
@@ -59,10 +60,20 @@ text = "CHARACTERS"
 label_settings = SubResource("LabelSettings_g4v7s")
 horizontal_alignment = 1
 
-[node name="Drag Drop Grid" parent="MarginContainer/VBoxContainer" unique_id=1209773775 instance=ExtResource("1_y883n")]
+[node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer" unique_id=628597229]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Drag Drop Grid" parent="MarginContainer/VBoxContainer/ScrollContainer" unique_id=1209773775 instance=ExtResource("1_y883n")]
 layout_mode = 2
 size_flags_vertical = 3
 columns = 4
+
+[node name="Hire New Characters Button" type="Button" parent="MarginContainer/VBoxContainer" unique_id=1375498247]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "HIRE NEW CHARACTERS"
 
 [node name="Close Button" parent="." unique_id=1203562834 instance=ExtResource("4_rio15")]
 layout_mode = 1
@@ -79,4 +90,9 @@ grow_horizontal = 0
 grow_vertical = 1
 pivot_offset = Vector2(25, 25)
 
+[node name="Character Hiring Page" parent="." unique_id=32850235 instance=ExtResource("5_lderk")]
+visible = false
+layout_mode = 1
+
+[connection signal="pressed" from="MarginContainer/VBoxContainer/Hire New Characters Button" to="." method="_on_hire_new_characters_button_pressed"]
 [connection signal="pressed" from="Close Button" to="." method="_on_close_button_pressed"]

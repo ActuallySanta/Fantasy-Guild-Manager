@@ -17,11 +17,15 @@ func _ready() -> void:
 		close_button.pressed.connect(close)
 	else:
 		push_error("Roster: drag the CloseButton into Close Button in the Inspector.")
-		
+	
+	# rebuild when someone is hired
+	CharacterContainer.on_character_added.connect(rebuild)
+	
 	close()  # start hidden so the quest list gets the whole screen
 	rebuild()
 
 func open() -> void:
+	rebuild()
 	if roster_panel:
 		roster_panel.visible = true
 

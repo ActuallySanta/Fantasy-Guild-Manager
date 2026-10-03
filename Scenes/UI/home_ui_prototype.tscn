@@ -19,6 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://wtb4ungnk6wg" path="res://Sprites/Character Icons/arrow-up-solid-full.svg" id="13_h2ntd"]
 [ext_resource type="Texture2D" uid="uid://ccw8frov4muxu" path="res://Sprites/Character Icons/gear-solid-full.svg" id="14_fkiig"]
 [ext_resource type="PackedScene" uid="uid://cuv2kkwbxwgjy" path="res://Scenes/UI/day_summary.tscn" id="19_73enw"]
+[ext_resource type="PackedScene" uid="uid://daweenf55s77m" path="res://Scenes/UI/guild_character_page.tscn" id="20_u2mag"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_g4v7s"]
 bg_color = Color(0.87635714, 0.47655976, 0.26507115, 1)
@@ -125,7 +126,7 @@ custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
 script = ExtResource("5_58akh")
 quest_list = NodePath("../Content/ContentScroll/ContentList")
-day_summary = NodePath("../../../DaySummary")
+day_summary = NodePath("../../../Popup Pages/DaySummary")
 
 [node name="DayBarRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DayBar" unique_id=1818156357]
 layout_mode = 2
@@ -258,9 +259,13 @@ text = "[font_size=45][color=black]Welcome to your new guild! You are a fledglin
 [node name="QuestManager" type="Node2D" parent="." unique_id=646399410]
 script = ExtResource("7_18fsv")
 
-[node name="DaySummary" parent="." unique_id=39756973 instance=ExtResource("19_73enw")]
+[node name="Popup Pages" type="Node" parent="." unique_id=68903464]
+
+[node name="DaySummary" parent="Popup Pages" unique_id=39756973 instance=ExtResource("19_73enw")]
 visible = false
-layout_mode = 1
+
+[node name="Guild Character Page" parent="Popup Pages" unique_id=842800654 instance=ExtResource("20_u2mag")]
+visible = false
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/NavBar/HBoxContainer/CharButton" to="." method="_on_char_button_pressed"]
 
