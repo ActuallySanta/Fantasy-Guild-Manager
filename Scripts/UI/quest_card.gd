@@ -6,6 +6,7 @@ extends PanelContainer
 # triggers when play accepts quest
 signal accepted(quest)
 signal closed(quest)
+signal denied(quest)
 
 # triggers when a character is added or removed from quest
 # the party array is the characters that are in the slots
@@ -21,6 +22,9 @@ var quest
 # check if quest is open
 var is_open := false
 
+# true once player denies quest
+var is_denied := false
+
 # get slots for the quests for reading and writing
 var slots: Array[CharacterSlot] = []
 
@@ -29,12 +33,14 @@ var slots: Array[CharacterSlot] = []
 # changed everything works
 @onready var _title_label: Label = %TitleLabel
 @onready var _accept_button: Button = %AcceptButton
+@onready var _deny_button: Button = %DenyButton
 @onready var _slot_row: HFlowContainer = %SlotRow
 
 func _ready() -> void:
 	# slots stay hidden untill quest is accepted
 	_slot_row.visible = false
 	_accept_button.pressed.connect(_on_accept_pressed)
+	_deny_button.pressed.connect(_on_deny_pressed)
 
 # called by quest_list.gd after card is added to scene
 func setup(data) -> void:
@@ -88,12 +94,28 @@ func _on_accept_pressed() -> void:
 	_slot_row.visible = is_open
 	_accept_button.text = "Cancel" if is_open else "Accept"
 	
+	# deny only shows when quest isn't accepted
+	_deny_button.visible = not is_open
+	
 	if is_open:
 		accepted.emit(quest)
 	else:
 		for slot in slots: 
 			slot.assign(null)
 		closed.emit(quest)
+
+# Turns the quest down but keeps quest data in case we need it
+func _on_deny_pressed() -> void:
+	for slot in slots:
+		slot.assign(null)   # send anyone in the slots back to the roster
+	is_open = false
+	is_denied = true
+	visible = false
+	denied.emit(quest)
+
+# true if the player still needs to deal with this quest
+func is_outstanding() -> bool:
+	return not is_denied and not is_ready_to_send()
 
 # returns characters currently placed on this quest
 func get_party() -> Array:

@@ -15,7 +15,10 @@ corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yf5fn"]
-bg_color = Color(0.36265266, 0.68963057, 0.33873305, 1)
+bg_color = Color(0.21087831, 0.7186899, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_acicf"]
+bg_color = Color(0.99, 0.123585016, 0.10890002, 1)
 
 [node name="QuestCard" type="PanelContainer" unique_id=529307882]
 anchors_preset = 10
@@ -49,6 +52,13 @@ custom_minimum_size = Vector2(160, 90)
 layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_yf5fn")
 text = "Accept"
+
+[node name="DenyButton" type="Button" parent="Columns/Header" unique_id=1823088070]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 90)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_acicf")
+text = "Deny"
 
 [node name="SlotRow" type="HFlowContainer" parent="Columns" unique_id=851287851]
 unique_name_in_owner = true
