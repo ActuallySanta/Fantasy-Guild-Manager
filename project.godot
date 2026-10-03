@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 ExternalContentContainer="*uid://bae36g2i7jnyo"
 CharacterContainer="*uid://2a60tdtp51bo"
+GuildUpgrades="*res://Globals/guild_upgrades.gd"
 
 [display]
 

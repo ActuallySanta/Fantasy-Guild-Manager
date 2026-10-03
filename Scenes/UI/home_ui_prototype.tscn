@@ -156,6 +156,7 @@ script = ExtResource("1_prqkl")
 quest_card_scene = ExtResource("2_xsnmc")
 
 [node name="Roster" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1362079796]
+visible = false
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_dh3ed")
