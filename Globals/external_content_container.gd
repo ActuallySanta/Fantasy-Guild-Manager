@@ -9,11 +9,11 @@ extends Node
 @export var priest_backstories_file_path : String = "res://External Content/Character Backstories/Backstories - Priest Backstories.csv"
 @export var pathfinder_backstories_file_path : String = "res://External Content/Character Backstories/Backstories - Pathfinder Backstories.csv"
 @export var mage_backstories_file_path : String = "res://External Content/Character Backstories/Backstories - Mage Backstories.csv"
-
 @export var random_backstories_file_path:String = "res://External Content/Character Backstories/Backstories - Random Backstories.csv"
+
 @export var dunegon_locations_test_path: String = "res://External Content/Quest Stuff (Test)/Dungeon Names (Locations).txt" #test path for locations
 @export var monsters_2D_test_path: String = "res://External Content/Quest Stuff (Test)/2D Monster Test.txt" #test path for monstrs
-@export var quest_story_test_path: String = "res://External Content/Quest Stuff (Test)/Story Parts Test.txt" #test path
+@export var quest_story_test_path: String = "res://External Content/Quest Stuff (Test)/Story Parts.txt" #test path
 	
 #Character Names
 var male_character_names: Array[String]
@@ -81,23 +81,12 @@ func _ready() -> void:
 	monster_test_names.append(MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 0)) #2D test
 	monster_test_names.append(MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 1)) 
 	monster_test_names.append(MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 2)) 
-	#monster_test_names[0] = MultiColumnLoader._load_info_from_rows(monsters_2D_test_path, 0) #2D test
-	#monster_test_names[1] = MultiColumnLoader._load_info_from_rows(monsters_2D_test_path, 1) #2D test
-	#monster_test_names[2] = MultiColumnLoader._load_info_from_rows(monsters_2D_test_path, 2) #2D test
 	
-	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 0)) #2D test
-	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 1)) 
-	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 2)) 
-	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 3)) 
-	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 4))
-	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 5))
-	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 6))
-	quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, 7))
+	for i in range(8):
+		quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, i))
 	
-	location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 0)) 
-	location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 1)) 
-	location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 2)) 
-	location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 3)) 
+	for i in range(4):
+			location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, i)) 
 	pass # Replace with function body.
 
 
