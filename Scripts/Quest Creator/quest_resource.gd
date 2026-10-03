@@ -54,13 +54,12 @@ var questNum: int:
 		return questNum
 
 func _init() -> void:
-	#hard coding variables for intial testing
-	difficulty = 0;
+	difficulty = 0; #hard code
 	
-	questNum = randi_range(0, 5)
+	questNum = randi_range(0, 7)
 	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
 	location = ExternalContentContainer.get_Location_Name(type - 1)
-	goldReward = 200;
+	goldReward = 200 + (150 * difficulty)
 	
 	match type:
 		1:
@@ -103,7 +102,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	var returnString = ""
 	
 	numAdventurers = _questingAdventurers.size()
-	print(numAdventurers)
+	#print(numAdventurers)
 	
 	var data = {"location": location}
 	if(numAdventurers == 1):
@@ -113,7 +112,7 @@ ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data))
 		returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, "[/b] ",
 ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data))
 	
-	var loopbreaker = 12
+	var loopbreaker = 12 + (3 * difficulty)
 	while randi_range(-1, 10) < loopbreaker:
 		match randi_range(0, 1):
 			0:
@@ -170,9 +169,9 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 			ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
 			"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n")
 		_:
-			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] was ATTACKED by a ", 
+			returnString = str(returnString, "[b]", _questingAdventurers[randi_range(0, numAdventurers - 1)].name, "[/b] was ATTACKED by a ", 
 			ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
-			". They managed to fight the monster off but was [color=red][b]INJURED[/b][/color] in the process.\n")
+			". They managed to fight the monster off but were [color=red][b]INJURED[/b][/color] in the process.\n")
 	return returnString
 		
 func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
@@ -190,7 +189,7 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 			goldReward += extraGold
 			returnString = str(returnString, "[b]The Party[/b] discovered an old chest containing [color=gold][b]", extraGold, " gold[/b][/color].\n")
 		_ :
-			returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] tripped on a rock and gained [color=red][b]1 INJURY[/b][/color].\n")
+			returnString = str(returnString, "[b]", _questingAdventurers[randi_range(0, numAdventurers - 1)].name, "[/b] tripped on a rock and gained [color=red][b]1 INJURY[/b][/color].\n")
 	return returnString
 
 func generatePartyDuo() -> Array[GuildCharacter]:
