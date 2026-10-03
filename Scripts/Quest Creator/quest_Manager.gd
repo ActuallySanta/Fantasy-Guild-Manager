@@ -44,13 +44,14 @@ func _ready() -> void:
 	testQuestNumber = testQuestNumber + 1
 	print(questResults, "\n")
 	
-	thisQuest = CreatedQuest.new()
+	thisQuest = CreatedQuest.new(10)
 	adventurerArray = thisQuest.generatePartyDuo()
 
 	successChance = thisQuest.calcSuccessChance(adventurerArray)
 	print(successChance)
+	print(thisQuest.questTitle)
 
-	questResults = thisQuest.generateResults(adventurerArray, successChance)
+	questResults = thisQuest.generateMilestoneResults(adventurerArray, successChance)
 	acceptedQuestResults.append(questResults)
 	
 	print(questResults, "\n")

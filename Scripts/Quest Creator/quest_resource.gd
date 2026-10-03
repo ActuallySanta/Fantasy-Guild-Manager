@@ -53,7 +53,11 @@ var questNum: int:
 	get:
 		return questNum
 
-func _init() -> void:
+func _init(dayNum := 0) -> void:
+	if(dayNum == 10):
+		_initMilestoneVars(dayNum)
+		return
+		
 	difficulty = 0; #hard code
 	
 	questNum = randi_range(0, 7)
@@ -190,6 +194,67 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 			returnString = str(returnString, "[b]The Party[/b] discovered an old chest containing [color=gold][b]", extraGold, " gold[/b][/color].\n")
 		_ :
 			returnString = str(returnString, "[b]", _questingAdventurers[randi_range(0, numAdventurers - 1)].name, "[/b] tripped on a rock and gained [color=red][b]1 INJURY[/b][/color].\n")
+	return returnString
+	
+func _initMilestoneVars(dayNum : int):
+	match dayNum:
+		10:
+			difficulty = 2;
+			questNum = 0
+			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
+			location = ExternalContentContainer.get_Location_Name(1)
+			goldReward = 300 + (150 * difficulty)
+			favStat = FavoredStat.Attack;
+			questTitle = str("A Bone Drake is ATTACHING ", location, "! Save the town before it is DESTROYED!")
+	
+	print("")
+	pass
+	
+func generateMilestoneResults(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
+	var returnString = ""
+	numAdventurers = _questingAdventurers.size()
+	
+	var data = {"location": location}
+	if(numAdventurers == 1):
+		returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] ",
+ExternalContentContainer.get_Milestone_story(questNum, 1).c_unescape().format(data))
+	else:
+		returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, "[/b] ",
+ExternalContentContainer.get_Milestone_story(questNum, 1).c_unescape().format(data))
+	
+	var loopbreaker = 12 + (3 * difficulty)
+	while randi_range(-1, 10) < loopbreaker:
+		match randi_range(0, 1):
+			0:
+				returnString = str(returnString, _combatEncounter(_questingAdventurers, _successChance))
+			1:
+				returnString = str(returnString, _search(_questingAdventurers, _successChance))
+		loopbreaker = loopbreaker - 1;
+	
+	var successDetermination = randi_range(0, 100)
+	match true:
+		_ when successDetermination >= _successChance:
+			if(numAdventurers == 1):
+				returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] ", ExternalContentContainer.get_Milestone_story(questNum, 3).c_unescape().format(data))
+			else:
+				returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
+	" ", ExternalContentContainer.get_Milestone_story(questNum, 3).c_unescape().format(data))
+			returnString = str(returnString, "Summary: The quest was [color=red][b]NOT SUCCESSFUL[/b][/color]. Your guild failed to obtain the reward.\n")
+			questSummary = str(questSummary, "Summary: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
+			
+			if(goldReward > 200):
+				returnString = str(returnString, "However, your adventurers did bring back [color=gold][b]", goldReward - 200, " gold[/b][/color].\n")
+				questSummary = str(questSummary, "However, your adventurers did bring back ", goldReward - 200, " gold")
+		_:
+			if(numAdventurers == 1):
+				returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] ",
+	ExternalContentContainer.get_Milestone_story(questNum, 4).c_unescape().format(data))
+			else:
+				returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, 
+	ExternalContentContainer.get_Milestone_story(questNum, 4).c_unescape().format(data))
+			returnString = str(returnString, "Summary: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=gold][b]", goldReward," gold[/b][/color].\n")
+			questSummary = str(questSummary, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward," gold.")
+
 	return returnString
 
 func generatePartyDuo() -> Array[GuildCharacter]:
