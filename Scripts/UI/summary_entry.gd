@@ -26,8 +26,11 @@ func setup(result: Dictionary) -> void:
  
 	# Party: the names of everyone who went on quest
 	var names: Array = result["party"].map(func(c): return CharacterButton.get_display_name(c))
-	_party_label.text = "Party: " + ", ".join(PackedStringArray(names))
- 
+	var party_text := "Party: " + ", ".join(PackedStringArray(names))
+	if result.has("chance"):
+		party_text += " (%d%% sucess chance)" % roundi(result["chance"])
+	_party_label.text = party_text
+	 
 	# The full story of what happened on the quest.
 	_story_label.text = result["story"]
  

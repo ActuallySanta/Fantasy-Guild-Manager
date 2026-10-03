@@ -5,10 +5,12 @@ extends PanelContainer
  
 @export var quest_list: QuestList
 @export var day_summary: DaySummary
- 
-# Chance (0-100) passed to generateResults(). Placeholder until the
-# quest system works it out from the party's stats.
-@export var success_chance: float = 80.0
+
+# calcSuccessChance() returns a fraction (0.85 = 85%), but
+# generateResults() compares against 0-100, so I will convert it here
+static func _get_success_chance(quest: CreatedQuest, party: Array[GuildCharacter]) -> float:
+	return quest.calcSuccessChance(party) * 100.0
+
 @onready var _end_day_button: Button = %EndDayButton
 
 # true after end day is pressed
@@ -48,10 +50,12 @@ func end_day() -> void:
  
 		# generateResults() wants typed Array[GuildCharacter]
 		# so copy the plain party Array into one.
+		# without this every quest would fail
 		var typed_party: Array[GuildCharacter] = []
 		typed_party.assign(party)
- 
-		var story: String = card.quest.generateResults(typed_party, success_chance)
+		
+		var chance := _get_success_chance(card.quest, typed_party)
+		var story: String = card.quest.generateResults(typed_party, chance)
  
 		results.append({
 			"quest": card.quest,

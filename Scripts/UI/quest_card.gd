@@ -78,8 +78,15 @@ static func get_title(q) -> String:
 
 # smaller info line under title for rank and rewards
 static func get_details(q) -> String:
-	var rank = CreatedQuest.QuestDifficulty.find_key(q.difficulty)
-	return "Rank %s - %d Gold" % [rank, q.goldReward]
+	# Once difficulty is added ill add the rank in: 
+	# var rank = CreatedQuest.QuestDifficulty.find_key(q.difficulty)
+	
+	var stat = CreatedQuest.FavoredStat.find_key(q.favStat)
+
+	var count := get_slot_count(q)
+	var adventurers := "1 Adventurer" if count == 1 else "%d Adventurers" % count
+
+	return "%d Gold  -  %s\nFavors: %s" % [q.goldReward, adventurers, stat]
 
 # How many character slots each quests needs, currently
 # no party size value but if its added later
