@@ -10,9 +10,9 @@ const SUCCESS_COLOR := Color(0.45, 0.85, 0.45)
 const FAIL_COLOR := Color(0.9, 0.4, 0.4)
 
 # unique labels for nodes
-@onready var _header_label: Label = %HeaderLabel
-@onready var _party_label: Label = %PartyLabel
-@onready var _story_label: Label = %StoryLabel
+@onready var _header_label: RichTextLabel = %HeaderLabel
+@onready var _party_label: RichTextLabel = %PartyLabel
+@onready var _story_label: RichTextLabel = %StoryLabel
  
 # result is a Dictionary built by day_bar.gd
 # ["quest":, "party": [...], "story":, "succeeded": true/false]
