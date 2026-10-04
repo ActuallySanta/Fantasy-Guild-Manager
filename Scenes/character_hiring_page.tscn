@@ -11,22 +11,23 @@ region = Rect2(0, 0, 96, 96)
 [sub_resource type="LabelSettings" id="LabelSettings_1gyy8"]
 font_size = 32
 
-[node name="Character Hiring Page" type="Control" unique_id=32850235]
-layout_mode = 3
+[node name="Character Hiring Page" type="MarginContainer" unique_id=1481978261]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
 script = ExtResource("1_a4nie")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="." unique_id=1188472112]
 texture_filter = 1
-layout_mode = 0
-offset_right = 720.0
-offset_bottom = 1280.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
 texture = SubResource("AtlasTexture_sl3xc")
 patch_margin_left = 48
 patch_margin_top = 48
@@ -79,18 +80,8 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="Close Button" parent="." unique_id=1203562834 instance=ExtResource("3_xvenb")]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_top = 0.0
-anchor_right = 1.0
-anchor_bottom = 0.0
-offset_left = -50.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 50.0
-grow_horizontal = 0
-grow_vertical = 1
-pivot_offset = Vector2(25, 25)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
 
 [connection signal="pressed" from="Close Button" to="." method="_on_close_button_pressed"]

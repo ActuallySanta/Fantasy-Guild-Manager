@@ -1,6 +1,6 @@
 extends Control
 
-@onready var guild_character_page: Control = $"Popup Pages/Guild Character Page"
+@onready var guild_character_page: Control = $"MarginContainer/VBoxContainer/Content/Guild Character Page"
 
 
 # Called when the node enters the scene tree for the first time.

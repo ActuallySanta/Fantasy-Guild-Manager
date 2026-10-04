@@ -126,7 +126,7 @@ custom_minimum_size = Vector2(0, 90)
 layout_mode = 2
 script = ExtResource("5_58akh")
 quest_list = NodePath("../Content/ContentScroll/ContentList")
-day_summary = NodePath("../../../Popup Pages/DaySummary")
+day_summary = NodePath("../Content/DaySummary")
 
 [node name="DayBarRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/DayBar" unique_id=1818156357]
 layout_mode = 2
@@ -154,6 +154,14 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 12
 script = ExtResource("1_prqkl")
 quest_card_scene = ExtResource("2_xsnmc")
+
+[node name="DaySummary" parent="MarginContainer/VBoxContainer/Content" unique_id=39756973 instance=ExtResource("19_73enw")]
+visible = false
+layout_mode = 2
+
+[node name="Guild Character Page" parent="MarginContainer/VBoxContainer/Content" unique_id=842800654 instance=ExtResource("20_u2mag")]
+visible = false
+layout_mode = 2
 
 [node name="Roster" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=1362079796]
 visible = false
@@ -252,7 +260,7 @@ layout_mode = 2
 [node name="Banner Title" parent="MarginContainer/Intro Blurb/Background/VBoxContainer" parent_id_path=PackedInt32Array(2008083606, 1861553414) index="0" unique_id=1148823556]
 text = "WELCOME"
 
-[node name="Log Contents" parent="MarginContainer/Intro Blurb/Background/VBoxContainer" parent_id_path=PackedInt32Array(2008083606, 1861553414) index="1" unique_id=2017656256]
+[node name="LogContents" parent="MarginContainer/Intro Blurb/Background/VBoxContainer" parent_id_path=PackedInt32Array(2008083606, 1861553414) index="2" unique_id=2017656256]
 text = "[font_size=45][color=black]Welcome to your new guild! You are a fledgling guild master with the goal of getting rich and defeating the demon king! To do so you must [b]HIRE[/b] guild members to [b]SEND[/b] on quests! You can choose to [b]ACCEPT[/b] or [b]DENY[/b] quests depending on what you want to prioritze. Your members will try to complete the quests to the best of their ability while trying to find [b]TREASURE[/b]. Your guild members can get [b]INJURED [/b]and will need to rest to heal back up. Try and do your best to claim your fortune and save the world![/font_size]"
 
 [node name="Character Generator" parent="." unique_id=1008846978 instance=ExtResource("6_brb4x")]
@@ -261,12 +269,6 @@ text = "[font_size=45][color=black]Welcome to your new guild! You are a fledglin
 script = ExtResource("7_18fsv")
 
 [node name="Popup Pages" type="Node" parent="." unique_id=68903464]
-
-[node name="DaySummary" parent="Popup Pages" unique_id=39756973 instance=ExtResource("19_73enw")]
-visible = false
-
-[node name="Guild Character Page" parent="Popup Pages" unique_id=842800654 instance=ExtResource("20_u2mag")]
-visible = false
 
 [connection signal="pressed" from="MarginContainer/VBoxContainer/NavBar/HBoxContainer/CharButton" to="." method="_on_char_button_pressed"]
 
