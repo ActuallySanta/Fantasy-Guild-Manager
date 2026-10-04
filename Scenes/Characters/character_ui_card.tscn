@@ -106,6 +106,13 @@ autowrap_mode = 3
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
 
+[node name="Strength Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1873679725]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "This is a test"
+label_settings = SubResource("LabelSettings_h6oeb")
+
 [node name="Defense Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer" unique_id=887562557]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -128,13 +135,6 @@ text = "This is a test"
 label_settings = SubResource("LabelSettings_h6oeb")
 
 [node name="Pluck Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1229794144]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 6
-text = "This is a test"
-label_settings = SubResource("LabelSettings_h6oeb")
-
-[node name="Strength Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer" unique_id=1873679725]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
