@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ccw8frov4muxu"
-path="res://.godot/imported/gear-solid-full.svg-916a6a44a261f08b72758e0a5aee12df.ctex"
+uid="uid://e4g7gfuo6w5i"
+path="res://.godot/imported/coins-solid-full.svg-282aee664ea357499e0883b421af7bdf.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Character Icons/gear-solid-full.svg"
-dest_files=["res://.godot/imported/gear-solid-full.svg-916a6a44a261f08b72758e0a5aee12df.ctex"]
+source_file="res://Sprites/UI Icons/coins-solid-full.svg"
+dest_files=["res://.godot/imported/coins-solid-full.svg-282aee664ea357499e0883b421af7bdf.ctex"]
 
 [params]
 

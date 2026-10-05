@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ccsai8aanfspa"
-path="res://.godot/imported/chess-rook-solid-full.svg-2cc93b992287d3895117efb8d6ca373c.ctex"
+uid="uid://ccw8frov4muxu"
+path="res://.godot/imported/gear-solid-full.svg-d4a73e7f2b96656d316e815719b4c823.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Character Icons/chess-rook-solid-full.svg"
-dest_files=["res://.godot/imported/chess-rook-solid-full.svg-2cc93b992287d3895117efb8d6ca373c.ctex"]
+source_file="res://Sprites/UI Icons/gear-solid-full.svg"
+dest_files=["res://.godot/imported/gear-solid-full.svg-d4a73e7f2b96656d316e815719b4c823.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c178h40n2xa06"
-path="res://.godot/imported/house-solid-full.svg-79226c0d0619c0a4b0a67c4165faaf84.ctex"
+uid="uid://wtb4ungnk6wg"
+path="res://.godot/imported/arrow-up-solid-full.svg-0e18de7e3185bd524697df3edaffd205.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Character Icons/house-solid-full.svg"
-dest_files=["res://.godot/imported/house-solid-full.svg-79226c0d0619c0a4b0a67c4165faaf84.ctex"]
+source_file="res://Sprites/UI Icons/arrow-up-solid-full.svg"
+dest_files=["res://.godot/imported/arrow-up-solid-full.svg-0e18de7e3185bd524697df3edaffd205.ctex"]
 
 [params]
 

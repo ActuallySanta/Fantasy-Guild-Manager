@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://e4g7gfuo6w5i"
-path="res://.godot/imported/coins-solid-full.svg-5e9072892be589c43441757c5e9673d1.ctex"
+uid="uid://bj1hfljhsxpfe"
+path="res://.godot/imported/book-solid-full.svg-05f9034f6ac35fffb0899a3b5fed4372.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Character Icons/coins-solid-full.svg"
-dest_files=["res://.godot/imported/coins-solid-full.svg-5e9072892be589c43441757c5e9673d1.ctex"]
+source_file="res://Sprites/UI Icons/book-solid-full.svg"
+dest_files=["res://.godot/imported/book-solid-full.svg-05f9034f6ac35fffb0899a3b5fed4372.ctex"]
 
 [params]
 

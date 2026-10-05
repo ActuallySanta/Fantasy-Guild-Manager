@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c0ojxw8sauffc"
-path="res://.godot/imported/user-solid-full.svg-d6bf9fd121c8dfb806f137e0b5845702.ctex"
+uid="uid://c178h40n2xa06"
+path="res://.godot/imported/house-solid-full.svg-906ff9d86647d93c6597f9fe446abf67.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Character Icons/user-solid-full.svg"
-dest_files=["res://.godot/imported/user-solid-full.svg-d6bf9fd121c8dfb806f137e0b5845702.ctex"]
+source_file="res://Sprites/UI Icons/house-solid-full.svg"
+dest_files=["res://.godot/imported/house-solid-full.svg-906ff9d86647d93c6597f9fe446abf67.ctex"]
 
 [params]
 
