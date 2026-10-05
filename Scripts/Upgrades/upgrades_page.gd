@@ -1,11 +1,10 @@
 ## Full-screen Guild Upgrades page, opened from the nav bar's Upgrades button
-## (GuildUpgrades.open_page). Shows the wallet and one UpgradeCard per building.
+## (GuildUpgrades.open_page). Shows one UpgradeCard per building. Gold and
+## standing are shown in the home screen's top bar, not on this page.
 extends Control
 
 const UPGRADE_CARD := preload("res://Scenes/UI/Upgrades/upgrade_card.tscn")
 
-@onready var gold_label: Label = %GoldLabel
-@onready var standing_label: Label = %StandingLabel
 @onready var card_list: VBoxContainer = %CardList
 @onready var debug_row: HBoxContainer = %DebugRow
 
@@ -35,8 +34,6 @@ func _ready() -> void:
 
 
 func refresh() -> void:
-	gold_label.text = "Gold: %d" % GuildUpgrades.gold
-	standing_label.text = "Standing: %d" % GuildUpgrades.standing
 	for card in _cards:
 		card.refresh()
 
