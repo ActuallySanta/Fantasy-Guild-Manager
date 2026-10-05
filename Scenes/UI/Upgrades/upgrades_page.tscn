@@ -11,17 +11,6 @@ region = Rect2(0, 0, 96, 96)
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
 font_size = 32
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wallet"]
-content_margin_left = 16.0
-content_margin_top = 10.0
-content_margin_right = 16.0
-content_margin_bottom = 10.0
-bg_color = Color(0.51, 0.32639998, 0.20399998, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
-
 [node name="Upgrades Page" type="Control" unique_id=1527011873]
 layout_mode = 3
 anchors_preset = 15
@@ -57,7 +46,7 @@ grow_vertical = 2
 theme_override_constants/margin_left = 32
 theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 32
-theme_override_constants/margin_bottom = 24
+theme_override_constants/margin_bottom = 16
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1519689040]
 layout_mode = 2
@@ -67,28 +56,7 @@ theme_override_constants/separation = 14
 layout_mode = 2
 text = "GUILD UPGRADES"
 label_settings = SubResource("LabelSettings_title")
-
-[node name="Wallet" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=2044371595]
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_wallet")
-
-[node name="WalletRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/Wallet" unique_id=578673341]
-layout_mode = 2
-
-[node name="GoldLabel" type="Label" parent="MarginContainer/VBoxContainer/Wallet/WalletRow" unique_id=853730871]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
-text = "Gold: 0"
-
-[node name="StandingLabel" type="Label" parent="MarginContainer/VBoxContainer/Wallet/WalletRow" unique_id=1731383630]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 24
-text = "Standing: 0"
-horizontal_alignment = 2
+horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer/VBoxContainer" unique_id=3602679]
 layout_mode = 2
@@ -138,10 +106,10 @@ anchor_left = 1.0
 anchor_top = 0.0
 anchor_right = 1.0
 anchor_bottom = 0.0
-offset_left = -50.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 50.0
+offset_left = -68.0
+offset_top = 16.0
+offset_right = -18.0
+offset_bottom = 66.0
 grow_horizontal = 0
 grow_vertical = 1
 pivot_offset = Vector2(25, 25)

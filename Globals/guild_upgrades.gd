@@ -318,12 +318,20 @@ func _is_nav_button(node: Node) -> bool:
 func open_page(from_button: Node = null) -> void:
 	if _page == null or not is_instance_valid(_page):
 		_page = load(UPGRADES_PAGE_PATH).instantiate()
-		var host: Node = get_tree().current_scene
-		if from_button != null and from_button.owner != null:
-			host = from_button.owner
-		host.add_child(_page)
+		_get_page_host(from_button).add_child(_page)
 	_page.move_to_front()
 	_page.show()
+
+
+## The page lives inside the home screen's "Content" panel (same spot as the
+## Characters page) so the top bar and nav bar stay visible. Falls back to the
+## scene root if no Content panel is found.
+func _get_page_host(from_button: Node) -> Node:
+	var root: Node = get_tree().current_scene
+	if from_button != null and from_button.owner != null:
+		root = from_button.owner
+	var content: Node = root.find_child("Content", true, false)
+	return content if content != null else root
 
 
 func close_page() -> void:
