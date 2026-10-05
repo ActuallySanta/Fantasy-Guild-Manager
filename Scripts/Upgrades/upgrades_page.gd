@@ -42,7 +42,3 @@ func _on_visibility_changed() -> void:
 	if visible:
 		GuildUpgrades.sync_characters()
 		refresh()
-
-
-func _on_close_button_pressed() -> void:
-	hide()

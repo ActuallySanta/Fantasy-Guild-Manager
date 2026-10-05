@@ -1,12 +1,6 @@
 [gd_scene format=3 uid="uid://d28mfgqtx1wvr"]
 
 [ext_resource type="Script" uid="uid://ceecbldjmp0is" path="res://Scripts/Upgrades/upgrades_page.gd" id="1_page"]
-[ext_resource type="Texture2D" uid="uid://do5kjvfstulyu" path="res://Sprites/32x32-Tilesheet.png" id="2_tiles"]
-[ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="3_close"]
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_frame"]
-atlas = ExtResource("2_tiles")
-region = Rect2(0, 0, 96, 96)
 
 [sub_resource type="LabelSettings" id="LabelSettings_title"]
 font_size = 32
@@ -20,22 +14,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_page")
 
-[node name="NinePatchRect" type="NinePatchRect" parent="." unique_id=1933832110]
-texture_filter = 1
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = SubResource("AtlasTexture_frame")
-patch_margin_left = 48
-patch_margin_top = 48
-patch_margin_right = 48
-patch_margin_bottom = 48
-axis_stretch_horizontal = 2
-axis_stretch_vertical = 2
-
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1099283544]
 layout_mode = 1
 anchors_preset = 15
@@ -43,9 +21,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 32
+theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 32
+theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 16
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=1519689040]
@@ -62,6 +40,7 @@ horizontal_alignment = 1
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
 
 [node name="CardList" type="VBoxContainer" parent="MarginContainer/VBoxContainer/ScrollContainer" unique_id=1127361881]
 unique_name_in_owner = true
@@ -98,20 +77,3 @@ custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Reset"
-
-[node name="Close Button" parent="." unique_id=1018566276 instance=ExtResource("3_close")]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_top = 0.0
-anchor_right = 1.0
-anchor_bottom = 0.0
-offset_left = -68.0
-offset_top = 16.0
-offset_right = -18.0
-offset_bottom = 66.0
-grow_horizontal = 0
-grow_vertical = 1
-pivot_offset = Vector2(25, 25)
-
-[connection signal="pressed" from="Close Button" to="." method="_on_close_button_pressed"]

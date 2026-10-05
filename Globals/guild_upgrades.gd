@@ -63,6 +63,7 @@ var standing: int = STARTING_STANDING
 var levels: Dictionary = {}
 
 var _page: Control
+var _hidden_content: Array[CanvasItem] = []
 var _gold_label: Label
 var _standing_label: Label
 var _last_character_count := -1
@@ -319,6 +320,7 @@ func open_page(from_button: Node = null) -> void:
 	if _page == null or not is_instance_valid(_page):
 		_page = load(UPGRADES_PAGE_PATH).instantiate()
 		_get_page_host(from_button).add_child(_page)
+	_hide_other_content()
 	_page.move_to_front()
 	_page.show()
 
@@ -337,6 +339,27 @@ func _get_page_host(from_button: Node) -> Node:
 func close_page() -> void:
 	if _page != null and is_instance_valid(_page):
 		_page.hide()
+	_restore_other_content()
+
+
+## The page has no background of its own (the Content panel's blue shows
+## through), so hide whatever else is showing in the panel while it's open
+## and bring it back when the page closes.
+func _hide_other_content() -> void:
+	var host := _page.get_parent()
+	if host == null or host == get_tree().current_scene:
+		return
+	for child in host.get_children():
+		if child != _page and child is CanvasItem and child.visible and not _hidden_content.has(child):
+			_hidden_content.append(child)
+			child.hide()
+
+
+func _restore_other_content() -> void:
+	for node in _hidden_content:
+		if is_instance_valid(node):
+			node.show()
+	_hidden_content.clear()
 
 
 func _update_top_bar() -> void:
