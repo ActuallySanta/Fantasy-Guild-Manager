@@ -62,19 +62,9 @@ func setup(data) -> void:
 # system data. Once Jacob changes things ill change
 # stuff here
 
-# quest headline, where I will add title
-static func get_title(q) -> String:
-	var title = q.get("title")
-	if title:
-		return str(title)
-	
-	match q.type:
-		CreatedQuest.QuestType.DungeonClear:
-			return "Clear the %s" % q.location
-		CreatedQuest.QuestType.Escort:
-			return "Escort a client through the %s" % q.location
-		_:
-			return "Raid the %s" % q.location
+# quest headline, where title goes
+static func get_title(q: CreatedQuest) -> String:
+	return q.questTitle
 
 # smaller info line under title for rank and rewards
 static func get_details(q) -> String:
@@ -91,13 +81,13 @@ static func get_details(q) -> String:
 static func get_type_name(q: CreatedQuest) -> String:
 	match q.type:
 		CreatedQuest.QuestType.DungeonClear:
-			return "Clear Dungeon"
+			return "Clear Dungeon Quest"
 		CreatedQuest.QuestType.Escort:
-			return "Escort"
+			return "Escort Quest"
 		CreatedQuest.QuestType.ScoutTerrain:
-			return "Scout Terrain"
+			return "Scout Terrain Quest"
 		CreatedQuest.QuestType.GatherIntel:
-			return "Gather Intel"
+			return "Gather Intel Quest"
 		_:
 			return "Unknown Quest"
 

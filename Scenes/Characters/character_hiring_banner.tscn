@@ -72,6 +72,13 @@ layout_mode = 2
 text = "HOMETOWN"
 label_settings = SubResource("LabelSettings_dha67")
 
+[node name="Strength Label" type="Label" parent="HBoxContainer/MarginContainer/Stats Container" unique_id=503766291]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 6
+text = "This is a test"
+label_settings = SubResource("LabelSettings_dha67")
+
 [node name="Defense Label" type="Label" parent="HBoxContainer/MarginContainer/Stats Container" unique_id=226413638]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -94,13 +101,6 @@ text = "This is a test"
 label_settings = SubResource("LabelSettings_dha67")
 
 [node name="Pluck Label" type="Label" parent="HBoxContainer/MarginContainer/Stats Container" unique_id=40687613]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 6
-text = "This is a test"
-label_settings = SubResource("LabelSettings_dha67")
-
-[node name="Strength Label" type="Label" parent="HBoxContainer/MarginContainer/Stats Container" unique_id=503766291]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 6
