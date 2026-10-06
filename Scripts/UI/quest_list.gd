@@ -42,7 +42,29 @@ func add_quest(quest) -> QuestCard:
 	card.closed.connect(_on_quest_closed)
 	card.denied.connect(_on_quest_denied)
 	card.party_changed.connect(_on_party_changed)
+	# keep the quest you're filling in view when the roster opens under it
+	card.accepted.connect(func(_quest): _focus_card(card))
+	for slot in card.slots:
+		slot.pressed.connect(_focus_card.bind(card))
 	return card
+
+# The roster panel opens below the quest board and shrinks it, which can
+# push the quest you just accepted out of view. Once the layout has
+# settled, scroll so that card's top sits at the top of the board, keeping
+# its title and slots visible above the roster.
+func _focus_card(card: QuestCard) -> void:
+	var scroll := get_parent() as ScrollContainer
+	if scroll == null:
+		return
+	# wait for the roster to open and the card's slot row to lay out
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if not is_instance_valid(card) or not card.visible:
+		return
+	scroll.scroll_vertical = int(card.position.y)
+	# if the card is near the bottom the scroll clamps, so at least make
+	# sure the whole card is on screen
+	scroll.ensure_control_visible(card)
 
 func _generate_quests() -> Array:
 	var quests := []

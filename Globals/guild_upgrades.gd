@@ -6,7 +6,9 @@
 ## Other UI is kept in sync without editing it: hiring-page totals are refreshed
 ## after an upgrade, and character cards show boosted stats as "5 (+1)".
 ## It also wires itself to the "UpgrButton" on the nav bar at runtime, so no
-## other scene has to be edited to open the upgrades page.
+## other scene has to be edited to open the upgrades page. The Characters tab
+## ("CharButton") gets the same tab behaviour: it hides the quest list while
+## open and is closed by the other nav tabs (the page has no close button).
 extends Node
 
 signal upgrades_changed
@@ -21,6 +23,7 @@ const MAX_LEVEL := 5
 const UPGRADES_PAGE_PATH := "res://Scenes/UI/Upgrades/upgrades_page.tscn"
 const ARMORY_META := "armory_bonus_applied"
 const HOOKED_META := "guild_upgrades_hooked"
+const CHARACTER_PAGE_NAME := "Guild Character Page"
 
 ## Display info for each building. "implemented" = its effect actually does
 ## something in the game yet (prototype: Armory + Barracks only).
@@ -63,6 +66,8 @@ var standing: int = STARTING_STANDING
 var levels: Dictionary = {}
 
 var _page: Control
+var _character_page: Control
+var _hidden_content: Array[CanvasItem] = []
 var _gold_label: Label
 var _standing_label: Label
 var _last_character_count := -1
@@ -289,8 +294,10 @@ func _on_node_added(node: Node) -> void:
 		node.set_meta(HOOKED_META, true)
 		if node.name == "UpgrButton":
 			node.pressed.connect(open_page.bind(node))
+		elif node.name == "CharButton":
+			node.pressed.connect(open_character_page.bind(node))
 		else:
-			# Any other nav tab closes the upgrades page.
+			# Any other nav tab closes the upgrades / characters pages.
 			node.pressed.connect(close_page)
 	elif node is CharacterUICard:
 		# Runs after the card's own _ready has filled in its labels.
@@ -319,8 +326,7 @@ func open_page(from_button: Node = null) -> void:
 	if _page == null or not is_instance_valid(_page):
 		_page = load(UPGRADES_PAGE_PATH).instantiate()
 		_get_page_host(from_button).add_child(_page)
-	_page.move_to_front()
-	_page.show()
+	_show_tab(_page)
 
 
 ## The page lives inside the home screen's "Content" panel (same spot as the
@@ -334,9 +340,53 @@ func _get_page_host(from_button: Node) -> Node:
 	return content if content != null else root
 
 
+## Characters tab. The home screen's own CharButton handler also shows the
+## page; this just makes it behave like a tab (hides the quest list / upgrades).
+func open_character_page(from_button: Node = null) -> void:
+	if _character_page == null or not is_instance_valid(_character_page):
+		var root: Node = get_tree().current_scene
+		if from_button != null and from_button.owner != null:
+			root = from_button.owner
+		_character_page = root.find_child(CHARACTER_PAGE_NAME, true, false) as Control
+	if _character_page != null:
+		_show_tab(_character_page)
+
+
 func close_page() -> void:
-	if _page != null and is_instance_valid(_page):
-		_page.hide()
+	for tab in [_page, _character_page]:
+		if tab != null and is_instance_valid(tab):
+			tab.hide()
+	_restore_other_content()
+
+
+func _is_tab_page(node: Node) -> bool:
+	return node != null and (node == _page or node == _character_page)
+
+
+## Tab pages have no background of their own (the Content panel's blue shows
+## through), so hide whatever else is showing in the panel while one is open
+## and bring it back when the tabs close. Other tab pages are just hidden,
+## not remembered, so switching tabs never brings the old one back.
+func _show_tab(tab: Control) -> void:
+	var host := tab.get_parent()
+	if host != null and host != get_tree().current_scene:
+		for child in host.get_children():
+			if child == tab or not (child is CanvasItem) or not child.visible:
+				continue
+			if _is_tab_page(child):
+				child.hide()
+			elif not _hidden_content.has(child):
+				_hidden_content.append(child)
+				child.hide()
+	tab.move_to_front()
+	tab.show()
+
+
+func _restore_other_content() -> void:
+	for node in _hidden_content:
+		if is_instance_valid(node):
+			node.show()
+	_hidden_content.clear()
 
 
 func _update_top_bar() -> void:
