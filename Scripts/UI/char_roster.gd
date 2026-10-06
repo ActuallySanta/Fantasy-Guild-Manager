@@ -4,6 +4,9 @@ extends HFlowContainer
 @export var roster_panel: Control
 @export var close_button: Button
 
+# shown instead of the roster when nobody is free to go on a quest
+var _empty_notice: VBoxContainer
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# Tag this node so slots can tell it to refresh with
@@ -21,6 +24,7 @@ func _ready() -> void:
 	# rebuild when someone is hired
 	CharacterContainer.on_character_added.connect(rebuild)
 	
+	_build_empty_notice()
 	close()  # start hidden so the quest list gets the whole screen
 	rebuild()
 
@@ -71,3 +75,48 @@ func refresh() -> void:
 	for button in get_children():
 		var is_placed := placed.any(func(c): return is_same(c, button.character))
 		button.visible = not is_placed
+
+	_update_empty_notice()
+
+
+# true if at least one character is free to be put on a quest
+func has_available_characters() -> bool:
+	for button in get_children():
+		if button is CharacterButton and button.visible:
+			return true
+	return false
+
+
+# Message that replaces the roster when every
+# character is already on a quest (or the guild has nobody yet)
+func _build_empty_notice() -> void:
+	_empty_notice = VBoxContainer.new()
+	_empty_notice.name = "EmptyNotice"
+	_empty_notice.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_empty_notice.alignment = BoxContainer.ALIGNMENT_CENTER
+	_empty_notice.add_theme_constant_override("separation", 12)
+	_empty_notice.visible = false
+	# same height as the roster's scroll area so the panel doesn't jump
+	_empty_notice.custom_minimum_size = Vector2(0, 270)
+
+	var label := Label.new()
+	label.text = "No one is free to go on this quest.\nHire more characters to fill the party!"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.add_theme_font_size_override("font_size", 24)
+	_empty_notice.add_child(label)
+
+	# sits next to the roster's scroll area (RosterColumn) so it can
+	# take the scroll area's place
+	var scroll := get_parent()
+	if scroll and scroll.get_parent():
+		scroll.get_parent().add_child.call_deferred(_empty_notice)
+
+
+func _update_empty_notice() -> void:
+	if _empty_notice == null:
+		return
+	var nobody_free := not has_available_characters()
+	_empty_notice.visible = nobody_free
+	get_parent().visible = not nobody_free  # the RosterScroll
+
