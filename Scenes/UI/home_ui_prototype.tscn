@@ -69,10 +69,10 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 
 [node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer" unique_id=789881013]
-custom_maximum_size = Vector2(-1, 150)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 texture = ExtResource("2_sufdd")
-expand_mode = 4
+expand_mode = 1
 stretch_mode = 5
 
 [node name="DayLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer" unique_id=1815111058]
@@ -89,10 +89,10 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 
 [node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer2" unique_id=795115508]
-custom_maximum_size = Vector2(-1, 150)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 texture = ExtResource("3_58akh")
-expand_mode = 4
+expand_mode = 1
 stretch_mode = 5
 
 [node name="GoldLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer2" unique_id=1468207839]
@@ -108,10 +108,10 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 
 [node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer3" unique_id=662753280]
-custom_maximum_size = Vector2(-1, 150)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 texture = ExtResource("4_73enw")
-expand_mode = 4
+expand_mode = 1
 stretch_mode = 5
 
 [node name="StanLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer3" unique_id=510686645]
