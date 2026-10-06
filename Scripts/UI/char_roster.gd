@@ -10,6 +10,7 @@ func _ready() -> void:
 	# get_tree().call_group("roster", "refresh").
 	# add_to_group("roster", "refresh")
 	add_to_group("roster")
+	CharacterContainer.on_character_added.connect(rebuild)
 	
 	if roster_panel == null:
 		push_error("Roster: drag the Roster panel into Roster Panel in the Inspector.")
