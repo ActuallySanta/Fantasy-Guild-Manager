@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://wtb4ungnk6wg"
-path="res://.godot/imported/arrow-up-solid-full.svg-64998604aee9360c65dace46f8264d20.ctex"
+uid="uid://c0ojxw8sauffc"
+path="res://.godot/imported/user-solid-full.svg-d85a5c19606a6acb4b19bccf3eeeebf2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Character Icons/arrow-up-solid-full.svg"
-dest_files=["res://.godot/imported/arrow-up-solid-full.svg-64998604aee9360c65dace46f8264d20.ctex"]
+source_file="res://Sprites/UI Icons/user-solid-full.svg"
+dest_files=["res://.godot/imported/user-solid-full.svg-d85a5c19606a6acb4b19bccf3eeeebf2.ctex"]
 
 [params]
 

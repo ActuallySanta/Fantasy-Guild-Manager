@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bj1hfljhsxpfe"
-path="res://.godot/imported/book-solid-full.svg-23388c668f8178d53d08bc53b0656c23.ctex"
+uid="uid://b45od3f4bqey8"
+path="res://.godot/imported/sun-solid-full.svg-f6101eb3d5760bf32281c5219ab99b39.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Character Icons/book-solid-full.svg"
-dest_files=["res://.godot/imported/book-solid-full.svg-23388c668f8178d53d08bc53b0656c23.ctex"]
+source_file="res://Sprites/UI Icons/sun-solid-full.svg"
+dest_files=["res://.godot/imported/sun-solid-full.svg-f6101eb3d5760bf32281c5219ab99b39.ctex"]
 
 [params]
 

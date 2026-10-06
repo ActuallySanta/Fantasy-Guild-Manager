@@ -46,6 +46,7 @@ var max_rand_backstories : int = 3
 var role: CharacterRole
 
 var injury_level: InjuryLevel
+var injury_count:int
 
 var stats: Dictionary[StatType, int] = {
 	StatType.STRENGTH: 0,
@@ -77,6 +78,7 @@ func _init() -> void:
 	description = generate_description()
 
 	injury_level = InjuryLevel.HEALTHY
+	injury_count = 0
 	status = CharacterStatus.IDLE
 
 	title = name + " the " + str(CharacterRole.find_key(role))
@@ -105,7 +107,6 @@ func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int)
 	pass
 
 func generate_description() -> String:
-	
 	var _description = ExternalContentContainer.get_role_backstory(self) +"\n"
 	
 	for i in max_rand_backstories:
@@ -114,3 +115,12 @@ func generate_description() -> String:
 			_description +=temp
 	
 	return _description
+
+func injure_character() ->bool:
+	injury_count +=1
+	injury_level+=1
+	
+	if(injury_level == InjuryLevel.DEAD):
+		return true
+	else: return false
+	

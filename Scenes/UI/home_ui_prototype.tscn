@@ -2,22 +2,22 @@
 
 [ext_resource type="Script" uid="uid://tlhfiyj5s2yd" path="res://Scripts/UI/home_ui_prototype.gd" id="1_18fsv"]
 [ext_resource type="Script" uid="uid://cmlplktrs1fb0" path="res://Scripts/UI/quest_list.gd" id="1_prqkl"]
-[ext_resource type="Texture2D" uid="uid://b45od3f4bqey8" path="res://Sprites/Character Icons/sun-solid-full.svg" id="2_sufdd"]
+[ext_resource type="Texture2D" uid="uid://b45od3f4bqey8" path="res://Sprites/UI Icons/sun-solid-full.svg" id="2_sufdd"]
 [ext_resource type="PackedScene" uid="uid://cawb7mk4rfspb" path="res://Scenes/UI/quest_card.tscn" id="2_xsnmc"]
-[ext_resource type="Texture2D" uid="uid://e4g7gfuo6w5i" path="res://Sprites/Character Icons/coins-solid-full.svg" id="3_58akh"]
+[ext_resource type="Texture2D" uid="uid://e4g7gfuo6w5i" path="res://Sprites/UI Icons/coins-solid-full.svg" id="3_58akh"]
 [ext_resource type="Script" uid="uid://djvjacwit4hlu" path="res://Scripts/UI/char_roster.gd" id="3_oscj5"]
 [ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="3_xsnmc"]
-[ext_resource type="Texture2D" uid="uid://ccsai8aanfspa" path="res://Sprites/Character Icons/chess-rook-solid-full.svg" id="4_73enw"]
+[ext_resource type="Texture2D" uid="uid://ccsai8aanfspa" path="res://Sprites/UI Icons/chess-rook-solid-full.svg" id="4_73enw"]
 [ext_resource type="PackedScene" uid="uid://dpm6emiryhpli" path="res://Scenes/UI/character_button.tscn" id="4_brb4x"]
 [ext_resource type="Script" uid="uid://so4dh7cytoft" path="res://Scripts/UI/day_bar.gd" id="5_58akh"]
 [ext_resource type="PackedScene" uid="uid://ca7d3fdaphs4v" path="res://Scenes/Characters/character_generator.tscn" id="6_brb4x"]
 [ext_resource type="Script" uid="uid://blul1044ocxp2" path="res://Scripts/Quest Creator/quest_Manager.gd" id="7_18fsv"]
 [ext_resource type="PackedScene" uid="uid://4q07bd1hkr4d" path="res://Scenes/UI/Reusable Elements/dialogue_box.tscn" id="7_jcj1f"]
-[ext_resource type="Texture2D" uid="uid://c0ojxw8sauffc" path="res://Sprites/Character Icons/user-solid-full.svg" id="10_u2mag"]
-[ext_resource type="Texture2D" uid="uid://bj1hfljhsxpfe" path="res://Sprites/Character Icons/book-solid-full.svg" id="11_ewhhe"]
-[ext_resource type="Texture2D" uid="uid://c178h40n2xa06" path="res://Sprites/Character Icons/house-solid-full.svg" id="12_rohuf"]
-[ext_resource type="Texture2D" uid="uid://wtb4ungnk6wg" path="res://Sprites/Character Icons/arrow-up-solid-full.svg" id="13_h2ntd"]
-[ext_resource type="Texture2D" uid="uid://ccw8frov4muxu" path="res://Sprites/Character Icons/gear-solid-full.svg" id="14_fkiig"]
+[ext_resource type="Texture2D" uid="uid://c0ojxw8sauffc" path="res://Sprites/UI Icons/user-solid-full.svg" id="10_u2mag"]
+[ext_resource type="Texture2D" uid="uid://bj1hfljhsxpfe" path="res://Sprites/UI Icons/book-solid-full.svg" id="11_ewhhe"]
+[ext_resource type="Texture2D" uid="uid://c178h40n2xa06" path="res://Sprites/UI Icons/house-solid-full.svg" id="12_rohuf"]
+[ext_resource type="Texture2D" uid="uid://wtb4ungnk6wg" path="res://Sprites/UI Icons/arrow-up-solid-full.svg" id="13_h2ntd"]
+[ext_resource type="Texture2D" uid="uid://ccw8frov4muxu" path="res://Sprites/UI Icons/gear-solid-full.svg" id="14_fkiig"]
 [ext_resource type="PackedScene" uid="uid://cuv2kkwbxwgjy" path="res://Scenes/UI/day_summary.tscn" id="19_73enw"]
 [ext_resource type="PackedScene" uid="uid://daweenf55s77m" path="res://Scenes/UI/guild_character_page.tscn" id="20_u2mag"]
 
@@ -69,10 +69,10 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 
 [node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer" unique_id=789881013]
-custom_maximum_size = Vector2(-1, 150)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 texture = ExtResource("2_sufdd")
-expand_mode = 4
+expand_mode = 1
 stretch_mode = 5
 
 [node name="DayLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer" unique_id=1815111058]
@@ -89,10 +89,10 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 
 [node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer2" unique_id=795115508]
-custom_maximum_size = Vector2(-1, 150)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 texture = ExtResource("3_58akh")
-expand_mode = 4
+expand_mode = 1
 stretch_mode = 5
 
 [node name="GoldLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer2" unique_id=1468207839]
@@ -108,10 +108,10 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 
 [node name="TextureRect" type="TextureRect" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer3" unique_id=662753280]
-custom_maximum_size = Vector2(-1, 150)
+custom_minimum_size = Vector2(0, 56)
 layout_mode = 2
 texture = ExtResource("4_73enw")
-expand_mode = 4
+expand_mode = 1
 stretch_mode = 5
 
 [node name="StanLabel" type="Label" parent="MarginContainer/VBoxContainer/TopBar/TopBarRow/VBoxContainer3" unique_id=510686645]
