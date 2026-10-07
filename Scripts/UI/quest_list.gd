@@ -12,6 +12,11 @@ signal board_changed
 func _ready() -> void:
 	# tag node so other systems will be able to reach it
 	add_to_group("quest_list")
+	GameState.day_started.connect(_on_day_started)
+	populate(_generate_quests())
+
+# creates new quests on new day
+func _on_day_started(_day: int) -> void:
 	populate(_generate_quests())
 
 func populate(quests: Array) -> void:

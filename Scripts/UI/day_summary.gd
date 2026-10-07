@@ -8,12 +8,12 @@ extends Control
 # unique label nodes
 @onready var _entry_list: VBoxContainer = %EntryList
 @onready var _empty_label: Label = %EmptyLabel
-@onready var _close_button: Button = %CloseButton
+@onready var _new_day_button: BaseButton = %NewDayButton
  
  
 func _ready() -> void:
 	visible = false  # hidden until the day ends
-	_close_button.pressed.connect(hide)
+	_new_day_button.pressed.connect(_on_new_day_pressed)
  
 # Fills the list with one entry per quest result, then shows the popup.
 func show_results(results: Array) -> void:
@@ -35,3 +35,7 @@ func show_results(results: Array) -> void:
 	_empty_label.visible = results.is_empty()
  
 	show()
+
+func _on_new_day_pressed() -> void:
+	hide()
+	GameState.start_new_day()
