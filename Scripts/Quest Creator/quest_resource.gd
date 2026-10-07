@@ -30,6 +30,7 @@ enum FavoredStat {
 #enum for modifiers if we ever choose to do them
 
 var numAdventurers: int
+var maxAdventurers: int
 var goldReward: int
 #var for statReward if applicable
 
@@ -61,6 +62,7 @@ func _init(dayNum := 0) -> void:
 
 	difficulty = 0
 	#hard code
+	maxAdventurers = randi_range(1,2)
 
 	questNum = randi_range(0, 7)
 	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
@@ -247,6 +249,7 @@ func _initMilestoneVars(dayNum: int):
 	match dayNum:
 		10:
 			difficulty = 2
+			maxAdventurers = 2
 			questNum = 0
 			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
 			location = ExternalContentContainer.get_Location_Name(1)
