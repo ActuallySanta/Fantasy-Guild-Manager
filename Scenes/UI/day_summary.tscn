@@ -1,7 +1,6 @@
 [gd_scene format=3 uid="uid://cuv2kkwbxwgjy"]
 
 [ext_resource type="Script" uid="uid://cwabtoyr1uy6k" path="res://Scripts/UI/day_summary.gd" id="1_wie7t"]
-[ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="2_art7y"]
 [ext_resource type="PackedScene" uid="uid://i3jep15b6byf" path="res://Scenes/UI/summary_entry.tscn" id="2_wiqur"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_art7y"]
@@ -52,11 +51,6 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 40
 text = "   Day Summary"
 
-[node name="CloseButton" parent="SummaryMargin/SummaryPanel/SummaryColumn/SummaryHeader" unique_id=1203562834 instance=ExtResource("2_art7y")]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-
 [node name="EmptyLabel" type="Label" parent="SummaryMargin/SummaryPanel/SummaryColumn" unique_id=1593576361]
 unique_name_in_owner = true
 layout_mode = 2
@@ -71,3 +65,9 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 12
+
+[node name="NewDayButton" type="Button" parent="SummaryMargin/SummaryPanel/SummaryColumn" unique_id=1531062587]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+text = "Start New Day"

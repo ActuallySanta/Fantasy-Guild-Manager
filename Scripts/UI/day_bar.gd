@@ -24,6 +24,12 @@ func _ready() -> void:
 		quest_list.board_changed.connect(_update_end_day_button)
 	
 	_update_end_day_button()
+	GameState.day_started.connect(_on_day_started)
+
+# make sure end day can be used again once the new quests are added
+func _on_day_started(_day: int) -> void:
+	_day_ended = false
+	_update_end_day_button()
 
 # Locks or unlocks end day button based on quests
 func _update_end_day_button() -> void:

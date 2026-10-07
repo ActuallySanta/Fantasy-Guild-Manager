@@ -73,6 +73,7 @@ static func get_details(q) -> String:
 	var stat = CreatedQuest.FavoredStat.find_key(q.favStat)
 	
 	var count := get_slot_count(q)
+	
 	var adventurers := "1 Adventurer" if count == 1 else "%d Adventurers" % count
 	
 	return "%s - %d Gold  \n%s - Favors: %s\nSuccess Chance: %d%%" % [get_type_name(q), q.goldReward, adventurers, stat, 0]
@@ -93,9 +94,8 @@ static func get_type_name(q: CreatedQuest) -> String:
 
 # How many character slots each quests needs, currently
 # no party size value but if its added later
-static func get_slot_count(q) -> int:
-	var size = q.get("party_size")
-	return int(size) if size != null else 2
+static func get_slot_count(q: CreatedQuest) -> int:
+	return q.maxAdventurers if q.maxAdventurers > 0 else 2
 # -----------------------------------------------
 
 # toggles card between open and closed
@@ -137,7 +137,7 @@ func get_party() -> Array:
 
 # true if quest is accepted and every slot is filled
 func is_ready_to_send() -> bool:
-	return is_open and not slots.is_empty() and get_party().size() == slots.size()
+	return is_open and not get_party().is_empty()
 
 # if any slot is changed, pass the updated party along
 func _on_slot_changed(_slot: CharacterSlot) -> void:

@@ -5,15 +5,23 @@ extends Node2D
 
 ## How many characters will be shown at the character hiring screen
 @export var max_hireable_characters: int = 3
+var hireable_characters: Array[GuildCharacter] = []
 
+signal on_hireables_refreshed
 signal on_character_added
-
 
 func _ready() -> void:
 	#for i in max_characters:
 	#generate_new_character()
+	refresh_hireable_characters()
 	pass
 
+# Replaces the hiring pool with new characters on a new day
+func refresh_hireable_characters() -> void:
+	hireable_characters.clear()
+	for i in max_hireable_characters:
+		hireable_characters.append(GuildCharacter.new())
+	on_hireables_refreshed.emit()
 
 func generate_new_character() -> void:
 	if (active_characters.size() == max_characters):
@@ -30,6 +38,7 @@ func add_character_to_guild(_character: GuildCharacter) -> bool:
 		return false
 
 	active_characters.append(_character)
+	hireable_characters.erase(_character) # char hired, so no longer for hire
 	print(_character.name + " HAS JOINED THE GUILD")
 	on_character_added.emit()
 	return true
