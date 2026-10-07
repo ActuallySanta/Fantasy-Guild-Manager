@@ -142,4 +142,4 @@ func is_ready_to_send() -> bool:
 # if any slot is changed, pass the updated party along
 func _on_slot_changed(_slot: CharacterSlot) -> void:
 	party_changed.emit(quest, get_party())
-	#print(quest.calcSuccessChance(get_party()))
+	print(quest.calcSuccessChance(get_party()))

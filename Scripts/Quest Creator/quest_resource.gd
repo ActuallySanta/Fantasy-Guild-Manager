@@ -87,7 +87,7 @@ func _init(dayNum := 0) -> void:
 	pass
 
 
-func calcSuccessChance(_questingAdventurers: Array[GuildCharacter]) -> float:
+func calcSuccessChance(_questingAdventurers: Array) -> float:
 	var statHitNum = 60.0 + (20 * difficulty)
 	var statTotal = 0.0
 
