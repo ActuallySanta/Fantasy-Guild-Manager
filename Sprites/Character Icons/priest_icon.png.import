@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dqfofkh0uu3x3"
-path="res://.godot/imported/Pathfinder Headshot.png-87c05c9663435347feba6680993f5fa1.ctex"
+uid="uid://dwkwfcgs6qeya"
+path="res://.godot/imported/priest_icon.png-f61ba91c8f554c3afce35ce82566c108.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Character Icons/Pathfinder Headshot.png"
-dest_files=["res://.godot/imported/Pathfinder Headshot.png-87c05c9663435347feba6680993f5fa1.ctex"]
+source_file="res://Sprites/Character Icons/priest_icon.png"
+dest_files=["res://.godot/imported/priest_icon.png-f61ba91c8f554c3afce35ce82566c108.ctex"]
 
 [params]
 
