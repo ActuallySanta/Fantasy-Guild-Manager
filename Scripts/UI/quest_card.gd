@@ -74,8 +74,8 @@ static func get_details(q) -> String:
 	
 	var count := get_slot_count(q)
 	var adventurers := "1 Adventurer" if count == 1 else "%d Adventurers" % count
-
-	return "%s\n%d Gold  -  %s\nFavors: %s" % [get_type_name(q), q.goldReward, adventurers, stat]
+	
+	return "%s - %d Gold  \n%s - Favors: %s\nSuccess Chance: %d%%" % [get_type_name(q), q.goldReward, adventurers, stat, 0]
 
 # turns the QuestType enum into a name players can read
 static func get_type_name(q: CreatedQuest) -> String:
@@ -142,3 +142,4 @@ func is_ready_to_send() -> bool:
 # if any slot is changed, pass the updated party along
 func _on_slot_changed(_slot: CharacterSlot) -> void:
 	party_changed.emit(quest, get_party())
+	#print(quest.calcSuccessChance(get_party()))
