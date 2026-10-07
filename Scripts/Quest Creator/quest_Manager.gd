@@ -11,7 +11,7 @@ var testQuestNumber = 0:
 	get:
 		return testQuestNumber
 
-@onready var rich_text = $"../LogContents"
+#@onready var rich_text = $"../LogContents"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -58,8 +58,8 @@ func _ready() -> void:
 	
 	print(questResults, "\n")
 	
-	if rich_text != null :
-		rich_text.changeText(acceptedQuestResults)
+	#if rich_text != null :
+		#rich_text.changeText(acceptedQuestResults)
 	
 	pass
 
