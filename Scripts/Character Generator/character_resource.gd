@@ -48,6 +48,7 @@ var role: CharacterRole
 var injury_level: InjuryLevel
 var injury_count:int
 
+var stat_deviation : int = 2
 var stats: Dictionary[StatType, int] = {
 	StatType.STRENGTH: 0,
 	StatType.DEFENSE: 0,
@@ -96,7 +97,7 @@ func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int)
 
 	#Generate random numbers and sum them all up
 	for stat in _stat_weights.size():
-		_stat_weights[stat] = randf()
+		_stat_weights[stat] = randfn(_total_points/_stats.size(),stat_deviation)
 		stat_sum += _stat_weights[stat]
 
 	#After all the stats are added together, make them proportional to the total points
@@ -123,4 +124,3 @@ func injure_character() ->bool:
 	if(injury_level == InjuryLevel.DEAD):
 		return true
 	else: return false
-	

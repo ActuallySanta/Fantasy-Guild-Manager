@@ -1,4 +1,4 @@
-extends NinePatchRect
+extends MarginContainer
 
 @onready var close_button: AnimatedButton = $"Close Button"
 
