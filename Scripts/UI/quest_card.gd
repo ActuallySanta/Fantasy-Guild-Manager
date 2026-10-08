@@ -45,6 +45,7 @@ func _ready() -> void:
 # called by quest_list.gd after card is added to scene
 func setup(data) -> void:
 	quest = data
+	_update_text()
 	_title_label.text = get_title(quest) + "\n" + get_details(quest)
 	
 	if slot_scene == null:
@@ -66,16 +67,20 @@ func setup(data) -> void:
 static func get_title(q: CreatedQuest) -> String:
 	return q.questTitle
 
-# smaller info line under title for rank and rewards
-static func get_details(q) -> String:
-	# Once difficulty is added ill add the rank in: 
+# smaller info lines under title: type, reward, party size, favored stat, success chance
+static func get_details(q: CreatedQuest, chance: int = -1) -> String:
+	# Once difficulty is added ill add the rank in:
 	# var rank = CreatedQuest.QuestDifficulty.find_key(q.difficulty)
 	var stat = CreatedQuest.FavoredStat.find_key(q.favStat)
-	
-	var count := get_slot_count(q)
-	var adventurers := "1 Adventurer" if count == 1 else "Up to %d Adventurers" % count
 
-	return "%s\n%d Gold  -  %s\nFavors: %s" % [get_type_name(q), q.goldReward, adventurers, stat]
+	var count := get_slot_count(q)
+	var adventurers := "1 Adventurer" if count == 1 else "%d Adventurers" % count
+
+	var chance_text := "Success Chance: --"
+	if chance >= 0:
+		chance_text = "Success Chance: %d%%" % mini(chance, 100)
+
+	return "%s - %d Gold\n%s - Favors: %s\n%s" % [get_type_name(q), q.goldReward, adventurers, stat, chance_text]
 
 # turns the QuestType enum into a name players can read
 static func get_type_name(q: CreatedQuest) -> String:
@@ -140,4 +145,14 @@ func is_ready_to_send() -> bool:
 
 # if any slot is changed, pass the updated party along
 func _on_slot_changed(_slot: CharacterSlot) -> void:
+	_update_text()
 	party_changed.emit(quest, get_party())
+	print(quest.calcSuccessChance(get_party()))
+
+# rebuilds the title and details text with the current party's success chance
+func _update_text() -> void:
+	var party := get_party()
+	var chance := -1
+	if not party.is_empty():
+		chance = quest.calcSuccessChance(party)
+	_title_label.text = get_title(quest) + "\n" + get_details(quest, chance)

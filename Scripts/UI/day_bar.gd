@@ -6,10 +6,8 @@ extends PanelContainer
 @export var quest_list: QuestList
 @export var day_summary: DaySummary
 
-# calcSuccessChance() returns a fraction (0.85 = 85%), but
-# generateResults() compares against 0-100, so I will convert it here
 static func _get_success_chance(quest: CreatedQuest, party: Array[GuildCharacter]) -> float:
-	return quest.calcSuccessChance(party) * 100.0
+	return quest.calcSuccessChance(party)
 
 @onready var _end_day_button: Button = %EndDayButton
 
@@ -62,12 +60,18 @@ func end_day() -> void:
 		
 		var chance := _get_success_chance(card.quest, typed_party)
 		var story: String = card.quest.generateResults(typed_party, chance)
- 
+		
+		var succeeded := _did_succeed(story)
+		var gold_earned := _get_gold_earned(card.quest, succeeded)
+		GameState.add_gold(gold_earned)
+		
 		results.append({
 			"quest": card.quest,
 			"party": party,
 			"story": story,
 			"succeeded": _did_succeed(story),
+			"chance": chance,
+			"gold": gold_earned,
 		})
 	
 	# end day
@@ -82,3 +86,9 @@ func end_day() -> void:
 # text so we gotta check it. 
 static func _did_succeed(story: String) -> bool:
 	return not story.contains("NOT SUCCESSFUL")
+
+# How much gold the guild actually gets
+static func _get_gold_earned(quest: CreatedQuest, succeeded: bool) -> int:
+	if succeeded:
+		return quest.goldReward
+	return maxi(quest.goldReward - 200, 0)

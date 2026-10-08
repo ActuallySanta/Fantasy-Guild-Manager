@@ -87,7 +87,7 @@ func _init(dayNum := 0) -> void:
 	pass
 
 
-func calcSuccessChance(_questingAdventurers: Array[GuildCharacter]) -> float:
+func calcSuccessChance(_questingAdventurers: Array) -> int:
 	var statHitNum = 60.0 + (20 * difficulty)
 	var statTotal = 0.0
 
@@ -103,7 +103,7 @@ func calcSuccessChance(_questingAdventurers: Array[GuildCharacter]) -> float:
 			3:
 				statTotal += adventurer.stats[3]
 
-	return snapped((statTotal / statHitNum), 0.01)
+	return (snapped((statTotal / statHitNum), 0.01) * 100)
 
 
 #this is the main root method for deciding and generating results I'll have

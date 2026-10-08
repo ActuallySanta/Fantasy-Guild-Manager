@@ -25,6 +25,7 @@ func _ready() -> void:
 	
 	var successChance = thisQuest.calcSuccessChance(adventurerArray)
 	print(successChance)
+	print(thisQuest.questTitle)
 	
 	questResults = thisQuest.generateResults(adventurerArrayAgain, successChance)
 	acceptedQuestResults.append(questResults)
@@ -37,6 +38,7 @@ func _ready() -> void:
 	
 	successChance = thisQuest.calcSuccessChance(adventurerArray)
 	print(successChance)
+	print(thisQuest.questTitle)
 	
 	questResults = thisQuest.generateResults(adventurerArray, successChance)
 	acceptedQuestResults.append(questResults)
