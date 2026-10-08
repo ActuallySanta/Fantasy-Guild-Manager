@@ -4,6 +4,9 @@
 [ext_resource type="Texture2D" uid="uid://deis7oxw14qbl" path="res://icon.svg" id="1_iwhsd"]
 [ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="2_8ovrn"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_grey"]
+bg_color = Color(0.6452097, 0.6452098, 0.6452097, 1)
+
 [sub_resource type="LabelSettings" id="LabelSettings_g4v7s"]
 font_size = 64
 font_color = Color(0, 0, 0, 1)
@@ -11,9 +14,6 @@ font_color = Color(0, 0, 0, 1)
 [sub_resource type="LabelSettings" id="LabelSettings_h6oeb"]
 font_size = 14
 font_color = Color(0, 0, 0, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_grey"]
-bg_color = Color(0.6452097, 0.6452098, 0.6452097, 1)
 
 [node name="Character UI Card" type="MarginContainer" unique_id=424955004]
 custom_minimum_size = Vector2(200, 450)
@@ -48,6 +48,7 @@ theme_override_constants/margin_right = 64
 theme_override_constants/margin_bottom = 32
 
 [node name="Character Name Label" type="Label" parent="VBoxContainer/Name Background/CenterContainer" unique_id=718164899]
+custom_minimum_size = Vector2(5, 0)
 layout_mode = 2
 text = "This is a test"
 label_settings = SubResource("LabelSettings_g4v7s")
@@ -88,7 +89,20 @@ theme_override_constants/margin_bottom = 16
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Character Description Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer" unique_id=345132546]
+[node name="VBoxContainer2" type="VBoxContainer" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer" unique_id=947403505]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Character Description Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer2" unique_id=345132546]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "This is a test"
+label_settings = SubResource("LabelSettings_h6oeb")
+autowrap_mode = 3
+
+[node name="Character Injury Label" type="Label" parent="VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer2" unique_id=1122551611]
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 size_flags_horizontal = 3

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dwkwfcgs6qeya"
-path="res://.godot/imported/Priest Headshot.png-50bd2705f129f767fb326b436711e98d.ctex"
+uid="uid://bw0opsv6knijq"
+path="res://.godot/imported/mage_icon.png-e26d7be00331005bf00d5d77678d0dfc.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Character Icons/Priest Headshot.png"
-dest_files=["res://.godot/imported/Priest Headshot.png-50bd2705f129f767fb326b436711e98d.ctex"]
+source_file="res://Sprites/Character Icons/mage_icon.png"
+dest_files=["res://.godot/imported/mage_icon.png-e26d7be00331005bf00d5d77678d0dfc.ctex"]
 
 [params]
 

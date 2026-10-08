@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dqfofkh0uu3x3"
-path="res://.godot/imported/Pathfinder Headshot.png-87c05c9663435347feba6680993f5fa1.ctex"
+path="res://.godot/imported/pathfinder_icon.png-fb13700f86906ebc9901ea89b6ddd838.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprites/Character Icons/Pathfinder Headshot.png"
-dest_files=["res://.godot/imported/Pathfinder Headshot.png-87c05c9663435347feba6680993f5fa1.ctex"]
+source_file="res://Sprites/Character Icons/pathfinder_icon.png"
+dest_files=["res://.godot/imported/pathfinder_icon.png-fb13700f86906ebc9901ea89b6ddd838.ctex"]
 
 [params]
 
