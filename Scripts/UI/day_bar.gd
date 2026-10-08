@@ -9,7 +9,7 @@ extends PanelContainer
 # calcSuccessChance() returns a fraction (0.85 = 85%), but
 # generateResults() compares against 0-100, so I will convert it here
 static func _get_success_chance(quest: CreatedQuest, party: Array[GuildCharacter]) -> float:
-	return quest.calcSuccessChance(party) * 100.0
+	return quest.calcSuccessChance(party)
 
 @onready var _end_day_button: Button = %EndDayButton
 
