@@ -54,13 +54,15 @@ grow_vertical = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=40666266]
 layout_mode = 2
 
-[node name="TopBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=168263758 node_paths=PackedStringArray("day_label")]
+[node name="TopBar" type="PanelContainer" parent="MarginContainer/VBoxContainer" unique_id=168263758 node_paths=PackedStringArray("day_label", "gold_label", "standing_label")]
 custom_minimum_size = Vector2(0, 70)
 custom_maximum_size = Vector2(-1, 250)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_g4v7s")
 script = ExtResource("2_ewhhe")
 day_label = NodePath("TopBarRow/VBoxContainer/DayLabel")
+gold_label = NodePath("TopBarRow/VBoxContainer2/GoldLabel")
+standing_label = NodePath("TopBarRow/VBoxContainer3/StanLabel")
 
 [node name="TopBarRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer/TopBar" unique_id=2127575527]
 layout_mode = 2
@@ -263,7 +265,7 @@ layout_mode = 2
 text = "WELCOME"
 
 [node name="LogContents" parent="MarginContainer/Intro Blurb/Background/VBoxContainer" parent_id_path=PackedInt32Array(2008083606, 1861553414) index="2" unique_id=2017656256]
-text = "[font_size=45][color=black]Welcome to your new guild! You are a fledgling guild master with the goal of getting rich and defeating the demon king! To do so you must [b]HIRE[/b] guild members to [b]SEND[/b] on quests! You can choose to [b]ACCEPT[/b] or [b]DENY[/b] quests depending on what you want to prioritze. Your members will try to complete the quests to the best of their ability while trying to find [b]TREASURE[/b]. Your guild members can get [b]INJURED [/b]and will need to rest to heal back up. Try and do your best to claim your fortune and save the world![/font_size]"
+text = "[font_size=41][color=black]Welcome to your new guild! You are a fledgling guild master with the goal of getting rich and defeating the demon king! To do so you must [b]HIRE[/b] guild members to [b]SEND[/b] on quests! You can choose to [b]ACCEPT[/b] or [b]DENY[/b] quests depending on what you want to prioritze. Your members will try to complete the quests to the best of their ability while trying to find [b]TREASURE[/b]. Your guild members can get [b]INJURED [/b]and will need to rest to heal back up. If they get too injured, they will die and you will lose them forever. Try and do your best to claim your fortune and save the world![/color][/font_size]"
 
 [node name="Character Generator" parent="." unique_id=1008846978 instance=ExtResource("6_brb4x")]
 

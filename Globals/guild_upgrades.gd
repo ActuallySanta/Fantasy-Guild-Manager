@@ -57,7 +57,7 @@ const UPGRADE_STANDING_REQ := [0, 1, 2, 3, 4]
 const STARTING_GOLD := 600
 const STARTING_STANDING := 1
 ## Write gold/standing into the top bar's GoldLabel / StanLabel.
-const DRIVE_TOP_BAR_LABELS := true
+const DRIVE_TOP_BAR_LABELS := false
 ## Show the +gold / +standing test buttons on the upgrades page.
 const SHOW_DEBUG_BUTTONS := true
 

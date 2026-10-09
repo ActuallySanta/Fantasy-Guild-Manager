@@ -4,10 +4,24 @@ extends Node
  
 # triggered after the day number goes up
 signal day_started(day: int)
- 
+
+# triggered when one of the resources is changed
+signal resources_changed
+
 # The current day, starts on day 1.
 var day: int = 1
- 
+
+var gold: int:
+	get:
+		return GuildUpgrades.gold
+
+var standing: int:
+	get:
+		return GuildUpgrades.standing
+
+func _ready() -> void:
+	GuildUpgrades.resources_changed.connect(resources_changed.emit)
+
 # Called by Start New Day button.
 func start_new_day() -> void:
 	day += 1
@@ -17,3 +31,11 @@ func start_new_day() -> void:
  
 	# Tell everything else the new day has begun.
 	day_started.emit(day)
+
+
+func add_gold(amount: int) -> void:
+	GuildUpgrades.add_gold(amount)
+
+
+func add_standing(amount: int) -> void:
+	GuildUpgrades.add_standing(amount)

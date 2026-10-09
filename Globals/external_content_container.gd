@@ -63,7 +63,7 @@ var character_icons: Dictionary[GuildCharacter.CharacterRole, Texture2D] = {
 	GuildCharacter.CharacterRole.KNIGHT: preload("uid://0nieya7vg7ir"),
 	GuildCharacter.CharacterRole.PRIEST: preload("uid://dwkwfcgs6qeya"),
 	GuildCharacter.CharacterRole.PATHFINDER: preload("uid://dqfofkh0uu3x3"),
-	GuildCharacter.CharacterRole.MAGE: preload("uid://deis7oxw14qbl"),
+	GuildCharacter.CharacterRole.MAGE: preload("uid://bw0opsv6knijq"),
 }
 
 

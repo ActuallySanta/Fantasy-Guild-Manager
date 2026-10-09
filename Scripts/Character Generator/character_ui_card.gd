@@ -10,7 +10,9 @@ var loaded_character: GuildCharacter
 
 @onready var character_icon: TextureRect = $"VBoxContainer/MarginContainer/Character Icon"
 
-@onready var character_description_label: Label = $"VBoxContainer/Stat Block/MarginContainer/HBoxContainer/Character Description Label"
+@onready var character_description_label: Label = $"VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer2/Character Description Label"
+@onready var character_injury_label: Label = $"VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer2/Character Injury Label"
+
 
 @onready var defense_label: Label = $"VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer/Defense Label"
 @onready var sleaziness_label: Label = $"VBoxContainer/Stat Block/MarginContainer/HBoxContainer/VBoxContainer/Sleaziness Label"
@@ -30,6 +32,7 @@ func _ready() -> void:
 	sleaziness_label.text = "Sleaziness: " + str(loaded_character.stats[GuildCharacter.StatType.SLEAZINESS])
 	pluck_label.text = "Pluck: " + str(loaded_character.pluck)
 	character_description_label.text = loaded_character.description
+	character_injury_label.text = "Injury Level: " + str(GuildCharacter.InjuryLevel.find_key(loaded_character.injury_level))
 	character_icon.texture = ExternalContentContainer.get_character_icon(loaded_character.role)
 	pass # Replace with function body.
 
