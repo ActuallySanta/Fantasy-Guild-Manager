@@ -7,6 +7,8 @@ var thisQuest = CreatedQuest
 var acceptedQuests: Array[CreatedQuest]
 var acceptedQuestResults: Array[String]
 
+var dayNum = 0;
+
 var testQuestNumber = 0:
 	get:
 		return testQuestNumber

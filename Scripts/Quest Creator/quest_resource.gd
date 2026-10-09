@@ -162,7 +162,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 			questSummary = str(questSummary, "Summary: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
 
 			if (goldReward > 200):
-				returnString = str(returnString, "However, your adventurers did bring back [color=gold][b]", goldReward - 200, " gold[/b][/color].\n")
+				returnString = str(returnString, "However, your adventurers did bring back [color=FFE700][b]", goldReward - 200, " gold[/b][/color].\n")
 				questSummary = str(questSummary, "However, your adventurers did bring back ", goldReward - 200, " gold")
 		_:
 			if (numAdventurers == 1):
@@ -182,7 +182,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					_questingAdventurers[1].name,
 					ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data),
 				)
-			returnString = str(returnString, "Summary: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=gold][b]", goldReward, " gold[/b][/color].\n")
+			returnString = str(returnString, "Summary: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=FFE700][b]", goldReward, " gold[/b][/color].\n")
 			questSummary = str(questSummary, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward, " gold.")
 
 	#loop with size based on difficulty -> higher difficulty more loops 
@@ -220,7 +220,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 				attackedAdventurer.name,
 				"[/b] was ATTACKED by a ",
 				ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
-				". They managed to fight the monster off but were [color=red][b]INJURED[/b][/color] in the process.\n",
+				". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n",
 			)
 			attackedAdventurer.injure_character()
 	return returnString
@@ -239,9 +239,9 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 		_ when searchChance >= successDetermination:
 			var extraGold = randi_range(11, 29)
 			goldReward += extraGold
-			returnString = str(returnString, "[b]The Party[/b] discovered an old chest containing [color=gold][b]", extraGold, " gold[/b][/color].\n")
+			returnString = str(returnString, "[b]The Party[/b] discovered an old chest containing [color=FFE700][b]", extraGold, " gold[/b][/color].\n")
 		_:
-			returnString = str(returnString, "[b]", _questingAdventurers[randi_range(0, numAdventurers - 1)].name, "[/b] tripped on a rock and gained [color=red][b]1 INJURY[/b][/color].\n")
+			returnString = str(returnString, "[b]", _questingAdventurers[randi_range(0, numAdventurers - 1)].name, "[/b] tripped on a rock and gained [color=FD0000][b]1 INJURY[/b][/color].\n")
 	return returnString
 
 
