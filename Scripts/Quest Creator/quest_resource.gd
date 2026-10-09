@@ -147,7 +147,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	match true:
 		_ when successDetermination >= _successChance:
 			if (numAdventurers == 1):
-				returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] ", ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data))
+				returnString = str(returnString, "[b]", _questingAdventurers[0].name, ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data))
 			else:
 				returnString = str(
 					returnString,
@@ -170,7 +170,6 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					returnString,
 					"[b]",
 					_questingAdventurers[0].name,
-					"[/b] ",
 					ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data),
 				)
 			else:
