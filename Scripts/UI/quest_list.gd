@@ -8,6 +8,7 @@ signal board_changed
 @export var quest_card_scene: PackedScene
 @export var quests_per_day: int = 5
 
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	# tag node so other systems will be able to reach it
@@ -30,7 +31,11 @@ func populate(quests: Array) -> void:
 		child.queue_free()
 	
 	for quest in quests:
-		add_quest(quest)
+		if(GameState.day != 10):
+			add_quest(quest)
+		else:
+			add_quest(CreatedQuest.new(10))
+			break
 	
 	# Old slots are gone, so put any characters back in the roster
 	# and close it, since no quest is open anymore

@@ -9,7 +9,9 @@ signal day_started(day: int)
 signal resources_changed
 
 # The current day, starts on day 1.
-var day: int = 1
+var day: int = 1:
+	get:
+		return day
 
 var gold: int:
 	get:

@@ -89,6 +89,8 @@ func _init(dayNum := 0) -> void:
 
 func calcSuccessChance(_questingAdventurers: Array) -> int:
 	var statHitNum = 60.0 + (20 * difficulty)
+	if(maxAdventurers == 1):
+		statHitNum = (statHitNum / 2)
 	var statTotal = 0.0
 
 	for adventurer in _questingAdventurers:
