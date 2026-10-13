@@ -62,7 +62,7 @@ func _init(dayNum := 0) -> void:
 
 	difficulty = 0
 	#hard code
-	maxAdventurers = randi_range(1,2)
+	maxAdventurers = randi_range(1, 2)
 
 	questNum = randi_range(0, 7)
 	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
@@ -89,7 +89,7 @@ func _init(dayNum := 0) -> void:
 
 func calcSuccessChance(_questingAdventurers: Array) -> int:
 	var statHitNum = 60.0 + (20 * difficulty)
-	if(maxAdventurers == 1):
+	if (maxAdventurers == 1):
 		statHitNum = (statHitNum / 2)
 	var statTotal = 0.0
 
@@ -256,7 +256,7 @@ func _initMilestoneVars(dayNum: int):
 			location = ExternalContentContainer.get_Location_Name(1)
 			goldReward = 300 + (150 * difficulty)
 			favStat = FavoredStat.Attack
-			questTitle = str("A Bone Drake is ATTACHING ", location, "! Save the town before it is DESTROYED!")
+			questTitle = str("A Bone Drake is ATTACKING ", location, "! Save the town before it is DESTROYED!")
 
 	print("")
 	pass
