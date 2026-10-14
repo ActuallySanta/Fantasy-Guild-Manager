@@ -245,10 +245,8 @@ func close_welcome() -> void:
 
 func _build_shell() -> void:
 	set_anchors_preset(PRESET_FULL_RECT)
-	var bg := TextureRect.new()
-	bg.texture = S.tex("page_bg.png")
-	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	bg.stretch_mode = TextureRect.STRETCH_SCALE
+	var bg := ColorRect.new()
+	bg.color = S.BG
 	bg.set_anchors_preset(PRESET_FULL_RECT)
 	bg.mouse_filter = MOUSE_FILTER_IGNORE
 	add_child(bg)
@@ -266,7 +264,7 @@ func _build_shell() -> void:
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_scroll.set_anchors_preset(PRESET_FULL_RECT)
 	_content_wrap.add_child(_scroll)
-	_content = S.vbox(26)
+	_content = S.vbox(12)
 	_content.size_flags_horizontal = SIZE_EXPAND_FILL
 	_scroll.add_child(S.margin(_content, 24, 26, 24, 40))
 	_scroll.get_child(0).size_flags_horizontal = SIZE_EXPAND_FILL
@@ -276,13 +274,11 @@ func _build_shell() -> void:
 	_content_wrap.add_child(_page_layer)
 
 	_day_bar = PanelContainer.new()
-	_day_bar.add_theme_stylebox_override("panel", S.sbtex("inset_parchment.png", 26, Vector4(26, 12, 22, 12), 8))
+	_day_bar.add_theme_stylebox_override("panel", S.box("bar", Vector4(16, 10, 16, 10)))
 	col.add_child(_day_bar)
 
 	_nav = PanelContainer.new()
-	var nsb := S.sbtex("wood_dark.png", 8, Vector4(14, 26, 14, 18))
-	nsb.axis_stretch_horizontal = StyleBoxTexture.AXIS_STRETCH_MODE_TILE_FIT
-	_nav.add_theme_stylebox_override("panel", nsb)
+	_nav.add_theme_stylebox_override("panel", S.box("bar", Vector4(8, 8, 8, 8)))
 	col.add_child(_nav)
 
 	_overlay = Control.new()
@@ -293,74 +289,22 @@ func _build_shell() -> void:
 
 func _build_header() -> Control:
 	var head := PanelContainer.new()
-	var hsb := S.sbtex("wood_bar.png", 8, Vector4(18, 14, 18, 18))
-	head.add_theme_stylebox_override("panel", hsb)
-	var v := S.vbox(10)
+	head.add_theme_stylebox_override("panel", S.box("panel", Vector4(16, 10, 16, 10)))
+	var v := S.vbox(8)
 	head.add_child(v)
-
-	var banner_row := Control.new()
-	banner_row.custom_minimum_size = Vector2(0, 104)
-	v.add_child(banner_row)
-	for side in [0, 1]:
-		var sp := TextureRect.new()
-		sp.texture = S.tex("sprig_l.png" if side == 0 else "sprig_r.png")
-		sp.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		sp.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT
-		sp.mouse_filter = MOUSE_FILTER_IGNORE
-		sp.anchor_left = 0.0 if side == 0 else 1.0
-		sp.anchor_right = sp.anchor_left
-		sp.offset_left = -8.0 if side == 0 else -150.0
-		sp.offset_right = sp.offset_left + 158.0
-		sp.offset_top = -8
-		sp.offset_bottom = 104
-		banner_row.add_child(sp)
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
-	banner_row.add_child(center)
-	var banner := PanelContainer.new()
-	var bsb := StyleBoxTexture.new()
-	bsb.texture = S.tex("banner.png")
-	bsb.texture_margin_left = 70
-	bsb.texture_margin_right = 70
-	bsb.texture_margin_top = 30
-	bsb.texture_margin_bottom = 36
-	bsb.content_margin_left = 84
-	bsb.content_margin_right = 84
-	bsb.content_margin_top = 12
-	bsb.content_margin_bottom = 22
-	banner.add_theme_stylebox_override("panel", bsb)
-	banner.custom_minimum_size = Vector2(0, 104)
-	var t := S.title("Guild Ledger", 50)
-	t.add_theme_font_override("font", S.display_black)
-	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	banner.add_child(t)
-	center.add_child(banner)
-
-	var strip := S.panel("panel", Vector4(16, 10, 16, 12))
-	var h := S.hbox(0)
-	strip.add_child(h)
+	v.add_child(S.title("Guild Ledger", 32))
+	var h := S.hbox(24)
 	var cells := [["sun", "day", "Day"], ["coins", "gold", "Gold"], ["rook", "standing", "Standing"]]
-	for i in cells.size():
-		var c: Array = cells[i]
-		if i > 0:
-			var line := ColorRect.new()
-			line.color = S.LINE
-			line.custom_minimum_size = Vector2(2, 0)
-			h.add_child(line)
-		var cell := S.hbox(12)
-		cell.alignment = BoxContainer.ALIGNMENT_CENTER
+	for c in cells:
+		var cell := S.hbox(8)
 		cell.size_flags_horizontal = SIZE_EXPAND_FILL
-		cell.add_child(S.icon(c[0], 62))
-		var cv := S.vbox(-6)
-		var num := S.title("0", 38)
-		num.add_theme_font_override("font", S.display_black)
-		cv.add_child(num)
-		cv.add_child(S.label(c[2], 23, S.INK_SOFT, S.body_bold))
-		cell.add_child(cv)
+		cell.add_child(S.icon(c[0], 32))
+		cell.add_child(S.label(c[2] + ":", 24, S.INK_SOFT))
+		var num := S.label("0", 24)
+		cell.add_child(num)
 		h.add_child(cell)
 		_stat_labels[c[1]] = num
-	v.add_child(strip)
+	v.add_child(h)
 	return head
 
 
@@ -484,59 +428,21 @@ func _build_nav() -> void:
 		current = "characters"
 	for t in TABS:
 		var active: bool = t[0] == current
-		var b := Button.new()
-		b.focus_mode = FOCUS_NONE
-		b.mouse_default_cursor_shape = CURSOR_POINTING_HAND
+		var label: String = t[1]
+		if t[0] == "quests" and outstanding() > 0:
+			label += " (%d)" % outstanding()
+		if t[0] == "characters" and CharacterContainer.active_characters.is_empty():
+			label += " (!)"
+		var b := S.button(label, "", 20, 84)
 		b.size_flags_horizontal = SIZE_EXPAND_FILL
-		b.custom_minimum_size = Vector2(0, 124)
-		b.text = t[1]
 		b.icon = S.icon_tex(t[2])
-		b.expand_icon = false
 		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
-		b.add_theme_constant_override("icon_max_width", 52)
 		b.add_theme_constant_override("h_separation", 2)
-		b.add_theme_font_override("font", S.body_bold)
-		b.add_theme_font_size_override("font_size", 21)
-		for s in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
-			b.add_theme_color_override(s, S.INK)
-		var sb := S.sbtex("tab_tile_active.png" if active else "tab_tile.png", 22, Vector4(4, 16, 4, 12), 4)
-		for s in ["normal", "hover", "pressed", "hover_pressed"]:
-			b.add_theme_stylebox_override(s, sb)
-		b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
-		b.pressed.connect(open_tab.bind(t[0]))
 		if active:
-			var rib := TextureRect.new()
-			rib.texture = S.tex("ribbon.png")
-			rib.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			rib.stretch_mode = TextureRect.STRETCH_SCALE
-			rib.anchor_left = 0.5
-			rib.anchor_right = 0.5
-			rib.offset_left = -15
-			rib.offset_right = 15
-			rib.offset_top = -30
-			rib.offset_bottom = 14
-			rib.show_behind_parent = true
-			rib.mouse_filter = MOUSE_FILTER_IGNORE
-			b.add_child(rib)
-		var badge := ""
-		if t[0] == "quests" and outstanding() > 0:
-			badge = str(outstanding())
-		if t[0] == "characters" and CharacterContainer.active_characters.is_empty():
-			badge = "!"
-		if badge != "":
-			var bp := PanelContainer.new()
-			bp.add_theme_stylebox_override("panel", S.flat(S.WAX, 16, 3, S.INK, Vector4(9, 0, 9, 2)))
-			var bl := S.label(badge, 22, S.WHITE, S.body_bold)
-			bl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			bp.add_child(bl)
-			bp.anchor_left = 1.0
-			bp.anchor_right = 1.0
-			bp.offset_left = -34
-			bp.offset_top = -14
-			bp.grow_horizontal = GROW_DIRECTION_BOTH
-			bp.mouse_filter = MOUSE_FILTER_IGNORE
-			b.add_child(bp)
+			b.add_theme_stylebox_override("normal", S.flat(Color("#BBBBBB"), 0, 1, S.INK, Vector4(4, 6, 4, 6)))
+			b.add_theme_stylebox_override("hover", S.flat(Color("#BBBBBB"), 0, 1, S.INK, Vector4(4, 6, 4, 6)))
+		b.pressed.connect(open_tab.bind(t[0]))
 		h.add_child(b)
 
 
@@ -546,8 +452,8 @@ func toast(text: String) -> void:
 	if _toast and is_instance_valid(_toast):
 		_toast.queue_free()
 	_toast = PanelContainer.new()
-	_toast.add_theme_stylebox_override("panel", S.flat(Color("#2E2012"), 16, 3, S.GOLD, Vector4(24, 14, 24, 16)))
-	var l := S.wrap(S.label(text, 26, Color("#F6E2B0"), S.body_bold))
+	_toast.add_theme_stylebox_override("panel", S.flat(Color("#333333"), 0, 0, S.INK, Vector4(16, 10, 16, 10)))
+	var l := S.wrap(S.label(text, 24, S.WHITE))
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_toast.add_child(l)
 	_toast.mouse_filter = MOUSE_FILTER_IGNORE

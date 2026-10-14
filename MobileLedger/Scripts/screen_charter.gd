@@ -14,10 +14,8 @@ static func build(ui) -> Control:
 	var n: int = ui.slot_count(e)
 	var key := PageQuests.type_key(e)
 
-	var root := TextureRect.new()
-	root.texture = S.tex("page_bg.png")
-	root.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	root.stretch_mode = TextureRect.STRETCH_SCALE
+	var root := ColorRect.new()
+	root.color = S.BG
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
 	var col := S.vbox(0)
@@ -30,7 +28,7 @@ static func build(ui) -> Control:
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(scroll)
-	var v := S.vbox(24)
+	var v := S.vbox(12)
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var m := S.margin(v, 24, 8, 24, 30)
 	m.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -44,11 +42,8 @@ static func build(ui) -> Control:
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hv.add_child(t)
 	var type_name: String = "Milestone" if e.get("milestone", false) else S.TYPE_NAMES.get(int(q.type), "Quest")
-	var sub := S.rich("[center][color=#6B5537]%s ·[/color] [b]%d Gold[/b] [color=#6B5537]· Rank %s[/color][/center]" % [type_name, q.goldReward, S.rank_letter(q)], 27)
+	var sub := S.rich("[center]%s, %d Gold, Rank %s[/center]" % [type_name, q.goldReward, S.rank_letter(q)], 24)
 	hv.add_child(sub)
-	var pic := S.picture(S.TYPE_SCENES[key], Vector2(440, 210))
-	pic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	hv.add_child(pic)
 	var fav := PageQuests.favored_row(q, 27)
 	fav.alignment = BoxContainer.ALIGNMENT_CENTER
 	hv.add_child(fav)
@@ -62,44 +57,28 @@ static func build(ui) -> Control:
 		if i < draft.size():
 			var c: GuildCharacter = draft[i]
 			var sv := S.vbox(6)
-			var circle := Control.new()
-			circle.custom_minimum_size = Vector2(196, 196)
-			var por := S.portrait(c, 172, "circle")
-			por.position = Vector2(12, 12)
-			circle.add_child(por)
-			var ring := S.picture("slot_ring.png", Vector2(196, 196))
-			circle.add_child(ring)
-			sv.add_child(circle)
+			sv.add_child(S.portrait(c, 120))
 			var nl := S.title(c.name, 28)
 			nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			sv.add_child(nl)
-			var rl := S.caps("Tap to remove", 21, S.WAX)
+			var rl := S.label("(tap to remove)", 20, S.INK_SOFT)
 			rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			sv.add_child(rl)
 			var tap := S.tap_area(sv)
-			tap.custom_minimum_size.x = 196
+			tap.custom_minimum_size.x = 140
 			tap.pressed.connect(toggle.bind(ui, c))
 			slots.add_child(tap)
 		else:
 			var sv2 := S.vbox(6)
-			var circle2 := Control.new()
-			circle2.custom_minimum_size = Vector2(196, 196)
-			circle2.add_child(S.picture("slot_circle.png", Vector2(196, 196)))
-			var inner := S.vbox(0)
-			inner.alignment = BoxContainer.ALIGNMENT_CENTER
-			inner.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-			inner.offset_bottom = -8
-			var plus := S.icon("plus", 56)
-			plus.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-			inner.add_child(plus)
-			for word in ["Add", "Adventurer"]:
-				var wl := S.label(word, 26, S.WHITE, S.body_bold)
-				wl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-				wl.add_theme_color_override("font_outline_color", Color(0.1, 0.2, 0.05, 0.8))
-				wl.add_theme_constant_override("outline_size", 5)
-				inner.add_child(wl)
-			circle2.add_child(inner)
-			sv2.add_child(circle2)
+			var empty_slot := PanelContainer.new()
+			empty_slot.custom_minimum_size = Vector2(120, 120)
+			empty_slot.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			empty_slot.add_theme_stylebox_override("panel", S.box("inset"))
+			var el0 := S.label("Empty", 22, S.INK_SOFT)
+			el0.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			el0.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			empty_slot.add_child(el0)
+			sv2.add_child(empty_slot)
 			var pl := S.caps("Pick below", 21)
 			pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			sv2.add_child(pl)
@@ -117,8 +96,7 @@ static func build(ui) -> Control:
 	ev.add_child(cap)
 	var row := S.hbox(18)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	var pct := S.title("-- %" if ch < 0 else "%d%%" % mini(ch, 100), 68, o[1])
-	pct.add_theme_font_override("font", S.display_black)
+	var pct := S.title("-- %" if ch < 0 else "%d%%" % mini(ch, 100), 40, o[1])
 	row.add_child(pct)
 	var word := S.title(o[0], 30)
 	word.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -137,10 +115,6 @@ static func build(ui) -> Control:
 	ev.add_child(nl2)
 	v.add_child(est)
 
-	var emblem := S.icon("emblem", 110)
-	emblem.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	v.add_child(emblem)
-
 	# --- roster to pick from
 	v.add_child(S.divider("Your Adventurers", 30))
 	var fav_name: String = S.STATS[S.favored_index(q)].name
@@ -158,27 +132,23 @@ static func build(ui) -> Control:
 		var el := S.wrap(S.label("Nobody to send yet. Hire adventurers first. It's free.", 26))
 		el.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		ev2.add_child(el)
-		var go := S.button("Go to For Hire", "green", 28)
+		var go := S.button("Go to For Hire", "blue", 28)
 		go.pressed.connect(ui.open_tab.bind("characters", "hire"))
 		ev2.add_child(go)
 		v.add_child(empty)
 
 	# --- dispatch
-	var foot := PanelContainer.new()
-	foot.add_theme_stylebox_override("panel", S.sbtex("inset_parchment.png", 26, Vector4(24, 14, 24, 14), 8))
+	var foot := S.panel("bar", Vector4(16, 10, 16, 10))
 	var fv := S.vbox(4)
 	foot.add_child(fv)
 	var label := "Pick an adventurer"
 	if not draft.is_empty():
 		label = "Update Party" if e.state == "ready" else "Dispatch Party"
-	var b := S.button(label, "red", 36, 100)
-	b.icon = S.tex("seal.png")
-	b.expand_icon = false
-	b.add_theme_constant_override("icon_max_width", 74)
+	var b := S.button(label, "green")
 	b.disabled = draft.is_empty()
 	b.pressed.connect(dispatch.bind(ui))
 	fv.add_child(b)
-	var fl := S.label("The party sets out when you end the day.", 22, S.INK_SOFT, S.body_bold)
+	var fl := S.label("The party sets out when you end the day.", 22, S.INK_SOFT)
 	fl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	fv.add_child(fl)
 	col.add_child(foot)
@@ -187,32 +157,16 @@ static func build(ui) -> Control:
 
 ## Back button + small banner title, shared by the full-screen pages.
 static func top_bar(_ui, text: String, back: Callable) -> Control:
-	var h := S.hbox(12)
-	var bb := Button.new()
-	bb.focus_mode = Control.FOCUS_NONE
-	bb.custom_minimum_size = Vector2(88, 88)
-	bb.icon = S.icon_tex("back")
-	bb.expand_icon = true
-	bb.add_theme_color_override("icon_normal_color", S.INK)
-	bb.add_theme_color_override("icon_hover_color", S.INK)
-	bb.add_theme_color_override("icon_pressed_color", S.INK)
-	var round := S.flat(S.CREAM, 44, 3, S.INK, Vector4(20, 20, 20, 20))
-	for s in ["normal", "hover", "pressed", "hover_pressed"]:
-		bb.add_theme_stylebox_override(s, round)
-	bb.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
-	bb.tooltip_text = "Back"
+	var head := S.panel("panel", Vector4(16, 10, 16, 10))
+	var h := S.hbox(16)
+	head.add_child(h)
+	var bb := S.button("< Back", "", 24, 56)
 	bb.pressed.connect(back)
 	h.add_child(bb)
-	h.add_child(S.spacer())
-	var tag := PanelContainer.new()
-	tag.add_theme_stylebox_override("panel", S.sbtex("inset_parchment.png", 26, Vector4(28, 8, 28, 10), 8))
-	tag.add_child(S.title(text, 30))
-	tag.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	h.add_child(tag)
-	h.add_child(S.spacer())
-	var seal := S.picture("seal.png", Vector2(88, 88))
-	h.add_child(seal)
-	return S.margin(h, 24, 16, 24, 10)
+	var t := S.title(text, 30)
+	t.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	h.add_child(t)
+	return head
 
 
 static func _score(q: CreatedQuest, c: GuildCharacter) -> int:
@@ -241,7 +195,7 @@ static func _pick_row(ui, e: Dictionary, c: GuildCharacter, draft: Array, n: int
 	var p := S.panel("ready" if chosen else "card", Vector4(18, 14, 18, 14))
 	var h := S.hbox(14)
 	p.add_child(h)
-	h.add_child(S.portrait(c, 96, "rounded"))
+	h.add_child(S.portrait(c, 80))
 	var mid := S.vbox(6)
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var nr := S.hbox(10)
@@ -254,26 +208,25 @@ static func _pick_row(ui, e: Dictionary, c: GuildCharacter, draft: Array, n: int
 	var fav := S.favored_index(e.quest)
 	for i in 4:
 		var st: Dictionary = S.STATS[i]
-		stats.add_child(S.icon_chip(st.icon, str(c.stats[i]), st.bg, st.color, 22, i == fav))
+		stats.add_child(S.icon_chip(st.icon, "%s %d" % [st.short, c.stats[i]], st.bg, st.color, 20, i == fav))
 	mid.add_child(stats)
 	if not elsewhere.is_empty():
-		mid.add_child(S.wrap(S.label("On \"%s\" · picking moves them" % elsewhere.quest.questTitle, 21, S.BLUE_TEXT, S.body_bold)))
+		mid.add_child(S.wrap(S.label("On \"%s\" · picking moves them" % elsewhere.quest.questTitle, 21, S.INFO)))
 	elif full:
-		mid.add_child(S.label("Party is full", 21, S.INK_SOFT, S.body_bold))
+		mid.add_child(S.label("Party is full", 21, S.INK_SOFT))
 	h.add_child(mid)
 	var right := S.vbox(6)
 	right.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var contrib: int = ui.chance_for(e, [c])
-	var cl := S.title("+%d%%" % contrib, 30, S.GREEN_TEXT)
+	var cl := S.label("+%d%%" % contrib, 24, S.GOOD)
 	cl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	right.add_child(cl)
-	var box := PanelContainer.new()
-	box.custom_minimum_size = Vector2(50, 50)
-	box.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	box.add_theme_stylebox_override("panel", S.flat(Color("#3F7A2E") if chosen else S.CREAM, 10, 3, S.INK, Vector4(6, 6, 6, 6)))
-	if chosen:
-		box.add_child(S.icon("check", 34))
-	right.add_child(box)
+	var cb := CheckBox.new()
+	cb.button_pressed = chosen
+	cb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	cb.focus_mode = Control.FOCUS_NONE
+	cb.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	right.add_child(cb)
 	h.add_child(right)
 	var tap := S.tap_area(p)
 	tap.disabled = full

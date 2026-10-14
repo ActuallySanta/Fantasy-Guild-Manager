@@ -6,7 +6,7 @@ const S := preload("res://MobileLedger/Scripts/ledger_style.gd")
 
 
 static func build(ui) -> Control:
-	var v := S.vbox(24)
+	var v := S.vbox(12)
 	var roster: Array = CharacterContainer.active_characters
 	var hires: Array = CharacterContainer.hireable_characters
 	var cap: int = CharacterContainer.max_characters
@@ -15,12 +15,10 @@ static func build(ui) -> Control:
 	var seg := S.hbox(0)
 	for s in [["guild", "Your Guild  %d/%d" % [roster.size(), cap], "nav_characters"], ["hire", "For Hire  ·  %d" % hires.size(), "plus"]]:
 		var on: bool = ui.seg == s[0]
-		var b := S.button(s[1], "red" if on else "paper", 27, 92)
+		var b := S.button(s[1], "", 27, 92)
 		b.icon = S.icon_tex(s[2])
-		b.add_theme_color_override("icon_normal_color", S.WHITE if on else S.INK)
-		b.add_theme_color_override("icon_hover_color", S.WHITE if on else S.INK)
-		b.add_theme_color_override("icon_pressed_color", S.WHITE if on else S.INK)
-		b.add_theme_constant_override("icon_max_width", 34)
+		b.toggle_mode = true
+		b.button_pressed = on
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.pressed.connect(func():
 			ui.seg = s[0]
@@ -44,7 +42,7 @@ static func build(ui) -> Control:
 			var l := S.wrap(S.label("Your guild is empty. Hire adventurers before you accept quests.", 28))
 			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			pv.add_child(l)
-			var go := S.button("See who's for hire", "green", 30)
+			var go := S.button("See who's for hire", "blue", 30)
 			go.pressed.connect(func():
 				ui.seg = "hire"
 				ui.queue_refresh())
@@ -53,8 +51,8 @@ static func build(ui) -> Control:
 		else:
 			for i in maxi(0, cap - roster.size()):
 				var slot := PanelContainer.new()
-				slot.add_theme_stylebox_override("panel", S.sbtex("slot_dashed.png", 30, Vector4(20, 20, 20, 20)))
-				slot.custom_minimum_size.y = 100
+				slot.add_theme_stylebox_override("panel", S.box("inset"))
+				slot.custom_minimum_size.y = 60
 				var sl := S.caps("Empty bunk", 24)
 				sl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 				sl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -90,16 +88,12 @@ static func stat_grid(c: GuildCharacter) -> GridContainer:
 		var val: int = c.pluck if i == 4 else int(c.stats[i])
 		var cell := PanelContainer.new()
 		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		cell.add_theme_stylebox_override("panel", S.flat(st.bg, 12, 0, st.color, Vector4(4, 6, 4, 6)))
+		cell.add_theme_stylebox_override("panel", S.flat(st.bg, 0, 1, st.color, Vector4(4, 6, 4, 6)))
 		var cv := S.vbox(0)
-		var ic := S.icon(st.icon, 38)
-		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-		cv.add_child(ic)
-		var vl := S.title(str(val), 30, st.color)
-		vl.add_theme_font_override("font", S.display_black)
+		var vl := S.label(str(val), 26, st.color)
 		vl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cv.add_child(vl)
-		var nl := S.caps(st.short, 19, st.color)
+		var nl := S.label(st.short, 18, st.color)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cv.add_child(nl)
 		cell.add_child(cv)
@@ -112,7 +106,7 @@ static func _roster_card(ui, c: GuildCharacter) -> Control:
 	var v := S.vbox(14)
 	p.add_child(v)
 	var h := S.hbox(16)
-	h.add_child(S.portrait(c, 110, "rounded"))
+	h.add_child(S.portrait(c, 96))
 	var info := S.vbox(2)
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -120,7 +114,7 @@ static func _roster_card(ui, c: GuildCharacter) -> Control:
 	info.add_child(S.label("the %s" % S.role_name(c), 26, S.INK_SOFT))
 	var e: Dictionary = ui.entry_of(c)
 	if not e.is_empty():
-		info.add_child(S.trim(S.label("Questing: %s" % e.quest.questTitle, 22, S.BLUE_TEXT, S.body_bold)))
+		info.add_child(S.trim(S.label("Questing: %s" % e.quest.questTitle, 22, S.INFO)))
 	h.add_child(info)
 	h.add_child(S.injury_chip(c.injury_level, 22))
 	v.add_child(h)
@@ -135,7 +129,7 @@ static func _hire_card(ui, c: GuildCharacter, full: bool) -> Control:
 	var v := S.vbox(14)
 	p.add_child(v)
 	var h := S.hbox(16)
-	h.add_child(S.portrait(c, 110, "rounded"))
+	h.add_child(S.portrait(c, 96))
 	var info := S.vbox(2)
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -143,14 +137,14 @@ static func _hire_card(ui, c: GuildCharacter, full: bool) -> Control:
 	var total: int = c.stats[0] + c.stats[1] + c.stats[2] + c.stats[3]
 	info.add_child(S.label("the %s · stat total %d" % [S.role_name(c), total], 25, S.INK_SOFT))
 	h.add_child(info)
-	var more := S.button("Codex", "paper", 24, 72)
+	var more := S.button("Codex", "", 24, 72)
 	more.pressed.connect(ui.open_codex.bind(c))
 	more.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	h.add_child(more)
 	v.add_child(h)
 	v.add_child(stat_grid(c))
 	var first: String = c.description.strip_edges().split("\n")[0]
-	var blurb := S.wrap(S.label(first, 25, Color("#4E3D26"), S.body_italic))
+	var blurb := S.wrap(S.label(first, 25, S.INK_SOFT))
 	blurb.max_lines_visible = 3
 	v.add_child(blurb)
 	var b := S.button("Guild full · upgrade Barracks" if full else "Hire %s (free)" % c.name, "green", 30, 90)

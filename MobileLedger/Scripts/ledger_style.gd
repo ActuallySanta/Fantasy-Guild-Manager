@@ -1,57 +1,83 @@
-## Style kit for the Mobile Ledger UI: painted parchment, wood, wax seals.
-## Every screen builds its widgets through these helpers so the look stays
-## consistent and can be re-tuned in one place. Art lives in MobileLedger/Art
-## (regenerate with MobileLedger/Tools/generate_art.py).
+## Style kit for the Mobile Ledger UI: deliberately plain. Flat grey boxes,
+## 1px borders, Godot's default font, no colour. Only art used is the project's
+## own Sprites/Character Icons (portraits) and Sprites/UI Icons.
 class_name LedgerStyle
 extends RefCounted
 
-const ART := "res://MobileLedger/Art/"
-const ICONS := "res://MobileLedger/Art/Icons/"
-const FONTS := "res://MobileLedger/Fonts/"
+const UI_ICONS := "res://Sprites/UI Icons/"
 
-const INK := Color("#3A2816")
-const INK_SOFT := Color("#6B5537")
-const PARCH := Color("#F3E4C2")
-const CREAM := Color("#FBF3DF")
-const LINE := Color("#C9A96A")
-const WAX := Color("#A3262A")
-const GOLD := Color("#D4A84F")
-const GOLD_TEXT := Color("#7A5A12")
-const GREEN_TEXT := Color("#2F6A22")
-const BLUE_TEXT := Color("#2F5F8A")
+## Every widget name the screens ask for → a file in Sprites/UI Icons.
+## Names with no match there render nothing.
+const ICON_FILES := {
+	"sun": "sun-solid-full.svg",
+	"coins": "coins-solid-full.svg",
+	"rook": "chess-rook-solid-full.svg",
+	"nav_home": "house-solid-full.svg",
+	"nav_quests": "book-solid-full.svg",
+	"nav_characters": "user-solid-full.svg",
+	"nav_upgrades": "arrow-up-solid-full.svg",
+	"nav_settings": "gear-solid-full.svg",
+}
+
+const INK := Color("#111111")
+const INK_SOFT := Color("#555555")
+const PARCH := Color("#FFFFFF")
+const CREAM := Color("#FFFFFF")
+const LINE := Color("#999999")
 const WHITE := Color("#FFFFFF")
+const BG := Color("#E6E6E6")
+const BOX := Color("#FFFFFF")
+const BOX_ALT := Color("#F2F2F2")
+const BTN := Color("#DDDDDD")
 
-## Quest title colours by CreatedQuest.QuestType (and 5 = milestone).
-const TYPE_COLORS := {
-	1: Color("#2E6B2A"), 2: Color("#8A4B12"), 3: Color("#24557F"), 4: Color("#5B3F8C"), 5: Color("#A3262A"),
-}
+## Colour is used only to mean something:
+## green = good / go, red = bad / danger, yellow = gold, blue = info / in progress.
+const GOOD := Color("#2E7D32")
+const GOOD_BG := Color("#C8E6C9")
+const BAD := Color("#C62828")
+const BAD_BG := Color("#FFCDD2")
+const WARN := Color("#E65100")
+const WARN_BG := Color("#FFE0B2")
+const GOLD := Color("#9A7400")
+const GOLD_BG := Color("#FFF3C4")
+const INFO := Color("#1565C0")
+const INFO_BG := Color("#BBDEFB")
+const WAX := BAD
+const GOLD_TEXT := GOLD
+const GREEN_TEXT := GOOD
+const BLUE_TEXT := INFO
+
+## Quest title colours by CreatedQuest.QuestType: plain, except the milestone (5) in red.
+const TYPE_COLORS := {1: INK, 2: INK, 3: INK, 4: INK, 5: BAD}
 const TYPE_NAMES := {1: "Clear Dungeon", 2: "Escort", 3: "Scout Terrain", 4: "Gather Intel"}
-const TYPE_SCENES := {
-	1: "scene_dungeon.png", 2: "scene_escort.png", 3: "scene_scout.png", 4: "scene_intel.png", 5: "scene_milestone.png",
+
+## GuildCharacter.StatType order, plus Pluck. Each stat has its own colour so it
+## can be matched at a glance (e.g. a quest's favored stat vs. a character's).
+const STATS := [
+	{"name": "Strength", "short": "Str", "icon": "", "color": Color("#C62828"), "bg": Color("#FFEBEE")},
+	{"name": "Defense", "short": "Def", "icon": "", "color": Color("#1565C0"), "bg": Color("#E3F2FD")},
+	{"name": "Wisdom", "short": "Wis", "icon": "", "color": Color("#6A1B9A"), "bg": Color("#F3E5F5")},
+	{"name": "Sleaziness", "short": "Slz", "icon": "", "color": Color("#2E7D32"), "bg": Color("#E8F5E9")},
+	{"name": "Pluck", "short": "Plk", "icon": "", "color": Color("#E65100"), "bg": Color("#FFF3E0")},
+]
+
+## GuildCharacter.InjuryLevel → label, background, text colour (green → red → grey).
+const INJURY := [
+	["Healthy", GOOD_BG, GOOD],
+	["Sore", GOLD_BG, GOLD],
+	["Lightly Injured", WARN_BG, WARN],
+	["Gravely Injured", BAD_BG, BAD],
+	["Dead", Color("#CCCCCC"), Color("#333333")],
+]
+
+## Button kinds → fill colour. Anything else is plain grey.
+const BUTTON_FILLS := {
+	"green": Color("#A5D6A7"), "red": Color("#EF9A9A"), "blue": Color("#90CAF9"),
 }
 
-## GuildCharacter.StatType order, plus Pluck (stored separately on the character).
-const STATS := [
-	{"name": "Strength", "short": "Str", "icon": "strength", "color": Color("#A3262A"), "bg": Color("#F2D5CB")},
-	{"name": "Defense", "short": "Def", "icon": "defense", "color": Color("#2F5F8A"), "bg": Color("#D3E1EE")},
-	{"name": "Wisdom", "short": "Wis", "icon": "wisdom", "color": Color("#5B3F8C"), "bg": Color("#E2D9EF")},
-	{"name": "Sleaziness", "short": "Slz", "icon": "sleaziness", "color": Color("#3E6B35"), "bg": Color("#D9E8CF")},
-	{"name": "Pluck", "short": "Plk", "icon": "pluck", "color": Color("#94500F"), "bg": Color("#F5DCC0")},
-]
-
-## GuildCharacter.InjuryLevel → label, background, text colour.
-const INJURY := [
-	["Healthy", Color("#D9E8CF"), Color("#2F5A27")],
-	["Sore", Color("#F4E5AC"), Color("#6E5410")],
-	["Lightly Injured", Color("#F6D7B2"), Color("#8A4A10")],
-	["Gravely Injured", Color("#F2CBC3"), Color("#8A1E22")],
-	["Dead", Color("#DDD3E0"), Color("#4A3B4F")],
-]
-
-const ROLE_GROUNDS := [Color("#B9C9D6"), Color("#E6DCC6"), Color("#C4D8A8"), Color("#D8C8E8")]
-
-static var display_font: FontVariation
-static var display_black: FontVariation
+## All fonts are Godot's built-in default font.
+static var display_font: Font
+static var display_black: Font
 static var body_font: Font
 static var body_bold: Font
 static var body_italic: Font
@@ -59,96 +85,72 @@ static var _cache := {}
 
 
 static func init_fonts() -> void:
-	if display_font:
+	if body_font:
 		return
-	var cinzel: Font = load(FONTS + "Cinzel-Variable.ttf")
-	display_font = FontVariation.new()
-	display_font.base_font = cinzel
-	display_font.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 700}
-	display_black = FontVariation.new()
-	display_black.base_font = cinzel
-	display_black.variation_opentype = {TextServerManager.get_primary_interface().name_to_tag("wght"): 900}
-	body_font = load(FONTS + "AlegreyaSans-Medium.ttf")
-	body_bold = load(FONTS + "AlegreyaSans-Bold.ttf")
-	body_italic = load(FONTS + "AlegreyaSans-Italic.ttf")
+	body_font = ThemeDB.fallback_font
+	display_font = body_font
+	display_black = body_font
+	body_bold = body_font
+	body_italic = body_font
 
 
 static func make_theme() -> Theme:
 	init_fonts()
 	var t := Theme.new()
-	t.default_font = body_font
-	t.default_font_size = 28
+	t.default_font_size = 26
 	t.set_color("font_color", "Label", INK)
-	var grab := StyleBoxFlat.new()
-	grab.bg_color = Color(INK_SOFT, 0.5)
-	grab.set_corner_radius_all(6)
-	grab.content_margin_left = 5
-	grab.content_margin_right = 5
+	var grab := flat(Color("#AAAAAA"), 0, 0, INK, Vector4(4, 0, 4, 0))
 	t.set_stylebox("grabber", "VScrollBar", grab)
 	t.set_stylebox("grabber_highlight", "VScrollBar", grab)
 	t.set_stylebox("grabber_pressed", "VScrollBar", grab)
-	var track := StyleBoxEmpty.new()
-	track.content_margin_left = 5
-	track.content_margin_right = 5
-	t.set_stylebox("scroll", "VScrollBar", track)
+	t.set_stylebox("scroll", "VScrollBar", flat(BG, 0, 0, INK, Vector4(4, 0, 4, 0)))
 	return t
 
 
 # ---------------------------------------------------------------- resources
 
-static func tex(file: String) -> Texture2D:
-	var path := ART + file
-	if not _cache.has(path):
-		_cache[path] = load(path)
-	return _cache[path]
-
-
 static func icon_tex(icon_name: String) -> Texture2D:
-	var path := ICONS + icon_name + ".svg"
+	if not ICON_FILES.has(icon_name):
+		return null
+	var path: String = UI_ICONS + ICON_FILES[icon_name]
 	if not _cache.has(path):
 		_cache[path] = load(path)
 	return _cache[path]
 
 
-## 9-slice stylebox from a painted texture. `margin` = slice size in the texture,
-## `pad` = content padding. `shadow` = extra pixels baked under the art.
-static func sbtex(file: String, margin: float, pad: Vector4 = Vector4(20, 18, 20, 18), shadow: float = 0.0) -> StyleBoxTexture:
-	var sb := StyleBoxTexture.new()
-	sb.texture = tex(file)
-	sb.texture_margin_left = margin
-	sb.texture_margin_right = margin
-	sb.texture_margin_top = margin
-	sb.texture_margin_bottom = margin + shadow
-	sb.content_margin_left = pad.x
-	sb.content_margin_top = pad.y
-	sb.content_margin_right = pad.z
-	sb.content_margin_bottom = pad.w + shadow
-	return sb
-
-
-static func flat(fill: Color, radius: int = 12, border: int = 0, border_color: Color = INK, pad: Vector4 = Vector4(12, 6, 12, 6)) -> StyleBoxFlat:
+static func flat(fill: Color, radius: int = 0, border: int = 0, border_color: Color = LINE, pad: Vector4 = Vector4(12, 6, 12, 6)) -> StyleBoxFlat:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = fill
-	sb.set_corner_radius_all(radius)
-	sb.set_border_width_all(border)
+	sb.set_corner_radius_all(0)
+	sb.set_border_width_all(1 if border > 0 else 0)
 	sb.border_color = border_color
 	sb.content_margin_left = pad.x
 	sb.content_margin_top = pad.y
 	sb.content_margin_right = pad.z
 	sb.content_margin_bottom = pad.w
-	sb.anti_aliasing = true
+	return sb
+
+
+## Plain bordered box. kind: "panel" | "card" | "ready" | "inset" | "bar".
+static func box(kind: String = "panel", pad: Vector4 = Vector4(16, 12, 16, 12)) -> StyleBoxFlat:
+	var fill := BOX
+	if kind == "inset" or kind == "bar":
+		fill = BOX_ALT
+	var border := 2 if kind == "ready" else 1
+	var sb := flat(fill, 0, 1, INK if kind == "ready" else LINE, pad)
+	sb.set_border_width_all(border)
 	return sb
 
 
 # ---------------------------------------------------------------- containers
 
-static func vbox(sep: int = 16) -> VBoxContainer:
+static func vbox(sep: int = 12) -> VBoxContainer:
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", sep)
 	return v
 
 
-static func hbox(sep: int = 16) -> HBoxContainer:
+static func hbox(sep: int = 12) -> HBoxContainer:
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", sep)
 	return h
@@ -172,13 +174,9 @@ static func margin(child: Control, l: int, t: int, r: int, b: int) -> MarginCont
 	return m
 
 
-## A painted parchment panel. kind: "panel" | "card" | "ready" | "inset".
-static func panel(kind: String = "panel", pad: Vector4 = Vector4(26, 22, 26, 24)) -> PanelContainer:
+static func panel(kind: String = "panel", pad: Vector4 = Vector4(16, 12, 16, 12)) -> PanelContainer:
 	var p := PanelContainer.new()
-	var file: String = {"panel": "panel_parchment.png", "card": "card_parchment.png", "ready": "card_ready.png", "inset": "inset_parchment.png"}[kind]
-	var m := 40.0 if kind != "inset" else 26.0
-	var sh := 10.0 if kind != "inset" else 8.0
-	p.add_theme_stylebox_override("panel", sbtex(file, m, pad, sh))
+	p.add_theme_stylebox_override("panel", box(kind, Vector4(14, 10, 14, 10)))
 	return p
 
 
@@ -190,12 +188,10 @@ static func clear(node: Node) -> void:
 
 # ---------------------------------------------------------------- text
 
-static func label(text: String, size: int = 28, color: Color = INK, font: Font = null) -> Label:
-	init_fonts()
+static func label(text: String, size: int = 26, color: Color = INK, _font: Font = null) -> Label:
 	var l := Label.new()
 	l.text = text
-	l.add_theme_font_override("font", font if font else body_font)
-	l.add_theme_font_size_override("font_size", size)
+	l.add_theme_font_size_override("font_size", mini(size, 34))
 	l.add_theme_color_override("font_color", color)
 	return l
 
@@ -214,28 +210,21 @@ static func trim(l: Label) -> Label:
 	return l
 
 
-static func title(text: String, size: int = 36, color: Color = INK) -> Label:
-	init_fonts()
-	return label(text, size, color, display_font)
+static func title(text: String, size: int = 30, color: Color = INK) -> Label:
+	return label(text, size, color)
 
 
 static func caps(text: String, size: int = 22, color: Color = INK_SOFT) -> Label:
-	init_fonts()
-	var l := label(text.to_upper(), size, color, body_bold)
-	return l
+	return label(text.to_upper(), size, color)
 
 
-static func rich(bbcode: String, size: int = 26) -> RichTextLabel:
-	init_fonts()
+static func rich(bbcode: String, size: int = 24) -> RichTextLabel:
 	var r := RichTextLabel.new()
 	r.bbcode_enabled = true
 	r.fit_content = true
 	r.scroll_active = false
 	r.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	r.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	r.add_theme_font_override("normal_font", body_font)
-	r.add_theme_font_override("bold_font", body_bold)
-	r.add_theme_font_override("italics_font", body_italic)
 	r.add_theme_font_size_override("normal_font_size", size)
 	r.add_theme_font_size_override("bold_font_size", size)
 	r.add_theme_font_size_override("italics_font_size", size)
@@ -245,84 +234,60 @@ static func rich(bbcode: String, size: int = 26) -> RichTextLabel:
 	return r
 
 
-## Section heading with leafy flourishes on both sides (as in the reference art).
-static func divider(text: String, size: int = 32) -> HBoxContainer:
-	var h := hbox(10)
-	h.alignment = BoxContainer.ALIGNMENT_CENTER
-	var l := TextureRect.new()
-	l.texture = tex("flourish_l.png")
-	l.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	l.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	l.custom_minimum_size = Vector2(110, 26)
-	l.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var r := TextureRect.new()
-	r.texture = tex("flourish_r.png")
-	r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	r.custom_minimum_size = Vector2(110, 26)
-	r.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	h.add_child(l)
-	var t := title(text, size)
-	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	h.add_child(t)
-	h.add_child(r)
-	return h
+## Section heading: a label over a thin line.
+static func divider(text: String, size: int = 28) -> VBoxContainer:
+	var v := vbox(4)
+	v.add_child(title(text, size))
+	v.add_child(hline())
+	return v
 
 
 # ---------------------------------------------------------------- widgets
 
-static func icon(icon_name: String, size: float = 40.0, tint: Color = Color.WHITE) -> TextureRect:
+## Icon from Sprites/UI Icons. Unknown names give an empty, hidden control.
+static func icon(icon_name: String, size: float = 32.0, tint: Color = INK) -> Control:
+	var tx := icon_tex(icon_name)
+	if tx == null:
+		var none := Control.new()
+		none.visible = false
+		none.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		return none
 	var t := TextureRect.new()
-	t.texture = icon_tex(icon_name)
+	t.texture = tx
 	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	t.custom_minimum_size = Vector2(size, size)
+	t.custom_minimum_size = Vector2(size, size) * 0.75
 	t.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	t.modulate = tint
 	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return t
 
 
-static func picture(file: String, size: Vector2) -> TextureRect:
-	var t := TextureRect.new()
-	t.texture = tex(file)
-	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	t.custom_minimum_size = size
-	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	return t
+static func _btn_box(fill: Color) -> StyleBoxFlat:
+	return flat(fill, 0, 1, Color("#888888"), Vector4(16, 6, 16, 6))
 
 
-## Painted button. kind: green | red | wood | blue | paper.
-static func button(text: String, kind: String = "green", size: int = 28, min_h: float = 88.0) -> Button:
-	init_fonts()
+## Flat button. kind: "green" (go / confirm), "red" (deny / cancel), "blue" (navigate);
+## anything else is plain grey.
+static func button(text: String, kind: String = "", size: int = 26, min_h: float = 64.0) -> Button:
 	var b := Button.new()
 	b.text = text
 	b.focus_mode = Control.FOCUS_NONE
-	b.custom_minimum_size = Vector2(0, min_h)
-	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
-	var pad := Vector4(26, 10, 26, 10)
-	var normal := sbtex("btn_%s.png" % kind, 26, pad, 6)
-	var down := sbtex("btn_%s_down.png" % kind, 26, pad + Vector4(0, 4, 0, -4), 6)
-	var off := sbtex("btn_disabled.png", 26, pad, 6)
-	b.add_theme_stylebox_override("normal", normal)
-	b.add_theme_stylebox_override("hover", normal)
-	b.add_theme_stylebox_override("pressed", down)
-	b.add_theme_stylebox_override("hover_pressed", down)
-	b.add_theme_stylebox_override("disabled", off)
+	b.custom_minimum_size = Vector2(0, minf(min_h, 64.0))
+	var fill: Color = BUTTON_FILLS.get(kind, BTN)
+	b.add_theme_stylebox_override("normal", _btn_box(fill))
+	b.add_theme_stylebox_override("hover", _btn_box(fill.darkened(0.06)))
+	b.add_theme_stylebox_override("pressed", _btn_box(fill.darkened(0.15)))
+	b.add_theme_stylebox_override("hover_pressed", _btn_box(fill.darkened(0.15)))
+	b.add_theme_stylebox_override("disabled", _btn_box(Color("#F0F0F0")))
 	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
-	b.add_theme_font_override("font", display_font)
-	b.add_theme_font_size_override("font_size", size)
-	var light := kind != "paper"
-	var fc := WHITE if light else INK
+	b.add_theme_font_size_override("font_size", mini(size, 26))
 	for s in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
-		b.add_theme_color_override(s, fc)
-	b.add_theme_color_override("font_disabled_color", Color("#7A6A55"))
-	if light:
-		b.add_theme_color_override("font_outline_color", Color(0.15, 0.08, 0.03, 0.85))
-		b.add_theme_constant_override("outline_size", 6)
-	b.add_theme_constant_override("icon_max_width", int(size * 1.3))
-	b.add_theme_constant_override("h_separation", 10)
+		b.add_theme_color_override(s, INK)
+	b.add_theme_color_override("font_disabled_color", Color("#999999"))
+	b.add_theme_color_override("icon_normal_color", INK)
+	b.add_theme_constant_override("icon_max_width", 28)
+	b.add_theme_constant_override("h_separation", 8)
 	return b
 
 
@@ -331,7 +296,6 @@ static func tap_area(child: Control, min_h: float = 0.0) -> Button:
 	var b := Button.new()
 	b.flat = true
 	b.focus_mode = Control.FOCUS_NONE
-	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.custom_minimum_size.y = min_h
 	for s in ["normal", "hover", "pressed", "hover_pressed", "focus", "disabled"]:
 		b.add_theme_stylebox_override(s, StyleBoxEmpty.new())
@@ -352,10 +316,10 @@ static func _ignore_mouse(n: Node) -> void:
 		_ignore_mouse(c)
 
 
-static func chip(text: String, bg: Color, fg: Color, size: int = 22, border: bool = true) -> PanelContainer:
+static func chip(text: String, bg: Color = BOX_ALT, fg: Color = INK, size: int = 20, border: bool = true) -> PanelContainer:
 	var p := PanelContainer.new()
-	p.add_theme_stylebox_override("panel", flat(bg, 18, 2 if border else 0, fg, Vector4(14, 2, 14, 4)))
-	var l := label(text, size, fg, body_bold)
+	p.add_theme_stylebox_override("panel", flat(bg, 0, 1 if border else 0, fg if fg != INK else LINE, Vector4(8, 2, 8, 2)))
+	var l := label(text, size, fg)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	p.add_child(l)
 	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -363,90 +327,60 @@ static func chip(text: String, bg: Color, fg: Color, size: int = 22, border: boo
 	return p
 
 
-static func icon_chip(icon_name: String, text: String, bg: Color, fg: Color, size: int = 22, outlined: bool = false) -> PanelContainer:
+## Chip with an optional icon; `outlined` = darker border (used for the favored stat).
+static func icon_chip(icon_name: String, text: String, bg: Color = BOX_ALT, fg: Color = INK, size: int = 20, outlined: bool = false) -> PanelContainer:
 	var p := PanelContainer.new()
-	p.add_theme_stylebox_override("panel", flat(bg, 18, 3 if outlined else 0, fg, Vector4(8, 2, 14, 2)))
-	var h := hbox(6)
-	h.add_child(icon(icon_name, size + 6))
-	h.add_child(label(text, size, fg, body_bold))
+	var sb := flat(bg, 0, 1, fg if outlined else LINE, Vector4(8, 2, 8, 2))
+	if outlined:
+		sb.set_border_width_all(2)
+	p.add_theme_stylebox_override("panel", sb)
+	var h := hbox(4)
+	h.add_child(icon(icon_name, size + 6, fg))
+	h.add_child(label(text, size, fg))
 	p.add_child(h)
 	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	p.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	return p
 
 
-static func injury_chip(level: int, size: int = 22) -> PanelContainer:
+static func injury_chip(level: int, size: int = 20) -> PanelContainer:
 	var info: Array = INJURY[clampi(level, 0, 4)]
 	return chip(info[0], info[1], info[2], size)
 
 
-## Ribbon-style banner label (the "Healthy" ribbon in the reference).
-static func ribbon_label(text: String, bg: Color, fg: Color, size: int = 28) -> PanelContainer:
-	var p := PanelContainer.new()
-	var sb := flat(bg, 4, 3, fg.darkened(0.1), Vector4(26, 4, 26, 6))
-	sb.skew = Vector2(0.0, 0.0)
-	p.add_theme_stylebox_override("panel", sb)
-	var l := label(text, size, fg, display_font)
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	p.add_child(l)
-	p.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	return p
+static func ribbon_label(text: String, bg: Color = BOX_ALT, fg: Color = INK, size: int = 24) -> PanelContainer:
+	return chip(text, bg, fg, size)
 
 
-## Character portrait from the project's own role art, clipped to a circle or
-## rounded square on a soft painted ground.
-static func portrait(character: GuildCharacter, size: float, shape: String = "rounded") -> Control:
-	var holder := Panel.new()
+## Character portrait: the project's role headshot in a plain bordered square.
+static func portrait(character: GuildCharacter, size: float, _shape: String = "") -> Control:
+	var holder := PanelContainer.new()
 	holder.custom_minimum_size = Vector2(size, size)
 	holder.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	holder.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	holder.add_theme_stylebox_override("panel", flat(Color("#DDDDDD"), 0, 1, LINE, Vector4(1, 1, 1, 1)))
 	var role: int = character.role if character else 0
-	var r := int(size / 2) if shape == "circle" else int(size * 0.18)
-	var ground: Color = ROLE_GROUNDS[clampi(role, 0, 3)]
-	holder.add_theme_stylebox_override("panel", flat(ground, r, 0))
-	holder.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
 	var t := TextureRect.new()
 	t.texture = ExternalContentContainer.get_character_icon(role)
 	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
-	t.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	t.offset_top = size * 0.06
+	t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if character and character.injury_level >= GuildCharacter.InjuryLevel.DEAD:
-		t.modulate = Color(0.6, 0.55, 0.62)
+		t.modulate = Color(1, 1, 1, 0.35)
 	holder.add_child(t)
-	var frame := Panel.new()
-	frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var fsb := flat(Color(0, 0, 0, 0), r, 3, INK)
-	fsb.draw_center = false
-	frame.add_theme_stylebox_override("panel", fsb)
-	holder.add_child(frame)
 	return holder
 
 
-## Five-segment rune bar like the reference's success gauge.
-static func gauge(value: float, fill: Color, width: float = 560.0) -> Control:
+## Plain progress bar: grey track, dark fill.
+static func gauge(value: float, fill: Color = INK_SOFT, width: float = 400.0) -> Control:
 	var c := Control.new()
-	c.custom_minimum_size = Vector2(width, 40)
+	c.custom_minimum_size = Vector2(width, 20)
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	c.draw.connect(func():
-		var w := c.size.x
-		var h := c.size.y
-		c.draw_style_box(flat(Color("#3A2816"), 10, 0), Rect2(0, 0, w, h))
-		var inner := Rect2(10, 8, w - 20, h - 16)
-		c.draw_style_box(flat(Color("#5E4A32"), 6, 0), inner)
-		var segs := 10
-		var gap := 4.0
-		var sw := (inner.size.x - gap * (segs - 1)) / segs
-		for i in segs:
-			var on := (i + 1) / float(segs) <= value + 0.0001
-			var rect := Rect2(inner.position.x + i * (sw + gap), inner.position.y + 3, sw, inner.size.y - 6)
-			c.draw_style_box(flat(fill if on else Color("#7C6648"), 4, 0), rect)
-		# gold end caps
-		for x in [4.0, w - 4.0]:
-			c.draw_colored_polygon(PackedVector2Array([Vector2(x, h / 2 - 12), Vector2(x + (8 if x < 10 else -8), h / 2), Vector2(x, h / 2 + 12)]), GOLD)
+		c.draw_rect(Rect2(Vector2.ZERO, c.size), Color("#DDDDDD"))
+		c.draw_rect(Rect2(0, 0, c.size.x * clampf(value, 0.0, 1.0), c.size.y), fill)
+		c.draw_rect(Rect2(Vector2.ZERO, c.size), LINE, false, 1.0)
 	)
 	return c
 
@@ -454,20 +388,20 @@ static func gauge(value: float, fill: Color, width: float = 560.0) -> Control:
 ## [word, text colour, gauge colour] for a success chance (-1 = no party yet).
 static func odds(p: int) -> Array:
 	if p < 0:
-		return ["Chance unknown", INK_SOFT, Color("#7C6648")]
+		return ["Chance unknown", INK_SOFT, INK_SOFT]
 	if p >= 80:
-		return ["Strong odds", GREEN_TEXT, Color("#6FD1A8")]
+		return ["Strong odds", GOOD, Color("#43A047")]
 	if p >= 60:
-		return ["Fair odds", Color("#6E5410"), GOLD]
+		return ["Fair odds", GOLD, Color("#FBC02D")]
 	if p >= 40:
-		return ["Risky", Color("#8A4A10"), Color("#E09A4F")]
-	return ["Long shot", Color("#8A1E22"), Color("#C9574F")]
+		return ["Risky", WARN, Color("#FB8C00")]
+	return ["Long shot", BAD, Color("#E53935")]
 
 
 static func hline() -> ColorRect:
 	var line := ColorRect.new()
-	line.color = Color(LINE, 0.9)
-	line.custom_minimum_size = Vector2(0, 2)
+	line.color = LINE
+	line.custom_minimum_size = Vector2(0, 1)
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return line
 

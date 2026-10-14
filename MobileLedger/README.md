@@ -1,7 +1,8 @@
 # Mobile Ledger UI (prototype)
 
-A phone-first UI for the guild game, styled after the "Guild Ledger" reference art
-(painted parchment, wood, wax seals, bookmark tabs). It is **UI only**: it runs on the
+A phone-first UI for the guild game, deliberately plain: flat grey boxes, 1px borders,
+Godot's default font, no colour. The only art it uses is the project's own
+`Sprites/Character Icons` (portraits) and `Sprites/UI Icons`. It is **UI only**: it runs on the
 existing systems and changes none of them.
 
 - **Run it:** open `MobileLedger/ledger_main.tscn` and press *Run Current Scene* (F6).
@@ -28,9 +29,8 @@ existing systems and changes none of them.
 ## Files
 
 - `Scripts/ledger_main.gd`: state, the game-flow calls, and the shell (header, day bar, nav)
-- `Scripts/ledger_style.gd`: colours, fonts and widget helpers. Tune the look here.
+- `Scripts/ledger_style.gd`: the plain widget helpers (boxes, buttons, chips, icons). Tune the look here.
 - `Scripts/page_*.gd`, `screen_*.gd`, `overlay_*.gd`: one file per screen
-- `Art/`: painted textures. Regenerate or re-tune with `python3 MobileLedger/Tools/generate_art.py`
-  (Pillow + numpy) and `python3 MobileLedger/Tools/make_icons.py`
-- `Fonts/`: Cinzel (titles) and Alegreya Sans (body), both SIL Open Font License
-- Portraits use the project's own `Sprites/Character Icons`.
+- `Art/`, `Fonts/`, `Tools/`: left over from the painted version and no longer used by any script.
+  Safe to delete.
+- Portraits use the project's own `Sprites/Character Icons`; icons come from `Sprites/UI Icons`.

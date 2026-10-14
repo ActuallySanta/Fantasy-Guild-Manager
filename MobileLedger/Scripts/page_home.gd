@@ -5,23 +5,18 @@ const S := preload("res://MobileLedger/Scripts/ledger_style.gd")
 
 
 static func build(ui) -> Control:
-	var v := S.vbox(24)
+	var v := S.vbox(12)
 	var roster: Array = CharacterContainer.active_characters
 
 	# --- day card
 	var day := S.panel("card", Vector4(26, 22, 26, 22))
 	var dh := S.hbox(20)
 	day.add_child(dh)
-	var sun := PanelContainer.new()
-	sun.custom_minimum_size = Vector2(112, 112)
-	sun.add_theme_stylebox_override("panel", S.flat(Color("#EAD6A8"), 56, 3, S.INK, Vector4(16, 16, 16, 16)))
-	sun.add_child(S.icon("sun", 78))
-	dh.add_child(sun)
+	dh.add_child(S.icon("sun", 64))
 	var dv := S.vbox(0)
 	dv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	dv.add_child(S.caps("The ledger reads", 22))
-	var dt := S.title("Day %d" % GameState.day, 54)
-	dt.add_theme_font_override("font", S.display_black)
+	var dt := S.title("Day %d" % GameState.day, 34)
 	dv.add_child(dt)
 	var d := GameState.day
 	var drake := "The Bone Drake attacks on Day 10 · %d day%s left" % [10 - d, "" if 10 - d == 1 else "s"]
@@ -29,7 +24,7 @@ static func build(ui) -> Control:
 		drake = "The Bone Drake is attacking today!"
 	elif d > 10:
 		drake = "The Bone Drake has come and gone."
-	dv.add_child(S.wrap(S.label(drake, 25, S.WAX if d == 10 else S.INK_SOFT, S.body_bold)))
+	dv.add_child(S.wrap(S.label(drake, 25, S.WAX if d == 10 else S.INK_SOFT)))
 	dh.add_child(dv)
 	v.add_child(day)
 
@@ -76,7 +71,7 @@ static func build(ui) -> Control:
 		var c: GuildCharacter = roster[i]
 		var row := S.hbox(14)
 		row.custom_minimum_size.y = 96
-		row.add_child(S.portrait(c, 72, "circle"))
+		row.add_child(S.portrait(c, 64))
 		var nv := S.vbox(-2)
 		nv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		nv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -84,7 +79,6 @@ static func build(ui) -> Control:
 		nv.add_child(S.label("%s · %s" % [S.role_name(c), "no injuries yet" if c.injury_count == 0 else "%d injur%s" % [c.injury_count, "y" if c.injury_count == 1 else "ies"]], 23, S.INK_SOFT))
 		row.add_child(nv)
 		row.add_child(S.injury_chip(c.injury_level, 22))
-		row.add_child(S.icon("chev_right", 30, S.INK_SOFT))
 		var tap := S.tap_area(row, 96)
 		tap.pressed.connect(ui.open_codex.bind(c))
 		hv.add_child(tap)
@@ -102,13 +96,13 @@ static func build(ui) -> Control:
 		lp.add_child(lv)
 		for res in ui.last_report.results:
 			var r := S.hbox(12)
-			r.add_child(S.icon("check" if res.succeeded else "x", 34, S.GREEN_TEXT if res.succeeded else S.WAX))
+			r.add_child(S.label("[OK]" if res.succeeded else "[FAIL]", 22, S.GOOD if res.succeeded else S.BAD))
 			r.add_child(S.trim(S.label(res.quest.questTitle, 25)))
 			r.add_child(S.title("+%dg" % res.gold if res.gold > 0 else "0g", 26, S.GOLD_TEXT))
 			lv.add_child(r)
 		if ui.last_report.results.is_empty():
 			lv.add_child(S.label("No quests went out last night.", 25, S.INK_SOFT))
-		var b := S.button("Read the full report", "paper", 27, 84)
+		var b := S.button("Read the full report", "", 27, 84)
 		b.pressed.connect(ui.open_last_report)
 		lv.add_child(b)
 		v.add_child(lp)
@@ -119,11 +113,7 @@ static func _todo(r: Array) -> Control:
 	var p := S.panel("card", Vector4(20, 16, 20, 18))
 	var h := S.hbox(16)
 	p.add_child(h)
-	var tile := PanelContainer.new()
-	tile.custom_minimum_size = Vector2(76, 76)
-	tile.add_theme_stylebox_override("panel", S.flat(r[1], 16, 3, S.INK, Vector4(12, 12, 12, 12)))
-	tile.add_child(S.icon(r[0], 48))
-	h.add_child(tile)
+	h.add_child(S.icon(r[0], 44))
 	var tv := S.vbox(0)
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -132,7 +122,6 @@ static func _todo(r: Array) -> Control:
 	h.add_child(tv)
 	if r[4] != "":
 		h.add_child(S.chip(r[4], r[5][1], r[5][2], 20))
-	h.add_child(S.icon("chev_right", 32, S.INK_SOFT))
 	var tap := S.tap_area(p)
 	tap.pressed.connect(r[6])
 	return tap

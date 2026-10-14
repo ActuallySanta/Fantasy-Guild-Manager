@@ -13,42 +13,35 @@ const STEPS := [
 
 static func build(ui) -> Control:
 	var root := ColorRect.new()
-	root.color = Color(0.16, 0.10, 0.05, 0.72)
+	root.color = Color(0, 0, 0, 0.5)
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
 	var center := CenterContainer.new()
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	root.add_child(center)
-	var p := S.panel("panel", Vector4(36, 34, 36, 36))
+	var p := S.panel("panel", Vector4(24, 20, 24, 20))
 	p.custom_minimum_size.x = 640
 	center.add_child(p)
-	var v := S.vbox(22)
+	var v := S.vbox(14)
 	p.add_child(v)
-	var seal := S.picture("seal_ribbon.png", Vector2(110, 150))
-	seal.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	v.add_child(seal)
 	var k := S.caps("Welcome, Guild Master", 24)
 	k.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(k)
-	var t := S.title("Your guild awaits", 46)
-	t.add_theme_font_override("font", S.display_black)
+	var t := S.title("Your guild awaits", 32)
 	t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(t)
 	for s in STEPS:
 		var row := S.hbox(18)
-		var tile := PanelContainer.new()
-		tile.custom_minimum_size = Vector2(76, 76)
-		tile.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-		tile.add_theme_stylebox_override("panel", S.flat(Color("#EAD6A8"), 38, 3, S.INK, Vector4(12, 12, 12, 12)))
-		tile.add_child(S.icon(s[0], 46))
-		row.add_child(tile)
+		var ic := S.icon(s[0], 44)
+		ic.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		row.add_child(ic)
 		var tv := S.vbox(0)
 		tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		tv.add_child(S.title(s[1], 30))
-		tv.add_child(S.wrap(S.label(s[2], 26, Color("#4E3D26"))))
+		tv.add_child(S.title(s[1], 26))
+		tv.add_child(S.wrap(S.label(s[2], 22, S.INK_SOFT)))
 		row.add_child(tv)
 		v.add_child(row)
-	var b := S.button("Open the Ledger", "green", 34, 100)
+	var b := S.button("Open the Ledger", "green")
 	b.pressed.connect(ui.close_welcome)
 	v.add_child(b)
 	return root
