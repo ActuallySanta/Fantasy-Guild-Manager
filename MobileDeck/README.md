@@ -45,8 +45,21 @@ SVGs are black).
 
 ## Files
 
-- `Scripts/deck_main.gd`: state, game-flow calls, the deck, swipe handling, roster tray
-- `Scripts/deck_cards.gd`: what's printed on recruit / quest / end-of-day cards
-- `Scripts/deck_sheets.gd`: upgrades, character details, how-to-play
-- `Scripts/overlay_report.gd`: the day report
-- `Scripts/deck_style.gd`: widget helpers and all colours
+- `deck_main.tscn` + `Scripts/deck_main.gd`: state, game-flow calls, the deck, swipe handling, roster tray
+- `Scenes/Cards/`: what's printed on recruit / quest / end-of-day cards
+- `Scenes/Sheets/`: upgrades, character details, how-to-play
+- `Scenes/Overlays/overlay_report.tscn`: the day report
+- `Scenes/Rows/`: progress dot, tray tile, party slots, plan row, upgrade row, report entry
+- `Scenes/Components/`: chip, stat row, portrait
+- `Styles/` + `deck_theme.tres`: shared boxes, icon tint materials and the base theme
+- `icon_tint.gdshader`: recolours the black UI icon SVGs
+- `Scripts/deck_style.gd`: all colours, plus the few restyles that depend on game state
+
+### Editing the scenes
+
+Every screen, row and widget is an authored scene you can open and edit in the
+Godot editor. Nothing is built from code at runtime: scripts only fill in text,
+show/hide nodes and instance row scenes for lists (one row per quest, character,
+etc.). Shared boxes (panels, buttons, chips) are `.tres` files in `Styles/`, so
+changing one restyles it everywhere; chips, stat rows and gauges are `@tool`
+components with exported colours/sizes so they preview in the editor.

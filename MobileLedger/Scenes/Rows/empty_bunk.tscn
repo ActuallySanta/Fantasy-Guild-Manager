@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_vdot5"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_slot_dashed_2.tres" id="2_nre71"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="3_t1ojt"]
+
+[node name="EmptyBunk" type="PanelContainer" unique_id=1877771363]
+custom_minimum_size = Vector2(0, 100)
+theme = ExtResource("1_vdot5")
+theme_override_styles/panel = ExtResource("2_nre71")
+
+[node name="Text" type="Label" parent="." unique_id=1032055436]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_fonts/font = ExtResource("3_t1ojt")
+theme_override_font_sizes/font_size = 24
+text = "EMPTY BUNK"
+horizontal_alignment = 1
+vertical_alignment = 1

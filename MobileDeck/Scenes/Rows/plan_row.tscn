@@ -1,0 +1,63 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileDeck/deck_theme.tres" id="1_uca5t"]
+[ext_resource type="Script" path="res://MobileDeck/Scripts/plan_row.gd" id="2_y6dry"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/empty.tres" id="3_mqmnf"]
+[ext_resource type="Script" path="res://MobileDeck/Scripts/tap_area.gd" id="4_ahvla"]
+[ext_resource type="PackedScene" path="res://MobileDeck/Scenes/Components/chip.tscn" id="5_bdfdg"]
+
+[node name="PlanRow" type="VBoxContainer" unique_id=1184254620]
+theme = ExtResource("1_uca5t")
+theme_override_constants/separation = 12
+script = ExtResource("2_y6dry")
+
+[node name="Tap" type="Button" parent="." unique_id=702409078]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/normal = ExtResource("3_mqmnf")
+theme_override_styles/pressed = ExtResource("3_mqmnf")
+theme_override_styles/hover = ExtResource("3_mqmnf")
+theme_override_styles/hover_pressed = ExtResource("3_mqmnf")
+theme_override_styles/disabled = ExtResource("3_mqmnf")
+theme_override_styles/focus = ExtResource("3_mqmnf")
+flat = true
+script = ExtResource("4_ahvla")
+min_height = 52.0
+
+[node name="Row" type="HBoxContainer" parent="Tap" unique_id=1749599370]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="QuestName" type="Label" parent="Tap/Row" unique_id=1368987239]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "Raid the Temple of Time"
+text_overrun_behavior = 3
+
+[node name="Status" parent="Tap/Row" unique_id=628586570 instance=ExtResource("5_bdfdg")]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "Undecided"
+bg = Color(0.2901961, 0.2, 0.08235294, 1)
+fg = Color(1, 0.654902, 0.14901961, 1)
+font_size = 18
+border = false
+
+[node name="Line" type="ColorRect" parent="." unique_id=1391244877]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.23921569, 0.2509804, 0.3137255, 1)

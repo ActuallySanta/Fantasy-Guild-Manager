@@ -27,10 +27,24 @@ existing systems and changes none of them.
 
 ## Files
 
-- `Scripts/ledger_main.gd`: state, the game-flow calls, and the shell (header, day bar, nav)
-- `Scripts/ledger_style.gd`: colours, fonts and widget helpers. Tune the look here.
-- `Scripts/page_*.gd`, `screen_*.gd`, `overlay_*.gd`: one file per screen
+- `ledger_main.tscn` + `Scripts/ledger_main.gd`: state, game-flow calls, the shell (header, day bar, nav)
+- `Scenes/Pages/`: the five tabs (Home, Quests, Characters, Upgrades, Settings)
+- `Scenes/Screens/`: Mission Charter and Adventurer Codex
+- `Scenes/Overlays/`: day report and welcome card
+- `Scenes/Rows/`: list rows (quest slip, roster / hire cards, upgrade card, charter slots and picker row, home checklist / health / last-night rows, report entry and story beats)
+- `Scenes/Components/`: chip, portrait, stat grid, wax seal, dashed slot, top bar
+- `Styles/` + `ledger_theme.tres`: shared boxes and the base theme
+- `Scripts/ledger_style.gd`: colours and fonts, plus the restyles that depend on game state
 - `Art/`: painted textures. Regenerate or re-tune with `python3 MobileLedger/Tools/generate_art.py`
   (Pillow + numpy) and `python3 MobileLedger/Tools/make_icons.py`
-- `Fonts/`: Cinzel (titles) and Alegreya Sans (body), both SIL Open Font License
+- `Fonts/`: Cinzel (titles, `cinzel_bold.tres` / `cinzel_black.tres` weights) and Alegreya Sans (body), both SIL Open Font License
 - Portraits use the project's own `Sprites/Character Icons`.
+
+### Editing the scenes
+
+Every screen, row and widget is an authored scene you can open and edit in the
+Godot editor. Nothing is built from code at runtime: scripts only fill in text,
+show/hide nodes and instance row scenes for lists (one row per quest, character,
+etc.). Shared boxes (panels, buttons, chips) are `.tres` files in `Styles/`, so
+changing one restyles it everywhere; chips, stat rows and gauges are `@tool`
+components with exported colours/sizes so they preview in the editor.

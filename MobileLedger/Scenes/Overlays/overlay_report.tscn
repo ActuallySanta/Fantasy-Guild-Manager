@@ -1,0 +1,135 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_m2cpb"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/page_bg.png" id="2_pw4y7"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/overlay_report.gd" id="3_jvgmx"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_wood_bar.tres" id="4_0hq2g"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_banner.tres" id="5_e2e06"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_black.tres" id="6_pte44"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="7_rpxhk"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_inset_parchment_6.tres" id="8_kylnc"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_inset_parchment_7.tres" id="9_kolgt"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="10_p0sjv"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green.tres" id="11_eh5og"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green_down.tres" id="12_2hm0w"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_disabled.tres" id="13_clv3u"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/empty.tres" id="14_0c5nb"]
+
+[node name="OverlayReport" type="TextureRect" unique_id=1630964606]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("1_m2cpb")
+texture = ExtResource("2_pw4y7")
+expand_mode = 1
+script = ExtResource("3_jvgmx")
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=1311935830]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="Header" type="PanelContainer" parent="Column" unique_id=532133409]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("4_0hq2g")
+
+[node name="Column" type="VBoxContainer" parent="Column/Header" unique_id=712525424]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Banner" type="PanelContainer" parent="Column/Header/Column" unique_id=802045918]
+custom_minimum_size = Vector2(480, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = ExtResource("5_e2e06")
+
+[node name="ReportTitle" type="Label" parent="Column/Header/Column/Banner" unique_id=186346580]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_pte44")
+theme_override_font_sizes/font_size = 44
+text = "Day 1 Report"
+horizontal_alignment = 1
+
+[node name="ReportSubtitle" type="Label" parent="Column/Header/Column" unique_id=2108821915]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9647059, 0.8862745, 0.6901961, 1)
+theme_override_fonts/font = ExtResource("7_rpxhk")
+theme_override_font_sizes/font_size = 27
+text = "1 quest went out · +228 gold"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Column" unique_id=207010651]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Column/Scroll" unique_id=1131540420]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 30
+
+[node name="Content" type="VBoxContainer" parent="Column/Scroll/Margin" unique_id=1461365468]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 26
+
+[node name="Entries" type="VBoxContainer" parent="Column/Scroll/Margin/Content" unique_id=1787687319]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 26
+
+[node name="Empty" type="PanelContainer" parent="Column/Scroll/Margin/Content" unique_id=1057777759]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("8_kylnc")
+
+[node name="Text" type="Label" parent="Column/Scroll/Margin/Content/Empty" unique_id=2118810301]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+text = "No quests went out today. The guild hall was very quiet."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Footer" type="PanelContainer" parent="Column" unique_id=1379683821]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("9_kolgt")
+
+[node name="ActionButton" type="Button" parent="Column/Footer" unique_id=915182672]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 44
+theme_override_fonts/font = ExtResource("10_p0sjv")
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = ExtResource("11_eh5og")
+theme_override_styles/pressed = ExtResource("12_2hm0w")
+theme_override_styles/hover = ExtResource("11_eh5og")
+theme_override_styles/hover_pressed = ExtResource("12_2hm0w")
+theme_override_styles/disabled = ExtResource("13_clv3u")
+theme_override_styles/focus = ExtResource("14_0c5nb")
+text = "Start Day 2"

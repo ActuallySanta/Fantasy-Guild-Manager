@@ -1,0 +1,20 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileDeck/deck_theme.tres" id="1_20425"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/flat_30323f_border_3d4050_r27.tres" id="2_t4yxj"]
+[ext_resource type="Script" path="res://MobileDeck/Scripts/slot_empty.gd" id="3_1r6e6"]
+
+[node name="SlotEmpty" type="PanelContainer" unique_id=1849413791]
+custom_minimum_size = Vector2(150, 150)
+size_flags_vertical = 0
+theme = ExtResource("1_20425")
+theme_override_styles/panel = ExtResource("2_t4yxj")
+script = ExtResource("3_1r6e6")
+
+[node name="Plus" type="Label" parent="." unique_id=929670771]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 34
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1

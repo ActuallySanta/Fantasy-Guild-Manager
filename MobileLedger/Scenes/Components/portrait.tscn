@@ -1,0 +1,35 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_vytnp"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/portrait.gd" id="2_68wxr"]
+[ext_resource type="Texture2D" path="res://Sprites/Character Icons/pathfinder_icon.png" id="3_llscw"]
+
+[node name="Portrait" type="Panel" unique_id=1315844981]
+clip_children = 2
+custom_minimum_size = Vector2(96, 96)
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("1_vytnp")
+script = ExtResource("2_68wxr")
+
+[node name="Art" type="TextureRect" parent="." unique_id=1302263068]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_llscw")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Frame" type="Panel" parent="." unique_id=1158592749]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

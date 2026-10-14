@@ -7,6 +7,10 @@
 ##   end-of-day card -> today's plan, upgrades, End Day
 ## Every swipe also has a button under the card. Back undoes the last card.
 ##
+## Every screen is an authored scene (see MobileDeck/Scenes). This script holds
+## the day's state, the game-flow calls and the swipe handling, and tells each
+## part of the screen to refresh.
+##
 ## UI only: every rule comes from the existing systems (CharacterContainer,
 ## GuildCharacter, CreatedQuest, GameState, GuildUpgrades, DayBar's scoring
 ## helpers). Nothing in those scripts is changed.
@@ -14,9 +18,8 @@ extends Control
 
 const S := preload("res://MobileDeck/Scripts/deck_style.gd")
 const DayBarLogic := preload("res://Scripts/UI/day_bar.gd")
-const Cards := preload("res://MobileDeck/Scripts/deck_cards.gd")
-const Sheets := preload("res://MobileDeck/Scripts/deck_sheets.gd")
-const OverlayReport := preload("res://MobileDeck/Scripts/overlay_report.gd")
+const ProgressDot := preload("res://MobileDeck/Scenes/Rows/progress_dot.tscn")
+const TrayTile := preload("res://MobileDeck/Scenes/Rows/tray_tile.tscn")
 
 ## Same as QuestList.quests_per_day.
 const QUESTS_PER_DAY := 5
@@ -37,23 +40,32 @@ var sheet := {"kind": "intro"}
 var report := {}
 var last_report := {}
 
-var _stat_labels := {}
-var _progress: HBoxContainer
-var _stage: Control
-var _actions: HBoxContainer
-var _tray: PanelContainer
-var _overlay: Control
-var _toast: PanelContainer
 var _dirty := false
-var _card: Control
 var _drag_from := Vector2.ZERO
 var _dragging := false
-var _swipe_hint: Label
+var _toast_tween: Tween
+
+@onready var _stage: Control = %Stage
+@onready var _card: PanelContainer = %Card
+@onready var _faces := {"hire": %CardHire, "quest": %CardQuest, "end": %CardEnd}
+@onready var _swipe_hint: Label = %SwipeHint
+@onready var _sheets := {"upgrades": %SheetUpgrades, "character": %SheetCharacter, "intro": %SheetIntro}
+@onready var _report: Control = %OverlayReport
+@onready var _overlay: Control = %Overlay
+@onready var _toast: PanelContainer = %Toast
 
 
 func _ready() -> void:
-	theme = S.make_theme()
-	_build_shell()
+	%UpgradesButton.pressed.connect(open_sheet.bind("upgrades"))
+	%HelpButton.pressed.connect(open_sheet.bind("intro"))
+	%BackButton.pressed.connect(back)
+	%NoButton.pressed.connect(press_swipe.bind(-1))
+	%YesButton.pressed.connect(press_swipe.bind(1))
+	_stage.resized.connect(_layout_card)
+	_card.gui_input.connect(_on_card_input)
+	for n in [_faces.hire, _faces.quest, _faces.end, _sheets.upgrades, _sheets.character, _sheets.intro, _report]:
+		n.setup(self)
+	_toast.visible = false
 	GameState.day_started.connect(_on_day_started)
 	GameState.resources_changed.connect(queue_refresh)
 	GuildUpgrades.upgrades_changed.connect(queue_refresh)
@@ -308,65 +320,7 @@ func close_sheet() -> void:
 	queue_refresh()
 
 
-# ================================================================ shell
-
-func _build_shell() -> void:
-	set_anchors_preset(PRESET_FULL_RECT)
-	var bg := ColorRect.new()
-	bg.color = S.BG
-	bg.set_anchors_preset(PRESET_FULL_RECT)
-	bg.mouse_filter = MOUSE_FILTER_IGNORE
-	add_child(bg)
-	var col := S.vbox(0)
-	col.set_anchors_preset(PRESET_FULL_RECT)
-	add_child(col)
-
-	# header
-	var head := S.panel("bar", Vector4(16, 10, 12, 10))
-	var hh := S.hbox(18)
-	head.add_child(hh)
-	for c in [["sun", "day", "Day", S.INK], ["coins", "gold", "", S.GOLD], ["rook", "standing", "", S.INK]]:
-		var cell := S.hbox(6)
-		cell.add_child(S.icon(c[0], 32, c[3]))
-		if c[2] != "":
-			cell.add_child(S.label(c[2], 22, S.INK_SOFT))
-		var num := S.label("0", 24, c[3])
-		cell.add_child(num)
-		hh.add_child(cell)
-		_stat_labels[c[1]] = num
-	hh.add_child(S.spacer())
-	var up := S.button("Upgrades", "", 20, 48)
-	up.pressed.connect(open_sheet.bind("upgrades"))
-	hh.add_child(up)
-	var help := S.button("?", "", 20, 48)
-	help.custom_minimum_size.x = 48
-	help.pressed.connect(open_sheet.bind("intro"))
-	hh.add_child(help)
-	col.add_child(head)
-
-	# progress through today's deck
-	_progress = S.hbox(6)
-	col.add_child(S.margin(_progress, 16, 10, 16, 0))
-
-	# card stage
-	_stage = Control.new()
-	_stage.size_flags_vertical = SIZE_EXPAND_FILL
-	_stage.resized.connect(_layout_card)
-	col.add_child(_stage)
-
-	# buttons under the card
-	_actions = S.hbox(12)
-	col.add_child(S.margin(_actions, 16, 6, 16, 10))
-
-	# roster tray
-	_tray = S.panel("bar", Vector4(12, 8, 12, 10))
-	col.add_child(_tray)
-
-	_overlay = Control.new()
-	_overlay.set_anchors_preset(PRESET_FULL_RECT)
-	_overlay.mouse_filter = MOUSE_FILTER_IGNORE
-	add_child(_overlay)
-
+# ================================================================ refresh
 
 func queue_refresh() -> void:
 	if _dirty:
@@ -377,34 +331,30 @@ func queue_refresh() -> void:
 
 func refresh() -> void:
 	_dirty = false
-	_stat_labels.day.text = str(GameState.day)
-	_stat_labels.gold.text = str(GameState.gold)
-	_stat_labels.standing.text = str(GameState.standing)
-	_build_progress()
-	_build_card()
-	_build_actions()
-	_build_tray()
+	%DayValue.text = str(GameState.day)
+	%GoldValue.text = str(GameState.gold)
+	%StandingValue.text = str(GameState.standing)
+	_refresh_progress()
+	_refresh_card()
+	_refresh_actions()
+	_refresh_tray()
 
-	S.clear(_overlay)
-	_overlay.mouse_filter = MOUSE_FILTER_IGNORE
-	var o: Control = null
-	if not report.is_empty():
-		o = OverlayReport.build(self)
-	elif not sheet.is_empty():
-		o = Sheets.build(self)
-	if o:
-		_overlay.add_child(o)
-		_overlay.mouse_filter = MOUSE_FILTER_STOP
+	var kind: String = sheet.get("kind", "")
+	_report.visible = not report.is_empty()
+	for k in _sheets:
+		_sheets[k].visible = not _report.visible and k == kind
+	if _report.visible:
+		_report.refresh()
+	elif _sheets.has(kind):
+		_sheets[kind].refresh()
+	_overlay.mouse_filter = MOUSE_FILTER_STOP if _report.visible or _sheets.has(kind) else MOUSE_FILTER_IGNORE
 
 
-func _build_progress() -> void:
-	S.clear(_progress)
+func _refresh_progress() -> void:
 	var c := current()
-	var quests := entries.size()
 	var qi := entries.find(c.entry) if c.kind == "quest" else -1
-	var txt := "Recruits" if c.kind == "hire" else ("Quest %d of %d" % [qi + 1, quests] if c.kind == "quest" else "End of day")
-	_progress.add_child(S.label(txt, 22, S.INK_SOFT))
-	_progress.add_child(S.spacer())
+	%ProgressLabel.text = "Recruits" if c.kind == "hire" else ("Quest %d of %d" % [qi + 1, entries.size()] if c.kind == "quest" else "End of day")
+	S.clear(%Dots)
 	for i in deck.size():
 		var d: Dictionary = deck[i]
 		var col := S.BOX_ALT
@@ -412,39 +362,21 @@ func _build_progress() -> void:
 			col = {"open": S.BOX_ALT, "ready": S.GOOD, "denied": S.BAD}[d.entry.state]
 		elif i < index:
 			col = S.INK_SOFT
-		var dot := Panel.new()
-		var sz := 16 if i == index else 10
-		dot.custom_minimum_size = Vector2(sz, sz)
-		dot.size_flags_vertical = SIZE_SHRINK_CENTER
-		dot.add_theme_stylebox_override("panel", S.flat(S.INFO if i == index else col, sz, 0))
-		_progress.add_child(dot)
+		S.add_row(%Dots, ProgressDot).setup(S.INFO if i == index else col, i == index)
 
 
 # ---------------------------------------------------------------- the card + swiping
 
-func _build_card() -> void:
-	S.clear(_stage)
+func _refresh_card() -> void:
 	_dragging = false
-	var card := PanelContainer.new()
-	card.add_theme_stylebox_override("panel", S.flat(S.BOX, 26, 1, S.LINE, Vector4(26, 22, 26, 22)))
-	card.mouse_filter = MOUSE_FILTER_STOP
-	card.add_child(Cards.build(self))
-	_stage.add_child(card)
-	_card = card
-	# stamp shown while dragging
-	_swipe_hint = S.label("", 40, S.GOOD)
-	_swipe_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_swipe_hint.mouse_filter = MOUSE_FILTER_IGNORE
-	_swipe_hint.modulate.a = 0.0
-	_stage.add_child(_swipe_hint)
-	_layout_card.call_deferred()
-	if current().kind != "end":
-		card.gui_input.connect(_on_card_input)
+	var kind: String = current().kind
+	for k in _faces:
+		_faces[k].visible = k == kind
+	_faces[kind].refresh()
+	_layout_card()
 
 
 func _layout_card() -> void:
-	if not is_instance_valid(_card):
-		return
 	var r := Rect2(Vector2(16, 12), _stage.size - Vector2(32, 18))
 	_card.position = r.position
 	_card.size = r.size
@@ -452,6 +384,7 @@ func _layout_card() -> void:
 	_card.rotation = 0.0
 	_swipe_hint.position = Vector2(0, 30)
 	_swipe_hint.size = Vector2(_stage.size.x, 60)
+	_swipe_hint.modulate.a = 0.0
 
 
 func _home_x() -> float:
@@ -459,6 +392,8 @@ func _home_x() -> float:
 
 
 func _on_card_input(ev: InputEvent) -> void:
+	if current().kind == "end":
+		return
 	if ev is InputEventMouseButton and ev.button_index == MOUSE_BUTTON_LEFT:
 		if ev.pressed:
 			_dragging = true
@@ -520,103 +455,47 @@ func _nudge() -> void:
 		toast("Your guild is full. Upgrade the Barracks for more room.")
 
 
-func _build_actions() -> void:
-	S.clear(_actions)
+func _refresh_actions() -> void:
 	var c := current()
-	var bk := S.button("Back", "", 22, 60)
-	bk.disabled = index == 0
-	bk.custom_minimum_size.x = 120
-	bk.pressed.connect(back)
-	if c.kind == "end":
-		_actions.add_child(bk)
+	%BackButton.disabled = index == 0
+	var choice: bool = c.kind != "end"
+	%NoButton.visible = choice
+	%YesButton.visible = choice
+	if not choice:
 		return
 	var words: Array = {"hire": ["Pass", "Hire"], "quest": ["Deny", "Send party"]}[c.kind]
-	var no := S.button("<  " + words[0], "red", 24, 64)
-	no.size_flags_horizontal = SIZE_EXPAND_FILL
-	no.pressed.connect(press_swipe.bind(-1))
-	var yes := S.button(words[1] + "  >", "green" if can_swipe(1) else "", 24, 64)
-	yes.size_flags_horizontal = SIZE_EXPAND_FILL
-	yes.disabled = not can_swipe(1)
-	yes.pressed.connect(press_swipe.bind(1))
-	_actions.add_child(no)
-	_actions.add_child(bk)
-	_actions.add_child(yes)
+	%NoButton.text = "<  " + words[0]
+	%YesButton.text = words[1] + "  >"
+	%YesButton.disabled = not can_swipe(1)
+	S.style_button(%YesButton, "green" if can_swipe(1) else "")
 
 
 # ---------------------------------------------------------------- roster tray
 
-func _build_tray() -> void:
-	S.clear(_tray)
-	var v := S.vbox(6)
-	_tray.add_child(v)
+func _refresh_tray() -> void:
 	var roster: Array = CharacterContainer.active_characters
 	var c := current()
 	var hint := "tap to add to this quest" if c.kind == "quest" and not roster.is_empty() else "tap for details"
-	v.add_child(S.label("Your guild %d/%d  ·  %s" % [roster.size(), CharacterContainer.max_characters, hint], 18, S.INK_SOFT))
-	var sc := ScrollContainer.new()
-	sc.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	sc.custom_minimum_size.y = 128
-	v.add_child(sc)
-	var h := S.hbox(10)
-	sc.add_child(h)
-	if roster.is_empty():
-		h.add_child(S.label("Nobody yet. Swipe right on a recruit to hire them.", 20, S.INK_SOFT))
+	%TrayLabel.text = "Your guild %d/%d  ·  %s" % [roster.size(), CharacterContainer.max_characters, hint]
+	%TrayEmpty.visible = roster.is_empty()
+	for t in %TrayList.get_children():
+		if t != %TrayEmpty:
+			%TrayList.remove_child(t)
+			t.queue_free()
 	for ch in roster:
-		h.add_child(_tray_tile(ch, c))
-
-
-func _tray_tile(ch: GuildCharacter, cur: Dictionary) -> Control:
-	var chosen := draft.has(ch)
-	var busy: Dictionary = entry_of(ch)
-	var b := Button.new()
-	b.focus_mode = FOCUS_NONE
-	b.custom_minimum_size = Vector2(104, 124)
-	var sb := S.flat(S.INFO_BG if chosen else S.BOX, 16, 2 if chosen else 1, S.INFO if chosen else S.LINE, Vector4(6, 6, 6, 6))
-	sb.set_border_width_all(3 if chosen else 1)
-	for s in ["normal", "hover", "pressed", "hover_pressed"]:
-		b.add_theme_stylebox_override(s, sb)
-	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
-	var v := S.vbox(2)
-	v.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
-	v.offset_left = 6
-	v.offset_right = -6
-	v.offset_top = 6
-	v.mouse_filter = MOUSE_FILTER_IGNORE
-	var p := S.portrait(ch, 64)
-	v.add_child(p)
-	var n := S.label(ch.name, 18)
-	n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	n.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	v.add_child(n)
-	var inj: Array = S.INJURY[clampi(ch.injury_level, 0, 4)]
-	var status := S.label(inj[0] if busy.is_empty() or chosen else "On a quest", 14, inj[2] if busy.is_empty() or chosen else S.INFO)
-	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	status.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	v.add_child(status)
-	for x in v.get_children():
-		if x is Control:
-			x.mouse_filter = MOUSE_FILTER_IGNORE
-	b.add_child(v)
-	b.pressed.connect(toggle_draft.bind(ch))
-	return b
+		S.add_row(%TrayList, TrayTile).setup(self, ch)
 
 
 func toast(text: String) -> void:
-	if _toast and is_instance_valid(_toast):
-		_toast.queue_free()
-	_toast = PanelContainer.new()
-	_toast.add_theme_stylebox_override("panel", S.flat(Color("#000000CC"), 14, 0, S.INK, Vector4(16, 10, 16, 10)))
-	var l := S.wrap(S.label(text, 22, S.WHITE))
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_toast.add_child(l)
-	_toast.mouse_filter = MOUSE_FILTER_IGNORE
-	# over the top edge of the card (the stage itself is rebuilt on refresh)
-	_toast.set_anchors_preset(PRESET_TOP_WIDE)
-	_toast.offset_left = 40
-	_toast.offset_right = -40
+	%ToastLabel.text = text
+	# over the top edge of the card
 	_toast.offset_top = _stage.get_global_rect().position.y - global_position.y + 4
-	add_child(_toast)
-	var tw := create_tween()
-	tw.tween_interval(2.0)
-	tw.tween_property(_toast, "modulate:a", 0.0, 0.4)
-	tw.tween_callback(_toast.queue_free)
+	_toast.offset_bottom = _toast.offset_top
+	_toast.modulate.a = 1.0
+	_toast.visible = true
+	if _toast_tween:
+		_toast_tween.kill()
+	_toast_tween = create_tween()
+	_toast_tween.tween_interval(2.0)
+	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.4)
+	_toast_tween.tween_callback(_toast.hide)

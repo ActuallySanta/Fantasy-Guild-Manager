@@ -1,0 +1,38 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_vs7r2"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/beat_row.gd" id="2_i1gjt"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/nav_quests.svg" id="3_23cdh"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Medium.ttf" id="4_isf36"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="5_daajw"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Italic.ttf" id="6_emq5m"]
+
+[node name="BeatRow" type="HBoxContainer" unique_id=91632759]
+theme = ExtResource("1_vs7r2")
+theme_override_constants/separation = 12
+script = ExtResource("2_i1gjt")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=1185966959]
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+texture = ExtResource("3_23cdh")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="RichTextLabel" parent="." unique_id=439758813]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_fonts/normal_font = ExtResource("4_isf36")
+theme_override_fonts/bold_font = ExtResource("5_daajw")
+theme_override_fonts/italics_font = ExtResource("6_emq5m")
+theme_override_font_sizes/normal_font_size = 25
+theme_override_font_sizes/bold_font_size = 25
+theme_override_font_sizes/italics_font_size = 25
+bbcode_enabled = true
+text = "[b]Gwen[/b] raided the [b]Temple of Time[/b]."
+fit_content = true
+scroll_active = false

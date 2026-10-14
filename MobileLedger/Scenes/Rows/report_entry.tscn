@@ -1,0 +1,99 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_6vb3s"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_card_parchment_6.tres" id="2_cvj4h"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/report_entry.gd" id="3_pgljl"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="4_mk0k6"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/chip.tscn" id="5_37ta4"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="6_32bxs"]
+
+[node name="ReportEntry" type="PanelContainer" unique_id=324569974]
+theme = ExtResource("1_6vb3s")
+theme_override_styles/panel = ExtResource("2_cvj4h")
+script = ExtResource("3_pgljl")
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=1850267302]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Top" type="HBoxContainer" parent="Column" unique_id=1882793401]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="QuestName" type="Label" parent="Column/Top" unique_id=1898807504]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("4_mk0k6")
+theme_override_font_sizes/font_size = 30
+text = "Raid the Temple of Time"
+autowrap_mode = 3
+
+[node name="Badge" parent="Column/Top" unique_id=476167600 instance=ExtResource("5_37ta4")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+text = "Success"
+bg = Color(0.24705882, 0.47843137, 0.18039216, 1)
+fg = Color(1, 1, 1, 1)
+font_size = 24
+border = false
+
+[node name="Party" type="HBoxContainer" parent="Column" unique_id=1208088553]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Portraits" type="HBoxContainer" parent="Column/Party" unique_id=236367819]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Names" type="Label" parent="Column/Party" unique_id=1024894810]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("6_32bxs")
+theme_override_font_sizes/font_size = 26
+text = "Gwen"
+text_overrun_behavior = 3
+
+[node name="Chips" type="HFlowContainer" parent="Column" unique_id=118543437]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 8
+
+[node name="ChanceChip" parent="Column/Chips" unique_id=338999981 instance=ExtResource("5_37ta4")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "83% chance"
+
+[node name="GoldChip" parent="Column/Chips" unique_id=2067002773 instance=ExtResource("5_37ta4")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "+228 gold"
+icon_name = "coins"
+bg = Color(0.95686275, 0.8980392, 0.6745098, 1)
+fg = Color(0.47843137, 0.3529412, 0.07058824, 1)
+icon_style = true
+
+[node name="InjuryChip" parent="Column/Chips" unique_id=1386277346 instance=ExtResource("5_37ta4")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "No injuries"
+icon_name = "heart"
+bg = Color(0.8509804, 0.9098039, 0.8117647, 1)
+fg = Color(0.18431373, 0.3529412, 0.15294118, 1)
+icon_style = true
+
+[node name="Line" type="ColorRect" parent="Column" unique_id=1732259138]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.7882353, 0.6627451, 0.41568628, 0.9)
+
+[node name="Beats" type="VBoxContainer" parent="Column" unique_id=278433742]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 14

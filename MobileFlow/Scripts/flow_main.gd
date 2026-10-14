@@ -7,6 +7,9 @@
 ##   3. End Day  - today's plan at a glance, upgrades, and the End Day button
 ## The Guild button in the header opens the roster / upgrades at any time.
 ##
+## Every screen is an authored scene (see MobileFlow/Scenes). This script holds
+## the day's state and the game-flow calls, and tells each screen to refresh.
+##
 ## UI only: every rule comes from the existing systems (CharacterContainer,
 ## GuildCharacter, CreatedQuest, GameState, GuildUpgrades, DayBar's scoring
 ## helpers). Nothing in those scripts is changed.
@@ -14,20 +17,11 @@ extends Control
 
 const S := preload("res://MobileFlow/Scripts/flow_style.gd")
 const DayBarLogic := preload("res://Scripts/UI/day_bar.gd")
-const StepHire := preload("res://MobileFlow/Scripts/step_hire.gd")
-const StepQuest := preload("res://MobileFlow/Scripts/step_quest.gd")
-const StepEnd := preload("res://MobileFlow/Scripts/step_end.gd")
-const SheetGuild := preload("res://MobileFlow/Scripts/sheet_guild.gd")
-const SheetCharacter := preload("res://MobileFlow/Scripts/sheet_character.gd")
-const OverlayReport := preload("res://MobileFlow/Scripts/overlay_report.gd")
-const OverlayIntro := preload("res://MobileFlow/Scripts/overlay_intro.gd")
 
 ## Same as QuestList.quests_per_day.
 const QUESTS_PER_DAY := 5
 ## The day QuestList swaps the board for the milestone quest.
 const MILESTONE_DAY := 10
-
-const STEPS := [["hire", "1. Hire"], ["quests", "2. Quests"], ["end", "3. End Day"]]
 
 ## Current step: "hire" | "quests" | "end".
 var step := "hire"
@@ -43,21 +37,33 @@ var report := {}
 var last_report := {}
 var show_intro := true
 
-var _stat_labels := {}
-var _steps_bar: HBoxContainer
-var _content: VBoxContainer
-var _scroll: ScrollContainer
-var _footer: PanelContainer
-var _sheet_layer: Control
-var _overlay: Control
-var _body: Control
-var _toast: PanelContainer
 var _dirty := false
+var _toast_tween: Tween
+var _last_view := ""
+
+@onready var _day_label: Label = %DayValue
+@onready var _gold_label: Label = %GoldValue
+@onready var _standing_label: Label = %StandingValue
+@onready var _guild_button: Button = %GuildButton
+@onready var _step_buttons := {"hire": %StepHireButton, "quests": %StepQuestsButton, "end": %StepEndButton}
+@onready var _steps := {"hire": %StepHire, "quests": %StepQuest, "end": %StepEnd}
+@onready var _sheet_layer: Control = %SheetLayer
+@onready var _sheet_guild: Control = %SheetGuild
+@onready var _sheet_character: Control = %SheetCharacter
+@onready var _overlay: Control = %Overlay
+@onready var _report: Control = %OverlayReport
+@onready var _intro: Control = %OverlayIntro
+@onready var _toast: PanelContainer = %Toast
+@onready var _toast_label: Label = %ToastLabel
 
 
 func _ready() -> void:
-	theme = S.make_theme()
-	_build_shell()
+	_guild_button.pressed.connect(open_guild)
+	for s in _step_buttons:
+		_step_buttons[s].pressed.connect(go_step.bind(s))
+	for node in [_steps.hire, _steps.quests, _steps.end, _sheet_guild, _sheet_character, _report, _intro]:
+		node.setup(self)
+	_toast.visible = false
 	GameState.day_started.connect(_on_day_started)
 	GameState.resources_changed.connect(queue_refresh)
 	GuildUpgrades.upgrades_changed.connect(queue_refresh)
@@ -296,73 +302,7 @@ func close_intro() -> void:
 	queue_refresh()
 
 
-# ================================================================ shell
-
-func _build_shell() -> void:
-	set_anchors_preset(PRESET_FULL_RECT)
-	var bg := ColorRect.new()
-	bg.color = S.BG
-	bg.set_anchors_preset(PRESET_FULL_RECT)
-	bg.mouse_filter = MOUSE_FILTER_IGNORE
-	add_child(bg)
-
-	var col := S.vbox(0)
-	col.set_anchors_preset(PRESET_FULL_RECT)
-	add_child(col)
-
-	# header: resources + Guild button
-	var head := S.panel("panel")
-	var hh := S.hbox(18)
-	head.add_child(hh)
-	for c in [["sun", "day", "Day"], ["coins", "gold", "Gold"], ["rook", "standing", "Standing"]]:
-		var cell := S.hbox(6)
-		cell.add_child(S.icon(c[0], 30))
-		var num := S.label("0", 24)
-		cell.add_child(S.label(c[2] + ":", 22, S.INK_SOFT))
-		cell.add_child(num)
-		hh.add_child(cell)
-		_stat_labels[c[1]] = num
-	hh.add_child(S.spacer())
-	var gb := S.button("Guild", "", 22, 52)
-	gb.icon = S.icon_tex("nav_characters")
-	gb.pressed.connect(open_guild)
-	hh.add_child(gb)
-	col.add_child(head)
-
-	# step bar
-	var sb := S.panel("bar", Vector4(10, 8, 10, 8))
-	_steps_bar = S.hbox(8)
-	sb.add_child(_steps_bar)
-	col.add_child(sb)
-
-	# body: scrolling step content, with sheets on top
-	_body = Control.new()
-	_body.size_flags_vertical = SIZE_EXPAND_FILL
-	_body.clip_contents = true
-	col.add_child(_body)
-	_scroll = ScrollContainer.new()
-	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	_scroll.set_anchors_preset(PRESET_FULL_RECT)
-	_body.add_child(_scroll)
-	_content = S.vbox(14)
-	_content.size_flags_horizontal = SIZE_EXPAND_FILL
-	var m := S.margin(_content, 16, 16, 16, 24)
-	m.size_flags_horizontal = SIZE_EXPAND_FILL
-	_scroll.add_child(m)
-	_sheet_layer = Control.new()
-	_sheet_layer.set_anchors_preset(PRESET_FULL_RECT)
-	_sheet_layer.mouse_filter = MOUSE_FILTER_IGNORE
-	_body.add_child(_sheet_layer)
-
-	# footer: the step's main action(s), always in thumb reach
-	_footer = S.panel("bar", Vector4(14, 10, 14, 10))
-	col.add_child(_footer)
-
-	_overlay = Control.new()
-	_overlay.set_anchors_preset(PRESET_FULL_RECT)
-	_overlay.mouse_filter = MOUSE_FILTER_IGNORE
-	add_child(_overlay)
-
+# ================================================================ refresh
 
 func queue_refresh() -> void:
 	if _dirty:
@@ -373,87 +313,68 @@ func queue_refresh() -> void:
 
 func refresh() -> void:
 	_dirty = false
-	_stat_labels.day.text = str(GameState.day)
-	_stat_labels.gold.text = str(GameState.gold)
-	_stat_labels.standing.text = str(GameState.standing)
-	_build_steps_bar()
+	_day_label.text = str(GameState.day)
+	_gold_label.text = str(GameState.gold)
+	_standing_label.text = str(GameState.standing)
+	_refresh_steps_bar()
 
-	S.clear(_content)
-	S.clear(_footer)
-	var built: Dictionary
-	match step:
-		"hire":
-			built = StepHire.build(self)
-		"quests":
-			built = StepQuest.build(self)
-		_:
-			built = StepEnd.build(self)
-	_content.add_child(built.body)
-	_footer.add_child(built.footer)
-	_scroll.scroll_vertical = 0
+	for s in _steps:
+		_steps[s].visible = s == step
+	_steps[step].refresh()
+	var view := "%s:%d:%d" % [step, quest_index, GameState.day]
+	if view != _last_view:
+		_last_view = view
+		_steps[step].scroll_to_top()
 
-	S.clear(_sheet_layer)
-	_sheet_layer.mouse_filter = MOUSE_FILTER_IGNORE
-	match sheet.get("kind", ""):
-		"guild":
-			_sheet_layer.add_child(SheetGuild.build(self))
-			_sheet_layer.mouse_filter = MOUSE_FILTER_STOP
-		"character":
-			_sheet_layer.add_child(SheetCharacter.build(self))
-			_sheet_layer.mouse_filter = MOUSE_FILTER_STOP
+	var kind: String = sheet.get("kind", "")
+	_sheet_guild.visible = kind == "guild"
+	_sheet_character.visible = kind == "character"
+	_sheet_layer.mouse_filter = MOUSE_FILTER_IGNORE if kind == "" else MOUSE_FILTER_STOP
+	# sheets cover the step but leave its footer in reach
+	_sheet_layer.offset_bottom = -_steps[step].footer_height()
+	if kind == "guild":
+		_sheet_guild.refresh()
+	elif kind == "character":
+		_sheet_character.refresh()
 
-	S.clear(_overlay)
-	_overlay.mouse_filter = MOUSE_FILTER_IGNORE
-	if not report.is_empty():
-		_overlay.add_child(OverlayReport.build(self))
-		_overlay.mouse_filter = MOUSE_FILTER_STOP
-	elif show_intro:
-		_overlay.add_child(OverlayIntro.build(self))
-		_overlay.mouse_filter = MOUSE_FILTER_STOP
+	_report.visible = not report.is_empty()
+	_intro.visible = report.is_empty() and show_intro
+	_overlay.mouse_filter = MOUSE_FILTER_STOP if _report.visible or _intro.visible else MOUSE_FILTER_IGNORE
+	if _report.visible:
+		_report.refresh()
 
 
-func _build_steps_bar() -> void:
-	S.clear(_steps_bar)
+func _refresh_steps_bar() -> void:
 	var out := outstanding()
-	for st in STEPS:
-		var active: bool = st[0] == step
-		var label: String = st[1]
+	for s in _step_buttons:
+		var b: Button = _step_buttons[s]
 		var done := false
-		match st[0]:
+		match s:
 			"hire":
+				b.text = "1. Hire"
 				done = not can_hire_anyone() or CharacterContainer.active_characters.size() > 0
 			"quests":
-				label += " (%d left)" % out if out > 0 else ""
+				b.text = "2. Quests" + (" (%d left)" % out if out > 0 else "")
 				done = out == 0
-		var b := S.button(label, "", 20, 48)
-		b.size_flags_horizontal = SIZE_EXPAND_FILL
-		if active:
-			for s in ["normal", "hover"]:
-				b.add_theme_stylebox_override(s, S.flat(S.INFO_BG, 0, 2, S.INFO, Vector4(6, 4, 6, 4)))
-			b.add_theme_color_override("font_color", S.INFO)
-			b.add_theme_color_override("font_hover_color", S.INFO)
-		elif done:
-			b.add_theme_color_override("font_color", S.GOOD)
-		b.pressed.connect(go_step.bind(st[0]))
-		_steps_bar.add_child(b)
+			"end":
+				b.text = "3. End Day"
+		if s == step:
+			S.style_button_active(b)
+		else:
+			S.style_button(b)
+			if done:
+				b.add_theme_color_override("font_color", S.GOOD)
 
 
 func toast(text: String) -> void:
-	if _toast and is_instance_valid(_toast):
-		_toast.queue_free()
-	_toast = PanelContainer.new()
-	_toast.add_theme_stylebox_override("panel", S.flat(Color("#333333"), 0, 0, S.INK, Vector4(16, 10, 16, 10)))
-	var l := S.wrap(S.label(text, 22, S.WHITE))
-	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_toast.add_child(l)
-	_toast.mouse_filter = MOUSE_FILTER_IGNORE
-	_toast.set_anchors_preset(PRESET_BOTTOM_WIDE)
-	_toast.offset_left = 30
-	_toast.offset_right = -30
-	_toast.offset_top = -70
-	_toast.offset_bottom = -12
-	_body.add_child(_toast)
-	var tw := create_tween()
-	tw.tween_interval(2.0)
-	tw.tween_property(_toast, "modulate:a", 0.0, 0.4)
-	tw.tween_callback(_toast.queue_free)
+	_toast_label.text = text
+	_toast.offset_bottom = -12 - _steps[step].footer_height()
+	_toast.offset_top = _toast.offset_bottom - 58
+	_toast.modulate.a = 1.0
+	_toast.visible = true
+	if _toast_tween:
+		_toast_tween.kill()
+	_toast_tween = create_tween()
+	_toast_tween.tween_interval(2.0)
+	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.4)
+	_toast_tween.tween_callback(_toast.hide)

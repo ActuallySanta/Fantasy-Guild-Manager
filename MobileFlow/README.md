@@ -38,8 +38,20 @@ health runs green → yellow → orange → red. Art is only the project's own
 
 ## Files
 
-- `Scripts/flow_main.gd`: state, game-flow calls, header / step bar / footer shell
-- `Scripts/flow_style.gd`: widget helpers and all colours
-- `Scripts/step_hire.gd`, `step_quest.gd`, `step_end.gd`: the three steps
-- `Scripts/sheet_guild.gd`, `sheet_character.gd`: Guild sheet and character details
-- `Scripts/overlay_report.gd`, `overlay_intro.gd`: day report and first-launch intro
+- `flow_main.tscn` + `Scripts/flow_main.gd`: state, game-flow calls, header / step bar
+- `Scenes/Steps/`: the three steps (`step_hire`, `step_quest`, `step_end`), each with its footer buttons
+- `Scenes/Sheets/`: Guild sheet and character details
+- `Scenes/Overlays/`: day report and first-launch intro
+- `Scenes/Rows/`: list rows (recruit card, roster member, party picker row, quest dot, plan row, upgrade row, report entry, party slots)
+- `Scenes/Components/`: chip, stat row, portrait
+- `Styles/` + `flow_theme.tres`: shared boxes and the base theme
+- `Scripts/flow_style.gd`: all colours, plus the few restyles that depend on game state
+
+### Editing the scenes
+
+Every screen, row and widget is an authored scene you can open and edit in the
+Godot editor. Nothing is built from code at runtime: scripts only fill in text,
+show/hide nodes and instance row scenes for lists (one row per quest, character,
+etc.). Shared boxes (panels, buttons, chips) are `.tres` files in `Styles/`, so
+changing one restyles it everywhere; chips, stat rows and gauges are `@tool`
+components with exported colours/sizes so they preview in the editor.

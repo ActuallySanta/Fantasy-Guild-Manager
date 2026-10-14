@@ -1,0 +1,189 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileDeck/deck_theme.tres" id="1_76rrk"]
+[ext_resource type="Script" path="res://MobileDeck/Scripts/sheet_intro.gd" id="2_hy0ah"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/intro_card.tres" id="3_0f7im"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_green_normal.tres" id="4_6r3ew"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_green_pressed.tres" id="5_2f7a5"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_green_hover.tres" id="6_m35ev"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_disabled.tres" id="7_i7cwe"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/empty.tres" id="8_meg6y"]
+
+[node name="SheetIntro" type="ColorRect" unique_id=854932364]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_76rrk")
+color = Color(0, 0, 0, 0.7)
+script = ExtResource("2_hy0ah")
+
+[node name="Center" type="CenterContainer" parent="." unique_id=2042992545]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Card" type="PanelContainer" parent="Center" unique_id=199960293]
+custom_minimum_size = Vector2(620, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_0f7im")
+
+[node name="Column" type="VBoxContainer" parent="Center/Card" unique_id=183429111]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Center/Card/Column" unique_id=158458168]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Each day is a deck of cards"
+
+[node name="SwipeRight" type="HBoxContainer" parent="Center/Card/Column" unique_id=391870681]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Bar" type="ColorRect" parent="Center/Card/Column/SwipeRight" unique_id=1282818863]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+color = Color(0.4, 0.73333335, 0.41568628, 1)
+
+[node name="Text" type="VBoxContainer" parent="Center/Card/Column/SwipeRight" unique_id=473140778]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Center/Card/Column/SwipeRight/Text" unique_id=1197481115]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.73333335, 0.41568628, 1)
+theme_override_font_sizes/font_size = 24
+text = "Swipe right"
+
+[node name="Body" type="Label" parent="Center/Card/Column/SwipeRight/Text" unique_id=377985879]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 20
+text = "Hire a recruit, or send a party on a quest."
+autowrap_mode = 3
+
+[node name="SwipeLeft" type="HBoxContainer" parent="Center/Card/Column" unique_id=984251927]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Bar" type="ColorRect" parent="Center/Card/Column/SwipeLeft" unique_id=2024460930]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+color = Color(0.9372549, 0.3254902, 0.3137255, 1)
+
+[node name="Text" type="VBoxContainer" parent="Center/Card/Column/SwipeLeft" unique_id=1264419014]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Center/Card/Column/SwipeLeft/Text" unique_id=31035990]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9372549, 0.3254902, 0.3137255, 1)
+theme_override_font_sizes/font_size = 24
+text = "Swipe left"
+
+[node name="Body" type="Label" parent="Center/Card/Column/SwipeLeft/Text" unique_id=1611954801]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 20
+text = "Pass on a recruit, or deny a quest."
+autowrap_mode = 3
+
+[node name="TapGuild" type="HBoxContainer" parent="Center/Card/Column" unique_id=470011833]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Bar" type="ColorRect" parent="Center/Card/Column/TapGuild" unique_id=1676434209]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+color = Color(0.25882354, 0.64705884, 0.9607843, 1)
+
+[node name="Text" type="VBoxContainer" parent="Center/Card/Column/TapGuild" unique_id=1028953523]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Center/Card/Column/TapGuild/Text" unique_id=1063542729]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.25882354, 0.64705884, 0.9607843, 1)
+theme_override_font_sizes/font_size = 24
+text = "Tap your guild"
+
+[node name="Body" type="Label" parent="Center/Card/Column/TapGuild/Text" unique_id=805697007]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 20
+text = "Tap adventurers in the bottom tray to put them on the quest card."
+autowrap_mode = 3
+
+[node name="LastCard" type="HBoxContainer" parent="Center/Card/Column" unique_id=723395017]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Bar" type="ColorRect" parent="Center/Card/Column/LastCard" unique_id=109433432]
+custom_minimum_size = Vector2(8, 0)
+layout_mode = 2
+color = Color(1, 0.7921569, 0.15686275, 1)
+
+[node name="Text" type="VBoxContainer" parent="Center/Card/Column/LastCard" unique_id=2016574329]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Center/Card/Column/LastCard/Text" unique_id=6731763]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.7921569, 0.15686275, 1)
+theme_override_font_sizes/font_size = 24
+text = "Last card"
+
+[node name="Body" type="Label" parent="Center/Card/Column/LastCard/Text" unique_id=2084352076]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 20
+text = "Buy upgrades, then end the day. Parties return with gold and injuries."
+autowrap_mode = 3
+
+[node name="ButtonsNote" type="Label" parent="Center/Card/Column" unique_id=1073505617]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 20
+text = "Not a swiper? The buttons under each card do the same thing."
+autowrap_mode = 3
+
+[node name="StartButton" type="Button" parent="Center/Card/Column" unique_id=1343737373]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_pressed_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_hover_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_disabled_color = Color(0.36078432, 0.3764706, 0.4392157, 1)
+theme_override_colors/icon_normal_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = ExtResource("4_6r3ew")
+theme_override_styles/pressed = ExtResource("5_2f7a5")
+theme_override_styles/hover = ExtResource("6_m35ev")
+theme_override_styles/hover_pressed = ExtResource("5_2f7a5")
+theme_override_styles/disabled = ExtResource("7_i7cwe")
+theme_override_styles/focus = ExtResource("8_meg6y")
+text = "Start"

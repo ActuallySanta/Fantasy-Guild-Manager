@@ -1,16 +1,333 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://MobileFlow/Scripts/flow_main.gd" id="1_flow"]
-[ext_resource type="Script" path="res://Scripts/Quest Creator/quest_Manager.gd" id="2_quests"]
+[ext_resource type="Theme" path="res://MobileFlow/flow_theme.tres" id="1_ph8fi"]
+[ext_resource type="Script" path="res://MobileFlow/Scripts/flow_main.gd" id="2_640ey"]
+[ext_resource type="Script" path="res://Scripts/Quest Creator/quest_Manager.gd" id="3_fk25p"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/box_panel.tres" id="4_ev5n8"]
+[ext_resource type="Texture2D" path="res://Sprites/UI Icons/sun-solid-full.svg" id="5_y7cax"]
+[ext_resource type="Texture2D" path="res://Sprites/UI Icons/coins-solid-full.svg" id="6_emlbv"]
+[ext_resource type="Texture2D" path="res://Sprites/UI Icons/chess-rook-solid-full.svg" id="7_ubjxp"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_grey_normal.tres" id="8_1jxx2"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_grey_pressed.tres" id="9_sp8aj"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_grey_hover.tres" id="10_fp1kl"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_disabled.tres" id="11_yxoaa"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/empty.tres" id="12_gx30b"]
+[ext_resource type="Texture2D" path="res://Sprites/UI Icons/user-solid-full.svg" id="13_acssl"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/box_inset.tres" id="14_5w0u0"]
+[ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Steps/step_hire.tscn" id="15_ppdaq"]
+[ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Steps/step_quest.tscn" id="16_6egfx"]
+[ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Steps/step_end.tscn" id="17_rpqpu"]
+[ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Sheets/sheet_guild.tscn" id="18_21nts"]
+[ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Sheets/sheet_character.tscn" id="19_svhhm"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/toast.tres" id="20_6f04b"]
+[ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Overlays/overlay_report.tscn" id="21_htepw"]
+[ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Overlays/overlay_intro.tscn" id="22_xq34w"]
 
-[node name="FlowMain" type="Control"]
+[node name="FlowMain" type="Control" unique_id=171945129]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_flow")
+theme = ExtResource("1_ph8fi")
+script = ExtResource("2_640ey")
 
-[node name="QuestManager" type="Node" parent="."]
-script = ExtResource("2_quests")
+[node name="QuestManager" type="Node" parent="." unique_id=516179558]
+script = ExtResource("3_fk25p")
+
+[node name="Background" type="ColorRect" parent="." unique_id=1023134713]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.9019608, 0.9019608, 0.9019608, 1)
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=947972584]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="Header" type="PanelContainer" parent="Column" unique_id=194688782]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("4_ev5n8")
+
+[node name="Row" type="HBoxContainer" parent="Column/Header" unique_id=149749969]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="DayCell" type="HBoxContainer" parent="Column/Header/Row" unique_id=1615796027]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="TextureRect" parent="Column/Header/Row/DayCell" unique_id=47972802]
+modulate = Color(0.06666667, 0.06666667, 0.06666667, 1)
+custom_minimum_size = Vector2(22.5, 22.5)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("5_y7cax")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Caption" type="Label" parent="Column/Header/Row/DayCell" unique_id=1243950599]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "Day:"
+
+[node name="DayValue" type="Label" parent="Column/Header/Row/DayCell" unique_id=839624679]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "1"
+
+[node name="GoldCell" type="HBoxContainer" parent="Column/Header/Row" unique_id=1298718466]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="TextureRect" parent="Column/Header/Row/GoldCell" unique_id=476711881]
+modulate = Color(0.06666667, 0.06666667, 0.06666667, 1)
+custom_minimum_size = Vector2(22.5, 22.5)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("6_emlbv")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Caption" type="Label" parent="Column/Header/Row/GoldCell" unique_id=396558613]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "Gold:"
+
+[node name="GoldValue" type="Label" parent="Column/Header/Row/GoldCell" unique_id=745646432]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "1"
+
+[node name="StandingCell" type="HBoxContainer" parent="Column/Header/Row" unique_id=1409264096]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="TextureRect" parent="Column/Header/Row/StandingCell" unique_id=1291786281]
+modulate = Color(0.06666667, 0.06666667, 0.06666667, 1)
+custom_minimum_size = Vector2(22.5, 22.5)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("7_ubjxp")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Caption" type="Label" parent="Column/Header/Row/StandingCell" unique_id=999178062]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "Standing:"
+
+[node name="StandingValue" type="Label" parent="Column/Header/Row/StandingCell" unique_id=1929937736]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "1"
+
+[node name="Spacer" type="Control" parent="Column/Header/Row" unique_id=1492931439]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="GuildButton" type="Button" parent="Column/Header/Row" unique_id=1949169193]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = ExtResource("8_1jxx2")
+theme_override_styles/pressed = ExtResource("9_sp8aj")
+theme_override_styles/hover = ExtResource("10_fp1kl")
+theme_override_styles/hover_pressed = ExtResource("9_sp8aj")
+theme_override_styles/disabled = ExtResource("11_yxoaa")
+theme_override_styles/focus = ExtResource("12_gx30b")
+text = "Guild"
+icon = ExtResource("13_acssl")
+
+[node name="StepsBar" type="PanelContainer" parent="Column" unique_id=1003847419]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("14_5w0u0")
+
+[node name="Row" type="HBoxContainer" parent="Column/StepsBar" unique_id=2103915679]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="StepHireButton" type="Button" parent="Column/StepsBar/Row" unique_id=819635372]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("8_1jxx2")
+theme_override_styles/pressed = ExtResource("9_sp8aj")
+theme_override_styles/hover = ExtResource("10_fp1kl")
+theme_override_styles/hover_pressed = ExtResource("9_sp8aj")
+theme_override_styles/disabled = ExtResource("11_yxoaa")
+theme_override_styles/focus = ExtResource("12_gx30b")
+text = "1. Hire"
+
+[node name="StepQuestsButton" type="Button" parent="Column/StepsBar/Row" unique_id=1081427303]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("8_1jxx2")
+theme_override_styles/pressed = ExtResource("9_sp8aj")
+theme_override_styles/hover = ExtResource("10_fp1kl")
+theme_override_styles/hover_pressed = ExtResource("9_sp8aj")
+theme_override_styles/disabled = ExtResource("11_yxoaa")
+theme_override_styles/focus = ExtResource("12_gx30b")
+text = "2. Quests"
+
+[node name="StepEndButton" type="Button" parent="Column/StepsBar/Row" unique_id=688959979]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("8_1jxx2")
+theme_override_styles/pressed = ExtResource("9_sp8aj")
+theme_override_styles/hover = ExtResource("10_fp1kl")
+theme_override_styles/hover_pressed = ExtResource("9_sp8aj")
+theme_override_styles/disabled = ExtResource("11_yxoaa")
+theme_override_styles/focus = ExtResource("12_gx30b")
+text = "3. End Day"
+
+[node name="Body" type="Control" parent="Column" unique_id=406693928]
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="StepHire" parent="Column/Body" unique_id=1091658920 instance=ExtResource("15_ppdaq")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="StepQuest" parent="Column/Body" unique_id=2120464959 instance=ExtResource("16_6egfx")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="StepEnd" parent="Column/Body" unique_id=2020411432 instance=ExtResource("17_rpqpu")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="SheetLayer" type="Control" parent="Column/Body" unique_id=693009408]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="SheetGuild" parent="Column/Body/SheetLayer" unique_id=206728142 instance=ExtResource("18_21nts")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="SheetCharacter" parent="Column/Body/SheetLayer" unique_id=1566349967 instance=ExtResource("19_svhhm")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="Toast" type="PanelContainer" parent="Column/Body" unique_id=1809490726]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = -160.0
+offset_right = -30.0
+offset_bottom = -100.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("20_6f04b")
+
+[node name="ToastLabel" type="Label" parent="Column/Body/Toast" unique_id=99713958]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "Gwen joined the guild!"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Overlay" type="Control" parent="." unique_id=1812176956]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="OverlayReport" parent="Overlay" unique_id=201099978 instance=ExtResource("21_htepw")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="OverlayIntro" parent="Overlay" unique_id=604384674 instance=ExtResource("22_xq34w")]
+unique_name_in_owner = true
+layout_mode = 1

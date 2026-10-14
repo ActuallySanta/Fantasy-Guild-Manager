@@ -1,0 +1,93 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_lyaft"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/health_row.gd" id="2_bytah"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/empty.tres" id="3_1v8fk"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/tap_area.gd" id="4_42kiy"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/portrait.tscn" id="5_ansk1"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="6_rqxi5"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/chip.tscn" id="7_g1m5k"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/chev_right.svg" id="8_khtw0"]
+
+[node name="HealthRow" type="VBoxContainer" unique_id=721983213]
+theme = ExtResource("1_lyaft")
+theme_override_constants/separation = 0
+script = ExtResource("2_bytah")
+
+[node name="Tap" type="Button" parent="." unique_id=394606622]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = ExtResource("3_1v8fk")
+theme_override_styles/pressed = ExtResource("3_1v8fk")
+theme_override_styles/hover = ExtResource("3_1v8fk")
+theme_override_styles/hover_pressed = ExtResource("3_1v8fk")
+theme_override_styles/disabled = ExtResource("3_1v8fk")
+theme_override_styles/focus = ExtResource("3_1v8fk")
+flat = true
+script = ExtResource("4_42kiy")
+min_height = 96.0
+
+[node name="Row" type="HBoxContainer" parent="Tap" unique_id=1518021488]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="Portrait" parent="Tap/Row" unique_id=1315844981 instance=ExtResource("5_ansk1")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+circle = true
+
+[node name="Text" type="VBoxContainer" parent="Tap/Row" unique_id=148745500]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = -2
+
+[node name="CharName" type="Label" parent="Tap/Row/Text" unique_id=901240919]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_rqxi5")
+text = "Alex"
+
+[node name="Sub" type="Label" parent="Tap/Row/Text" unique_id=1314873040]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_font_sizes/font_size = 23
+text = "Pathfinder · no injuries yet"
+
+[node name="Injury" parent="Tap/Row" unique_id=476167600 instance=ExtResource("7_g1m5k")]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "Healthy"
+bg = Color(0.8509804, 0.9098039, 0.8117647, 1)
+fg = Color(0.18431373, 0.3529412, 0.15294118, 1)
+
+[node name="Chevron" type="TextureRect" parent="Tap/Row" unique_id=2080835833]
+modulate = Color(0.41960785, 0.33333334, 0.21568628, 1)
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("8_khtw0")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Line" type="ColorRect" parent="." unique_id=113793677]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.7882353, 0.6627451, 0.41568628, 0.9)

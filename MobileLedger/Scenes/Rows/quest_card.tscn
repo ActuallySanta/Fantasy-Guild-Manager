@@ -1,0 +1,293 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_u0efv"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_card_parchment_2.tres" id="2_2splp"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/quest_card.gd" id="3_ra0hd"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/seal.tscn" id="4_hde7s"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="5_25a5w"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Medium.ttf" id="6_lmoxj"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="7_vxhxb"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Italic.ttf" id="8_jt0o4"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/chip.tscn" id="9_13kgq"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/scene_intel.png" id="10_qu33x"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_wood.tres" id="11_7eqxh"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_wood_down.tres" id="12_qncyd"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_disabled.tres" id="13_mmb41"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/empty.tres" id="14_uwktm"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_paper.tres" id="15_4bwir"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_paper_down.tres" id="16_55w87"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/tap_area.gd" id="17_88ttq"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_red.tres" id="18_em8kl"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_red_down.tres" id="19_4i5a5"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green.tres" id="20_40f60"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green_down.tres" id="21_o0dat"]
+
+[node name="QuestCard" type="PanelContainer" unique_id=2050892974]
+theme = ExtResource("1_u0efv")
+theme_override_styles/panel = ExtResource("2_2splp")
+script = ExtResource("3_ra0hd")
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=882268504]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Top" type="HBoxContainer" parent="Column" unique_id=456449297]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Seal" parent="Column/Top" unique_id=1988644754 instance=ExtResource("4_hde7s")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Info" type="VBoxContainer" parent="Column/Top" unique_id=896750676]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="QuestTitle" type="Label" parent="Column/Top/Info" unique_id=288537279]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.35686275, 0.24705882, 0.54901963, 1)
+theme_override_fonts/font = ExtResource("5_25a5w")
+theme_override_font_sizes/font_size = 29
+text = "Gather information on a possible Necromancer"
+autowrap_mode = 3
+
+[node name="TypeGold" type="RichTextLabel" parent="Column/Top/Info" unique_id=1020151071]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_fonts/normal_font = ExtResource("6_lmoxj")
+theme_override_fonts/bold_font = ExtResource("7_vxhxb")
+theme_override_fonts/italics_font = ExtResource("8_jt0o4")
+theme_override_font_sizes/normal_font_size = 25
+theme_override_font_sizes/bold_font_size = 25
+theme_override_font_sizes/italics_font_size = 25
+bbcode_enabled = true
+text = "[color=#6B5537]Gather Intel ·[/color] [b]200 Gold[/b]"
+fit_content = true
+scroll_active = false
+
+[node name="PartySize" type="Label" parent="Column/Top/Info" unique_id=1023700701]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Up to 2 adventurers"
+
+[node name="Favored" type="HBoxContainer" parent="Column/Top/Info" unique_id=1331725892]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Caption" type="Label" parent="Column/Top/Info/Favored" unique_id=1703682043]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Favored:"
+
+[node name="FavChip" parent="Column/Top/Info/Favored" unique_id=476167600 instance=ExtResource("9_13kgq")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Sleaziness"
+icon_name = "sleaziness"
+bg = Color(0.8509804, 0.9098039, 0.8117647, 1)
+fg = Color(0.24313726, 0.41960785, 0.20784314, 1)
+icon_style = true
+
+[node name="Success" type="RichTextLabel" parent="Column/Top/Info" unique_id=1096432736]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_fonts/normal_font = ExtResource("6_lmoxj")
+theme_override_fonts/bold_font = ExtResource("7_vxhxb")
+theme_override_fonts/italics_font = ExtResource("8_jt0o4")
+theme_override_font_sizes/normal_font_size = 25
+theme_override_font_sizes/bold_font_size = 25
+theme_override_font_sizes/italics_font_size = 25
+bbcode_enabled = true
+text = "Success: [b][color=#6b5537]--[/color][/b]"
+fit_content = true
+scroll_active = false
+
+[node name="Picture" type="TextureRect" parent="Column/Top" unique_id=1393315212]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(178, 132)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+texture = ExtResource("10_qu33x")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Line" type="ColorRect" parent="Column" unique_id=1766855256]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.7882353, 0.6627451, 0.41568628, 0.9)
+
+[node name="Bottom" type="HBoxContainer" parent="Column" unique_id=221657216]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ReadyGroup" type="HBoxContainer" parent="Column/Bottom" unique_id=1485909284]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="PartyPortraits" type="HBoxContainer" parent="Column/Bottom/ReadyGroup" unique_id=1894668663]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PartyNames" type="Label" parent="Column/Bottom/ReadyGroup" unique_id=1874673568]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("7_vxhxb")
+theme_override_font_sizes/font_size = 26
+text = "Alex"
+text_overrun_behavior = 3
+
+[node name="EditButton" type="Button" parent="Column/Bottom/ReadyGroup" unique_id=2088709773]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 33
+theme_override_fonts/font = ExtResource("5_25a5w")
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = ExtResource("11_7eqxh")
+theme_override_styles/pressed = ExtResource("12_qncyd")
+theme_override_styles/hover = ExtResource("11_7eqxh")
+theme_override_styles/hover_pressed = ExtResource("12_qncyd")
+theme_override_styles/disabled = ExtResource("13_mmb41")
+theme_override_styles/focus = ExtResource("14_uwktm")
+text = "Edit"
+
+[node name="CancelButton" type="Button" parent="Column/Bottom/ReadyGroup" unique_id=310546084]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 33
+theme_override_fonts/font = ExtResource("5_25a5w")
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = ExtResource("15_4bwir")
+theme_override_styles/pressed = ExtResource("16_55w87")
+theme_override_styles/hover = ExtResource("15_4bwir")
+theme_override_styles/hover_pressed = ExtResource("16_55w87")
+theme_override_styles/disabled = ExtResource("13_mmb41")
+theme_override_styles/focus = ExtResource("14_uwktm")
+text = "Cancel"
+
+[node name="OpenGroup" type="HBoxContainer" parent="Column/Bottom" unique_id=1107268194]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="PickTap" type="Button" parent="Column/Bottom/OpenGroup" unique_id=453618823]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 80)
+layout_mode = 2
+tooltip_text = "Pick a party"
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = ExtResource("14_uwktm")
+theme_override_styles/pressed = ExtResource("14_uwktm")
+theme_override_styles/hover = ExtResource("14_uwktm")
+theme_override_styles/hover_pressed = ExtResource("14_uwktm")
+theme_override_styles/disabled = ExtResource("14_uwktm")
+theme_override_styles/focus = ExtResource("14_uwktm")
+flat = true
+script = ExtResource("17_88ttq")
+min_height = 80.0
+
+[node name="Slots" type="HBoxContainer" parent="Column/Bottom/OpenGroup/PickTap" unique_id=134456662]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+
+[node name="Spacer" type="Control" parent="Column/Bottom/OpenGroup" unique_id=1928529478]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="DenyButton" type="Button" parent="Column/Bottom/OpenGroup" unique_id=1457445379]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 36
+theme_override_fonts/font = ExtResource("5_25a5w")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = ExtResource("18_em8kl")
+theme_override_styles/pressed = ExtResource("19_4i5a5")
+theme_override_styles/hover = ExtResource("18_em8kl")
+theme_override_styles/hover_pressed = ExtResource("19_4i5a5")
+theme_override_styles/disabled = ExtResource("13_mmb41")
+theme_override_styles/focus = ExtResource("14_uwktm")
+text = "Deny"
+
+[node name="AcceptButton" type="Button" parent="Column/Bottom/OpenGroup" unique_id=1891487435]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 82)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 36
+theme_override_fonts/font = ExtResource("5_25a5w")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = ExtResource("20_40f60")
+theme_override_styles/pressed = ExtResource("21_o0dat")
+theme_override_styles/hover = ExtResource("20_40f60")
+theme_override_styles/hover_pressed = ExtResource("21_o0dat")
+theme_override_styles/disabled = ExtResource("13_mmb41")
+theme_override_styles/focus = ExtResource("14_uwktm")
+text = "Accept"

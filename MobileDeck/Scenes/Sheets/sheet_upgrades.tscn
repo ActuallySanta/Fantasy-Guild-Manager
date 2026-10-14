@@ -1,0 +1,102 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileDeck/deck_theme.tres" id="1_uk806"]
+[ext_resource type="Script" path="res://MobileDeck/Scripts/sheet_upgrades.gd" id="2_j5mvx"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/sheet.tres" id="3_mvf0e"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_grey_normal.tres" id="4_y1on0"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_grey_pressed.tres" id="5_83kpt"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_grey_hover.tres" id="6_nd1bt"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_disabled.tres" id="7_o62jv"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/empty.tres" id="8_ree6b"]
+
+[node name="SheetUpgrades" type="ColorRect" unique_id=34814498]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_uk806")
+color = Color(0, 0, 0, 0.6)
+script = ExtResource("2_j5mvx")
+
+[node name="Sheet" type="PanelContainer" parent="." unique_id=1899610268]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_mvf0e")
+
+[node name="Column" type="VBoxContainer" parent="Sheet" unique_id=239861413]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Sheet/Column" unique_id=257964472]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SheetTitle" type="Label" parent="Sheet/Column/Header" unique_id=1233123211]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Upgrades"
+
+[node name="Spacer" type="Control" parent="Sheet/Column/Header" unique_id=850589753]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="CloseButton" type="Button" parent="Sheet/Column/Header" unique_id=275929841]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_pressed_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_hover_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_disabled_color = Color(0.36078432, 0.3764706, 0.4392157, 1)
+theme_override_colors/icon_normal_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = ExtResource("4_y1on0")
+theme_override_styles/pressed = ExtResource("5_83kpt")
+theme_override_styles/hover = ExtResource("6_nd1bt")
+theme_override_styles/hover_pressed = ExtResource("5_83kpt")
+theme_override_styles/disabled = ExtResource("7_o62jv")
+theme_override_styles/focus = ExtResource("8_ree6b")
+text = "Close"
+
+[node name="Scroll" type="ScrollContainer" parent="Sheet/Column" unique_id=1123241348]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Sheet/Column/Scroll" unique_id=828006052]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 24
+
+[node name="Content" type="VBoxContainer" parent="Sheet/Column/Scroll/Margin" unique_id=1821398798]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Wallet" type="Label" parent="Sheet/Column/Scroll/Margin/Content" unique_id=1037866665]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 22
+text = "600 gold  ·  Standing 1"
+
+[node name="UpgradeList" type="VBoxContainer" parent="Sheet/Column/Scroll/Margin/Content" unique_id=1686624834]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12

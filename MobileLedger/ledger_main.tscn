@@ -1,16 +1,727 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://MobileLedger/Scripts/ledger_main.gd" id="1_ledger"]
-[ext_resource type="Script" path="res://Scripts/Quest Creator/quest_Manager.gd" id="2_quests"]
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_ocu7p"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/ledger_main.gd" id="2_a8mio"]
+[ext_resource type="Script" path="res://Scripts/Quest Creator/quest_Manager.gd" id="3_t8dao"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/page_bg.png" id="4_tyxeh"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_wood_bar_2.tres" id="5_k6a2c"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/sprig_l.png" id="6_j4i4u"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/sprig_r.png" id="7_uh4d8"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_banner_2.tres" id="8_3it05"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_black.tres" id="9_ksyfh"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_panel_parchment_2.tres" id="10_oi520"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/sun.svg" id="11_2ox0c"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="12_f5cjx"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/coins.svg" id="13_ny1mo"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/rook.svg" id="14_o3fe7"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Pages/page_home.tscn" id="15_y1ep6"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Pages/page_quests.tscn" id="16_6pjhr"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Pages/page_characters.tscn" id="17_f01mk"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Pages/page_upgrades.tscn" id="18_48csl"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Pages/page_settings.tscn" id="19_fdfos"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Screens/screen_charter.tscn" id="20_h168h"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Screens/screen_codex.tscn" id="21_xrdt2"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/flat_2e2012_border_d4a84f_w3_r16.tres" id="22_h1jcl"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_inset_parchment_8.tres" id="23_dhrjr"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="24_rj41h"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_blue.tres" id="25_6xdxh"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_blue_down.tres" id="26_atd0u"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_disabled.tres" id="27_v6orn"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/empty.tres" id="28_emdys"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_wood_dark.tres" id="29_sulqs"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_tab_tile.tres" id="30_aciut"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/nav_characters.svg" id="31_jt1j2"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/ribbon.png" id="32_6ckji"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/flat_a3262a_border_3a2816_w3_r16.tres" id="33_ih1vr"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/nav_quests.svg" id="34_1p0ad"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_tab_tile_active.tres" id="35_qfvnr"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/nav_home.svg" id="36_2p2uf"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/nav_upgrades.svg" id="37_ccea0"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/nav_settings.svg" id="38_b1kcd"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Overlays/overlay_report.tscn" id="39_gxs7d"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Overlays/overlay_welcome.tscn" id="40_ew63u"]
 
-[node name="LedgerMain" type="Control"]
+[node name="LedgerMain" type="Control" unique_id=1184317337]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_ledger")
+theme = ExtResource("1_ocu7p")
+script = ExtResource("2_a8mio")
 
-[node name="QuestManager" type="Node" parent="."]
-script = ExtResource("2_quests")
+[node name="QuestManager" type="Node" parent="." unique_id=436115995]
+script = ExtResource("3_t8dao")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1904478278]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_tyxeh")
+expand_mode = 1
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=270117068]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="Header" type="PanelContainer" parent="Column" unique_id=1803629415]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("5_k6a2c")
+
+[node name="Column" type="VBoxContainer" parent="Column/Header" unique_id=860549515]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BannerRow" type="Control" parent="Column/Header/Column" unique_id=2036925153]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+
+[node name="SprigL" type="TextureRect" parent="Column/Header/Column/BannerRow" unique_id=1194407134]
+layout_mode = 1
+offset_left = -8.0
+offset_top = -8.0
+offset_right = 150.0
+offset_bottom = 104.0
+mouse_filter = 2
+texture = ExtResource("6_j4i4u")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="SprigR" type="TextureRect" parent="Column/Header/Column/BannerRow" unique_id=871023761]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -150.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 104.0
+mouse_filter = 2
+texture = ExtResource("7_uh4d8")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="Center" type="CenterContainer" parent="Column/Header/Column/BannerRow" unique_id=177713404]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Banner" type="PanelContainer" parent="Column/Header/Column/BannerRow/Center" unique_id=1932778583]
+custom_minimum_size = Vector2(0, 104)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("8_3it05")
+
+[node name="Title" type="Label" parent="Column/Header/Column/BannerRow/Center/Banner" unique_id=306719166]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_ksyfh")
+theme_override_font_sizes/font_size = 50
+text = "Guild Ledger"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Resources" type="PanelContainer" parent="Column/Header/Column" unique_id=1949217754]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("10_oi520")
+
+[node name="Row" type="HBoxContainer" parent="Column/Header/Column/Resources" unique_id=1979657319]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="DayCell" type="HBoxContainer" parent="Column/Header/Column/Resources/Row" unique_id=96115093]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="Column/Header/Column/Resources/Row/DayCell" unique_id=129336782]
+custom_minimum_size = Vector2(62, 62)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("11_2ox0c")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="VBoxContainer" parent="Column/Header/Column/Resources/Row/DayCell" unique_id=496419077]
+layout_mode = 2
+theme_override_constants/separation = -6
+
+[node name="DayValue" type="Label" parent="Column/Header/Column/Resources/Row/DayCell/Text" unique_id=8028389]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_ksyfh")
+theme_override_font_sizes/font_size = 38
+text = "1"
+
+[node name="Caption" type="Label" parent="Column/Header/Column/Resources/Row/DayCell/Text" unique_id=1727473205]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 23
+text = "Day"
+
+[node name="Divider1" type="ColorRect" parent="Column/Header/Column/Resources/Row" unique_id=179160348]
+custom_minimum_size = Vector2(2, 0)
+layout_mode = 2
+color = Color(0.7882353, 0.6627451, 0.41568628, 1)
+
+[node name="GoldCell" type="HBoxContainer" parent="Column/Header/Column/Resources/Row" unique_id=869730066]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="Column/Header/Column/Resources/Row/GoldCell" unique_id=574064153]
+custom_minimum_size = Vector2(62, 62)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("13_ny1mo")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="VBoxContainer" parent="Column/Header/Column/Resources/Row/GoldCell" unique_id=1517513009]
+layout_mode = 2
+theme_override_constants/separation = -6
+
+[node name="GoldValue" type="Label" parent="Column/Header/Column/Resources/Row/GoldCell/Text" unique_id=1277791974]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_ksyfh")
+theme_override_font_sizes/font_size = 38
+text = "1"
+
+[node name="Caption" type="Label" parent="Column/Header/Column/Resources/Row/GoldCell/Text" unique_id=667419961]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 23
+text = "Gold"
+
+[node name="Divider2" type="ColorRect" parent="Column/Header/Column/Resources/Row" unique_id=128169245]
+custom_minimum_size = Vector2(2, 0)
+layout_mode = 2
+color = Color(0.7882353, 0.6627451, 0.41568628, 1)
+
+[node name="StandingCell" type="HBoxContainer" parent="Column/Header/Column/Resources/Row" unique_id=2031002942]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="Column/Header/Column/Resources/Row/StandingCell" unique_id=138225156]
+custom_minimum_size = Vector2(62, 62)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("14_o3fe7")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="VBoxContainer" parent="Column/Header/Column/Resources/Row/StandingCell" unique_id=85759669]
+layout_mode = 2
+theme_override_constants/separation = -6
+
+[node name="StandingValue" type="Label" parent="Column/Header/Column/Resources/Row/StandingCell/Text" unique_id=1202058666]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_ksyfh")
+theme_override_font_sizes/font_size = 38
+text = "1"
+
+[node name="Caption" type="Label" parent="Column/Header/Column/Resources/Row/StandingCell/Text" unique_id=1851656682]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 23
+text = "Standing"
+
+[node name="ContentWrap" type="Control" parent="Column" unique_id=1502172289]
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Scroll" type="ScrollContainer" parent="Column/ContentWrap" unique_id=875948196]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Column/ContentWrap/Scroll" unique_id=856591376]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 26
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 40
+
+[node name="Content" type="VBoxContainer" parent="Column/ContentWrap/Scroll/Margin" unique_id=649852325]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 26
+
+[node name="PageHome" parent="Column/ContentWrap/Scroll/Margin/Content" unique_id=507645192 instance=ExtResource("15_y1ep6")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PageQuests" parent="Column/ContentWrap/Scroll/Margin/Content" unique_id=1028683330 instance=ExtResource("16_6pjhr")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="PageCharacters" parent="Column/ContentWrap/Scroll/Margin/Content" unique_id=1415700278 instance=ExtResource("17_f01mk")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="PageUpgrades" parent="Column/ContentWrap/Scroll/Margin/Content" unique_id=1917405076 instance=ExtResource("18_48csl")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="PageSettings" parent="Column/ContentWrap/Scroll/Margin/Content" unique_id=1313313119 instance=ExtResource("19_fdfos")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="PageLayer" type="Control" parent="Column/ContentWrap" unique_id=1236528055]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ScreenCharter" parent="Column/ContentWrap/PageLayer" unique_id=1586541300 instance=ExtResource("20_h168h")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="ScreenCodex" parent="Column/ContentWrap/PageLayer" unique_id=1011074139 instance=ExtResource("21_xrdt2")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="Toast" type="PanelContainer" parent="Column/ContentWrap" unique_id=2141149335]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 40.0
+offset_top = 16.0
+offset_right = -40.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("22_h1jcl")
+
+[node name="ToastLabel" type="Label" parent="Column/ContentWrap/Toast" unique_id=1124410253]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9647059, 0.8862745, 0.6901961, 1)
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 26
+text = "Gwen joined the guild!"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="DayBar" type="PanelContainer" parent="Column" unique_id=798622982]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("23_dhrjr")
+
+[node name="Row" type="HBoxContainer" parent="Column/DayBar" unique_id=1621090382]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Text" type="VBoxContainer" parent="Column/DayBar/Row" unique_id=1745086516]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = -2
+
+[node name="DayBarTitle" type="Label" parent="Column/DayBar/Row/Text" unique_id=505600708]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("24_rj41h")
+text = "5 quests undecided"
+
+[node name="DayBarSubtitle" type="Label" parent="Column/DayBar/Row/Text" unique_id=773652375]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_font_sizes/font_size = 24
+text = "Accept with a party or deny each one"
+
+[node name="DayBarButton" type="Button" parent="Column/DayBar/Row" unique_id=558021267]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 84)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 36
+theme_override_fonts/font = ExtResource("24_rj41h")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = ExtResource("25_6xdxh")
+theme_override_styles/pressed = ExtResource("26_atd0u")
+theme_override_styles/hover = ExtResource("25_6xdxh")
+theme_override_styles/hover_pressed = ExtResource("26_atd0u")
+theme_override_styles/disabled = ExtResource("27_v6orn")
+theme_override_styles/focus = ExtResource("28_emdys")
+text = "Review"
+
+[node name="Nav" type="PanelContainer" parent="Column" unique_id=1031035102]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("29_sulqs")
+
+[node name="Row" type="HBoxContainer" parent="Column/Nav" unique_id=916539793]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Tab_characters" type="Button" parent="Column/Nav/Row" unique_id=1931560834]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 124)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_constants/h_separation = 2
+theme_override_constants/icon_max_width = 52
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = ExtResource("30_aciut")
+theme_override_styles/pressed = ExtResource("30_aciut")
+theme_override_styles/hover = ExtResource("30_aciut")
+theme_override_styles/hover_pressed = ExtResource("30_aciut")
+theme_override_styles/focus = ExtResource("28_emdys")
+text = "Characters"
+icon = ExtResource("31_jt1j2")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Ribbon" type="TextureRect" parent="Column/Nav/Row/Tab_characters" unique_id=968701387]
+visible = false
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -15.0
+offset_top = -30.0
+offset_right = 15.0
+offset_bottom = 14.0
+mouse_filter = 2
+texture = ExtResource("32_6ckji")
+expand_mode = 1
+
+[node name="Badge" type="PanelContainer" parent="Column/Nav/Row/Tab_characters" unique_id=615138016]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -34.0
+offset_top = -14.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("33_ih1vr")
+
+[node name="Text" type="Label" parent="Column/Nav/Row/Tab_characters/Badge" unique_id=497374260]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 22
+text = "5"
+horizontal_alignment = 1
+
+[node name="Tab_quests" type="Button" parent="Column/Nav/Row" unique_id=816034608]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 124)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_constants/h_separation = 2
+theme_override_constants/icon_max_width = 52
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = ExtResource("30_aciut")
+theme_override_styles/pressed = ExtResource("30_aciut")
+theme_override_styles/hover = ExtResource("30_aciut")
+theme_override_styles/hover_pressed = ExtResource("30_aciut")
+theme_override_styles/focus = ExtResource("28_emdys")
+text = "Quests"
+icon = ExtResource("34_1p0ad")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Ribbon" type="TextureRect" parent="Column/Nav/Row/Tab_quests" unique_id=1650876794]
+visible = false
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -15.0
+offset_top = -30.0
+offset_right = 15.0
+offset_bottom = 14.0
+mouse_filter = 2
+texture = ExtResource("32_6ckji")
+expand_mode = 1
+
+[node name="Badge" type="PanelContainer" parent="Column/Nav/Row/Tab_quests" unique_id=589985757]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -34.0
+offset_top = -14.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("33_ih1vr")
+
+[node name="Text" type="Label" parent="Column/Nav/Row/Tab_quests/Badge" unique_id=1935456880]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 22
+text = "5"
+horizontal_alignment = 1
+
+[node name="Tab_home" type="Button" parent="Column/Nav/Row" unique_id=745970505]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 124)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_constants/h_separation = 2
+theme_override_constants/icon_max_width = 52
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = ExtResource("35_qfvnr")
+theme_override_styles/pressed = ExtResource("35_qfvnr")
+theme_override_styles/hover = ExtResource("35_qfvnr")
+theme_override_styles/hover_pressed = ExtResource("35_qfvnr")
+theme_override_styles/focus = ExtResource("28_emdys")
+text = "Home"
+icon = ExtResource("36_2p2uf")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Ribbon" type="TextureRect" parent="Column/Nav/Row/Tab_home" unique_id=2023663993]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -15.0
+offset_top = -30.0
+offset_right = 15.0
+offset_bottom = 14.0
+mouse_filter = 2
+texture = ExtResource("32_6ckji")
+expand_mode = 1
+
+[node name="Badge" type="PanelContainer" parent="Column/Nav/Row/Tab_home" unique_id=1299025247]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -34.0
+offset_top = -14.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("33_ih1vr")
+
+[node name="Text" type="Label" parent="Column/Nav/Row/Tab_home/Badge" unique_id=1365497950]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 22
+text = "5"
+horizontal_alignment = 1
+
+[node name="Tab_upgrades" type="Button" parent="Column/Nav/Row" unique_id=201153892]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 124)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_constants/h_separation = 2
+theme_override_constants/icon_max_width = 52
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = ExtResource("30_aciut")
+theme_override_styles/pressed = ExtResource("30_aciut")
+theme_override_styles/hover = ExtResource("30_aciut")
+theme_override_styles/hover_pressed = ExtResource("30_aciut")
+theme_override_styles/focus = ExtResource("28_emdys")
+text = "Upgrades"
+icon = ExtResource("37_ccea0")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Ribbon" type="TextureRect" parent="Column/Nav/Row/Tab_upgrades" unique_id=1964011851]
+visible = false
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -15.0
+offset_top = -30.0
+offset_right = 15.0
+offset_bottom = 14.0
+mouse_filter = 2
+texture = ExtResource("32_6ckji")
+expand_mode = 1
+
+[node name="Badge" type="PanelContainer" parent="Column/Nav/Row/Tab_upgrades" unique_id=426674969]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -34.0
+offset_top = -14.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("33_ih1vr")
+
+[node name="Text" type="Label" parent="Column/Nav/Row/Tab_upgrades/Badge" unique_id=1509559856]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 22
+text = "5"
+horizontal_alignment = 1
+
+[node name="Tab_settings" type="Button" parent="Column/Nav/Row" unique_id=216540792]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 124)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_constants/h_separation = 2
+theme_override_constants/icon_max_width = 52
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 21
+theme_override_styles/normal = ExtResource("30_aciut")
+theme_override_styles/pressed = ExtResource("30_aciut")
+theme_override_styles/hover = ExtResource("30_aciut")
+theme_override_styles/hover_pressed = ExtResource("30_aciut")
+theme_override_styles/focus = ExtResource("28_emdys")
+text = "Settings"
+icon = ExtResource("38_b1kcd")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Ribbon" type="TextureRect" parent="Column/Nav/Row/Tab_settings" unique_id=1010555566]
+visible = false
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -15.0
+offset_top = -30.0
+offset_right = 15.0
+offset_bottom = 14.0
+mouse_filter = 2
+texture = ExtResource("32_6ckji")
+expand_mode = 1
+
+[node name="Badge" type="PanelContainer" parent="Column/Nav/Row/Tab_settings" unique_id=1601192586]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -34.0
+offset_top = -14.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("33_ih1vr")
+
+[node name="Text" type="Label" parent="Column/Nav/Row/Tab_settings/Badge" unique_id=630203864]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("12_f5cjx")
+theme_override_font_sizes/font_size = 22
+text = "5"
+horizontal_alignment = 1
+
+[node name="Overlay" type="Control" parent="." unique_id=697353453]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="OverlayReport" parent="Overlay" unique_id=1630964606 instance=ExtResource("39_gxs7d")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="OverlayWelcome" parent="Overlay" unique_id=874530323 instance=ExtResource("40_ew63u")]
+unique_name_in_owner = true
+layout_mode = 1

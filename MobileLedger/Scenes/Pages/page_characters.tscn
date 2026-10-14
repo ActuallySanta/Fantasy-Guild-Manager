@@ -1,0 +1,217 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_cn6ef"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/page_characters.gd" id="2_gpqd3"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="3_tw0e8"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_red.tres" id="4_jqucj"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_red_down.tres" id="5_lfj43"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_disabled.tres" id="6_6s68d"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/empty.tres" id="7_fi4to"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/nav_characters.svg" id="8_v7ga1"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_paper.tres" id="9_y6dd1"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_paper_down.tres" id="10_naqr2"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/plus.svg" id="11_srrm6"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_card_parchment_10.tres" id="12_f4io4"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green.tres" id="13_30r4r"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green_down.tres" id="14_x0n0w"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_inset_parchment_3.tres" id="15_fabda"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/coins.svg" id="16_ss8qe"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_inset_parchment_2.tres" id="17_7pkul"]
+
+[node name="PageCharacters" type="VBoxContainer" unique_id=1415700278]
+size_flags_horizontal = 3
+theme = ExtResource("1_cn6ef")
+theme_override_constants/separation = 24
+script = ExtResource("2_gpqd3")
+
+[node name="Segments" type="HBoxContainer" parent="." unique_id=345246293]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="GuildSegButton" type="Button" parent="Segments" unique_id=2005320780]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 34
+theme_override_fonts/font = ExtResource("3_tw0e8")
+theme_override_font_sizes/font_size = 27
+theme_override_styles/normal = ExtResource("4_jqucj")
+theme_override_styles/pressed = ExtResource("5_lfj43")
+theme_override_styles/hover = ExtResource("4_jqucj")
+theme_override_styles/hover_pressed = ExtResource("5_lfj43")
+theme_override_styles/disabled = ExtResource("6_6s68d")
+theme_override_styles/focus = ExtResource("7_fi4to")
+text = "Your Guild  0/4"
+icon = ExtResource("8_v7ga1")
+
+[node name="HireSegButton" type="Button" parent="Segments" unique_id=976409794]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/icon_normal_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/icon_pressed_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_colors/icon_hover_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 34
+theme_override_fonts/font = ExtResource("3_tw0e8")
+theme_override_font_sizes/font_size = 27
+theme_override_styles/normal = ExtResource("9_y6dd1")
+theme_override_styles/pressed = ExtResource("10_naqr2")
+theme_override_styles/hover = ExtResource("9_y6dd1")
+theme_override_styles/hover_pressed = ExtResource("10_naqr2")
+theme_override_styles/disabled = ExtResource("6_6s68d")
+theme_override_styles/focus = ExtResource("7_fi4to")
+text = "For Hire  ·  3"
+icon = ExtResource("11_srrm6")
+
+[node name="GuildPage" type="VBoxContainer" parent="." unique_id=624444121]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Hint" type="Label" parent="GuildPage" unique_id=2130588960]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_font_sizes/font_size = 25
+text = "Tap an adventurer to open their codex."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="RosterList" type="VBoxContainer" parent="GuildPage" unique_id=118997687]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="EmptyGuild" type="PanelContainer" parent="GuildPage" unique_id=691033629]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("12_f4io4")
+
+[node name="Column" type="VBoxContainer" parent="GuildPage/EmptyGuild" unique_id=1767872632]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Icon" type="TextureRect" parent="GuildPage/EmptyGuild/Column" unique_id=963531733]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("8_v7ga1")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="GuildPage/EmptyGuild/Column" unique_id=1683587059]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Your guild is empty. Hire adventurers before you accept quests."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SeeHiresButton" type="Button" parent="GuildPage/EmptyGuild/Column" unique_id=498544182]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 39
+theme_override_fonts/font = ExtResource("3_tw0e8")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = ExtResource("13_30r4r")
+theme_override_styles/pressed = ExtResource("14_x0n0w")
+theme_override_styles/hover = ExtResource("13_30r4r")
+theme_override_styles/hover_pressed = ExtResource("14_x0n0w")
+theme_override_styles/disabled = ExtResource("6_6s68d")
+theme_override_styles/focus = ExtResource("7_fi4to")
+text = "See who's for hire"
+
+[node name="Bunks" type="VBoxContainer" parent="GuildPage" unique_id=957378991]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="HirePage" type="VBoxContainer" parent="." unique_id=721466015]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Note" type="PanelContainer" parent="HirePage" unique_id=1556410452]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("15_fabda")
+
+[node name="Row" type="HBoxContainer" parent="HirePage/Note" unique_id=1918090676]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Icon" type="TextureRect" parent="HirePage/Note/Row" unique_id=1615582586]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("16_ss8qe")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="HireNote" type="Label" parent="HirePage/Note/Row" unique_id=420366132]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 25
+text = "Hiring is free. Room for 4 more. New faces arrive every morning."
+autowrap_mode = 3
+
+[node name="HireList" type="VBoxContainer" parent="HirePage" unique_id=1855555309]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="HireEmpty" type="PanelContainer" parent="HirePage" unique_id=1440835256]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_styles/panel = ExtResource("17_7pkul")
+
+[node name="Text" type="Label" parent="HirePage/HireEmpty" unique_id=1421533115]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_font_sizes/font_size = 26
+text = "Everyone's been hired. New faces arrive tomorrow morning."
+horizontal_alignment = 1
+autowrap_mode = 3
