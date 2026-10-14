@@ -1,20 +1,30 @@
-## Settings tab: help, plus the upgrades page's debug buttons (when enabled).
+## Settings tab: show the welcome again, plus the upgrades page's debug
+## buttons (only when GuildUpgrades.SHOW_DEBUG_BUTTONS is on).
+## Scene: MobileLedger/Scenes/Pages/page_settings.tscn
 extends VBoxContainer
 
-var ui
+const Main := preload("res://MobileLedger/Scripts/ledger_main.gd")
+
+## What the debug buttons add.
+const DEBUG_GOLD := 200
+const DEBUG_STANDING := 1
+
+@onready var _welcome_button: Button = %WelcomeButton
+@onready var _debug: Control = %Debug
+@onready var _add_gold_button: Button = %AddGoldButton
+@onready var _add_standing_button: Button = %AddStandingButton
+@onready var _reset_button: Button = %ResetButton
+
+var ui: Main
 
 
-func setup(main) -> void:
+func setup(main: Main) -> void:
 	ui = main
-	%WelcomeButton.pressed.connect(func():
-		ui.show_welcome = true
-		ui.queue_refresh())
-	%AddGoldButton.pressed.connect(GuildUpgrades.add_gold.bind(200))
-	%AddStandingButton.pressed.connect(GuildUpgrades.add_standing.bind(1))
-	%ResetButton.pressed.connect(func():
-		GuildUpgrades.reset()
-		ui.toast("Upgrades reset"))
+	_welcome_button.pressed.connect(func(): ui.open_welcome())
+	_add_gold_button.pressed.connect(GuildUpgrades.add_gold.bind(DEBUG_GOLD))
+	_add_standing_button.pressed.connect(GuildUpgrades.add_standing.bind(DEBUG_STANDING))
+	_reset_button.pressed.connect(func(): ui.reset_upgrades())
 
 
 func refresh() -> void:
-	%Debug.visible = GuildUpgrades.SHOW_DEBUG_BUTTONS
+	_debug.visible = GuildUpgrades.SHOW_DEBUG_BUTTONS

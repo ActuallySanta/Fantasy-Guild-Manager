@@ -1,59 +1,80 @@
 ## Step 3: End Day. Today's plan at a glance, upgrades to spend gold on, and
-## the End Day button (locked until every quest is decided).
+## the End Day button (swapped for "Back to quests" until every quest is decided).
+## Scene: MobileFlow/Scenes/Steps/step_end.tscn
 extends VBoxContainer
 
 const S := preload("res://MobileFlow/Scripts/flow_style.gd")
+const Main := preload("res://MobileFlow/Scripts/flow_main.gd")
 const PlanRow := preload("res://MobileFlow/Scenes/Rows/plan_row.tscn")
 const UpgradeRow := preload("res://MobileFlow/Scenes/Rows/upgrade_row.tscn")
 
-var ui
+# ---- TEXT
+const TEXT_WALLET := "You have %d gold and Standing %d."
+const TEXT_DECIDE_MORE := "Decide %d more %s before ending the day."
+const TEXT_PARTIES_GOING := "%d %s will set out."
+const TEXT_NOBODY_GOING := "Nobody is going out today."
+const TEXT_END_DAY := "End Day %d"
+
+# ---- NODES
+@onready var _scroll: ScrollContainer = %Scroll
+@onready var _footer: Control = %Footer
+@onready var _plan_list: Container = %PlanList
+@onready var _upgrades_subtitle: Label = %UpgradesSubtitle
+@onready var _upgrade_list: Container = %UpgradeList
+@onready var _last_report_button: Button = %LastReportButton
+@onready var _warning: Label = %Warning
+@onready var _back_button: Button = %BackButton
+@onready var _going_info: Label = %GoingInfo
+@onready var _end_day_button: Button = %EndDayButton
+
+var ui: Main
 
 
-func setup(main) -> void:
+func setup(main: Main) -> void:
 	ui = main
-	%LastReportButton.pressed.connect(func(): ui.open_last_report())
-	%BackButton.pressed.connect(func(): ui.go_step("quests"))
-	%EndDayButton.pressed.connect(func(): ui.end_day())
+	_last_report_button.pressed.connect(func(): ui.open_last_report())
+	_back_button.pressed.connect(func(): ui.go_step("quests"))
+	_end_day_button.pressed.connect(func(): ui.end_day())
 
 
 func footer_height() -> float:
-	return %Footer.size.y
+	return _footer.size.y
 
 
 func scroll_to_top() -> void:
-	%Scroll.scroll_vertical = 0
+	_scroll.scroll_vertical = 0
 
 
 func refresh() -> void:
-	var out: int = ui.outstanding()
+	_show_plan()
+	_show_upgrades()
+	_last_report_button.visible = not ui.last_report.is_empty()
+	_show_footer()
 
-	# --- today's plan
-	S.clear(%PlanList)
+
+## One row per quest: who's going and their odds, or Denied / Not decided.
+func _show_plan() -> void:
+	S.clear(_plan_list)
 	for i in ui.entries.size():
-		S.add_row(%PlanList, PlanRow).setup(ui, i, i == ui.entries.size() - 1)
+		S.add_row(_plan_list, PlanRow).setup(ui, i, i == ui.entries.size() - 1)
 
-	# --- upgrades
-	%UpgradesSubtitle.text = "You have %d gold and Standing %d." % [GameState.gold, GameState.standing]
-	S.clear(%UpgradeList)
-	for b in sorted_buildings():
-		S.add_row(%UpgradeList, UpgradeRow).setup(ui, b)
-	%LastReportButton.visible = not ui.last_report.is_empty()
 
-	# --- footer
-	%Warning.visible = out > 0
-	%BackButton.visible = out > 0
-	%GoingInfo.visible = out == 0
-	%EndDayButton.visible = out == 0
+func _show_upgrades() -> void:
+	_upgrades_subtitle.text = TEXT_WALLET % [GameState.gold, GameState.standing]
+	S.clear(_upgrade_list)
+	for b in S.buildings_in_order():
+		S.add_row(_upgrade_list, UpgradeRow).setup(ui, b)
+
+
+func _show_footer() -> void:
+	var out: int = ui.outstanding()
+	_warning.visible = out > 0
+	_back_button.visible = out > 0
+	_going_info.visible = out == 0
+	_end_day_button.visible = out == 0
 	if out > 0:
-		%Warning.text = "Decide %d more quest%s before ending the day." % [out, "" if out == 1 else "s"]
-	else:
-		var going: int = ui.ready_entries().size()
-		%GoingInfo.text = "%d part%s will set out." % [going, "y" if going == 1 else "ies"] if going > 0 else "Nobody is going out today."
-		%EndDayButton.text = "End Day %d" % GameState.day
-
-
-## Working buildings first, "coming soon" ones after.
-static func sorted_buildings() -> Array:
-	var order: Array = GuildUpgrades.Building.values()
-	order.sort_custom(func(a, b): return GuildUpgrades.is_implemented(a) and not GuildUpgrades.is_implemented(b))
-	return order
+		_warning.text = TEXT_DECIDE_MORE % [out, S.plural(out, "quest", "quests")]
+		return
+	var going: int = ui.ready_entries().size()
+	_going_info.text = TEXT_PARTIES_GOING % [going, S.plural(going, "party", "parties")] if going > 0 else TEXT_NOBODY_GOING
+	_end_day_button.text = TEXT_END_DAY % GameState.day

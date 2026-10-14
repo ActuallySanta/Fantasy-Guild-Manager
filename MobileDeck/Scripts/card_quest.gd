@@ -1,57 +1,103 @@
-## Quest card face (Scenes/Cards/card_quest.tscn): party slots filled from the
-## roster tray, live success chance. Swipe right to send, left to deny.
+## Quest card face: type, rank, gold, favored stat, party slots and live odds.
+## Fill the slots from the roster tray, then swipe right to send / left to deny.
+## Scene: MobileDeck/Scenes/Cards/card_quest.tscn
 extends VBoxContainer
 
 const S := preload("res://MobileDeck/Scripts/deck_style.gd")
+const Main := preload("res://MobileDeck/Scripts/deck_main.gd")
 const SlotFilled := preload("res://MobileDeck/Scenes/Rows/slot_filled.tscn")
 const SlotEmpty := preload("res://MobileDeck/Scenes/Rows/slot_empty.tscn")
 
-var ui
+## Slot size: big for 1-2 adventurers, smaller for bigger parties.
+const SLOT_SIZE_SMALL_PARTY := 150.0
+const SLOT_SIZE_BIG_PARTY := 120.0
+
+# ---- TEXT
+const TEXT_MILESTONE := "MILESTONE"
+const TEXT_RANK := "Rank %s"
+const TEXT_GOLD := "%d gold"
+const TEXT_FAV_NOTE := "(counts twice)"
+const TEXT_FAV_NOTE_PLUCK := "(doesn't change odds)"
+const TEXT_SOLO := "Solo quest"
+const TEXT_PARTY_OF := "Party of up to %d"
+const TEXT_CHANCE_UNKNOWN := "chance of success"
+const TEXT_HINT_NO_ADVENTURERS := "No adventurers yet. Press Back to see the recruits, or swipe left to deny."
+const TEXT_HINT_PICK := "Tap adventurers in the tray below to add them.\nThen swipe right to send, or left to deny."
+const TEXT_HINT_SEND := "Swipe right to send this party, left to deny the quest."
+
+# ---- NODES
+@onready var _type_chip = %TypeChip
+@onready var _rank_chip = %RankChip
+@onready var _gold_chip = %GoldChip
+@onready var _quest_title: Label = %QuestTitle
+@onready var _fav_chip = %FavChip
+@onready var _fav_note: Label = %FavNote
+@onready var _milestone_note: Control = %MilestoneNote
+@onready var _party_label: Label = %PartyLabel
+@onready var _slots: Container = %Slots
+@onready var _chance_percent: Label = %ChancePercent
+@onready var _chance_word: Label = %ChanceWord
+@onready var _chance_gauge = %ChanceGauge
+@onready var _hint: Label = %Hint
+
+var ui: Main
 
 
-func setup(main) -> void:
+func setup(main: Main) -> void:
 	ui = main
 
 
 func refresh() -> void:
 	var e: Dictionary = ui.current().entry
+	_show_quest(e)
+	_show_slots(e)
+	_show_odds(e)
+	_show_hint()
+
+
+func _show_quest(e: Dictionary) -> void:
 	var q: CreatedQuest = e.quest
+	var milestone: bool = e.milestone
+	var type_name: String = TEXT_MILESTONE if milestone else S.TYPE_NAMES.get(int(q.type), "Quest").to_upper()
+	_type_chip.set_chip(type_name, S.BAD_BG if milestone else S.BOX_ALT, S.BAD if milestone else S.INK_SOFT, -1, false)
+	_rank_chip.set_chip(TEXT_RANK % S.rank_letter(q), S.BOX_ALT, S.INK, -1, false)
+	_gold_chip.set_icon_chip("coins", TEXT_GOLD % q.goldReward, S.GOLD_BG, S.GOLD)
+	_quest_title.text = q.questTitle
+	S.color(_quest_title, S.BAD if milestone else S.INK)
+	var fav := S.favored_index(q)
+	var st: Dictionary = S.STATS[fav]
+	_fav_chip.set_icon_chip("", st.name, st.bg, st.color, -1, true)
+	_fav_note.text = TEXT_FAV_NOTE if fav < 4 else TEXT_FAV_NOTE_PLUCK
+	_milestone_note.visible = milestone
+
+
+## One slot per adventurer the quest takes. Tap a filled slot to remove them.
+func _show_slots(e: Dictionary) -> void:
 	var n: int = ui.slot_count(e)
-	var milestone: bool = e.get("milestone", false)
-
-	var type_name: String = "MILESTONE" if milestone else S.TYPE_NAMES.get(int(q.type), "Quest").to_upper()
-	%TypeChip.set_chip(type_name, S.BAD_BG if milestone else S.BOX_ALT, S.BAD if milestone else S.INK_SOFT, -1, false)
-	%RankChip.set_chip("Rank %s" % S.rank_letter(q), S.BOX_ALT, S.INK, -1, false)
-	%GoldChip.set_icon_chip("coins", "%d gold" % q.goldReward, S.GOLD_BG, S.GOLD)
-	%QuestTitle.text = q.questTitle
-	%QuestTitle.add_theme_color_override("font_color", S.BAD if milestone else S.INK)
-	var fi := S.favored_index(q)
-	var st: Dictionary = S.STATS[fi]
-	%FavChip.set_icon_chip("", st.name, st.bg, st.color, -1, true)
-	%FavNote.text = "(counts twice)" if fi < 4 else "(doesn't change odds)"
-	%MilestoneNote.visible = milestone
-
-	# party slots: tap a filled one to remove that adventurer
-	%PartyLabel.text = "Solo quest" if n == 1 else "Party of up to %d" % n
-	var size := 150.0 if n <= 2 else 120.0
-	S.clear(%Slots)
+	var slot_size := SLOT_SIZE_SMALL_PARTY if n <= 2 else SLOT_SIZE_BIG_PARTY
+	_party_label.text = TEXT_SOLO if n == 1 else TEXT_PARTY_OF % n
+	S.clear(_slots)
 	for i in n:
 		if i < ui.draft.size():
-			S.add_row(%Slots, SlotFilled).setup(ui, ui.draft[i], size)
+			S.add_row(_slots, SlotFilled).setup(ui, ui.draft[i], slot_size)
 		else:
-			S.add_row(%Slots, SlotEmpty).setup(size)
+			S.add_row(_slots, SlotEmpty).setup(slot_size)
 
-	var ch_pct: int = ui.chance_for(e, ui.draft)
-	var o: Array = S.odds(ch_pct)
-	%ChancePercent.text = "--" if ch_pct < 0 else "%d%%" % mini(ch_pct, 100)
-	%ChancePercent.add_theme_color_override("font_color", o[1])
-	%ChanceWord.text = "chance of success" if ch_pct < 0 else o[0]
-	%ChanceWord.add_theme_color_override("font_color", o[1])
-	%ChanceGauge.set_value(0.0 if ch_pct < 0 else minf(ch_pct, 100) / 100.0, o[2])
 
+func _show_odds(e: Dictionary) -> void:
+	var chance: int = ui.chance_for(e, ui.draft)
+	var o: Array = S.odds(chance)
+	_chance_percent.text = S.percent(chance)
+	S.color(_chance_percent, o[1])
+	_chance_word.text = TEXT_CHANCE_UNKNOWN if chance < 0 else o[0]
+	S.color(_chance_word, o[1])
+	_chance_gauge.set_value(0.0 if chance < 0 else minf(chance, 100) / 100.0, o[2])
+
+
+func _show_hint() -> void:
 	if CharacterContainer.active_characters.is_empty():
-		%Hint.text = "No adventurers yet. Press Back to see the recruits, or swipe left to deny."
+		_hint.text = TEXT_HINT_NO_ADVENTURERS
 	elif ui.draft.is_empty():
-		%Hint.text = "Tap adventurers in the tray below to add them.\nThen swipe right to send, or left to deny."
+		_hint.text = TEXT_HINT_PICK
 	else:
-		%Hint.text = "Swipe right to send this party, left to deny the quest."
+		_hint.text = TEXT_HINT_SEND

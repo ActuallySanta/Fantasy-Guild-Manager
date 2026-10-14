@@ -1,43 +1,72 @@
-## One quest in the Day Report (Rows/report_entry.tscn).
+## One quest in the Day Report: result, party, gold / injuries, and the story.
+## Scene: MobileDeck/Scenes/Rows/report_entry.tscn
 extends PanelContainer
 
 const S := preload("res://MobileDeck/Scripts/deck_style.gd")
-const PortraitScene := preload("res://MobileDeck/Scenes/Components/portrait.tscn")
+const Portrait := preload("res://MobileDeck/Scenes/Components/portrait.tscn")
 
+## generateResults writes bright BBCode colours meant for a dark screen;
+## these swap them for the UI's meaning colours.
+const RECOLOR := {
+	"[color=FFE700]": S.GOLD, "[color=gold]": S.GOLD,
+	"[color=green]": S.GOOD,
+	"[color=FD0000]": S.BAD, "[color=red]": S.BAD,
+}
 
-## generateResults uses bright BBCode colours meant for a dark screen; map them
-## to the UI's meaning colours (gold = gold, green = good, red = bad).
-static func recolor(t: String) -> String:
-	var map := {
-		"[color=FFE700]": S.GOLD, "[color=gold]": S.GOLD, "[color=green]": S.GOOD,
-		"[color=FD0000]": S.BAD, "[color=red]": S.BAD,
-	}
-	for k in map:
-		t = t.replace(k, "[color=#%s]" % map[k].to_html(false))
-	return t
+# ---- TEXT
+const TEXT_SUCCESS := "Success"
+const TEXT_FAILED := "Failed"
+const TEXT_CHANCE := "%d%% chance"
+const TEXT_GOLD := "+%d gold"
+const TEXT_NO_GOLD := "No gold"
+const TEXT_INJURIES := "%d %s"
+const TEXT_NO_INJURIES := "No injuries"
+
+# ---- NODES
+@onready var _quest_name: Label = %QuestName
+@onready var _badge = %Badge
+@onready var _portraits: Container = %Portraits
+@onready var _names: Label = %Names
+@onready var _chance_chip = %ChanceChip
+@onready var _gold_chip = %GoldChip
+@onready var _injury_chip = %InjuryChip
+@onready var _story: RichTextLabel = %Story
 
 
 func setup(r: Dictionary) -> void:
-	%QuestName.text = r.quest.questTitle
 	var ok: bool = r.succeeded
-	%Badge.set_chip("Success" if ok else "Failed", S.GOOD_BG if ok else S.BAD_BG, S.GOOD if ok else S.BAD)
-	var names := []
-	for c in r.party:
-		var p := PortraitScene.instantiate()
+	_quest_name.text = r.quest.questTitle
+	_badge.set_chip(TEXT_SUCCESS if ok else TEXT_FAILED, S.GOOD_BG if ok else S.BAD_BG, S.GOOD if ok else S.BAD)
+	_show_party(r.party)
+	_show_chips(r)
+	_story.text = _story_text(r.story)
+
+
+func _show_party(party: Array) -> void:
+	for c in party:
+		var p := Portrait.instantiate()
 		p.custom_minimum_size = Vector2(56, 56)
-		%Portraits.add_child(p)
+		_portraits.add_child(p)
 		p.show_character(c)
-		names.append(c.name)
-	%Names.text = " & ".join(PackedStringArray(names))
-	%ChanceChip.set_chip("%d%% chance" % mini(int(r.chance), 100))
-	%GoldChip.set_icon_chip("coins", "+%d gold" % r.gold if r.gold > 0 else "No gold", S.GOLD_BG, S.GOLD)
+	_names.text = S.names(party, " & ")
+
+
+func _show_chips(r: Dictionary) -> void:
+	_chance_chip.set_chip(TEXT_CHANCE % mini(int(r.chance), 100))
+	_gold_chip.set_icon_chip("coins", TEXT_GOLD % r.gold if r.gold > 0 else TEXT_NO_GOLD, S.GOLD_BG, S.GOLD)
 	var injuries: int = r.story.count("INJURED")
 	if injuries > 0:
-		%InjuryChip.set_chip("%d injur%s" % [injuries, "y" if injuries == 1 else "ies"], S.BAD_BG, S.BAD)
+		_injury_chip.set_chip(TEXT_INJURIES % [injuries, S.plural(injuries, "injury", "injuries")], S.BAD_BG, S.BAD)
 	else:
-		%InjuryChip.set_chip("No injuries", S.GOOD_BG, S.GOOD)
+		_injury_chip.set_chip(TEXT_NO_INJURIES, S.GOOD_BG, S.GOOD)
+
+
+## The story with recoloured BBCode and blank lines removed.
+func _story_text(story: String) -> String:
+	for k in RECOLOR:
+		story = story.replace(k, "[color=#%s]" % RECOLOR[k].to_html(false))
 	var beats := PackedStringArray()
-	for line in recolor(r.story).split("\n"):
+	for line in story.split("\n"):
 		if line.strip_edges() != "":
 			beats.append(line.strip_edges())
-	%Story.text = "\n".join(beats)
+	return "\n".join(beats)

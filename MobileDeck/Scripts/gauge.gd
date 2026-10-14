@@ -1,9 +1,12 @@
-## Rounded progress bar. Drawn, so it previews in the editor.
+## Rounded progress bar.
+## Drawn in code (no child nodes), so it previews in the editor; set `value`
+## and `fill` in the Inspector, or call set_value() at runtime.
 @tool
 extends Control
 
 const S := preload("res://MobileDeck/Scripts/deck_style.gd")
 
+## 0 = empty, 1 = full.
 @export_range(0.0, 1.0) var value := 0.5:
 	set(v):
 		value = v
@@ -20,7 +23,8 @@ func set_value(v: float, color: Color) -> void:
 
 
 func _draw() -> void:
-	draw_style_box(S.flat(S.BOX_ALT, int(size.y / 2), 0), Rect2(Vector2.ZERO, size))
+	var radius := int(size.y / 2)
+	draw_style_box(S.flat(S.BOX_ALT, radius, 0), Rect2(Vector2.ZERO, size))
 	var w := size.x * clampf(value, 0.0, 1.0)
 	if w > 1.0:
-		draw_style_box(S.flat(fill, int(size.y / 2), 0), Rect2(0, 0, maxf(w, size.y), size.y))
+		draw_style_box(S.flat(fill, radius, 0), Rect2(0, 0, maxf(w, size.y), size.y))

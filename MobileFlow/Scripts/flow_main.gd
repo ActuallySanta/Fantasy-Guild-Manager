@@ -1,49 +1,80 @@
 ## Mobile Flow: a phone-first UI for the guild game built as a guided day loop.
+## Scene: MobileFlow/flow_main.tscn
 ##
-## Instead of free tabs, each day walks through three steps:
-##   1. Hire     - recruits for today (skippable)
-##   2. Quests   - one quest per screen, party picked on the same screen,
-##                 then Send or Deny moves straight on to the next quest
-##   3. End Day  - today's plan at a glance, upgrades, and the End Day button
+## Each day walks through three steps:
+##   1. Hire     - today's recruits (skippable)
+##   2. Quests   - one quest per screen with the party picker under it;
+##                 Send or Deny moves straight on to the next quest
+##   3. End Day  - today's plan, upgrades, and the End Day button
 ## The Guild button in the header opens the roster / upgrades at any time.
 ##
-## Every screen is an authored scene (see MobileFlow/Scenes). This script holds
-## the day's state and the game-flow calls, and tells each screen to refresh.
+## This script owns the day's state and every game action. The screens
+## (steps, sheets, overlays) call the ACTIONS below and read the QUERIES; after
+## any change this script calls refresh() on whatever is showing.
 ##
 ## UI only: every rule comes from the existing systems (CharacterContainer,
 ## GuildCharacter, CreatedQuest, GameState, GuildUpgrades, DayBar's scoring
 ## helpers). Nothing in those scripts is changed.
+##
+## Sections: SETTINGS · TEXT · STATE · NODES · SETUP · QUERIES · ACTIONS ·
+##           REFRESH · TOAST
 extends Control
 
 const S := preload("res://MobileFlow/Scripts/flow_style.gd")
 const DayBarLogic := preload("res://Scripts/UI/day_bar.gd")
 
+
+# ============================================================ SETTINGS
+
 ## Same as QuestList.quests_per_day.
 const QUESTS_PER_DAY := 5
 ## The day QuestList swaps the board for the milestone quest.
 const MILESTONE_DAY := 10
+## Seconds a toast stays up before fading.
+const TOAST_SECONDS := 2.0
+
+
+# ============================================================ TEXT
+
+const STEP_LABELS := {"hire": "1. Hire", "quests": "2. Quests", "end": "3. End Day"}
+const STEP_QUESTS_LEFT := " (%d left)"
+const TOAST_PARTY_SET := "Party set for %s"
+const TOAST_DENIED := "Denied: %s"
+const TOAST_HIRED := "%s joined the guild!"
+const TOAST_UPGRADED := "%s upgraded to level %d!"
+const TOAST_NEW_DAY := "Day %d begins"
+const TOAST_MILESTONE_DAY := "Day %d. The Bone Drake is attacking!"
+
+
+# ============================================================ STATE
 
 ## Current step: "hire" | "quests" | "end".
 var step := "hire"
-## Today's quests: {quest: CreatedQuest, state: "open"|"ready"|"denied", party: Array, milestone: bool}
+## Today's quests. Each entry:
+##   {quest: CreatedQuest, state: "open" | "ready" | "denied", party: Array, milestone: bool}
 var entries: Array = []
 ## Which quest the Quests step is showing, and the party being picked for it.
 var quest_index := 0
 var draft: Array = []
-## Bottom sheet over the step: {} | {kind: "guild", seg: "roster"|"hire"|"upgrades"} | {kind: "character", character}
+## Sheet over the step:
+##   {} | {kind: "guild", seg: "roster" | "hire" | "upgrades"} | {kind: "character", character, back}
 var sheet := {}
 ## Day report being shown: {live: bool, day: int, results: Array}. Empty = hidden.
 var report := {}
+## Yesterday's report, readable again from the End Day step.
 var last_report := {}
 var show_intro := true
 
-var _dirty := false
-var _toast_tween: Tween
+var _refresh_queued := false
 var _last_view := ""
+var _toast_tween: Tween
 
-@onready var _day_label: Label = %DayValue
-@onready var _gold_label: Label = %GoldValue
-@onready var _standing_label: Label = %StandingValue
+
+# ============================================================ NODES
+
+@onready var _day_value: Label = %DayValue
+@onready var _gold_value: Label = %GoldValue
+@onready var _standing_value: Label = %StandingValue
 @onready var _guild_button: Button = %GuildButton
 @onready var _step_buttons := {"hire": %StepHireButton, "quests": %StepQuestsButton, "end": %StepEndButton}
 @onready var _steps := {"hire": %StepHire, "quests": %StepQuest, "end": %StepEnd}
@@ -57,54 +88,62 @@ var _last_view := ""
 @onready var _toast_label: Label = %ToastLabel
 
 
+# ============================================================ SETUP
+
 func _ready() -> void:
 	_guild_button.pressed.connect(open_guild)
 	for s in _step_buttons:
 		_step_buttons[s].pressed.connect(go_step.bind(s))
-	for node in [_steps.hire, _steps.quests, _steps.end, _sheet_guild, _sheet_character, _report, _intro]:
-		node.setup(self)
+	for screen in [_steps.hire, _steps.quests, _steps.end, _sheet_guild, _sheet_character, _report, _intro]:
+		screen.setup(self)
 	_toast.visible = false
+
 	GameState.day_started.connect(_on_day_started)
 	GameState.resources_changed.connect(queue_refresh)
 	GuildUpgrades.upgrades_changed.connect(queue_refresh)
 	CharacterContainer.on_character_added.connect(queue_refresh)
 	CharacterContainer.on_hireables_refreshed.connect(queue_refresh)
+
 	_generate_quests()
-	_start_steps()
+	_start_of_day_step()
 	refresh()
 
 
-# ================================================================ game state
+func _on_day_started(_day: int) -> void:
+	_generate_quests()
+	_start_of_day_step()
+	queue_refresh()
+
 
 ## Mirrors QuestList.populate / _generate_quests.
 func _generate_quests() -> void:
 	entries.clear()
 	if GameState.day == MILESTONE_DAY:
-		entries.append({"quest": CreatedQuest.new(MILESTONE_DAY), "state": "open", "party": [], "milestone": true})
+		entries.append(_new_entry(CreatedQuest.new(MILESTONE_DAY), true))
 		return
 	for i in QUESTS_PER_DAY:
-		entries.append({"quest": CreatedQuest.new(), "state": "open", "party": [], "milestone": false})
+		entries.append(_new_entry(CreatedQuest.new(), false))
 
 
-func _on_day_started(_day: int) -> void:
-	_generate_quests()
-	_start_steps()
-	queue_refresh()
+func _new_entry(quest: CreatedQuest, milestone: bool) -> Dictionary:
+	return {"quest": quest, "state": "open", "party": [], "milestone": milestone}
 
 
 ## Each morning: start on Hire if there's anyone to hire and room for them.
-func _start_steps() -> void:
+func _start_of_day_step() -> void:
 	quest_index = 0
 	draft = []
 	step = "hire" if can_hire_anyone() else "quests"
 
+
+# ============================================================ QUERIES
 
 func can_hire_anyone() -> bool:
 	return not CharacterContainer.hireable_characters.is_empty() \
 		and CharacterContainer.active_characters.size() < CharacterContainer.max_characters
 
 
-## Quests that still need Send (with a party) or Deny - QuestCard.is_outstanding.
+## How many quests still need Send (with a party) or Deny. QuestCard.is_outstanding.
 func outstanding() -> int:
 	return entries.filter(func(e): return e.state == "open").size()
 
@@ -113,6 +152,7 @@ func ready_entries() -> Array:
 	return entries.filter(func(e): return e.state == "ready")
 
 
+## The quest a character is already sent on today, or {}.
 func entry_of(character: GuildCharacter) -> Dictionary:
 	for e in entries:
 		if e.state == "ready" and e.party.has(character):
@@ -120,6 +160,7 @@ func entry_of(character: GuildCharacter) -> Dictionary:
 	return {}
 
 
+## How many adventurers a quest takes.
 func slot_count(entry: Dictionary) -> int:
 	return QuestCard.get_slot_count(entry.quest)
 
@@ -131,13 +172,25 @@ func chance_for(entry: Dictionary, party: Array) -> int:
 	return int(entry.quest.calcSuccessChance(party))
 
 
+## The quest the Quests step is showing, or {} if there are none.
 func current_entry() -> Dictionary:
 	if entries.is_empty():
 		return {}
 	return entries[clampi(quest_index, 0, entries.size() - 1)]
 
 
-# ================================================================ actions
+## First undecided quest at or after `from` (wrapping around), or -1.
+func _next_open(from: int) -> int:
+	for k in entries.size():
+		var i := (from + k) % entries.size()
+		if entries[i].state == "open":
+			return i
+	return -1
+
+
+# ============================================================ ACTIONS
+
+# ---- moving around
 
 func go_step(s: String) -> void:
 	step = s
@@ -156,16 +209,8 @@ func show_quest(i: int) -> void:
 	queue_refresh()
 
 
-## First undecided quest at or after `from` (wrapping), or -1.
-func _next_open(from: int) -> int:
-	for k in entries.size():
-		var i := (from + k) % entries.size()
-		if entries[i].state == "open":
-			return i
-	return -1
-
-
-func _advance() -> void:
+## Go to the next undecided quest, or to End Day when there are none left.
+func advance() -> void:
 	var next := _next_open(quest_index + 1)
 	if next < 0:
 		step = "end"
@@ -174,6 +219,40 @@ func _advance() -> void:
 	queue_refresh()
 
 
+func open_guild(seg: String = "roster") -> void:
+	sheet = {"kind": "guild", "seg": seg}
+	queue_refresh()
+
+
+func set_guild_tab(seg: String) -> void:
+	sheet.seg = seg
+	queue_refresh()
+
+
+## Character details. Closing goes back to whatever sheet was open before.
+func open_character(c: GuildCharacter) -> void:
+	sheet = {"kind": "character", "character": c, "back": sheet.duplicate()}
+	queue_refresh()
+
+
+func close_sheet() -> void:
+	sheet = sheet.get("back", {}) if sheet.get("kind", "") == "character" else {}
+	queue_refresh()
+
+
+func open_intro() -> void:
+	show_intro = true
+	queue_refresh()
+
+
+func close_intro() -> void:
+	show_intro = false
+	queue_refresh()
+
+
+# ---- quests
+
+## Tap an adventurer in the picker: add or remove them from the draft party.
 func toggle_draft(c: GuildCharacter) -> void:
 	var n := slot_count(current_entry())
 	if draft.has(c):
@@ -185,7 +264,8 @@ func toggle_draft(c: GuildCharacter) -> void:
 	queue_refresh()
 
 
-## A character can only be on one quest (CharacterSlot.assign).
+## Send the draft party. A character can only be on one quest
+## (CharacterSlot.assign), so they leave any other party first.
 func send_party() -> void:
 	var entry := current_entry()
 	if draft.is_empty() or entry.is_empty():
@@ -198,8 +278,8 @@ func send_party() -> void:
 			e.state = "open"
 	entry.party = draft.duplicate()
 	entry.state = "ready"
-	toast("Party set for %s" % entry.quest.questTitle)
-	_advance()
+	toast(TOAST_PARTY_SET % entry.quest.questTitle)
+	advance()
 
 
 func deny_quest() -> void:
@@ -208,8 +288,8 @@ func deny_quest() -> void:
 		return
 	entry.party = []
 	entry.state = "denied"
-	toast("Denied: %s" % entry.quest.questTitle)
-	_advance()
+	toast(TOAST_DENIED % entry.quest.questTitle)
+	advance()
 
 
 ## Undo a decision so the quest can be decided again.
@@ -221,36 +301,45 @@ func reopen_quest() -> void:
 	queue_refresh()
 
 
+# ---- guild
+
 func hire(character: GuildCharacter) -> void:
 	if CharacterContainer.add_character_to_guild(character):
-		toast("%s joined the guild!" % character.name)
+		toast(TOAST_HIRED % character.name)
 	queue_refresh()
 
 
 func upgrade(building: int) -> void:
 	if GuildUpgrades.try_upgrade(building):
-		toast("%s upgraded to level %d!" % [GuildUpgrades.get_building_name(building), GuildUpgrades.get_level(building)])
+		toast(TOAST_UPGRADED % [GuildUpgrades.get_building_name(building), GuildUpgrades.get_level(building)])
 	queue_refresh()
 
 
-## Mirrors DayBar.end_day: run every quest that has a party, pay out, show the summary.
+# ---- end of day
+
+## Mirrors DayBar.end_day: run every quest that has a party, pay out, show the report.
 func end_day() -> void:
 	if outstanding() > 0:
 		go_step("quests")
 		return
 	var results := []
 	for e in ready_entries():
-		var typed_party: Array[GuildCharacter] = []
-		typed_party.assign(e.party)
-		var chance: float = DayBarLogic._get_success_chance(e.quest, typed_party)
-		var story: String = e.quest.generateResults(typed_party, chance)
-		var succeeded: bool = DayBarLogic._did_succeed(story)
-		var gold: int = DayBarLogic._get_gold_earned(e.quest, succeeded)
-		GameState.add_gold(gold)
-		results.append({"quest": e.quest, "party": e.party.duplicate(), "story": story, "succeeded": succeeded, "chance": chance, "gold": gold})
+		results.append(_run_quest(e))
 	sheet = {}
 	report = {"live": true, "day": GameState.day, "results": results}
 	queue_refresh()
+
+
+## Play out one quest with DayBar's helpers and pay its gold.
+func _run_quest(e: Dictionary) -> Dictionary:
+	var party: Array[GuildCharacter] = []
+	party.assign(e.party)
+	var chance: float = DayBarLogic._get_success_chance(e.quest, party)
+	var story: String = e.quest.generateResults(party, chance)
+	var succeeded: bool = DayBarLogic._did_succeed(story)
+	var gold: int = DayBarLogic._get_gold_earned(e.quest, succeeded)
+	GameState.add_gold(gold)
+	return {"quest": e.quest, "party": e.party.duplicate(), "story": story, "succeeded": succeeded, "chance": chance, "gold": gold}
 
 
 ## DaySummary's "New Day" button.
@@ -259,13 +348,11 @@ func start_new_day() -> void:
 	last_report.live = false
 	report = {}
 	GameState.start_new_day()
-	if GameState.day == MILESTONE_DAY:
-		toast("Day %d. The Bone Drake is attacking!" % GameState.day)
-	else:
-		toast("Day %d begins" % GameState.day)
+	toast((TOAST_MILESTONE_DAY if GameState.day == MILESTONE_DAY else TOAST_NEW_DAY) % GameState.day)
 	queue_refresh()
 
 
+## The report's button: starts the next day after End Day, otherwise just closes.
 func close_report() -> void:
 	if report.get("live", false):
 		start_new_day()
@@ -282,61 +369,75 @@ func open_last_report() -> void:
 	queue_refresh()
 
 
-func open_guild(seg: String = "roster") -> void:
-	sheet = {"kind": "guild", "seg": seg}
-	queue_refresh()
+# ============================================================ REFRESH
 
-
-func open_character(c: GuildCharacter) -> void:
-	sheet = {"kind": "character", "character": c, "back": sheet.duplicate()}
-	queue_refresh()
-
-
-func close_sheet() -> void:
-	sheet = sheet.get("back", {}) if sheet.get("kind", "") == "character" else {}
-	queue_refresh()
-
-
-func close_intro() -> void:
-	show_intro = false
-	queue_refresh()
-
-
-# ================================================================ refresh
-
+## Ask for a refresh at the end of this frame (many changes = one refresh).
 func queue_refresh() -> void:
-	if _dirty:
+	if _refresh_queued:
 		return
-	_dirty = true
+	_refresh_queued = true
 	refresh.call_deferred()
 
 
 func refresh() -> void:
-	_dirty = false
-	_day_label.text = str(GameState.day)
-	_gold_label.text = str(GameState.gold)
-	_standing_label.text = str(GameState.standing)
+	_refresh_queued = false
+	_refresh_header()
 	_refresh_steps_bar()
+	_refresh_step()
+	_refresh_sheets()
+	_refresh_overlays()
 
+
+func _refresh_header() -> void:
+	_day_value.text = str(GameState.day)
+	_gold_value.text = str(GameState.gold)
+	_standing_value.text = str(GameState.standing)
+
+
+## Step buttons: current step highlighted, finished steps in green.
+func _refresh_steps_bar() -> void:
+	var out := outstanding()
+	var done := {
+		"hire": not can_hire_anyone() or not CharacterContainer.active_characters.is_empty(),
+		"quests": out == 0,
+		"end": false,
+	}
+	for s in _step_buttons:
+		var b: Button = _step_buttons[s]
+		b.text = STEP_LABELS[s] + (STEP_QUESTS_LEFT % out if s == "quests" and out > 0 else "")
+		if s == step:
+			S.style_button_active(b)
+		else:
+			S.style_button(b)
+			if done[s]:
+				S.color(b, S.GOOD)
+
+
+func _refresh_step() -> void:
 	for s in _steps:
 		_steps[s].visible = s == step
 	_steps[step].refresh()
+	# back to the top only when the screen changes, not on every tap
 	var view := "%s:%d:%d" % [step, quest_index, GameState.day]
 	if view != _last_view:
 		_last_view = view
 		_steps[step].scroll_to_top()
 
+
+func _refresh_sheets() -> void:
 	var kind: String = sheet.get("kind", "")
 	_sheet_guild.visible = kind == "guild"
 	_sheet_character.visible = kind == "character"
 	_sheet_layer.mouse_filter = MOUSE_FILTER_IGNORE if kind == "" else MOUSE_FILTER_STOP
-	# sheets cover the step but leave its footer in reach
+	# sheets cover the step but leave its footer buttons in reach
 	_sheet_layer.offset_bottom = -_steps[step].footer_height()
-	if kind == "guild":
+	if _sheet_guild.visible:
 		_sheet_guild.refresh()
-	elif kind == "character":
+	if _sheet_character.visible:
 		_sheet_character.refresh()
 
+
+func _refresh_overlays() -> void:
 	_report.visible = not report.is_empty()
 	_intro.visible = report.is_empty() and show_intro
 	_overlay.mouse_filter = MOUSE_FILTER_STOP if _report.visible or _intro.visible else MOUSE_FILTER_IGNORE
@@ -344,28 +445,9 @@ func refresh() -> void:
 		_report.refresh()
 
 
-func _refresh_steps_bar() -> void:
-	var out := outstanding()
-	for s in _step_buttons:
-		var b: Button = _step_buttons[s]
-		var done := false
-		match s:
-			"hire":
-				b.text = "1. Hire"
-				done = not can_hire_anyone() or CharacterContainer.active_characters.size() > 0
-			"quests":
-				b.text = "2. Quests" + (" (%d left)" % out if out > 0 else "")
-				done = out == 0
-			"end":
-				b.text = "3. End Day"
-		if s == step:
-			S.style_button_active(b)
-		else:
-			S.style_button(b)
-			if done:
-				b.add_theme_color_override("font_color", S.GOOD)
+# ============================================================ TOAST
 
-
+## Short message above the footer that fades out.
 func toast(text: String) -> void:
 	_toast_label.text = text
 	_toast.offset_bottom = -12 - _steps[step].footer_height()
@@ -375,6 +457,6 @@ func toast(text: String) -> void:
 	if _toast_tween:
 		_toast_tween.kill()
 	_toast_tween = create_tween()
-	_toast_tween.tween_interval(2.0)
+	_toast_tween.tween_interval(TOAST_SECONDS)
 	_toast_tween.tween_property(_toast, "modulate:a", 0.0, 0.4)
 	_toast_tween.tween_callback(_toast.hide)

@@ -1,13 +1,18 @@
-## First-launch card explaining the three steps of each day. All content is in
-## overlay_intro.tscn; this only wires the Start button.
+## First-launch card explaining the three steps of each day.
+## Scene: MobileFlow/Scenes/Overlays/overlay_intro.tscn
+## All the wording is in the scene; this only wires the Start button.
 extends ColorRect
 
-var ui
+const Main := preload("res://MobileFlow/Scripts/flow_main.gd")
+
+@onready var _start_button: Button = %StartButton
+
+var ui: Main
 
 
-func setup(main) -> void:
+func setup(main: Main) -> void:
 	ui = main
-	%StartButton.pressed.connect(func(): ui.close_intro())
+	_start_button.pressed.connect(func(): ui.close_intro())
 
 
 func refresh() -> void:

@@ -1,21 +1,27 @@
-## Upgrades bottom sheet (Scenes/Sheets/sheet_upgrades.tscn).
+## Upgrades bottom sheet: one row per building.
+## Scene: MobileDeck/Scenes/Sheets/sheet_upgrades.tscn
 extends ColorRect
 
 const S := preload("res://MobileDeck/Scripts/deck_style.gd")
+const Main := preload("res://MobileDeck/Scripts/deck_main.gd")
 const UpgradeRow := preload("res://MobileDeck/Scenes/Rows/upgrade_row.tscn")
 
-var ui
+const TEXT_WALLET := "%d gold  ·  Standing %d"
+
+@onready var _close_button: Button = %CloseButton
+@onready var _wallet: Label = %Wallet
+@onready var _upgrade_list: Container = %UpgradeList
+
+var ui: Main
 
 
-func setup(main) -> void:
+func setup(main: Main) -> void:
 	ui = main
-	%CloseButton.pressed.connect(func(): ui.close_sheet())
+	_close_button.pressed.connect(func(): ui.close_sheet())
 
 
 func refresh() -> void:
-	%Wallet.text = "%d gold  ·  Standing %d" % [GameState.gold, GameState.standing]
-	var order: Array = GuildUpgrades.Building.values()
-	order.sort_custom(func(a, b): return GuildUpgrades.is_implemented(a) and not GuildUpgrades.is_implemented(b))
-	S.clear(%UpgradeList)
-	for b in order:
-		S.add_row(%UpgradeList, UpgradeRow).setup(ui, b)
+	_wallet.text = TEXT_WALLET % [GameState.gold, GameState.standing]
+	S.clear(_upgrade_list)
+	for b in S.buildings_in_order():
+		S.add_row(_upgrade_list, UpgradeRow).setup(ui, b)

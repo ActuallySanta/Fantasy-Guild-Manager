@@ -1,8 +1,14 @@
-## A chosen adventurer in the Mission Charter's party slots. Tap to remove.
+## A chosen adventurer in the Mission Charter's round slots. Tap to remove them.
+## Scene: MobileLedger/Scenes/Rows/charter_slot_filled.tscn
 extends "res://MobileLedger/Scripts/tap_area.gd"
 
+const Main := preload("res://MobileLedger/Scripts/ledger_main.gd")
 
-func setup(screen, c: GuildCharacter) -> void:
-	%Portrait.show_character(c)
-	%CharName.text = c.name
-	pressed.connect(screen.toggle.bind(c))
+@onready var _portrait = %Portrait
+@onready var _char_name: Label = %CharName
+
+
+func setup(ui: Main, c: GuildCharacter) -> void:
+	_portrait.show_character(c)
+	_char_name.text = c.name
+	pressed.connect(ui.toggle_charter_pick.bind(c))

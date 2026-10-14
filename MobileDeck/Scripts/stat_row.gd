@@ -1,40 +1,43 @@
 ## Row of coloured stat chips for a character ("Str 5", "Def 7", ...).
-## The five chips are in Components/stat_row.tscn; this fills in the numbers.
+## Scene: MobileDeck/Scenes/Components/stat_row.tscn (five chips: Stat0..Stat4,
+## in deck_style.gd STATS order). Set font_size / show_pluck per instance.
 @tool
 extends HFlowContainer
 
 const S := preload("res://MobileDeck/Scripts/deck_style.gd")
 
+const TEXT_STAT := "%s %d"
+
 @export var font_size := 20:
 	set(v):
 		font_size = v
-		if is_node_ready():
-			_apply_size()
-
-
-## Hide the fifth stat (Pluck), e.g. where only the four quest stats matter.
+		_apply()
+## Hide Pluck (the fifth stat), e.g. where only the four quest stats matter.
 @export var show_pluck := true:
 	set(v):
 		show_pluck = v
-		if is_node_ready():
-			_apply_size()
+		_apply()
 
 
 func _ready() -> void:
-	_apply_size()
+	_apply()
 
 
-func _apply_size() -> void:
+func _apply() -> void:
+	if not is_node_ready():
+		return
 	for i in 5:
-		get_node("Stat%d" % i).font_size = font_size
-	get_node("Stat4").visible = show_pluck
+		_chip(i).font_size = font_size
+	_chip(4).visible = show_pluck
 
 
-## `fav` (0-4) gets a heavier outline; `with_pluck` shows the fifth stat.
+## `fav` (0-4) gets a heavier outline; `with_pluck` = false hides Pluck too.
 func show_stats(c: GuildCharacter, fav: int = -1, with_pluck: bool = true) -> void:
 	for i in 5:
-		var chip := get_node("Stat%d" % i)
-		chip.visible = i < 4 or (with_pluck and show_pluck)
 		var st: Dictionary = S.STATS[i]
-		var val: int = c.pluck if i == 4 else int(c.stats[i])
-		chip.set_icon_chip("", "%s %d" % [st.short, val], st.bg, st.color, -1, i == fav)
+		_chip(i).visible = i < 4 or (with_pluck and show_pluck)
+		_chip(i).set_icon_chip("", TEXT_STAT % [st.short, S.stat_value(c, i)], st.bg, st.color, -1, i == fav)
+
+
+func _chip(i: int) -> Node:
+	return get_node("Stat%d" % i)

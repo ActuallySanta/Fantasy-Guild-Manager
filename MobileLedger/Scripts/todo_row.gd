@@ -1,37 +1,46 @@
-## One line of the Home tab's "Today's Ledger" checklist (Scenes/Rows/todo_row.tscn).
-## Tile colour and icon are exports so each row previews in the editor.
+## One line of the Home tab's "Today's Ledger" checklist. Tap to go there.
+## Scene: MobileLedger/Scenes/Rows/todo_row.tscn
+## Icon and tile colour are exports, set on each of the four rows in page_home.tscn.
 @tool
 extends "res://MobileLedger/Scripts/tap_area.gd"
 
 const S := preload("res://MobileLedger/Scripts/ledger_style.gd")
 
+## An icon name from MobileLedger/Art/Icons.
 @export var icon_name := "nav_quests":
 	set(v):
 		icon_name = v
-		if is_node_ready():
-			_apply()
+		_apply_tile()
 @export var tile_color := Color("#F2D5CB"):
 	set(v):
 		tile_color = v
-		if is_node_ready():
-			_apply()
+		_apply_tile()
+
+@onready var _tile: PanelContainer = %Tile
+@onready var _icon: TextureRect = %Icon
+@onready var _title: Label = %TodoTitle
+@onready var _sub: Label = %TodoSub
+@onready var _status = %Status
 
 
 func _ready() -> void:
-	_apply()
+	_apply_tile()
 	if not Engine.is_editor_hint():
 		super()
 
 
-func _apply() -> void:
-	%Icon.texture = S.icon_tex(icon_name)
-	%Tile.add_theme_stylebox_override("panel", S.flat(tile_color, 16, 3, S.INK, Vector4(12, 12, 12, 12)))
-
-
-## chip_info = one of S.INJURY ([label, bg, fg]); only its colours are used.
-func show_todo(title: String, sub: String, chip_text: String, chip_info: Array) -> void:
-	%TodoTitle.text = title
-	%TodoSub.text = sub
-	%Status.visible = chip_text != ""
+## chip_colors: one of ledger_style.gd INJURY rows ([label, bg, fg]); only the
+## colours are used. Empty chip_text hides the chip.
+func show_todo(title: String, sub: String, chip_text: String, chip_colors: Array) -> void:
+	_title.text = title
+	_sub.text = sub
+	_status.visible = chip_text != ""
 	if chip_text != "":
-		%Status.set_chip(chip_text, chip_info[1], chip_info[2])
+		_status.set_chip(chip_text, chip_colors[1], chip_colors[2])
+
+
+func _apply_tile() -> void:
+	if not is_node_ready():
+		return
+	_icon.texture = S.icon_tex(icon_name)
+	_tile.add_theme_stylebox_override("panel", S.flat(tile_color, 16, 3, S.INK, Vector4(12, 12, 12, 12)))

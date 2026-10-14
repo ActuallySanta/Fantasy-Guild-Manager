@@ -63,3 +63,27 @@ show/hide nodes and instance row scenes for lists (one row per quest, character,
 etc.). Shared boxes (panels, buttons, chips) are `.tres` files in `Styles/`, so
 changing one restyles it everywhere; chips, stat rows and gauges are `@tool`
 components with exported colours/sizes so they preview in the editor.
+
+### Editing the scripts
+
+Every script follows the same layout, so you can find things quickly:
+
+- **Header comment**: what the screen is and which `.tscn` it belongs to.
+- **TEXT**: every message the script fills in, as `TEXT_...` / `TOAST_...` constants at the top
+  (fixed headings and the intro card are typed straight into the scenes).
+  Change wording there (keep the `%d` / `%s` placeholders).
+- **NODES**: `@onready var _name = %Name` for every node the script touches. The `%Name`
+  matches a node marked "Access as Unique Name" in the scene, so renaming a node in the
+  editor means renaming it here too.
+- **setup(main)**: connects the buttons. **refresh()**: fills everything in from game state,
+  split into small `_show_...()` functions, one per part of the screen.
+
+Where to look:
+
+- `Scripts/deck_main.gd`: all state and game actions (hire, send, deny, end day...), with
+  SETTINGS (quests per day, milestone day, timings) at the top. Screens never change game
+  state themselves; they call these actions.
+- `Scripts/deck_style.gd`: colours, stat / injury / odds tables, small text helpers
+  (plurals, name lists), and the restyles that change at runtime.
+- Row and component scripts (`chip`, `portrait`, rows): one `setup()` each.
+

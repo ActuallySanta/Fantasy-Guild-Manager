@@ -1,5 +1,6 @@
-## Back button + small banner title, shared by the full-screen pages
-## (Scenes/Components/top_bar.tscn).
+## Back button + small banner title, shared by the full-screen pages.
+## Scene: MobileLedger/Scenes/Components/top_bar.tscn
+## Set `title` on each instance; listen to back_pressed.
 @tool
 extends MarginContainer
 
@@ -9,10 +10,13 @@ signal back_pressed
 	set(v):
 		title = v
 		if is_node_ready():
-			%Title.text = v
+			_title.text = v
+
+@onready var _title: Label = %Title
+@onready var _back_button: Button = %BackButton
 
 
 func _ready() -> void:
-	%Title.text = title
+	_title.text = title
 	if not Engine.is_editor_hint():
-		%BackButton.pressed.connect(back_pressed.emit)
+		_back_button.pressed.connect(back_pressed.emit)
