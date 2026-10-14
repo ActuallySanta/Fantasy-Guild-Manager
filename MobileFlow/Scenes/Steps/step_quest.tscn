@@ -1,0 +1,440 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileFlow/flow_theme.tres" id="1_ogk1h"]
+[ext_resource type="Script" path="res://MobileFlow/Scripts/step_quest.gd" id="2_ok7k1"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/box_panel.tres" id="3_gku5o"]
+[ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Components/chip.tscn" id="4_wvb2g"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/decision_good.tres" id="5_xmw8x"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/box_inset.tres" id="6_pkfx1"]
+[ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Rows/slot_empty.tscn" id="7_ypm7k"]
+[ext_resource type="Script" path="res://MobileFlow/Scripts/gauge.gd" id="8_qxoef"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_blue_normal.tres" id="9_3lmr8"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_blue_pressed.tres" id="10_6stsj"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_blue_hover.tres" id="11_jo7dk"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_disabled.tres" id="12_vf5mk"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/empty.tres" id="13_s8oc5"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_green_normal.tres" id="14_41bgj"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_green_pressed.tres" id="15_lntgi"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_green_hover.tres" id="16_mkq4q"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_grey_normal.tres" id="17_0fa7d"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_grey_pressed.tres" id="18_vsc7v"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_grey_hover.tres" id="19_fws00"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_red_normal.tres" id="20_7tqjt"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_red_pressed.tres" id="21_bxrrk"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_red_hover.tres" id="22_e8534"]
+
+[node name="StepQuest" type="VBoxContainer" unique_id=2120464959]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_ogk1h")
+theme_override_constants/separation = 0
+script = ExtResource("2_ok7k1")
+
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=1375022796]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Scroll" unique_id=2142407956]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 24
+
+[node name="Content" type="VBoxContainer" parent="Scroll/Margin" unique_id=651871813]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="NoQuests" type="VBoxContainer" parent="Scroll/Margin/Content" unique_id=1918995110]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="Scroll/Margin/Content/NoQuests" unique_id=2042096139]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "No quests today"
+
+[node name="QuestNav" type="HBoxContainer" parent="Scroll/Margin/Content" unique_id=1900965865]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="QuestOf" type="Label" parent="Scroll/Margin/Content/QuestNav" unique_id=688793919]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "Quest 1 of 5"
+
+[node name="Spacer" type="Control" parent="Scroll/Margin/Content/QuestNav" unique_id=79692630]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Dots" type="HBoxContainer" parent="Scroll/Margin/Content/QuestNav" unique_id=723233668]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="QuestCard" type="PanelContainer" parent="Scroll/Margin/Content" unique_id=920653666]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_gku5o")
+
+[node name="Column" type="VBoxContainer" parent="Scroll/Margin/Content/QuestCard" unique_id=1691473870]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="QuestTitle" type="Label" parent="Scroll/Margin/Content/QuestCard/Column" unique_id=814789933]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "Gather information on a possible Necromancer"
+autowrap_mode = 3
+
+[node name="Chips" type="HFlowContainer" parent="Scroll/Margin/Content/QuestCard/Column" unique_id=840995911]
+layout_mode = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+
+[node name="TypeChip" parent="Scroll/Margin/Content/QuestCard/Column/Chips" unique_id=542229946 instance=ExtResource("4_wvb2g")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Gather Intel, Rank F"
+
+[node name="GoldChip" parent="Scroll/Margin/Content/QuestCard/Column/Chips" unique_id=280174253 instance=ExtResource("4_wvb2g")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "200 gold"
+icon_name = "coins"
+bg = Color(1, 0.9529412, 0.76862746, 1)
+fg = Color(0.6039216, 0.45490196, 0, 1)
+icon_style = true
+
+[node name="PartyChip" parent="Scroll/Margin/Content/QuestCard/Column/Chips" unique_id=1382837784 instance=ExtResource("4_wvb2g")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Party of up to 2"
+
+[node name="Favored" type="HBoxContainer" parent="Scroll/Margin/Content/QuestCard/Column" unique_id=873491653]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Caption" type="Label" parent="Scroll/Margin/Content/QuestCard/Column/Favored" unique_id=1122983126]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Favored stat:"
+
+[node name="FavChip" parent="Scroll/Margin/Content/QuestCard/Column/Favored" unique_id=856891834 instance=ExtResource("4_wvb2g")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Sleaziness"
+bg = Color(0.9098039, 0.9607843, 0.9137255, 1)
+fg = Color(0.18039216, 0.49019608, 0.19607843, 1)
+font_size = 22
+icon_style = true
+outlined = true
+
+[node name="FavNote" type="Label" parent="Scroll/Margin/Content/QuestCard/Column/Favored" unique_id=1092988400]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 20
+text = "(counts twice)"
+
+[node name="MilestoneNote" type="Label" parent="Scroll/Margin/Content/QuestCard/Column" unique_id=695311567]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.7764706, 0.15686275, 0.15686275, 1)
+theme_override_font_sizes/font_size = 22
+text = "The Bone Drake is attacking. This is today's only quest."
+autowrap_mode = 3
+
+[node name="DecisionPanel" type="PanelContainer" parent="Scroll/Margin/Content" unique_id=621818895]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_styles/panel = ExtResource("5_xmw8x")
+
+[node name="DecisionText" type="Label" parent="Scroll/Margin/Content/DecisionPanel" unique_id=1933080211]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.18039216, 0.49019608, 0.19607843, 1)
+theme_override_font_sizes/font_size = 22
+text = "Party set: Alex. They leave when the day ends."
+autowrap_mode = 3
+
+[node name="OddsPanel" type="PanelContainer" parent="Scroll/Margin/Content" unique_id=1319080272]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("6_pkfx1")
+
+[node name="Row" type="HBoxContainer" parent="Scroll/Margin/Content/OddsPanel" unique_id=1035210658]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Slots" type="HBoxContainer" parent="Scroll/Margin/Content/OddsPanel/Row" unique_id=701089771]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Sample1" parent="Scroll/Margin/Content/OddsPanel/Row/Slots" unique_id=1490454078 instance=ExtResource("7_ypm7k")]
+layout_mode = 2
+
+[node name="Sample2" parent="Scroll/Margin/Content/OddsPanel/Row/Slots" unique_id=1139985245 instance=ExtResource("7_ypm7k")]
+layout_mode = 2
+
+[node name="Chance" type="VBoxContainer" parent="Scroll/Margin/Content/OddsPanel/Row" unique_id=583822815]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Caption" type="Label" parent="Scroll/Margin/Content/OddsPanel/Row/Chance" unique_id=450068066]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 20
+text = "Chance of success"
+
+[node name="Row" type="HBoxContainer" parent="Scroll/Margin/Content/OddsPanel/Row/Chance" unique_id=1583077813]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ChancePercent" type="Label" parent="Scroll/Margin/Content/OddsPanel/Row/Chance/Row" unique_id=16742247]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 34
+text = "--"
+
+[node name="ChanceWord" type="Label" parent="Scroll/Margin/Content/OddsPanel/Row/Chance/Row" unique_id=1529728470]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "Chance unknown"
+
+[node name="ChanceGauge" type="Control" parent="Scroll/Margin/Content/OddsPanel/Row/Chance" unique_id=1410300540]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 20)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+script = ExtResource("8_qxoef")
+
+[node name="NoRoster" type="PanelContainer" parent="Scroll/Margin/Content" unique_id=1338257158]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_styles/panel = ExtResource("6_pkfx1")
+
+[node name="Column" type="VBoxContainer" parent="Scroll/Margin/Content/NoRoster" unique_id=2109686518]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Text" type="Label" parent="Scroll/Margin/Content/NoRoster/Column" unique_id=483540576]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "You have nobody to send. Hire adventurers first (it's free)."
+autowrap_mode = 3
+
+[node name="GoHireButton" type="Button" parent="Scroll/Margin/Content/NoRoster/Column" unique_id=1950218934]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = ExtResource("9_3lmr8")
+theme_override_styles/pressed = ExtResource("10_6stsj")
+theme_override_styles/hover = ExtResource("11_jo7dk")
+theme_override_styles/hover_pressed = ExtResource("10_6stsj")
+theme_override_styles/disabled = ExtResource("12_vf5mk")
+theme_override_styles/focus = ExtResource("13_s8oc5")
+text = "Go to Hire"
+
+[node name="PickHeading" type="VBoxContainer" parent="Scroll/Margin/Content" unique_id=183230951]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="Scroll/Margin/Content/PickHeading" unique_id=298118970]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Pick your party"
+
+[node name="PickSubtitle" type="Label" parent="Scroll/Margin/Content/PickHeading" unique_id=1702048366]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "Tap to add or remove. Best fit for this quest first."
+autowrap_mode = 3
+
+[node name="PickList" type="VBoxContainer" parent="Scroll/Margin/Content" unique_id=1097712946]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Footer" type="PanelContainer" parent="." unique_id=271922557]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("6_pkfx1")
+
+[node name="Column" type="VBoxContainer" parent="Footer" unique_id=1919768163]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="ToEndButton" type="Button" parent="Footer/Column" unique_id=729043717]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = ExtResource("14_41bgj")
+theme_override_styles/pressed = ExtResource("15_lntgi")
+theme_override_styles/hover = ExtResource("16_mkq4q")
+theme_override_styles/hover_pressed = ExtResource("15_lntgi")
+theme_override_styles/disabled = ExtResource("12_vf5mk")
+theme_override_styles/focus = ExtResource("13_s8oc5")
+text = "Next: End Day  >"
+
+[node name="DecidedButtons" type="HBoxContainer" parent="Footer/Column" unique_id=618909752]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ChangeButton" type="Button" parent="Footer/Column/DecidedButtons" unique_id=2078564732]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = ExtResource("17_0fa7d")
+theme_override_styles/pressed = ExtResource("18_vsc7v")
+theme_override_styles/hover = ExtResource("19_fws00")
+theme_override_styles/hover_pressed = ExtResource("18_vsc7v")
+theme_override_styles/disabled = ExtResource("12_vf5mk")
+theme_override_styles/focus = ExtResource("13_s8oc5")
+text = "Change decision"
+
+[node name="NextButton" type="Button" parent="Footer/Column/DecidedButtons" unique_id=1803094860]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = ExtResource("9_3lmr8")
+theme_override_styles/pressed = ExtResource("10_6stsj")
+theme_override_styles/hover = ExtResource("11_jo7dk")
+theme_override_styles/hover_pressed = ExtResource("10_6stsj")
+theme_override_styles/disabled = ExtResource("12_vf5mk")
+theme_override_styles/focus = ExtResource("13_s8oc5")
+text = "Next  >"
+
+[node name="OpenButtons" type="HBoxContainer" parent="Footer/Column" unique_id=698984952]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="DenyButton" type="Button" parent="Footer/Column/OpenButtons" unique_id=1083117869]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = ExtResource("20_7tqjt")
+theme_override_styles/pressed = ExtResource("21_bxrrk")
+theme_override_styles/hover = ExtResource("22_e8534")
+theme_override_styles/hover_pressed = ExtResource("21_bxrrk")
+theme_override_styles/disabled = ExtResource("12_vf5mk")
+theme_override_styles/focus = ExtResource("13_s8oc5")
+text = "Deny"
+
+[node name="SendButton" type="Button" parent="Footer/Column/OpenButtons" unique_id=772968121]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.6
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = ExtResource("17_0fa7d")
+theme_override_styles/pressed = ExtResource("18_vsc7v")
+theme_override_styles/hover = ExtResource("19_fws00")
+theme_override_styles/hover_pressed = ExtResource("18_vsc7v")
+theme_override_styles/disabled = ExtResource("12_vf5mk")
+theme_override_styles/focus = ExtResource("13_s8oc5")
+disabled = true
+text = "Pick a party first"

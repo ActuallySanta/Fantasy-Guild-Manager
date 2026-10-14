@@ -1,0 +1,95 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_3h75k"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/empty.tres" id="2_qsdqn"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/roster_card.gd" id="3_ya47p"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_card_parchment_3.tres" id="4_prirl"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/portrait.tscn" id="5_8juvq"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="6_kffg3"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="7_5ynx0"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/chip.tscn" id="8_73s51"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/stat_grid.tscn" id="9_vhphv"]
+
+[node name="RosterCard" type="Button" unique_id=1521210332]
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme = ExtResource("1_3h75k")
+theme_override_styles/normal = ExtResource("2_qsdqn")
+theme_override_styles/pressed = ExtResource("2_qsdqn")
+theme_override_styles/hover = ExtResource("2_qsdqn")
+theme_override_styles/hover_pressed = ExtResource("2_qsdqn")
+theme_override_styles/disabled = ExtResource("2_qsdqn")
+theme_override_styles/focus = ExtResource("2_qsdqn")
+flat = true
+script = ExtResource("3_ya47p")
+
+[node name="Card" type="PanelContainer" parent="." unique_id=1465770265]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("4_prirl")
+
+[node name="Column" type="VBoxContainer" parent="Card" unique_id=1728877043]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="Head" type="HBoxContainer" parent="Card/Column" unique_id=1518700606]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 16
+
+[node name="Portrait" parent="Card/Column/Head" unique_id=1315844981 instance=ExtResource("5_8juvq")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+
+[node name="Info" type="VBoxContainer" parent="Card/Column/Head" unique_id=518168533]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="CharName" type="Label" parent="Card/Column/Head/Info" unique_id=1931786064]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_kffg3")
+theme_override_font_sizes/font_size = 34
+text = "Alex"
+
+[node name="Role" type="Label" parent="Card/Column/Head/Info" unique_id=890656123]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_font_sizes/font_size = 26
+text = "the Pathfinder"
+
+[node name="Questing" type="Label" parent="Card/Column/Head/Info" unique_id=698871322]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.18431373, 0.37254903, 0.5411765, 1)
+theme_override_fonts/font = ExtResource("7_5ynx0")
+theme_override_font_sizes/font_size = 22
+text = "Questing: Raid the Temple of Time"
+text_overrun_behavior = 3
+
+[node name="Injury" parent="Card/Column/Head" unique_id=476167600 instance=ExtResource("8_73s51")]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+text = "Healthy"
+bg = Color(0.8509804, 0.9098039, 0.8117647, 1)
+fg = Color(0.18431373, 0.3529412, 0.15294118, 1)
+
+[node name="Stats" parent="Card/Column" unique_id=1630959181 instance=ExtResource("9_vhphv")]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2

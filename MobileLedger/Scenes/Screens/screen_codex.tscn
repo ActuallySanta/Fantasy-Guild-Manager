@@ -1,0 +1,648 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_ryxcf"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/page_bg.png" id="2_jsw4g"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/screen_codex.gd" id="3_hxor7"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/top_bar.tscn" id="4_7nx58"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/flat_c4d8a8_r101.tres" id="5_ouu6u"]
+[ext_resource type="Texture2D" path="res://Sprites/Character Icons/pathfinder_icon.png" id="6_0eehm"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/frame_oval.png" id="7_0peun"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_black.tres" id="8_um7fg"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="9_i46e0"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/flat_d9e8cf_border_2a5123_w3_r4.tres" id="10_5pb1b"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="11_wb333"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_card_parchment_13.tres" id="12_h1mbb"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/empty.tres" id="13_weuir"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/tap_area.gd" id="14_all3i"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/wisdom.svg" id="15_4p3e8"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/chev_up.svg" id="16_a66af"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/flourish_l.png" id="17_x6etg"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/flourish_r.png" id="18_q6c5s"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_card_parchment_14.tres" id="19_tky0h"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/strength.svg" id="20_vio5c"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/defense.svg" id="21_ffnlw"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/sleaziness.svg" id="22_savyx"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/pluck.svg" id="23_dgubv"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_inset_parchment_5.tres" id="24_416wl"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green.tres" id="25_plr67"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green_down.tres" id="26_7mxpq"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_disabled.tres" id="27_ymt4u"]
+
+[node name="ScreenCodex" type="TextureRect" unique_id=1011074139]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("1_ryxcf")
+texture = ExtResource("2_jsw4g")
+expand_mode = 1
+script = ExtResource("3_hxor7")
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=1822869160]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TopBar" parent="Column" unique_id=1991745689 instance=ExtResource("4_7nx58")]
+unique_name_in_owner = true
+layout_mode = 2
+title = "Adventurer Codex"
+
+[node name="PageScroll" type="ScrollContainer" parent="Column" unique_id=1741728445]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Column/PageScroll" unique_id=326572608]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 30
+
+[node name="Content" type="VBoxContainer" parent="Column/PageScroll/Margin" unique_id=181869251]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 24
+
+[node name="Head" type="HBoxContainer" parent="Column/PageScroll/Margin/Content" unique_id=897260433]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Frame" type="Control" parent="Column/PageScroll/Margin/Content/Head" unique_id=306854898]
+custom_minimum_size = Vector2(270, 324)
+layout_mode = 2
+
+[node name="Oval" type="Panel" parent="Column/PageScroll/Margin/Content/Head/Frame" unique_id=256343013]
+unique_name_in_owner = true
+clip_children = 2
+layout_mode = 0
+offset_left = 34.0
+offset_top = 40.0
+offset_right = 236.0
+offset_bottom = 296.0
+theme_override_styles/panel = ExtResource("5_ouu6u")
+
+[node name="Art" type="TextureRect" parent="Column/PageScroll/Margin/Content/Head/Frame/Oval" unique_id=80700368]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("6_0eehm")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Ring" type="TextureRect" parent="Column/PageScroll/Margin/Content/Head/Frame" unique_id=955587799]
+custom_minimum_size = Vector2(270, 324)
+layout_mode = 0
+offset_right = 270.0
+offset_bottom = 324.0
+mouse_filter = 2
+texture = ExtResource("7_0peun")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Info" type="VBoxContainer" parent="Column/PageScroll/Margin/Content/Head" unique_id=534680993]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+
+[node name="CharName" type="Label" parent="Column/PageScroll/Margin/Content/Head/Info" unique_id=668524001]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("8_um7fg")
+theme_override_font_sizes/font_size = 56
+text = "Alex"
+autowrap_mode = 3
+
+[node name="Role" type="Label" parent="Column/PageScroll/Margin/Content/Head/Info" unique_id=153082270]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_fonts/font = ExtResource("9_i46e0")
+theme_override_font_sizes/font_size = 30
+text = "the Pathfinder"
+
+[node name="Ribbon" type="PanelContainer" parent="Column/PageScroll/Margin/Content/Head/Info" unique_id=1419817579]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_styles/panel = ExtResource("10_5pb1b")
+
+[node name="RibbonText" type="Label" parent="Column/PageScroll/Margin/Content/Head/Info/Ribbon" unique_id=1612753144]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18431373, 0.3529412, 0.15294118, 1)
+theme_override_fonts/font = ExtResource("9_i46e0")
+theme_override_font_sizes/font_size = 30
+text = "Healthy"
+horizontal_alignment = 1
+
+[node name="InjuryCount" type="Label" parent="Column/PageScroll/Margin/Content/Head/Info" unique_id=1771204849]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_font_sizes/font_size = 24
+text = "No injuries yet"
+
+[node name="Questing" type="Label" parent="Column/PageScroll/Margin/Content/Head/Info" unique_id=1978589481]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.18431373, 0.37254903, 0.5411765, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 23
+text = "Questing: Raid the Temple of Time"
+autowrap_mode = 3
+
+[node name="Story" type="PanelContainer" parent="Column/PageScroll/Margin/Content" unique_id=787121419]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("12_h1mbb")
+
+[node name="Column" type="VBoxContainer" parent="Column/PageScroll/Margin/Content/Story" unique_id=1287335624]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StoryToggle" type="Button" parent="Column/PageScroll/Margin/Content/Story/Column" unique_id=2094808242]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_styles/normal = ExtResource("13_weuir")
+theme_override_styles/pressed = ExtResource("13_weuir")
+theme_override_styles/hover = ExtResource("13_weuir")
+theme_override_styles/hover_pressed = ExtResource("13_weuir")
+theme_override_styles/disabled = ExtResource("13_weuir")
+theme_override_styles/focus = ExtResource("13_weuir")
+flat = true
+script = ExtResource("14_all3i")
+min_height = 64.0
+
+[node name="Row" type="HBoxContainer" parent="Column/PageScroll/Margin/Content/Story/Column/StoryToggle" unique_id=1015191606]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="Icon" type="TextureRect" parent="Column/PageScroll/Margin/Content/Story/Column/StoryToggle/Row" unique_id=790135530]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("15_4p3e8")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Column/PageScroll/Margin/Content/Story/Column/StoryToggle/Row" unique_id=1114527466]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_i46e0")
+theme_override_font_sizes/font_size = 32
+text = "Backstory"
+
+[node name="Spacer" type="Control" parent="Column/PageScroll/Margin/Content/Story/Column/StoryToggle/Row" unique_id=1682693475]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="Chevron" type="TextureRect" parent="Column/PageScroll/Margin/Content/Story/Column/StoryToggle/Row" unique_id=975401267]
+unique_name_in_owner = true
+modulate = Color(0.22745098, 0.15686275, 0.08627451, 1)
+custom_minimum_size = Vector2(34, 34)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("16_a66af")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Backstory" type="Label" parent="Column/PageScroll/Margin/Content/Story/Column" unique_id=582363343]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.30588236, 0.23921569, 0.14901961, 1)
+theme_override_constants/paragraph_spacing = 10
+theme_override_font_sizes/font_size = 26
+text = "Alex grew up in the forests of [HOMETOWN].
+Alex is scared of the color yellow."
+autowrap_mode = 3
+
+[node name="StatsDivider" type="HBoxContainer" parent="Column/PageScroll/Margin/Content" unique_id=1344413987]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="FlourishL" type="TextureRect" parent="Column/PageScroll/Margin/Content/StatsDivider" unique_id=956105337]
+custom_minimum_size = Vector2(110, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("17_x6etg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Column/PageScroll/Margin/Content/StatsDivider" unique_id=836435263]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_i46e0")
+theme_override_font_sizes/font_size = 34
+text = "Stats"
+horizontal_alignment = 1
+
+[node name="FlourishR" type="TextureRect" parent="Column/PageScroll/Margin/Content/StatsDivider" unique_id=280509688]
+custom_minimum_size = Vector2(110, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("18_q6c5s")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Stats" type="PanelContainer" parent="Column/PageScroll/Margin/Content" unique_id=2066398233]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("19_tky0h")
+
+[node name="Column" type="VBoxContainer" parent="Column/PageScroll/Margin/Content/Stats" unique_id=433260784]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Stat0" type="HBoxContainer" parent="Column/PageScroll/Margin/Content/Stats/Column" unique_id=1878515718]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Icon" type="TextureRect" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat0" unique_id=767289624]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("20_vio5c")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatName" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat0" unique_id=155499397]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.6392157, 0.14901961, 0.16470589, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 30
+text = "Strength"
+
+[node name="Value" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat0" unique_id=108174761]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("8_um7fg")
+theme_override_font_sizes/font_size = 38
+text = "4"
+
+[node name="BonusBox" type="PanelContainer" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat0" unique_id=1139378215]
+custom_minimum_size = Vector2(64, 46)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = ExtResource("13_weuir")
+
+[node name="Bonus" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat0/BonusBox" unique_id=10079314]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18431373, 0.41568628, 0.13333334, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 26
+text = "+1"
+horizontal_alignment = 1
+
+[node name="None" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat0/BonusBox" unique_id=9962962]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.627451, 0.5411765, 0.4, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 26
+text = "—"
+horizontal_alignment = 1
+
+[node name="Line0" type="ColorRect" parent="Column/PageScroll/Margin/Content/Stats/Column" unique_id=1052187414]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.7882353, 0.6627451, 0.41568628, 0.9)
+
+[node name="Stat1" type="HBoxContainer" parent="Column/PageScroll/Margin/Content/Stats/Column" unique_id=1370634509]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Icon" type="TextureRect" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat1" unique_id=408816754]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("21_ffnlw")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatName" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat1" unique_id=1130068255]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.18431373, 0.37254903, 0.5411765, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 30
+text = "Defense"
+
+[node name="Value" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat1" unique_id=1927516007]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("8_um7fg")
+theme_override_font_sizes/font_size = 38
+text = "3"
+
+[node name="BonusBox" type="PanelContainer" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat1" unique_id=1888521035]
+custom_minimum_size = Vector2(64, 46)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = ExtResource("13_weuir")
+
+[node name="Bonus" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat1/BonusBox" unique_id=765696843]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18431373, 0.41568628, 0.13333334, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 26
+text = "+1"
+horizontal_alignment = 1
+
+[node name="None" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat1/BonusBox" unique_id=704432790]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.627451, 0.5411765, 0.4, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 26
+text = "—"
+horizontal_alignment = 1
+
+[node name="Line1" type="ColorRect" parent="Column/PageScroll/Margin/Content/Stats/Column" unique_id=224380709]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.7882353, 0.6627451, 0.41568628, 0.9)
+
+[node name="Stat2" type="HBoxContainer" parent="Column/PageScroll/Margin/Content/Stats/Column" unique_id=1323131958]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Icon" type="TextureRect" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat2" unique_id=519198641]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("15_4p3e8")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatName" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat2" unique_id=1714065598]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.35686275, 0.24705882, 0.54901963, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 30
+text = "Wisdom"
+
+[node name="Value" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat2" unique_id=707133481]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("8_um7fg")
+theme_override_font_sizes/font_size = 38
+text = "4"
+
+[node name="BonusBox" type="PanelContainer" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat2" unique_id=452029436]
+custom_minimum_size = Vector2(64, 46)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = ExtResource("13_weuir")
+
+[node name="Bonus" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat2/BonusBox" unique_id=1250923101]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18431373, 0.41568628, 0.13333334, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 26
+text = "+1"
+horizontal_alignment = 1
+
+[node name="None" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat2/BonusBox" unique_id=2112055648]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.627451, 0.5411765, 0.4, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 26
+text = "—"
+horizontal_alignment = 1
+
+[node name="Line2" type="ColorRect" parent="Column/PageScroll/Margin/Content/Stats/Column" unique_id=480194015]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.7882353, 0.6627451, 0.41568628, 0.9)
+
+[node name="Stat3" type="HBoxContainer" parent="Column/PageScroll/Margin/Content/Stats/Column" unique_id=984213787]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Icon" type="TextureRect" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat3" unique_id=2067482338]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("22_savyx")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatName" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat3" unique_id=1543712597]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.24313726, 0.41960785, 0.20784314, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 30
+text = "Sleaziness"
+
+[node name="Value" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat3" unique_id=1163511099]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("8_um7fg")
+theme_override_font_sizes/font_size = 38
+text = "7"
+
+[node name="BonusBox" type="PanelContainer" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat3" unique_id=14765330]
+custom_minimum_size = Vector2(64, 46)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = ExtResource("13_weuir")
+
+[node name="Bonus" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat3/BonusBox" unique_id=974885399]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18431373, 0.41568628, 0.13333334, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 26
+text = "+1"
+horizontal_alignment = 1
+
+[node name="None" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat3/BonusBox" unique_id=1480098304]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.627451, 0.5411765, 0.4, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 26
+text = "—"
+horizontal_alignment = 1
+
+[node name="Line3" type="ColorRect" parent="Column/PageScroll/Margin/Content/Stats/Column" unique_id=1244562874]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.7882353, 0.6627451, 0.41568628, 0.9)
+
+[node name="Stat4" type="HBoxContainer" parent="Column/PageScroll/Margin/Content/Stats/Column" unique_id=694875693]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 76)
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Icon" type="TextureRect" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat4" unique_id=1573960120]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("23_dgubv")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatName" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat4" unique_id=2047615151]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.5803922, 0.3137255, 0.05882353, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 30
+text = "Pluck"
+
+[node name="Value" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat4" unique_id=625065503]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("8_um7fg")
+theme_override_font_sizes/font_size = 38
+text = "0"
+
+[node name="BonusBox" type="PanelContainer" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat4" unique_id=1552094822]
+custom_minimum_size = Vector2(64, 46)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/panel = ExtResource("13_weuir")
+
+[node name="Bonus" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat4/BonusBox" unique_id=2118193907]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.18431373, 0.41568628, 0.13333334, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 26
+text = "+1"
+horizontal_alignment = 1
+
+[node name="None" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/Stat4/BonusBox" unique_id=1999589220]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.627451, 0.5411765, 0.4, 1)
+theme_override_fonts/font = ExtResource("11_wb333")
+theme_override_font_sizes/font_size = 26
+text = "—"
+horizontal_alignment = 1
+
+[node name="NoteMargin" type="MarginContainer" parent="Column/PageScroll/Margin/Content/Stats/Column" unique_id=1924010044]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="ArmoryNote" type="Label" parent="Column/PageScroll/Margin/Content/Stats/Column/NoteMargin" unique_id=1249231739]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_font_sizes/font_size = 22
+text = "Green bonuses come from the Armory (level 1) and already count toward quest odds."
+autowrap_mode = 3
+
+[node name="Footer" type="PanelContainer" parent="Column" unique_id=1328951948]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("24_416wl")
+
+[node name="Row" type="HBoxContainer" parent="Column/Footer" unique_id=1905963587]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="AssignButton" type="Button" parent="Column/Footer/Row" unique_id=880713372]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 41
+theme_override_fonts/font = ExtResource("9_i46e0")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = ExtResource("25_plr67")
+theme_override_styles/pressed = ExtResource("26_7mxpq")
+theme_override_styles/hover = ExtResource("25_plr67")
+theme_override_styles/hover_pressed = ExtResource("26_7mxpq")
+theme_override_styles/disabled = ExtResource("27_ymt4u")
+theme_override_styles/focus = ExtResource("13_weuir")
+text = "Assign to Quest"
+
+[node name="HireButton" type="Button" parent="Column/Footer/Row" unique_id=650541129]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 39
+theme_override_fonts/font = ExtResource("9_i46e0")
+theme_override_font_sizes/font_size = 30
+theme_override_styles/normal = ExtResource("25_plr67")
+theme_override_styles/pressed = ExtResource("26_7mxpq")
+theme_override_styles/hover = ExtResource("25_plr67")
+theme_override_styles/hover_pressed = ExtResource("26_7mxpq")
+theme_override_styles/disabled = ExtResource("27_ymt4u")
+theme_override_styles/focus = ExtResource("13_weuir")
+text = "Hire Alex (free)"

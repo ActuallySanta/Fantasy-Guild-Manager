@@ -1,0 +1,73 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_esl5m"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/empty.tres" id="2_5gfbe"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/charter_slot_filled.gd" id="3_p40gp"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/portrait.tscn" id="4_y3kux"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/slot_ring.png" id="5_rp5nt"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="6_8hxh2"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="7_hgxcg"]
+
+[node name="CharterSlotFilled" type="Button" unique_id=684705037]
+custom_minimum_size = Vector2(196, 0)
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme = ExtResource("1_esl5m")
+theme_override_styles/normal = ExtResource("2_5gfbe")
+theme_override_styles/pressed = ExtResource("2_5gfbe")
+theme_override_styles/hover = ExtResource("2_5gfbe")
+theme_override_styles/hover_pressed = ExtResource("2_5gfbe")
+theme_override_styles/disabled = ExtResource("2_5gfbe")
+theme_override_styles/focus = ExtResource("2_5gfbe")
+flat = true
+script = ExtResource("3_p40gp")
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=1141390659]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+
+[node name="Circle" type="Control" parent="Column" unique_id=1926482926]
+custom_minimum_size = Vector2(196, 196)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Portrait" parent="Column/Circle" unique_id=1315844981 instance=ExtResource("4_y3kux")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(172, 172)
+layout_mode = 0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 184.0
+offset_bottom = 184.0
+circle = true
+
+[node name="Ring" type="TextureRect" parent="Column/Circle" unique_id=832837169]
+custom_minimum_size = Vector2(196, 196)
+layout_mode = 0
+offset_right = 196.0
+offset_bottom = 196.0
+mouse_filter = 2
+texture = ExtResource("5_rp5nt")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CharName" type="Label" parent="Column" unique_id=910224057]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_8hxh2")
+text = "Alex"
+horizontal_alignment = 1
+
+[node name="Remove" type="Label" parent="Column" unique_id=705354315]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6392157, 0.14901961, 0.16470589, 1)
+theme_override_fonts/font = ExtResource("7_hgxcg")
+theme_override_font_sizes/font_size = 21
+text = "TAP TO REMOVE"
+horizontal_alignment = 1

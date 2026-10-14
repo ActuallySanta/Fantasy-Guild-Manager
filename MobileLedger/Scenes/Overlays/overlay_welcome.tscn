@@ -1,0 +1,250 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_hbrwe"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/overlay_welcome.gd" id="2_2agx8"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_panel_parchment.tres" id="3_3gyj5"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/seal_ribbon.png" id="4_tvrig"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="5_bcj2l"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_black.tres" id="6_cgx6d"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/flat_ead6a8_border_3a2816_w3_r38.tres" id="7_gvjhm"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/nav_characters.svg" id="8_v14x1"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="9_fmlxm"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/nav_quests.svg" id="10_mupph"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/sun.svg" id="11_qkifd"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/nav_upgrades.svg" id="12_f40sn"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green.tres" id="13_0b3nv"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green_down.tres" id="14_qowvs"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_disabled.tres" id="15_xr6bf"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/empty.tres" id="16_2hbce"]
+
+[node name="OverlayWelcome" type="ColorRect" unique_id=874530323]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_hbrwe")
+color = Color(0.16, 0.1, 0.05, 0.72)
+script = ExtResource("2_2agx8")
+
+[node name="Center" type="CenterContainer" parent="." unique_id=1662749107]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Card" type="PanelContainer" parent="Center" unique_id=1368789096]
+custom_minimum_size = Vector2(640, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_3gyj5")
+
+[node name="Column" type="VBoxContainer" parent="Center/Card" unique_id=657184767]
+layout_mode = 2
+theme_override_constants/separation = 22
+
+[node name="Seal" type="TextureRect" parent="Center/Card/Column" unique_id=976747230]
+custom_minimum_size = Vector2(110, 150)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+texture = ExtResource("4_tvrig")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Kicker" type="Label" parent="Center/Card/Column" unique_id=1445572130]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_fonts/font = ExtResource("5_bcj2l")
+theme_override_font_sizes/font_size = 24
+text = "WELCOME, GUILD MASTER"
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Center/Card/Column" unique_id=1667729748]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_cgx6d")
+theme_override_font_sizes/font_size = 46
+text = "Your guild awaits"
+horizontal_alignment = 1
+
+[node name="StepHire" type="HBoxContainer" parent="Center/Card/Column" unique_id=1491965796]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Tile" type="PanelContainer" parent="Center/Card/Column/StepHire" unique_id=1575370541]
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/panel = ExtResource("7_gvjhm")
+
+[node name="Icon" type="TextureRect" parent="Center/Card/Column/StepHire/Tile" unique_id=473048341]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("8_v14x1")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="VBoxContainer" parent="Center/Card/Column/StepHire" unique_id=1196963132]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Center/Card/Column/StepHire/Text" unique_id=179448764]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_fmlxm")
+theme_override_font_sizes/font_size = 30
+text = "Hire"
+
+[node name="Body" type="Label" parent="Center/Card/Column/StepHire/Text" unique_id=1492800733]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.30588236, 0.23921569, 0.14901961, 1)
+theme_override_font_sizes/font_size = 26
+text = "Recruit adventurers for free under Characters, then For Hire."
+autowrap_mode = 3
+
+[node name="StepDecide" type="HBoxContainer" parent="Center/Card/Column" unique_id=634466214]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Tile" type="PanelContainer" parent="Center/Card/Column/StepDecide" unique_id=1474235516]
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/panel = ExtResource("7_gvjhm")
+
+[node name="Icon" type="TextureRect" parent="Center/Card/Column/StepDecide/Tile" unique_id=134524634]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("10_mupph")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="VBoxContainer" parent="Center/Card/Column/StepDecide" unique_id=280724257]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Center/Card/Column/StepDecide/Text" unique_id=1522781026]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_fmlxm")
+theme_override_font_sizes/font_size = 30
+text = "Accept or deny"
+
+[node name="Body" type="Label" parent="Center/Card/Column/StepDecide/Text" unique_id=507025919]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.30588236, 0.23921569, 0.14901961, 1)
+theme_override_font_sizes/font_size = 26
+text = "Every quest needs a decision. Accept one by picking its party."
+autowrap_mode = 3
+
+[node name="StepEndDay" type="HBoxContainer" parent="Center/Card/Column" unique_id=1061314340]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Tile" type="PanelContainer" parent="Center/Card/Column/StepEndDay" unique_id=577272920]
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/panel = ExtResource("7_gvjhm")
+
+[node name="Icon" type="TextureRect" parent="Center/Card/Column/StepEndDay/Tile" unique_id=433744492]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("11_qkifd")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="VBoxContainer" parent="Center/Card/Column/StepEndDay" unique_id=585367883]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Center/Card/Column/StepEndDay/Text" unique_id=201906410]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_fmlxm")
+theme_override_font_sizes/font_size = 30
+text = "End the day"
+
+[node name="Body" type="Label" parent="Center/Card/Column/StepEndDay/Text" unique_id=1576431664]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.30588236, 0.23921569, 0.14901961, 1)
+theme_override_font_sizes/font_size = 26
+text = "Parties set out and come back with gold, treasure and injuries."
+autowrap_mode = 3
+
+[node name="StepGrow" type="HBoxContainer" parent="Center/Card/Column" unique_id=1105434173]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Tile" type="PanelContainer" parent="Center/Card/Column/StepGrow" unique_id=1259652271]
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_styles/panel = ExtResource("7_gvjhm")
+
+[node name="Icon" type="TextureRect" parent="Center/Card/Column/StepGrow/Tile" unique_id=633553121]
+custom_minimum_size = Vector2(46, 46)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("12_f40sn")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="VBoxContainer" parent="Center/Card/Column/StepGrow" unique_id=249944077]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Center/Card/Column/StepGrow/Text" unique_id=1411709386]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("9_fmlxm")
+theme_override_font_sizes/font_size = 30
+text = "Grow the guild"
+
+[node name="Body" type="Label" parent="Center/Card/Column/StepGrow/Text" unique_id=1557236129]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.30588236, 0.23921569, 0.14901961, 1)
+theme_override_font_sizes/font_size = 26
+text = "Spend gold on upgrades. Get rich, and one day defeat the Demon King."
+autowrap_mode = 3
+
+[node name="OpenButton" type="Button" parent="Center/Card/Column" unique_id=273079538]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 44
+theme_override_fonts/font = ExtResource("9_fmlxm")
+theme_override_font_sizes/font_size = 34
+theme_override_styles/normal = ExtResource("13_0b3nv")
+theme_override_styles/pressed = ExtResource("14_qowvs")
+theme_override_styles/hover = ExtResource("13_0b3nv")
+theme_override_styles/hover_pressed = ExtResource("14_qowvs")
+theme_override_styles/disabled = ExtResource("15_xr6bf")
+theme_override_styles/focus = ExtResource("16_2hbce")
+text = "Open the Ledger"

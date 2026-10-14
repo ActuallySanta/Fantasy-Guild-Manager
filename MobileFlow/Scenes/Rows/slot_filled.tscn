@@ -1,0 +1,21 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileFlow/flow_theme.tres" id="1_bkbo3"]
+[ext_resource type="Script" path="res://MobileFlow/Scripts/slot.gd" id="2_t8vhk"]
+[ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Components/portrait.tscn" id="3_byl0n"]
+
+[node name="SlotFilled" type="VBoxContainer" unique_id=774468153]
+theme = ExtResource("1_bkbo3")
+theme_override_constants/separation = 2
+script = ExtResource("2_t8vhk")
+
+[node name="Portrait" parent="." unique_id=407676010 instance=ExtResource("3_byl0n")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CharName" type="Label" parent="." unique_id=1186248119]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Alex"
+horizontal_alignment = 1

@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileDeck/deck_theme.tres" id="1_plhjt"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/flat_30323f_border_3d4050_r12.tres" id="2_vnxge"]
+[ext_resource type="Script" path="res://MobileDeck/Scripts/chip.gd" id="3_1iax1"]
+[ext_resource type="Material" path="res://MobileDeck/Styles/icon_tint_eeeff3.tres" id="4_xx37h"]
+
+[node name="Chip" type="PanelContainer" unique_id=628586570]
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme = ExtResource("1_plhjt")
+theme_override_styles/panel = ExtResource("2_vnxge")
+script = ExtResource("3_1iax1")
+
+[node name="Row" type="HBoxContainer" parent="." unique_id=1656885462]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Icon" type="TextureRect" parent="Row" unique_id=926236662]
+visible = false
+material = ExtResource("4_xx37h")
+custom_minimum_size = Vector2(19.5, 19.5)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="Label" parent="Row" unique_id=1661834081]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Chip"
+horizontal_alignment = 1

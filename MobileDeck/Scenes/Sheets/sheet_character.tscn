@@ -1,0 +1,309 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileDeck/deck_theme.tres" id="1_2pohb"]
+[ext_resource type="Script" path="res://MobileDeck/Scripts/sheet_character.gd" id="2_edafa"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/sheet.tres" id="3_cbd58"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_grey_normal.tres" id="4_260s0"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_grey_pressed.tres" id="5_087j1"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_grey_hover.tres" id="6_e6me7"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_disabled.tres" id="7_k172m"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/empty.tres" id="8_rxikn"]
+[ext_resource type="PackedScene" path="res://MobileDeck/Scenes/Components/portrait.tscn" id="9_gob56"]
+[ext_resource type="PackedScene" path="res://MobileDeck/Scenes/Components/chip.tscn" id="10_phw1y"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/box_card.tres" id="11_guibi"]
+
+[node name="SheetCharacter" type="ColorRect" unique_id=2064311064]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_2pohb")
+color = Color(0, 0, 0, 0.6)
+script = ExtResource("2_edafa")
+
+[node name="Sheet" type="PanelContainer" parent="." unique_id=110170771]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("3_cbd58")
+
+[node name="Column" type="VBoxContainer" parent="Sheet" unique_id=352908747]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Header" type="HBoxContainer" parent="Sheet/Column" unique_id=1415822020]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SheetTitle" type="Label" parent="Sheet/Column/Header" unique_id=68096888]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Alex"
+
+[node name="Spacer" type="Control" parent="Sheet/Column/Header" unique_id=2026618309]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="CloseButton" type="Button" parent="Sheet/Column/Header" unique_id=329706492]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_pressed_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_hover_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_disabled_color = Color(0.36078432, 0.3764706, 0.4392157, 1)
+theme_override_colors/icon_normal_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = ExtResource("4_260s0")
+theme_override_styles/pressed = ExtResource("5_087j1")
+theme_override_styles/hover = ExtResource("6_e6me7")
+theme_override_styles/hover_pressed = ExtResource("5_087j1")
+theme_override_styles/disabled = ExtResource("7_k172m")
+theme_override_styles/focus = ExtResource("8_rxikn")
+text = "Close"
+
+[node name="Scroll" type="ScrollContainer" parent="Sheet/Column" unique_id=1240421752]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Sheet/Column/Scroll" unique_id=1755101460]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 24
+
+[node name="Content" type="VBoxContainer" parent="Sheet/Column/Scroll/Margin" unique_id=1899236576]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Head" type="HBoxContainer" parent="Sheet/Column/Scroll/Margin/Content" unique_id=1451462973]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Portrait" parent="Sheet/Column/Scroll/Margin/Content/Head" unique_id=82067602 instance=ExtResource("9_gob56")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(170, 170)
+layout_mode = 2
+
+[node name="Info" type="VBoxContainer" parent="Sheet/Column/Scroll/Margin/Content/Head" unique_id=911093514]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Role" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Head/Info" unique_id=1270700848]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 24
+text = "the Pathfinder"
+
+[node name="Injury" parent="Sheet/Column/Scroll/Margin/Content/Head/Info" unique_id=628586570 instance=ExtResource("10_phw1y")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Healthy"
+bg = Color(0.12156863, 0.22745098, 0.14117648, 1)
+fg = Color(0.4, 0.73333335, 0.41568628, 1)
+font_size = 22
+
+[node name="InjuryCount" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Head/Info" unique_id=352987533]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 20
+text = "No injuries yet"
+
+[node name="OnQuest" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Head/Info" unique_id=2120770096]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.25882354, 0.64705884, 0.9607843, 1)
+theme_override_font_sizes/font_size = 20
+text = "On quest: Raid the Temple of Time"
+autowrap_mode = 3
+
+[node name="Stats" type="PanelContainer" parent="Sheet/Column/Scroll/Margin/Content" unique_id=832418465]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("11_guibi")
+
+[node name="Column" type="VBoxContainer" parent="Sheet/Column/Scroll/Margin/Content/Stats" unique_id=1636970330]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Stat0" type="HBoxContainer" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column" unique_id=806153518]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StatName" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat0" unique_id=1973324524]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9372549, 0.3254902, 0.3137255, 1)
+theme_override_font_sizes/font_size = 22
+text = "Strength"
+
+[node name="Value" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat0" unique_id=1540407083]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9372549, 0.3254902, 0.3137255, 1)
+theme_override_font_sizes/font_size = 24
+text = "4"
+
+[node name="Bonus" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat0" unique_id=220776216]
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.73333335, 0.41568628, 1)
+theme_override_font_sizes/font_size = 20
+text = "+1"
+
+[node name="Stat1" type="HBoxContainer" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column" unique_id=844343406]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StatName" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat1" unique_id=261062068]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.25882354, 0.64705884, 0.9607843, 1)
+theme_override_font_sizes/font_size = 22
+text = "Defense"
+
+[node name="Value" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat1" unique_id=898453106]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.25882354, 0.64705884, 0.9607843, 1)
+theme_override_font_sizes/font_size = 24
+text = "3"
+
+[node name="Bonus" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat1" unique_id=290080051]
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.73333335, 0.41568628, 1)
+theme_override_font_sizes/font_size = 20
+text = "+1"
+
+[node name="Stat2" type="HBoxContainer" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column" unique_id=426029429]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StatName" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat2" unique_id=290503786]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.80784315, 0.5764706, 0.84705883, 1)
+theme_override_font_sizes/font_size = 22
+text = "Wisdom"
+
+[node name="Value" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat2" unique_id=210603734]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.80784315, 0.5764706, 0.84705883, 1)
+theme_override_font_sizes/font_size = 24
+text = "4"
+
+[node name="Bonus" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat2" unique_id=1928637191]
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.73333335, 0.41568628, 1)
+theme_override_font_sizes/font_size = 20
+
+[node name="Stat3" type="HBoxContainer" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column" unique_id=270434949]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StatName" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat3" unique_id=739781788]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.4, 0.73333335, 0.41568628, 1)
+theme_override_font_sizes/font_size = 22
+text = "Sleaziness"
+
+[node name="Value" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat3" unique_id=832686342]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.73333335, 0.41568628, 1)
+theme_override_font_sizes/font_size = 24
+text = "7"
+
+[node name="Bonus" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat3" unique_id=1915823781]
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.73333335, 0.41568628, 1)
+theme_override_font_sizes/font_size = 20
+
+[node name="Stat4" type="HBoxContainer" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column" unique_id=417321061]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StatName" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat4" unique_id=1935668649]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1, 0.654902, 0.14901961, 1)
+theme_override_font_sizes/font_size = 22
+text = "Pluck"
+
+[node name="Value" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat4" unique_id=1213765161]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.654902, 0.14901961, 1)
+theme_override_font_sizes/font_size = 24
+text = "0"
+
+[node name="Bonus" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column/Stat4" unique_id=712848458]
+custom_minimum_size = Vector2(44, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.73333335, 0.41568628, 1)
+theme_override_font_sizes/font_size = 20
+
+[node name="ArmoryNote" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Stats/Column" unique_id=258089514]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 18
+text = "+N = Armory bonus (level 1), already counted in quest odds."
+autowrap_mode = 3
+
+[node name="Story" type="PanelContainer" parent="Sheet/Column/Scroll/Margin/Content" unique_id=2053270745]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("11_guibi")
+
+[node name="Column" type="VBoxContainer" parent="Sheet/Column/Scroll/Margin/Content/Story" unique_id=96009818]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Title" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Story/Column" unique_id=519242156]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Backstory"
+
+[node name="Backstory" type="Label" parent="Sheet/Column/Scroll/Margin/Content/Story/Column" unique_id=1423559347]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/paragraph_spacing = 6
+theme_override_font_sizes/font_size = 20
+text = "Alex grew up in the forests of [HOMETOWN].
+Alex is scared of the color yellow."
+autowrap_mode = 3

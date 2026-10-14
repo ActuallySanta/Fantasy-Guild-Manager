@@ -1,0 +1,376 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_sg3rp"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/page_bg.png" id="2_tq8qc"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/screen_charter.gd" id="3_uere1"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/top_bar.tscn" id="4_2fqbb"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_card_parchment_12.tres" id="5_3ylkr"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="6_fvjpt"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Medium.ttf" id="7_kngd3"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="8_fntq2"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Italic.ttf" id="9_4pmlk"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/scene_intel.png" id="10_t0vu2"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/chip.tscn" id="11_q8jbp"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/flourish_l.png" id="12_whev1"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/flourish_r.png" id="13_7hqjo"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Rows/charter_slot_empty.tscn" id="14_4myko"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_inset_parchment_4.tres" id="15_xttn3"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_black.tres" id="16_4e86t"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/gauge.gd" id="17_h35xh"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/emblem.svg" id="18_advtw"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_inset_parchment_2.tres" id="19_sqn4b"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green.tres" id="20_aimrw"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green_down.tres" id="21_3gvg5"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_disabled.tres" id="22_w5vuv"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/empty.tres" id="23_dn8k2"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_inset_parchment_5.tres" id="24_amlma"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_red.tres" id="25_dtatt"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_red_down.tres" id="26_xa804"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/seal.png" id="27_ldqk1"]
+
+[node name="ScreenCharter" type="TextureRect" unique_id=1586541300]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("1_sg3rp")
+texture = ExtResource("2_tq8qc")
+expand_mode = 1
+script = ExtResource("3_uere1")
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=2101465529]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TopBar" parent="Column" unique_id=1991745689 instance=ExtResource("4_2fqbb")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="PageScroll" type="ScrollContainer" parent="Column" unique_id=991188451]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Column/PageScroll" unique_id=1569578427]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 30
+
+[node name="Content" type="VBoxContainer" parent="Column/PageScroll/Margin" unique_id=1937218222]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 24
+
+[node name="Charter" type="PanelContainer" parent="Column/PageScroll/Margin/Content" unique_id=765601299]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("5_3ylkr")
+
+[node name="Column" type="VBoxContainer" parent="Column/PageScroll/Margin/Content/Charter" unique_id=329979548]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="QuestTitle" type="Label" parent="Column/PageScroll/Margin/Content/Charter/Column" unique_id=1816068309]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.35686275, 0.24705882, 0.54901963, 1)
+theme_override_fonts/font = ExtResource("6_fvjpt")
+theme_override_font_sizes/font_size = 38
+text = "Gather information on a possible Necromancer"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="QuestSub" type="RichTextLabel" parent="Column/PageScroll/Margin/Content/Charter/Column" unique_id=672114588]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_fonts/normal_font = ExtResource("7_kngd3")
+theme_override_fonts/bold_font = ExtResource("8_fntq2")
+theme_override_fonts/italics_font = ExtResource("9_4pmlk")
+theme_override_font_sizes/normal_font_size = 27
+theme_override_font_sizes/bold_font_size = 27
+theme_override_font_sizes/italics_font_size = 27
+bbcode_enabled = true
+text = "[center][color=#6B5537]Gather Intel ·[/color] [b]200 Gold[/b] [color=#6B5537]· Rank F[/color][/center]"
+fit_content = true
+scroll_active = false
+
+[node name="QuestPicture" type="TextureRect" parent="Column/PageScroll/Margin/Content/Charter/Column" unique_id=1181428639]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(440, 210)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+texture = ExtResource("10_t0vu2")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Favored" type="HBoxContainer" parent="Column/PageScroll/Margin/Content/Charter/Column" unique_id=876005501]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="Caption" type="Label" parent="Column/PageScroll/Margin/Content/Charter/Column/Favored" unique_id=1141735353]
+layout_mode = 2
+theme_override_font_sizes/font_size = 27
+text = "Favored:"
+
+[node name="FavChip" parent="Column/PageScroll/Margin/Content/Charter/Column/Favored" unique_id=476167600 instance=ExtResource("11_q8jbp")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Sleaziness"
+icon_name = "sleaziness"
+bg = Color(0.8509804, 0.9098039, 0.8117647, 1)
+fg = Color(0.24313726, 0.41960785, 0.20784314, 1)
+font_size = 24
+icon_style = true
+
+[node name="SlotsDivider" type="HBoxContainer" parent="Column/PageScroll/Margin/Content" unique_id=253582105]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="FlourishL" type="TextureRect" parent="Column/PageScroll/Margin/Content/SlotsDivider" unique_id=616525646]
+custom_minimum_size = Vector2(110, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("12_whev1")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="SlotsTitle" type="Label" parent="Column/PageScroll/Margin/Content/SlotsDivider" unique_id=855044584]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_fvjpt")
+theme_override_font_sizes/font_size = 30
+text = "Select up to 2"
+horizontal_alignment = 1
+
+[node name="FlourishR" type="TextureRect" parent="Column/PageScroll/Margin/Content/SlotsDivider" unique_id=1931232202]
+custom_minimum_size = Vector2(110, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("13_7hqjo")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Slots" type="HBoxContainer" parent="Column/PageScroll/Margin/Content" unique_id=840847626]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="Sample1" parent="Column/PageScroll/Margin/Content/Slots" unique_id=1840633585 instance=ExtResource("14_4myko")]
+layout_mode = 2
+
+[node name="Sample2" parent="Column/PageScroll/Margin/Content/Slots" unique_id=1855000633 instance=ExtResource("14_4myko")]
+layout_mode = 2
+
+[node name="Estimate" type="PanelContainer" parent="Column/PageScroll/Margin/Content" unique_id=1980360274]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("15_xttn3")
+
+[node name="Column" type="VBoxContainer" parent="Column/PageScroll/Margin/Content/Estimate" unique_id=82849862]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Caption" type="Label" parent="Column/PageScroll/Margin/Content/Estimate/Column" unique_id=1581866087]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_fvjpt")
+text = "Success Estimate"
+horizontal_alignment = 1
+
+[node name="Row" type="HBoxContainer" parent="Column/PageScroll/Margin/Content/Estimate/Column" unique_id=1921438213]
+layout_mode = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="ChancePercent" type="Label" parent="Column/PageScroll/Margin/Content/Estimate/Column/Row" unique_id=1259926294]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_fonts/font = ExtResource("16_4e86t")
+theme_override_font_sizes/font_size = 68
+text = "-- %"
+
+[node name="ChanceWord" type="Label" parent="Column/PageScroll/Margin/Content/Estimate/Column/Row" unique_id=443902591]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_fvjpt")
+theme_override_font_sizes/font_size = 30
+text = "Chance unknown"
+
+[node name="ChanceGauge" type="Control" parent="Column/PageScroll/Margin/Content/Estimate/Column" unique_id=665646906]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(560, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+script = ExtResource("17_h35xh")
+value = 0.0
+
+[node name="EstimateNote" type="Label" parent="Column/PageScroll/Margin/Content/Estimate/Column" unique_id=302453005]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_font_sizes/font_size = 24
+text = "Pick adventurers to see the odds"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Emblem" type="TextureRect" parent="Column/PageScroll/Margin/Content" unique_id=1792399681]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("18_advtw")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="RosterDivider" type="HBoxContainer" parent="Column/PageScroll/Margin/Content" unique_id=729507232]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="FlourishL" type="TextureRect" parent="Column/PageScroll/Margin/Content/RosterDivider" unique_id=736067836]
+custom_minimum_size = Vector2(110, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("12_whev1")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Title" type="Label" parent="Column/PageScroll/Margin/Content/RosterDivider" unique_id=1247238983]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_fvjpt")
+theme_override_font_sizes/font_size = 30
+text = "Your Adventurers"
+horizontal_alignment = 1
+
+[node name="FlourishR" type="TextureRect" parent="Column/PageScroll/Margin/Content/RosterDivider" unique_id=1481442078]
+custom_minimum_size = Vector2(110, 26)
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("13_7hqjo")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="FavNote" type="Label" parent="Column/PageScroll/Margin/Content" unique_id=2015303468]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_font_sizes/font_size = 24
+text = "Each adventurer adds all four stats, plus Sleaziness again."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="PickList" type="VBoxContainer" parent="Column/PageScroll/Margin/Content" unique_id=1929710429]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="NoRoster" type="PanelContainer" parent="Column/PageScroll/Margin/Content" unique_id=902804708]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_styles/panel = ExtResource("19_sqn4b")
+
+[node name="Column" type="VBoxContainer" parent="Column/PageScroll/Margin/Content/NoRoster" unique_id=1214834068]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Text" type="Label" parent="Column/PageScroll/Margin/Content/NoRoster/Column" unique_id=25105676]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "Nobody to send yet. Hire adventurers first. It's free."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="GoHireButton" type="Button" parent="Column/PageScroll/Margin/Content/NoRoster/Column" unique_id=2035505427]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 36
+theme_override_fonts/font = ExtResource("6_fvjpt")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = ExtResource("20_aimrw")
+theme_override_styles/pressed = ExtResource("21_3gvg5")
+theme_override_styles/hover = ExtResource("20_aimrw")
+theme_override_styles/hover_pressed = ExtResource("21_3gvg5")
+theme_override_styles/disabled = ExtResource("22_w5vuv")
+theme_override_styles/focus = ExtResource("23_dn8k2")
+text = "Go to For Hire"
+
+[node name="Footer" type="PanelContainer" parent="Column" unique_id=296038629]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("24_amlma")
+
+[node name="Column" type="VBoxContainer" parent="Column/Footer" unique_id=1890466278]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DispatchButton" type="Button" parent="Column/Footer/Column" unique_id=1389969903]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 74
+theme_override_fonts/font = ExtResource("6_fvjpt")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = ExtResource("25_dtatt")
+theme_override_styles/pressed = ExtResource("26_xa804")
+theme_override_styles/hover = ExtResource("25_dtatt")
+theme_override_styles/hover_pressed = ExtResource("26_xa804")
+theme_override_styles/disabled = ExtResource("22_w5vuv")
+theme_override_styles/focus = ExtResource("23_dn8k2")
+disabled = true
+text = "Pick an adventurer"
+icon = ExtResource("27_ldqk1")
+
+[node name="Note" type="Label" parent="Column/Footer/Column" unique_id=458051675]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_fonts/font = ExtResource("8_fntq2")
+theme_override_font_sizes/font_size = 22
+text = "The party sets out when you end the day."
+horizontal_alignment = 1

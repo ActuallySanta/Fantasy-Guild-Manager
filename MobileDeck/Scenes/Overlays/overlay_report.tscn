@@ -1,0 +1,117 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileDeck/deck_theme.tres" id="1_c0oyp"]
+[ext_resource type="Script" path="res://MobileDeck/Scripts/overlay_report.gd" id="2_8kocd"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/box_panel.tres" id="3_2ng7a"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/flat_30323f_border_3d4050_r18.tres" id="4_yabfb"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/box_bar.tres" id="5_43n7m"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_green_normal.tres" id="6_k21tr"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_green_pressed.tres" id="7_aa2rq"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_green_hover.tres" id="8_vbeu7"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_disabled.tres" id="9_84hsq"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/empty.tres" id="10_gvnpq"]
+
+[node name="OverlayReport" type="ColorRect" unique_id=288174919]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_c0oyp")
+color = Color(0.08627451, 0.09019608, 0.11372549, 1)
+script = ExtResource("2_8kocd")
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=972433625]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="Header" type="PanelContainer" parent="Column" unique_id=1952871624]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_2ng7a")
+
+[node name="Column" type="VBoxContainer" parent="Column/Header" unique_id=1827230675]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ReportTitle" type="Label" parent="Column/Header/Column" unique_id=704122618]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Day 1 Report"
+
+[node name="ReportSubtitle" type="Label" parent="Column/Header/Column" unique_id=1481598133]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 24
+text = "1 quest went out, +228 gold"
+
+[node name="Scroll" type="ScrollContainer" parent="Column" unique_id=880823743]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Column/Scroll" unique_id=669468372]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Content" type="VBoxContainer" parent="Column/Scroll/Margin" unique_id=1849448351]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Entries" type="VBoxContainer" parent="Column/Scroll/Margin/Content" unique_id=8039317]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Empty" type="PanelContainer" parent="Column/Scroll/Margin/Content" unique_id=1141282234]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("4_yabfb")
+
+[node name="Text" type="Label" parent="Column/Scroll/Margin/Content/Empty" unique_id=1411861181]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 28
+text = "No quests went out today. The guild hall was very quiet."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Footer" type="PanelContainer" parent="Column" unique_id=1261132726]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("5_43n7m")
+
+[node name="ActionButton" type="Button" parent="Column/Footer" unique_id=1571552191]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_pressed_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_hover_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_disabled_color = Color(0.36078432, 0.3764706, 0.4392157, 1)
+theme_override_colors/icon_normal_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = ExtResource("6_k21tr")
+theme_override_styles/pressed = ExtResource("7_aa2rq")
+theme_override_styles/hover = ExtResource("8_vbeu7")
+theme_override_styles/hover_pressed = ExtResource("7_aa2rq")
+theme_override_styles/disabled = ExtResource("9_84hsq")
+theme_override_styles/focus = ExtResource("10_gvnpq")
+text = "Start Day 2"
