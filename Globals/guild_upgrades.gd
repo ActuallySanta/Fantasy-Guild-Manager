@@ -63,7 +63,7 @@ const SHOW_DEBUG_BUTTONS := true
 
 var gold: int = STARTING_GOLD
 var standing: int = STARTING_STANDING
-var levels: Dictionary = {}
+var levels: Dictionary = { }
 
 var _page: Control
 var _character_page: Control
@@ -93,8 +93,8 @@ func _process(_delta: float) -> void:
 		_last_character_count = count
 		sync_characters()
 
-
 # ---------------------------------------------------------------- queries
+
 
 func get_level(building: int) -> int:
 	return levels.get(building, 1)
@@ -172,8 +172,8 @@ func get_armory_bonus() -> Vector2i:
 func get_max_heroes() -> int:
 	return BARRACKS_MAX_HEROES[get_level(Building.BARRACKS) - 1]
 
-
 # ---------------------------------------------------------------- actions
+
 
 func try_upgrade(building: int) -> bool:
 	if get_upgrade_status(building) != UpgradeStatus.READY:
@@ -202,6 +202,12 @@ func add_standing(amount: int) -> void:
 	_update_top_bar()
 
 
+func reduce_standing(amount: int) -> void:
+	standing = maxi(standing - amount, 0)
+	resources_changed.emit()
+	_update_top_bar()
+
+
 ## Back to a fresh guild (all level 1, starting wallet). Armory bonus is
 ## removed from heroes again by the re-sync.
 func reset() -> void:
@@ -214,8 +220,8 @@ func reset() -> void:
 	upgrades_changed.emit()
 	_update_top_bar()
 
-
 # ---------------------------------------------------------------- effects
+
 
 func _apply_effects() -> void:
 	CharacterContainer.max_characters = get_max_heroes()
@@ -284,8 +290,8 @@ func _patch_character_card(card: Node) -> void:
 	card.strength_label.text = format_stat(character, GuildCharacter.StatType.STRENGTH, "Strength")
 	card.defense_label.text = format_stat(character, GuildCharacter.StatType.DEFENSE, "Defense")
 
-
 # ---------------------------------------------------------------- nav bar hookup
+
 
 func _on_node_added(node: Node) -> void:
 	if node is Button and _is_nav_button(node):

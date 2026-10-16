@@ -1,0 +1,141 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileFlow/flow_theme.tres" id="1_m8biy"]
+[ext_resource type="Script" path="res://MobileFlow/Scripts/step_hire.gd" id="2_ahvxf"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/box_inset.tres" id="3_vovex"]
+[ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Components/portrait.tscn" id="4_u2ru7"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_green_normal.tres" id="5_bphg7"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_green_pressed.tres" id="6_vfic6"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_green_hover.tres" id="7_7702x"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_disabled.tres" id="8_7mpvk"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/empty.tres" id="9_xiiop"]
+
+[node name="StepHire" type="VBoxContainer" unique_id=1091658920]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_m8biy")
+theme_override_constants/separation = 0
+script = ExtResource("2_ahvxf")
+
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=1316250288]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Scroll" unique_id=1408414192]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 24
+
+[node name="Content" type="VBoxContainer" parent="Scroll/Margin" unique_id=57584778]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 14
+
+[node name="Heading" type="VBoxContainer" parent="Scroll/Margin/Content" unique_id=141378670]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Title" type="Label" parent="Scroll/Margin/Content/Heading" unique_id=1999029824]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Hire adventurers"
+
+[node name="Subtitle" type="Label" parent="Scroll/Margin/Content/Heading" unique_id=1774067979]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "Hiring is free. Your guild has room for 4 more (0/4)."
+autowrap_mode = 3
+
+[node name="GuildStrip" type="PanelContainer" parent="Scroll/Margin/Content" unique_id=1714658017]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_vovex")
+
+[node name="Row" type="HBoxContainer" parent="Scroll/Margin/Content/GuildStrip" unique_id=1054534752]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Caption" type="Label" parent="Scroll/Margin/Content/GuildStrip/Row" unique_id=1252778014]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 20
+text = "Your guild:"
+
+[node name="GuildPortraits" type="HBoxContainer" parent="Scroll/Margin/Content/GuildStrip/Row" unique_id=39214419]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Sample" parent="Scroll/Margin/Content/GuildStrip/Row/GuildPortraits" unique_id=407676010 instance=ExtResource("4_u2ru7")]
+custom_minimum_size = Vector2(52, 52)
+layout_mode = 2
+
+[node name="Recruits" type="VBoxContainer" parent="Scroll/Margin/Content" unique_id=637938919]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="NoRecruits" type="PanelContainer" parent="Scroll/Margin/Content" unique_id=1885939603]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_vovex")
+
+[node name="Text" type="Label" parent="Scroll/Margin/Content/NoRecruits" unique_id=1950511455]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "Nobody is for hire right now. New faces arrive every morning."
+autowrap_mode = 3
+
+[node name="Footer" type="PanelContainer" parent="." unique_id=282990219]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_vovex")
+
+[node name="Column" type="VBoxContainer" parent="Footer" unique_id=17103340]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="FooterWarning" type="Label" parent="Footer/Column" unique_id=1062120364]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9019608, 0.31764707, 0, 1)
+theme_override_font_sizes/font_size = 20
+text = "Hire at least one adventurer to send on quests."
+horizontal_alignment = 1
+
+[node name="NextButton" type="Button" parent="Footer/Column" unique_id=132449226]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = ExtResource("5_bphg7")
+theme_override_styles/pressed = ExtResource("6_vfic6")
+theme_override_styles/hover = ExtResource("7_7702x")
+theme_override_styles/hover_pressed = ExtResource("6_vfic6")
+theme_override_styles/disabled = ExtResource("8_7mpvk")
+theme_override_styles/focus = ExtResource("9_xiiop")
+text = "Next: Quests  >"

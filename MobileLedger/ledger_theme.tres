@@ -1,0 +1,25 @@
+[gd_resource type="Theme" format=3]
+
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Medium.ttf" id="1_53bbu"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_63y3v"]
+content_margin_left = 5.0
+content_margin_right = 5.0
+bg_color = Color(0.41960785, 0.33333334, 0.21568628, 0.5)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_5e812"]
+content_margin_left = 5.0
+content_margin_right = 5.0
+
+[resource]
+default_font = ExtResource("1_53bbu")
+default_font_size = 28
+Label/colors/font_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+VScrollBar/styles/grabber = SubResource("StyleBoxFlat_63y3v")
+VScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_63y3v")
+VScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_63y3v")
+VScrollBar/styles/scroll = SubResource("StyleBoxEmpty_5e812")

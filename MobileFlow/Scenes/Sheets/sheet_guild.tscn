@@ -1,0 +1,246 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileFlow/flow_theme.tres" id="1_12e2g"]
+[ext_resource type="Script" path="res://MobileFlow/Scripts/sheet_guild.gd" id="2_7b328"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/box_panel.tres" id="3_pdsce"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_grey_normal.tres" id="4_hcff3"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_grey_pressed.tres" id="5_s4c4u"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_grey_hover.tres" id="6_hc367"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_disabled.tres" id="7_f6mrx"]
+[ext_resource type="StyleBox" path="res://MobileFlow/Styles/empty.tres" id="8_q4c7t"]
+
+[node name="SheetGuild" type="ColorRect" unique_id=206728142]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_12e2g")
+color = Color(0.9019608, 0.9019608, 0.9019608, 1)
+script = ExtResource("2_7b328")
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=799353313]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="Header" type="PanelContainer" parent="Column" unique_id=998706347]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_pdsce")
+
+[node name="Row" type="HBoxContainer" parent="Column/Header" unique_id=421673879]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SheetTitle" type="Label" parent="Column/Header/Row" unique_id=2031947169]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Guild"
+
+[node name="Spacer" type="Control" parent="Column/Header/Row" unique_id=708291033]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="HelpButton" type="Button" parent="Column/Header/Row" unique_id=266481530]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("4_hcff3")
+theme_override_styles/pressed = ExtResource("5_s4c4u")
+theme_override_styles/hover = ExtResource("6_hc367")
+theme_override_styles/hover_pressed = ExtResource("5_s4c4u")
+theme_override_styles/disabled = ExtResource("7_f6mrx")
+theme_override_styles/focus = ExtResource("8_q4c7t")
+text = "How to play"
+
+[node name="CloseButton" type="Button" parent="Column/Header/Row" unique_id=1558384175]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = ExtResource("4_hcff3")
+theme_override_styles/pressed = ExtResource("5_s4c4u")
+theme_override_styles/hover = ExtResource("6_hc367")
+theme_override_styles/hover_pressed = ExtResource("5_s4c4u")
+theme_override_styles/disabled = ExtResource("7_f6mrx")
+theme_override_styles/focus = ExtResource("8_q4c7t")
+text = "Close"
+
+[node name="Scroll" type="ScrollContainer" parent="Column" unique_id=1923035808]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Column/Scroll" unique_id=953903768]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 24
+
+[node name="Content" type="VBoxContainer" parent="Column/Scroll/Margin" unique_id=1068564323]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Tabs" type="HBoxContainer" parent="Column/Scroll/Margin/Content" unique_id=1727574238]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="RosterTab" type="Button" parent="Column/Scroll/Margin/Content/Tabs" unique_id=1807338203]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("4_hcff3")
+theme_override_styles/pressed = ExtResource("5_s4c4u")
+theme_override_styles/hover = ExtResource("6_hc367")
+theme_override_styles/hover_pressed = ExtResource("5_s4c4u")
+theme_override_styles/disabled = ExtResource("7_f6mrx")
+theme_override_styles/focus = ExtResource("8_q4c7t")
+toggle_mode = true
+text = "Roster 0/4"
+
+[node name="HireTab" type="Button" parent="Column/Scroll/Margin/Content/Tabs" unique_id=1052377346]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("4_hcff3")
+theme_override_styles/pressed = ExtResource("5_s4c4u")
+theme_override_styles/hover = ExtResource("6_hc367")
+theme_override_styles/hover_pressed = ExtResource("5_s4c4u")
+theme_override_styles/disabled = ExtResource("7_f6mrx")
+theme_override_styles/focus = ExtResource("8_q4c7t")
+toggle_mode = true
+text = "For hire (0)"
+
+[node name="UpgradesTab" type="Button" parent="Column/Scroll/Margin/Content/Tabs" unique_id=657155024]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_colors/font_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/icon_normal_color = Color(0.06666667, 0.06666667, 0.06666667, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("4_hcff3")
+theme_override_styles/pressed = ExtResource("5_s4c4u")
+theme_override_styles/hover = ExtResource("6_hc367")
+theme_override_styles/hover_pressed = ExtResource("5_s4c4u")
+theme_override_styles/disabled = ExtResource("7_f6mrx")
+theme_override_styles/focus = ExtResource("8_q4c7t")
+toggle_mode = true
+text = "Upgrades"
+
+[node name="RosterPage" type="VBoxContainer" parent="Column/Scroll/Margin/Content" unique_id=385247049]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="RosterList" type="VBoxContainer" parent="Column/Scroll/Margin/Content/RosterPage" unique_id=1533442199]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="RosterEmpty" type="Label" parent="Column/Scroll/Margin/Content/RosterPage" unique_id=449889126]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "Nobody in the guild yet. Check For hire."
+autowrap_mode = 3
+
+[node name="HirePage" type="VBoxContainer" parent="Column/Scroll/Margin/Content" unique_id=678871869]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HireList" type="VBoxContainer" parent="Column/Scroll/Margin/Content/HirePage" unique_id=1753855043]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HireEmpty" type="Label" parent="Column/Scroll/Margin/Content/HirePage" unique_id=108516689]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "Nobody is for hire right now."
+autowrap_mode = 3
+
+[node name="UpgradesPage" type="VBoxContainer" parent="Column/Scroll/Margin/Content" unique_id=1594243572]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Wallet" type="Label" parent="Column/Scroll/Margin/Content/UpgradesPage" unique_id=377717042]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "600 gold, Standing 1"
+
+[node name="UpgradeList" type="VBoxContainer" parent="Column/Scroll/Margin/Content/UpgradesPage" unique_id=811588487]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12

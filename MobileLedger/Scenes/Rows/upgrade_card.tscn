@@ -1,0 +1,228 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileLedger/ledger_theme.tres" id="1_kjimb"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_card_parchment_4.tres" id="2_dku24"]
+[ext_resource type="Script" path="res://MobileLedger/Scripts/upgrade_card.gd" id="3_gkbbj"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/flat_4f96d9_border_3a2816_w3_r20.tres" id="4_iiprp"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/armory.svg" id="5_g26xw"]
+[ext_resource type="FontVariation" path="res://MobileLedger/Fonts/cinzel_bold.tres" id="6_ntdmx"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Bold.ttf" id="7_cvqbr"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/flat_4f96d9_border_3a2816_w2_r6.tres" id="8_p8nl1"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/flat_e2cc9c_border_3a2816_w2_r6.tres" id="9_ovqmg"]
+[ext_resource type="PackedScene" path="res://MobileLedger/Scenes/Components/chip.tscn" id="10_4e7tu"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Medium.ttf" id="11_7al4x"]
+[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Italic.ttf" id="12_aor8c"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/coins.svg" id="13_bnl5r"]
+[ext_resource type="Texture2D" path="res://MobileLedger/Art/Icons/rook.svg" id="14_d5jyg"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green.tres" id="15_5hnj8"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_green_down.tres" id="16_7xuk0"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/tex_btn_disabled.tres" id="17_tfvsi"]
+[ext_resource type="StyleBox" path="res://MobileLedger/Styles/empty.tres" id="18_lijym"]
+
+[node name="UpgradeCard" type="PanelContainer" unique_id=69156086]
+theme = ExtResource("1_kjimb")
+theme_override_styles/panel = ExtResource("2_dku24")
+script = ExtResource("3_gkbbj")
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=1413746058]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Top" type="HBoxContainer" parent="Column" unique_id=359674242]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Tile" type="PanelContainer" parent="Column/Top" unique_id=915030876]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("4_iiprp")
+
+[node name="Icon" type="TextureRect" parent="Column/Top/Tile" unique_id=566162053]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(66, 66)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("5_g26xw")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Info" type="VBoxContainer" parent="Column/Top" unique_id=1375446438]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+
+[node name="NameRow" type="HBoxContainer" parent="Column/Top/Info" unique_id=1667520486]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BuildingName" type="Label" parent="Column/Top/Info/NameRow" unique_id=1228489694]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_ntdmx")
+theme_override_font_sizes/font_size = 32
+text = "Armory"
+
+[node name="Level" type="Label" parent="Column/Top/Info/NameRow" unique_id=910277633]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.41960785, 0.33333334, 0.21568628, 1)
+theme_override_fonts/font = ExtResource("7_cvqbr")
+theme_override_font_sizes/font_size = 25
+text = "Lv 1 / 5"
+
+[node name="Pips" type="HBoxContainer" parent="Column/Top/Info" unique_id=755516151]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Pip1" type="Panel" parent="Column/Top/Info/Pips" unique_id=823374470]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = ExtResource("8_p8nl1")
+
+[node name="Pip2" type="Panel" parent="Column/Top/Info/Pips" unique_id=1992006243]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = ExtResource("9_ovqmg")
+
+[node name="Pip3" type="Panel" parent="Column/Top/Info/Pips" unique_id=965024788]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = ExtResource("9_ovqmg")
+
+[node name="Pip4" type="Panel" parent="Column/Top/Info/Pips" unique_id=320869164]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = ExtResource("9_ovqmg")
+
+[node name="Pip5" type="Panel" parent="Column/Top/Info/Pips" unique_id=1979541598]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = ExtResource("9_ovqmg")
+
+[node name="SoonChip" parent="Column/Top" unique_id=476167600 instance=ExtResource("10_4e7tu")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Coming soon"
+bg = Color(0.22745098, 0.15686275, 0.08627451, 1)
+fg = Color(0.9529412, 0.89411765, 0.7607843, 1)
+font_size = 20
+border = false
+
+[node name="Now" type="RichTextLabel" parent="Column" unique_id=299019131]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_fonts/normal_font = ExtResource("11_7al4x")
+theme_override_fonts/bold_font = ExtResource("7_cvqbr")
+theme_override_fonts/italics_font = ExtResource("12_aor8c")
+theme_override_font_sizes/normal_font_size = 26
+theme_override_font_sizes/bold_font_size = 26
+theme_override_font_sizes/italics_font_size = 26
+bbcode_enabled = true
+text = "[b]Now:[/b] Every hero: Strength +1, Defense +1"
+fit_content = true
+scroll_active = false
+
+[node name="Next" type="RichTextLabel" parent="Column" unique_id=211162098]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.22745098, 0.15686275, 0.08627451, 1)
+theme_override_fonts/normal_font = ExtResource("11_7al4x")
+theme_override_fonts/bold_font = ExtResource("7_cvqbr")
+theme_override_fonts/italics_font = ExtResource("12_aor8c")
+theme_override_font_sizes/normal_font_size = 26
+theme_override_font_sizes/bold_font_size = 26
+theme_override_font_sizes/italics_font_size = 26
+bbcode_enabled = true
+text = "[color=#2F6A22][b]Next:[/b] Every hero: Strength +2, Defense +1[/color]"
+fit_content = true
+scroll_active = false
+
+[node name="Line" type="ColorRect" parent="Column" unique_id=2010619973]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.7882353, 0.6627451, 0.41568628, 0.9)
+
+[node name="Bottom" type="HBoxContainer" parent="Column" unique_id=1573160374]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="CoinIcon" type="TextureRect" parent="Column/Bottom" unique_id=192999151]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("13_bnl5r")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Cost" type="Label" parent="Column/Bottom" unique_id=818778204]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_ntdmx")
+theme_override_font_sizes/font_size = 30
+text = "150"
+
+[node name="RookIcon" type="TextureRect" parent="Column/Bottom" unique_id=398837470]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("14_d5jyg")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Requirement" type="Label" parent="Column/Bottom" unique_id=698733443]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_ntdmx")
+theme_override_font_sizes/font_size = 30
+text = "1"
+
+[node name="Spacer" type="Control" parent="Column/Bottom" unique_id=300841246]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="UpgradeButton" type="Button" parent="Column/Bottom" unique_id=1700516508]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+focus_mode = 0
+mouse_default_cursor_shape = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.08, 0.03, 0.85)
+theme_override_constants/outline_size = 6
+theme_override_constants/h_separation = 10
+theme_override_constants/icon_max_width = 35
+theme_override_fonts/font = ExtResource("6_ntdmx")
+theme_override_font_sizes/font_size = 27
+theme_override_styles/normal = ExtResource("15_5hnj8")
+theme_override_styles/pressed = ExtResource("16_7xuk0")
+theme_override_styles/hover = ExtResource("15_5hnj8")
+theme_override_styles/hover_pressed = ExtResource("16_7xuk0")
+theme_override_styles/disabled = ExtResource("17_tfvsi")
+theme_override_styles/focus = ExtResource("18_lijym")
+text = "Upgrade"

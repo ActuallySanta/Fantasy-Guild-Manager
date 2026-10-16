@@ -124,3 +124,9 @@ func injure_character() ->bool:
 	if(injury_level == InjuryLevel.DEAD):
 		return true
 	else: return false
+
+func level_up_random_stat(_points_to_add: int):
+	for i in _points_to_add:
+		var stat_to_pick = stats.keys().pick_random()
+		stats[stat_to_pick] += 1
+		total_points += 1

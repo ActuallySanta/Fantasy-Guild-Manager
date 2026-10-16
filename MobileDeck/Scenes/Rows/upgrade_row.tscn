@@ -1,0 +1,138 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileDeck/deck_theme.tres" id="1_va2dx"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/box_card.tres" id="2_s6cwk"]
+[ext_resource type="Script" path="res://MobileDeck/Scripts/upgrade_row.gd" id="3_4y6ko"]
+[ext_resource type="PackedScene" path="res://MobileDeck/Scenes/Components/chip.tscn" id="4_k7vu0"]
+[ext_resource type="Script" path="res://MobileDeck/Scripts/gauge.gd" id="5_adb82"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_green_normal.tres" id="6_fjsx1"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_green_pressed.tres" id="7_gp2en"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_green_hover.tres" id="8_h186i"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/button_disabled.tres" id="9_30sgr"]
+[ext_resource type="StyleBox" path="res://MobileDeck/Styles/empty.tres" id="10_axn1n"]
+
+[node name="UpgradeRow" type="PanelContainer" unique_id=1431073363]
+theme = ExtResource("1_va2dx")
+theme_override_styles/panel = ExtResource("2_s6cwk")
+script = ExtResource("3_4y6ko")
+
+[node name="Column" type="VBoxContainer" parent="." unique_id=366398314]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Top" type="HBoxContainer" parent="Column" unique_id=674081059]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BuildingName" type="Label" parent="Column/Top" unique_id=1854034729]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Armory"
+
+[node name="Level" type="Label" parent="Column/Top" unique_id=1703136109]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.61960787, 0.63529414, 0.7019608, 1)
+theme_override_font_sizes/font_size = 20
+text = "Lv 1/5"
+
+[node name="Spacer" type="Control" parent="Column/Top" unique_id=1206277053]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="SoonChip" parent="Column/Top" unique_id=628586570 instance=ExtResource("4_k7vu0")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+text = "Coming soon"
+bg = Color(0.08627451, 0.20784314, 0.32156864, 1)
+fg = Color(0.25882354, 0.64705884, 0.9607843, 1)
+font_size = 18
+border = false
+
+[node name="LevelGauge" type="Control" parent="Column" unique_id=1651784480]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 16)
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+script = ExtResource("5_adb82")
+value = 0.2
+
+[node name="Now" type="RichTextLabel" parent="Column" unique_id=1747416239]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_font_sizes/normal_font_size = 20
+theme_override_font_sizes/bold_font_size = 20
+theme_override_font_sizes/italics_font_size = 20
+bbcode_enabled = true
+text = "[b]Now:[/b] Every hero: Strength +1, Defense +1"
+fit_content = true
+scroll_active = false
+
+[node name="Next" type="RichTextLabel" parent="Column" unique_id=1822907674]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_font_sizes/normal_font_size = 20
+theme_override_font_sizes/bold_font_size = 20
+theme_override_font_sizes/italics_font_size = 20
+bbcode_enabled = true
+text = "[color=#66bb6a][b]Next:[/b] Every hero: Strength +2, Defense +1[/color]"
+fit_content = true
+scroll_active = false
+
+[node name="Bottom" type="HBoxContainer" parent="Column" unique_id=1917155158]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CostChip" parent="Column/Bottom" unique_id=496919763 instance=ExtResource("4_k7vu0")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "150"
+icon_name = "coins"
+bg = Color(0.27450982, 0.22745098, 0.07058824, 1)
+fg = Color(1, 0.7921569, 0.15686275, 1)
+font_size = 18
+icon_style = true
+
+[node name="StandingChip" parent="Column/Bottom" unique_id=269081949 instance=ExtResource("4_k7vu0")]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1"
+icon_name = "rook"
+font_size = 18
+icon_style = true
+
+[node name="Spacer" type="Control" parent="Column/Bottom" unique_id=1708054218]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+
+[node name="UpgradeButton" type="Button" parent="Column/Bottom" unique_id=1468530944]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+focus_mode = 0
+theme_override_colors/font_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_pressed_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_hover_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_colors/font_disabled_color = Color(0.36078432, 0.3764706, 0.4392157, 1)
+theme_override_colors/icon_normal_color = Color(0.93333334, 0.9372549, 0.9529412, 1)
+theme_override_constants/h_separation = 8
+theme_override_constants/icon_max_width = 28
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = ExtResource("6_fjsx1")
+theme_override_styles/pressed = ExtResource("7_gp2en")
+theme_override_styles/hover = ExtResource("8_h186i")
+theme_override_styles/hover_pressed = ExtResource("7_gp2en")
+theme_override_styles/disabled = ExtResource("9_30sgr")
+theme_override_styles/focus = ExtResource("10_axn1n")
+text = "Upgrade"

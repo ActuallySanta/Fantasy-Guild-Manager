@@ -1,0 +1,47 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileDeck/deck_theme.tres" id="1_43gqt"]
+[ext_resource type="Script" path="res://MobileDeck/Scripts/stat_row.gd" id="2_lquha"]
+[ext_resource type="PackedScene" path="res://MobileDeck/Scenes/Components/chip.tscn" id="3_oawob"]
+
+[node name="StatRow" type="HFlowContainer" unique_id=1923336473]
+size_flags_horizontal = 3
+theme = ExtResource("1_43gqt")
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+script = ExtResource("2_lquha")
+
+[node name="Stat0" parent="." unique_id=628586570 instance=ExtResource("3_oawob")]
+layout_mode = 2
+text = "Str 4"
+bg = Color(0.24313726, 0.11764706, 0.13333334, 1)
+fg = Color(0.9372549, 0.3254902, 0.3137255, 1)
+icon_style = true
+
+[node name="Stat1" parent="." unique_id=762255699 instance=ExtResource("3_oawob")]
+layout_mode = 2
+text = "Def 3"
+bg = Color(0.08235294, 0.1882353, 0.2901961, 1)
+fg = Color(0.25882354, 0.64705884, 0.9607843, 1)
+icon_style = true
+
+[node name="Stat2" parent="." unique_id=1745100263 instance=ExtResource("3_oawob")]
+layout_mode = 2
+text = "Wis 8"
+bg = Color(0.21176471, 0.1254902, 0.23921569, 1)
+fg = Color(0.80784315, 0.5764706, 0.84705883, 1)
+icon_style = true
+
+[node name="Stat3" parent="." unique_id=817345668 instance=ExtResource("3_oawob")]
+layout_mode = 2
+text = "Slz 6"
+bg = Color(0.11764706, 0.20784314, 0.13333334, 1)
+fg = Color(0.4, 0.73333335, 0.41568628, 1)
+icon_style = true
+
+[node name="Stat4" parent="." unique_id=1947084942 instance=ExtResource("3_oawob")]
+layout_mode = 2
+text = "Plk 0"
+bg = Color(0.27058825, 0.19215687, 0.101960786, 1)
+fg = Color(1, 0.654902, 0.14901961, 1)
+icon_style = true
