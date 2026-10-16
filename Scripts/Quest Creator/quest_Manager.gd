@@ -35,34 +35,19 @@ func _ready() -> void:
 	testQuestNumber = testQuestNumber + 1
 	print(questResults, "\n")
 	
-	thisQuest = CreatedQuest.new()
-	adventurerArray = thisQuest.generatePartyDuo()
+	var newRegion = Region.new(0)
+	var dungeonNames = newRegion.dungeonNames
+	var escortLocations = newRegion.escortLocations
+	var explorationAreas = newRegion.explorationAreas
+	var intelTargets = newRegion.intelTargets
 	
-	successChance = thisQuest.calcSuccessChance(adventurerArray)
-	print(successChance)
-	print(thisQuest.questTitle)
-	
-	questResults = thisQuest.generateResults(adventurerArray, successChance)
-	acceptedQuestResults.append(questResults)
-	
-	testQuestNumber = testQuestNumber + 1
-	print(questResults, "\n")
-	
-	thisQuest = CreatedQuest.new(10)
-	adventurerArray = thisQuest.generatePartyDuo()
+	for int in range(10):
+		print(newRegion.returnName(0))
+		print(newRegion.returnName(1))
+		print(newRegion.returnName(2))
+		print(newRegion.returnName(3))
 
-	successChance = thisQuest.calcSuccessChance(adventurerArray)
-	print(successChance)
-	print(thisQuest.questTitle)
 
-	questResults = thisQuest.generateMilestoneResults(adventurerArray, successChance)
-	acceptedQuestResults.append(questResults)
-	
-	print(questResults, "\n")
-	
-	#if rich_text != null :
-		#rich_text.changeText(acceptedQuestResults)
-	
 	pass
 
 
