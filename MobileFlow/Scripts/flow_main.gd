@@ -288,6 +288,12 @@ func deny_quest() -> void:
 		return
 	entry.party = []
 	entry.state = "denied"
+	
+	# Right now just reduce standing by the quest difficulty, 
+	#but in the future we can reduce the standing 
+	#depending on the importance
+	GameState.reduce_standing(entry.quest.difficulty)
+	
 	toast(TOAST_DENIED % entry.quest.questTitle)
 	advance()
 
@@ -339,6 +345,10 @@ func _run_quest(e: Dictionary) -> Dictionary:
 	var succeeded: bool = DayBarLogic._did_succeed(story)
 	var gold: int = DayBarLogic._get_gold_earned(e.quest, succeeded)
 	GameState.add_gold(gold)
+	
+	if(succeeded):
+		GameState.add_standing(e.quest.difficulty+1)
+	
 	return {"quest": e.quest, "party": e.party.duplicate(), "story": story, "succeeded": succeeded, "chance": chance, "gold": gold}
 
 

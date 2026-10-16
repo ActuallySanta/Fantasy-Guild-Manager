@@ -56,6 +56,8 @@ const UPGRADE_STANDING_REQ := [0, 1, 2, 3, 4]
 # ---- Placeholder economy (no gold/standing system exists yet) ----
 const STARTING_GOLD := 600
 const STARTING_STANDING := 1
+const MINIMUM_STANDING := -10
+
 ## Write gold/standing into the top bar's GoldLabel / StanLabel.
 const DRIVE_TOP_BAR_LABELS := false
 ## Show the +gold / +standing test buttons on the upgrades page.
@@ -197,13 +199,13 @@ func add_gold(amount: int) -> void:
 
 
 func add_standing(amount: int) -> void:
-	standing = maxi(standing + amount, 0)
+	standing += amount
 	resources_changed.emit()
 	_update_top_bar()
 
 
 func reduce_standing(amount: int) -> void:
-	standing = maxi(standing - amount, 0)
+	standing -= amount
 	resources_changed.emit()
 	_update_top_bar()
 

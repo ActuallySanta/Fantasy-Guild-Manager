@@ -1,13 +1,13 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://gfr51fyg322d"]
 
-[ext_resource type="Theme" path="res://MobileFlow/flow_theme.tres" id="1_ogk1h"]
-[ext_resource type="Script" path="res://MobileFlow/Scripts/step_quest.gd" id="2_ok7k1"]
+[ext_resource type="Theme" uid="uid://cxbbig1tjh4j1" path="res://MobileFlow/flow_theme.tres" id="1_ogk1h"]
+[ext_resource type="Script" uid="uid://be1k5wiy26xcu" path="res://MobileFlow/Scripts/step_quest.gd" id="2_ok7k1"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/box_panel.tres" id="3_gku5o"]
 [ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Components/chip.tscn" id="4_wvb2g"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/decision_good.tres" id="5_xmw8x"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/box_inset.tres" id="6_pkfx1"]
 [ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Rows/slot_empty.tscn" id="7_ypm7k"]
-[ext_resource type="Script" path="res://MobileFlow/Scripts/gauge.gd" id="8_qxoef"]
+[ext_resource type="Script" uid="uid://cxca7llamco6d" path="res://MobileFlow/Scripts/gauge.gd" id="8_qxoef"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_blue_normal.tres" id="9_3lmr8"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_blue_pressed.tres" id="10_6stsj"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_blue_hover.tres" id="11_jo7dk"]
@@ -22,6 +22,54 @@
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_red_normal.tres" id="20_7tqjt"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_red_pressed.tres" id="21_bxrrk"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_red_hover.tres" id="22_e8534"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ogk1h"]
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+bg_color = Color(0.9490196, 0.9490196, 0.9490196, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.6, 0.6, 0.6, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ok7k1"]
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+bg_color = Color(1, 0.9529412, 0.76862746, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.6, 0.6, 0.6, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gku5o"]
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+bg_color = Color(0.9490196, 0.9490196, 0.9490196, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.6, 0.6, 0.6, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wvb2g"]
+content_margin_left = 8.0
+content_margin_top = 2.0
+content_margin_right = 8.0
+content_margin_bottom = 2.0
+bg_color = Color(0.9098039, 0.9607843, 0.9137255, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.18039216, 0.49019608, 0.19607843, 1)
 
 [node name="StepQuest" type="VBoxContainer" unique_id=2120464959]
 anchors_preset = 15
@@ -111,11 +159,13 @@ theme_override_constants/v_separation = 6
 [node name="TypeChip" parent="Scroll/Margin/Content/QuestCard/Column/Chips" unique_id=542229946 instance=ExtResource("4_wvb2g")]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ogk1h")
 text = "Gather Intel, Rank F"
 
 [node name="GoldChip" parent="Scroll/Margin/Content/QuestCard/Column/Chips" unique_id=280174253 instance=ExtResource("4_wvb2g")]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ok7k1")
 text = "200 gold"
 icon_name = "coins"
 bg = Color(1, 0.9529412, 0.76862746, 1)
@@ -125,6 +175,7 @@ icon_style = true
 [node name="PartyChip" parent="Scroll/Margin/Content/QuestCard/Column/Chips" unique_id=1382837784 instance=ExtResource("4_wvb2g")]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_gku5o")
 text = "Party of up to 2"
 
 [node name="Favored" type="HBoxContainer" parent="Scroll/Margin/Content/QuestCard/Column" unique_id=873491653]
@@ -139,6 +190,7 @@ text = "Favored stat:"
 [node name="FavChip" parent="Scroll/Margin/Content/QuestCard/Column/Favored" unique_id=856891834 instance=ExtResource("4_wvb2g")]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_wvb2g")
 text = "Sleaziness"
 bg = Color(0.9098039, 0.9607843, 0.9137255, 1)
 fg = Color(0.18039216, 0.49019608, 0.19607843, 1)

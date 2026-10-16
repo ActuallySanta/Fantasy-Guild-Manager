@@ -1,11 +1,11 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bdothxpf2n4pv"]
 
-[ext_resource type="Theme" path="res://MobileFlow/flow_theme.tres" id="1_335a4"]
-[ext_resource type="Script" path="res://MobileFlow/Scripts/overlay_intro.gd" id="2_lm7d8"]
+[ext_resource type="Theme" uid="uid://cxbbig1tjh4j1" path="res://MobileFlow/flow_theme.tres" id="1_335a4"]
+[ext_resource type="Script" uid="uid://dokwujk4begm6" path="res://MobileFlow/Scripts/overlay_intro.gd" id="2_lm7d8"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/box_panel.tres" id="3_dtn25"]
-[ext_resource type="Texture2D" path="res://Sprites/UI Icons/user-solid-full.svg" id="4_wmvkl"]
-[ext_resource type="Texture2D" path="res://Sprites/UI Icons/book-solid-full.svg" id="5_ijoic"]
-[ext_resource type="Texture2D" path="res://Sprites/UI Icons/sun-solid-full.svg" id="6_osv3f"]
+[ext_resource type="Texture2D" uid="uid://c0ojxw8sauffc" path="res://Sprites/UI Icons/user-solid-full.svg" id="4_wmvkl"]
+[ext_resource type="Texture2D" uid="uid://bj1hfljhsxpfe" path="res://Sprites/UI Icons/book-solid-full.svg" id="5_ijoic"]
+[ext_resource type="Texture2D" uid="uid://b45od3f4bqey8" path="res://Sprites/UI Icons/sun-solid-full.svg" id="6_osv3f"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_green_normal.tres" id="7_423ch"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_green_pressed.tres" id="8_5mw6r"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_green_hover.tres" id="9_sbb8a"]
@@ -74,7 +74,9 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
 theme_override_font_sizes/font_size = 20
-text = "Recruit adventurers for free. You need at least one to take quests."
+text = "Recruit adventurers for free. You need at least one to take quests.
+
+If your standing gets too low, you will no longer be able to hire more characters"
 autowrap_mode = 3
 
 [node name="Step2" type="HBoxContainer" parent="Center/Card/Column" unique_id=336452900]
@@ -107,7 +109,9 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
 theme_override_font_sizes/font_size = 20
-text = "Quests come one at a time. Pick a party and send them, or deny the quest."
+text = "Quests come one at a time. Pick a party and send them, or deny the quest.
+
+Denying a quest will reduce your standing"
 autowrap_mode = 3
 
 [node name="Step3" type="HBoxContainer" parent="Center/Card/Column" unique_id=1751263618]

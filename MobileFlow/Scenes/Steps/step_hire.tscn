@@ -1,7 +1,7 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://1w0u1l6kiabu"]
 
-[ext_resource type="Theme" path="res://MobileFlow/flow_theme.tres" id="1_m8biy"]
-[ext_resource type="Script" path="res://MobileFlow/Scripts/step_hire.gd" id="2_ahvxf"]
+[ext_resource type="Theme" uid="uid://cxbbig1tjh4j1" path="res://MobileFlow/flow_theme.tres" id="1_m8biy"]
+[ext_resource type="Script" uid="uid://cdrlu241bbasy" path="res://MobileFlow/Scripts/step_hire.gd" id="2_ahvxf"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/box_inset.tres" id="3_vovex"]
 [ext_resource type="PackedScene" path="res://MobileFlow/Scenes/Components/portrait.tscn" id="4_u2ru7"]
 [ext_resource type="StyleBox" path="res://MobileFlow/Styles/button_green_normal.tres" id="5_bphg7"]
@@ -99,6 +99,20 @@ size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
 theme_override_font_sizes/font_size = 22
 text = "Nobody is for hire right now. New faces arrive every morning."
+autowrap_mode = 3
+
+[node name="LowStanding" type="PanelContainer" parent="Scroll/Margin/Content" unique_id=929771013]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_vovex")
+
+[node name="Text" type="Label" parent="Scroll/Margin/Content/LowStanding" unique_id=1990240260]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.33333334, 0.33333334, 0.33333334, 1)
+theme_override_font_sizes/font_size = 22
+text = "Your guild is too unpopular, and nobody wants to come join"
 autowrap_mode = 3
 
 [node name="Footer" type="PanelContainer" parent="." unique_id=282990219]

@@ -18,6 +18,7 @@ const TEXT_FULL := "Your guild is full (%d/%d). Upgrade the Barracks for more ro
 @onready var _guild_strip: Control = %GuildStrip
 @onready var _guild_portraits: Container = %GuildPortraits
 @onready var _recruits: Container = %Recruits
+@onready var _low_standing: Control = %LowStanding
 @onready var _no_recruits: Control = %NoRecruits
 @onready var _footer: Control = %Footer
 @onready var _footer_warning: Label = %FooterWarning
@@ -44,10 +45,14 @@ func refresh() -> void:
 	var cap: int = CharacterContainer.max_characters
 	var room := cap - roster.size()
 	_subtitle.text = TEXT_ROOM % [room, roster.size(), cap] if room > 0 else TEXT_FULL % [roster.size(), cap]
-	_show_guild_strip(roster)
-	_show_recruits(room <= 0)
-	# nobody hired yet: warn, and don't make Next look like the obvious move
-	_footer_warning.visible = roster.is_empty()
+	
+	if(GameState.standing > GuildUpgrades.MINIMUM_STANDING):
+		_show_guild_strip(roster)
+		_show_recruits(room <= 0)
+		# nobody hired yet: warn, and don't make Next look like the obvious move
+		_footer_warning.visible = roster.is_empty()
+	
+	_low_standing.visible = !(GameState.standing > GuildUpgrades.MINIMUM_STANDING)
 	S.style_button(_next_button, "" if roster.is_empty() else "green")
 
 
