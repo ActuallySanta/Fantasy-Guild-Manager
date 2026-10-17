@@ -66,7 +66,7 @@ func _init(dayNum := 0) -> void:
 
 	questNum = randi_range(0, 7)
 	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
-	location = ExternalContentContainer.get_Location_Name(type - 1)
+	location = QuestManager.newRegion.returnName(type)
 	goldReward = 200 + (150 * difficulty)
 
 	match type:
@@ -210,7 +210,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 			returnString = str(
 				returnString,
 				"[b]The Party[/b] was ATTACKED by a group of ",
-				ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
+				QuestManager.newRegion.returnMonster(),
 				"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n",
 			)
 		_:
@@ -220,7 +220,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 				"[b]",
 				attackedAdventurer.name,
 				"[/b] was ATTACKED by a ",
-				ExternalContentContainer.get_Monster_Name(QuestManager.instance.testQuestNumber),
+				QuestManager.newRegion.returnMonster(),
 				". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n",
 			)
 			attackedAdventurer.injure_character()

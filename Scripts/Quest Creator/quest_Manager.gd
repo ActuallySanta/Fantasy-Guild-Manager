@@ -1,11 +1,9 @@
 extends Node
 
-class_name QuestManager
-static var instance: QuestManager
-
 var thisQuest = CreatedQuest
 var acceptedQuests: Array[CreatedQuest]
 var acceptedQuestResults: Array[String]
+var newRegion: Region = Region.new(0)
 
 var dayNum = 0;
 
@@ -35,12 +33,6 @@ func _ready() -> void:
 	testQuestNumber = testQuestNumber + 1
 	print(questResults, "\n")
 	
-	var newRegion = Region.new(0)
-	var dungeonNames = newRegion.dungeonNames
-	var escortLocations = newRegion.escortLocations
-	var explorationAreas = newRegion.explorationAreas
-	var intelTargets = newRegion.intelTargets
-	
 	for int in range(10):
 		print(newRegion.returnName(0))
 		print(newRegion.returnName(1))
@@ -54,10 +46,3 @@ func _ready() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass
-
-func _enter_tree() -> void:
-	instance = self
-
-func _exit_tree() -> void:
-	if instance == self:
-		instance = null
