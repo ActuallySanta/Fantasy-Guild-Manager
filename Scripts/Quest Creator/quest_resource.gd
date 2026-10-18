@@ -208,38 +208,79 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 
 	if combatChance >= successDetermination:
 		var succComDet = randi_range(1, 100)
-		if(1 <= succComDet <= 25):
+		if(1 <= succComDet && succComDet <= 25):
 				returnString = str(
 					"[b]The Party[/b] was ATTACKED by a group of ",
 					QuestManager.newRegion.returnMonster(),
 					"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n"
 				)
-		elif (26 <= succComDet <= 50):
+		elif (26 <= succComDet && succComDet <= 50):
 				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
 				returnString = str(
 					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
 					QuestManager.newRegion.returnMonster(),
 					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
-		)
-		elif (51 <= succComDet <= 75):
-				print("equipment")
-		elif (76 <= succComDet <= 90):
-				print("gold")
-		elif (91 <= succComDet <= 100):
-				print("gold and injury")
+					)
+		elif (51 <= succComDet && succComDet <= 75):
+				returnString = str(
+					"[b]The Party[/b] was ATTACKED by a group of ",
+					QuestManager.newRegion.returnMonster(),
+					". They defeated them [color=green][b]without sustaining any injuries[/b][/color], and also obtained [EQUIP_NOT_IMPLEMENTED].\n"
+					)
+		elif (76 <= succComDet && succComDet <= 90):
+				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
+				var extraGold = randi_range(11, 29)
+				goldReward += extraGold
+				returnString = str(
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					QuestManager.newRegion.returnMonster(),
+					", and defeated it, finding [color=FFE700][b] ", extraGold," gold [/b][/color]on its corpse.\n"
+					)
+		elif (91 <= succComDet && succComDet <= 100):
+				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
+				var extraGold = randi_range(11, 29)
+				goldReward += extraGold
+				returnString = str(
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					QuestManager.newRegion.returnMonster(), ", and defeated it, finding [color=FFE700][b] ", extraGold, 
+					" gold [/b][/color]on its corpse. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
+					)
+				attackedAdventurer.injure_character()
 
 	else:
 		var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
-
-		returnString = str(
-			"[b]",
-			attackedAdventurer.name,
-			"[/b] was ATTACKED by a ",
-			QuestManager.newRegion.returnMonster(),
+		var succComDet = randi_range(1, 100)
+		
+		if(1 <= succComDet && succComDet <= 25):
+			returnString = str(
+			"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ", QuestManager.newRegion.returnMonster(),
 			". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
-		)
-
-		attackedAdventurer.injure_character()
+			)
+			attackedAdventurer.injure_character()
+		elif (26 <= succComDet && succComDet <= 50):
+			returnString = str(
+					"[b]The Party[/b] was ATTACKED by a group of ", QuestManager.newRegion.returnMonster(),
+					"s. They managed to defeat them, but not before [color=FD0000][b]", attackedAdventurer, " was INJURED[/b][/color] in the process.\n"
+					)
+			attackedAdventurer.injure_character()
+		elif (51 <= succComDet && succComDet <= 75):
+			returnString = str(
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ", QuestManager.newRegion.returnMonster(), 
+					", and defeated it, obtaining a(n) [EQUIP_NOT_IMPLEMENTED] on its corpse. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
+					)
+			attackedAdventurer.injure_character()
+		elif (76 <= succComDet && succComDet <= 90):
+			returnString = str(
+					"[b]The Party[/b] was ATTACKED by a group of ",
+					QuestManager.newRegion.returnMonster(),
+					"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n"
+				)
+		elif (91 <= succComDet && succComDet <= 100):
+				returnString = str(
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					QuestManager.newRegion.returnMonster(),
+					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
+					)
 
 	return returnString
 
