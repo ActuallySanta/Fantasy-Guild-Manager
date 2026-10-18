@@ -1,0 +1,72 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_menu.gd" id="1_3yvdq"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/dim.tres" id="2_kkstj"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/sheet.tres" id="3_ccfii"]
+
+[node name="OverlayMenu" type="Control" unique_id=1444146504]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_3yvdq")
+
+[node name="Dim" type="PanelContainer" parent="." unique_id=1929477413]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = ExtResource("2_kkstj")
+
+[node name="Center" type="CenterContainer" parent="." unique_id=1155779853]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Sheet" type="PanelContainer" parent="Center" unique_id=740623616]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("3_ccfii")
+
+[node name="Col" type="VBoxContainer" parent="Center/Sheet" unique_id=1842961326]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Sheet/Col" unique_id=1774342722]
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+text = "Menu"
+horizontal_alignment = 1
+
+[node name="HowButton" type="Button" parent="Center/Sheet/Col" unique_id=69910396]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "HowButton"
+
+[node name="ReportButton" type="Button" parent="Center/Sheet/Col" unique_id=447442367]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "ReportButton"
+
+[node name="ResetButton" type="Button" parent="Center/Sheet/Col" unique_id=1210881435]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "ResetButton"
+
+[node name="CloseButton" type="Button" parent="Center/Sheet/Col" unique_id=2045574900]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "CloseButton"

@@ -1,6 +1,6 @@
-[gd_resource type="Theme" format=3]
+[gd_resource type="Theme" format=3 uid="uid://q062pgiv7lf5"]
 
-[ext_resource type="FontFile" path="res://MobileLedger/Fonts/AlegreyaSans-Medium.ttf" id="1_53bbu"]
+[ext_resource type="FontFile" uid="uid://bgdjqufjyeu52" path="res://MobileLedger/Fonts/AlegreyaSans-Medium.ttf" id="1_53bbu"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_63y3v"]
 content_margin_left = 5.0

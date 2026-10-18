@@ -1,0 +1,74 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://MobileHall/Scripts/tab_board.gd" id="1_uvw3s"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Rows/today_item.tscn" id="2_otn60"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/card.tres" id="3_h2bar"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/today_item.gd" id="4_dk61h"]
+
+[node name="TabBoard" type="ScrollContainer" unique_id=905224989]
+horizontal_scroll_mode = 0
+script = ExtResource("1_uvw3s")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1778300488]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 20
+
+[node name="Col" type="VBoxContainer" parent="Margin" unique_id=362105929]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Today" type="HBoxContainer" parent="Margin/Col" unique_id=1239515434]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TodayRecruits" type="PanelContainer" parent="Margin/Col/Today" unique_id=202577791 instance=ExtResource("2_otn60")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = ExtResource("3_h2bar")
+script = ExtResource("4_dk61h")
+
+[node name="TodayQuests" type="PanelContainer" parent="Margin/Col/Today" unique_id=1628681663 instance=ExtResource("2_otn60")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = ExtResource("3_h2bar")
+script = ExtResource("4_dk61h")
+
+[node name="TodayUpgrades" type="PanelContainer" parent="Margin/Col/Today" unique_id=624831711 instance=ExtResource("2_otn60")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_styles/panel = ExtResource("3_h2bar")
+script = ExtResource("4_dk61h")
+
+[node name="HeadingBox" type="VBoxContainer" parent="Margin/Col" unique_id=1416287704]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Heading" type="Label" parent="Margin/Col/HeadingBox" unique_id=25998558]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Today's Quests"
+
+[node name="Hint" type="Label" parent="Margin/Col/HeadingBox" unique_id=2054389682]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+text = "Tap a quest to pick its party."
+autowrap_mode = 3
+
+[node name="QuestList" type="VBoxContainer" parent="Margin/Col" unique_id=1780989176]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10

@@ -1,0 +1,125 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_report.gd" id="1_s0qxh"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/header.tres" id="2_6ukms"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_bnucx"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/chip.tres" id="4_8tshr"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/chip.gd" id="5_3md2h"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="6_fuucl"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green.tres" id="7_oiqxi"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green_down.tres" id="8_knrq5"]
+
+[node name="OverlayReport" type="Control" unique_id=646940817]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_s0qxh")
+
+[node name="Bg" type="ColorRect" parent="." unique_id=1021900790]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.9411765, 0.9411765, 0.9411765, 1)
+
+[node name="Layout" type="VBoxContainer" parent="." unique_id=512838239]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 0
+
+[node name="Header" type="PanelContainer" parent="Layout" unique_id=1977943461]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("2_6ukms")
+
+[node name="Col" type="VBoxContainer" parent="Layout/Header" unique_id=1990462942]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Layout/Header/Col" unique_id=1449689581]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "Day 1 Report"
+
+[node name="Chips" type="HBoxContainer" parent="Layout/Header/Col" unique_id=1020426321]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="WinsChip" type="PanelContainer" parent="Layout/Header/Col/Chips" unique_id=545259554 instance=ExtResource("3_bnucx")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("4_8tshr")
+script = ExtResource("5_3md2h")
+
+[node name="GoldChip" type="PanelContainer" parent="Layout/Header/Col/Chips" unique_id=2069857636 instance=ExtResource("3_bnucx")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("4_8tshr")
+script = ExtResource("5_3md2h")
+
+[node name="HurtChip" type="PanelContainer" parent="Layout/Header/Col/Chips" unique_id=2117541711 instance=ExtResource("3_bnucx")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("4_8tshr")
+script = ExtResource("5_3md2h")
+
+[node name="Scroll" type="ScrollContainer" parent="Layout" unique_id=1628967775]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Layout/Scroll" unique_id=347502963]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 20
+
+[node name="Col" type="VBoxContainer" parent="Layout/Scroll/Margin" unique_id=1135641165]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Entries" type="VBoxContainer" parent="Layout/Scroll/Margin/Col" unique_id=2052586860]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Empty" type="Label" parent="Layout/Scroll/Margin/Col" unique_id=1575770257]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+text = "Nobody went out."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Footer" type="PanelContainer" parent="Layout" unique_id=1972650590]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("6_fuucl")
+
+[node name="ActionButton" type="Button" parent="Layout/Footer" unique_id=1041452009]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/normal = ExtResource("7_oiqxi")
+theme_override_styles/pressed = ExtResource("8_knrq5")
+theme_override_styles/hover = ExtResource("7_oiqxi")
+theme_override_styles/hover_pressed = ExtResource("8_knrq5")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 32
+text = "Start Day 2"

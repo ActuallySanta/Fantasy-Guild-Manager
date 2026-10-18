@@ -1,0 +1,427 @@
+[gd_scene format=3]
+
+[ext_resource type="Theme" path="res://MobileHall/hall_theme.tres" id="1_puoav"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/hall_main.gd" id="2_f2ct0"]
+[ext_resource type="Script" path="res://Scripts/Quest Creator/quest_Manager.gd" id="3_0akhc"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/header.tres" id="4_y5xmu"]
+[ext_resource type="Texture2D" path="res://Sprites/UI Icons/coins-solid-full.svg" id="5_5hrq8"]
+[ext_resource type="Texture2D" path="res://Sprites/UI Icons/chess-rook-solid-full.svg" id="6_8tvxw"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_wood.tres" id="7_6io04"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_wood_down.tres" id="8_efxwo"]
+[ext_resource type="Texture2D" path="res://Sprites/UI Icons/gear-solid-full.svg" id="9_csala"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_board.tscn" id="10_mpynf"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/tab_board.gd" id="11_o2r3c"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_guild.tscn" id="12_cbnp0"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/tab_guild.gd" id="13_fy7u4"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_upgrades.tscn" id="14_v8b36"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/tab_upgrades.gd" id="15_1go6h"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Screens/screen_assign.tscn" id="16_tj44p"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/screen_assign.gd" id="17_aicat"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Screens/screen_character.tscn" id="18_c5uvo"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/screen_character.gd" id="19_njt8t"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="20_7dlno"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_blue.tres" id="21_yay8x"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_blue_down.tres" id="22_3inmb"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/nav.tres" id="23_gfraq"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/tab_tile.tres" id="24_bpy6t"]
+[ext_resource type="Texture2D" path="res://Sprites/UI Icons/book-solid-full.svg" id="25_ompdi"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/badge.tres" id="26_t8oow"]
+[ext_resource type="Texture2D" path="res://Sprites/UI Icons/user-solid-full.svg" id="27_8udri"]
+[ext_resource type="Texture2D" path="res://Sprites/UI Icons/arrow-up-solid-full.svg" id="28_whkse"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/toast.tres" id="29_n8ylg"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_end_day.tscn" id="30_cwf4i"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_end_day.gd" id="31_yegx1"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_menu.tscn" id="32_kg28u"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_menu.gd" id="33_ylx3o"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_report.tscn" id="34_6fy20"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_report.gd" id="35_rcc7c"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_welcome.gd" id="37_hqd2c"]
+
+[node name="MobileHall" type="Control" unique_id=1778077561]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("1_puoav")
+script = ExtResource("2_f2ct0")
+
+[node name="Bg" type="ColorRect" parent="." unique_id=98911713]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+color = Color(0.9411765, 0.9411765, 0.9411765, 1)
+
+[node name="QuestManager" type="Node" parent="." unique_id=45246718]
+script = ExtResource("3_0akhc")
+
+[node name="Layout" type="VBoxContainer" parent="." unique_id=1405455268]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 0
+
+[node name="Header" type="PanelContainer" parent="Layout" unique_id=1730726479]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("4_y5xmu")
+
+[node name="Row" type="HBoxContainer" parent="Layout/Header" unique_id=1120088229]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="DayBox" type="VBoxContainer" parent="Layout/Header/Row" unique_id=1034361038]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="DayValue" type="Label" parent="Layout/Header/Row/DayBox" unique_id=1317940463]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "Day 1"
+
+[node name="DrakeValue" type="Label" parent="Layout/Header/Row/DayBox" unique_id=1482028234]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 19
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "Bone Drake in 9 days"
+
+[node name="GoldValueBox" type="HBoxContainer" parent="Layout/Header/Row" unique_id=1965072113]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="TextureRect" parent="Layout/Header/Row/GoldValueBox" unique_id=2007830193]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("5_5hrq8")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GoldValue" type="Label" parent="Layout/Header/Row/GoldValueBox" unique_id=1617523312]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "0"
+
+[node name="StandingValueBox" type="HBoxContainer" parent="Layout/Header/Row" unique_id=1648845580]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Icon" type="TextureRect" parent="Layout/Header/Row/StandingValueBox" unique_id=1542981211]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_8tvxw")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StandingValue" type="Label" parent="Layout/Header/Row/StandingValueBox" unique_id=1888306115]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "0"
+
+[node name="MenuButton" type="Button" parent="Layout/Header/Row" unique_id=698452107]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 72)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_styles/normal = ExtResource("7_6io04")
+theme_override_styles/pressed = ExtResource("8_efxwo")
+theme_override_styles/hover = ExtResource("7_6io04")
+theme_override_styles/hover_pressed = ExtResource("8_efxwo")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
+theme_override_colors/icon_normal_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/icon_hover_color = Color(1, 1, 1, 1)
+theme_override_constants/icon_max_width = 34
+icon = ExtResource("9_csala")
+icon_alignment = 1
+
+[node name="Content" type="Control" parent="Layout" unique_id=2038967090]
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TabBoard" type="ScrollContainer" parent="Layout/Content" unique_id=905224989 instance=ExtResource("10_mpynf")]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+horizontal_scroll_mode = 0
+script = ExtResource("11_o2r3c")
+
+[node name="TabGuild" type="VBoxContainer" parent="Layout/Content" unique_id=1782587226 instance=ExtResource("12_cbnp0")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 0
+script = ExtResource("13_fy7u4")
+
+[node name="TabUpgrades" type="ScrollContainer" parent="Layout/Content" unique_id=229603043 instance=ExtResource("14_v8b36")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+horizontal_scroll_mode = 0
+script = ExtResource("15_1go6h")
+
+[node name="ScreenAssign" type="VBoxContainer" parent="Layout/Content" unique_id=216972609 instance=ExtResource("16_tj44p")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 0
+script = ExtResource("17_aicat")
+
+[node name="ScreenCharacter" type="VBoxContainer" parent="Layout/Content" unique_id=2004027154 instance=ExtResource("18_c5uvo")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 0
+script = ExtResource("19_njt8t")
+
+[node name="ActionBar" type="PanelContainer" parent="Layout" unique_id=1623730675]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = ExtResource("20_7dlno")
+
+[node name="Row" type="HBoxContainer" parent="Layout/ActionBar" unique_id=2026292799]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Text" type="VBoxContainer" parent="Layout/ActionBar/Row" unique_id=861739172]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ActionTitle" type="Label" parent="Layout/ActionBar/Row/Text" unique_id=1332768597]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "5 quests to decide"
+text_overrun_behavior = 3
+
+[node name="ActionHint" type="Label" parent="Layout/ActionBar/Row/Text" unique_id=2083500454]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+text = "Next: Raid the Goblin Caves"
+text_overrun_behavior = 3
+
+[node name="ActionButton" type="Button" parent="Layout/ActionBar/Row" unique_id=951064072]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 92)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/normal = ExtResource("21_yay8x")
+theme_override_styles/pressed = ExtResource("22_3inmb")
+theme_override_styles/hover = ExtResource("21_yay8x")
+theme_override_styles/hover_pressed = ExtResource("22_3inmb")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 30
+text = "Next Quest"
+
+[node name="Nav" type="PanelContainer" parent="Layout" unique_id=1083681724]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("23_gfraq")
+
+[node name="Row" type="HBoxContainer" parent="Layout/Nav" unique_id=349265253]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Nav_board" type="Button" parent="Layout/Nav/Row" unique_id=450545657]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_styles/normal = ExtResource("24_bpy6t")
+theme_override_styles/pressed = ExtResource("24_bpy6t")
+theme_override_styles/hover = ExtResource("24_bpy6t")
+theme_override_styles/hover_pressed = ExtResource("24_bpy6t")
+theme_override_font_sizes/font_size = 22
+theme_override_constants/icon_max_width = 34
+text = "Board"
+icon = ExtResource("25_ompdi")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Badge" type="PanelContainer" parent="Layout/Nav/Row/Nav_board" unique_id=1771042315]
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -10.0
+offset_top = -6.0
+offset_right = 6.0
+offset_bottom = 28.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("26_t8oow")
+
+[node name="Text" type="Label" parent="Layout/Nav/Row/Nav_board/Badge" unique_id=881336935]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "5"
+horizontal_alignment = 1
+
+[node name="Nav_guild" type="Button" parent="Layout/Nav/Row" unique_id=814993424]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_styles/normal = ExtResource("24_bpy6t")
+theme_override_styles/pressed = ExtResource("24_bpy6t")
+theme_override_styles/hover = ExtResource("24_bpy6t")
+theme_override_styles/hover_pressed = ExtResource("24_bpy6t")
+theme_override_font_sizes/font_size = 22
+theme_override_constants/icon_max_width = 34
+text = "Guild"
+icon = ExtResource("27_8udri")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Badge" type="PanelContainer" parent="Layout/Nav/Row/Nav_guild" unique_id=212470916]
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -10.0
+offset_top = -6.0
+offset_right = 6.0
+offset_bottom = 28.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("26_t8oow")
+
+[node name="Text" type="Label" parent="Layout/Nav/Row/Nav_guild/Badge" unique_id=1620047249]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "5"
+horizontal_alignment = 1
+
+[node name="Nav_upgrades" type="Button" parent="Layout/Nav/Row" unique_id=1290755603]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_styles/normal = ExtResource("24_bpy6t")
+theme_override_styles/pressed = ExtResource("24_bpy6t")
+theme_override_styles/hover = ExtResource("24_bpy6t")
+theme_override_styles/hover_pressed = ExtResource("24_bpy6t")
+theme_override_font_sizes/font_size = 22
+theme_override_constants/icon_max_width = 34
+text = "Upgrades"
+icon = ExtResource("28_whkse")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Badge" type="PanelContainer" parent="Layout/Nav/Row/Nav_upgrades" unique_id=2073680511]
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -10.0
+offset_top = -6.0
+offset_right = 6.0
+offset_bottom = 28.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("26_t8oow")
+
+[node name="Text" type="Label" parent="Layout/Nav/Row/Nav_upgrades/Badge" unique_id=1757162546]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "5"
+horizontal_alignment = 1
+
+[node name="Toast" type="PanelContainer" parent="." unique_id=607669442]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -330.0
+offset_top = -272.0
+offset_right = 330.0
+offset_bottom = -272.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("29_n8ylg")
+
+[node name="ToastLabel" type="Label" parent="Toast" unique_id=1146268095]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+text = "Toast"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="OverlayEndDay" type="Control" parent="." unique_id=1202933692 instance=ExtResource("30_cwf4i")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("31_yegx1")
+
+[node name="OverlayMenu" type="Control" parent="." unique_id=1444146504 instance=ExtResource("32_kg28u")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("33_ylx3o")
+
+[node name="OverlayReport" type="Control" parent="." unique_id=646940817 instance=ExtResource("34_6fy20")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("35_rcc7c")
+
+[node name="OverlayWelcome" type="Control" parent="." unique_id=1913149125 instance=ExtResource("36_61m5h")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("37_hqd2c")

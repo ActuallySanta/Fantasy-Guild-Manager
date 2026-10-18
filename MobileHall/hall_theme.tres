@@ -1,0 +1,50 @@
+[gd_resource type="Theme" format=3]
+
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_disabled.tres" id="1_f0m7t"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/empty.tres" id="2_drikl"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_paper.tres" id="3_v4jfh"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_paper_down.tres" id="4_2efbg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0kl0n"]
+content_margin_left = 5.0
+content_margin_top = 0.0
+content_margin_right = 5.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0, 0, 0.3)
+border_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0bmvb"]
+content_margin_left = 5.0
+content_margin_top = 0.0
+content_margin_right = 5.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0, 0, 0)
+border_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+
+[resource]
+default_font_size = 26
+Button/colors/font_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+Button/colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
+Button/colors/font_focus_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+Button/colors/font_hover_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+Button/colors/font_hover_pressed_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+Button/colors/font_pressed_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+Button/font_sizes/font_size = 26
+Button/styles/disabled = ExtResource("1_f0m7t")
+Button/styles/focus = ExtResource("2_drikl")
+Button/styles/hover = ExtResource("3_v4jfh")
+Button/styles/hover_pressed = ExtResource("4_2efbg")
+Button/styles/normal = ExtResource("3_v4jfh")
+Button/styles/pressed = ExtResource("4_2efbg")
+Label/colors/font_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+RichTextLabel/colors/default_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+RichTextLabel/font_sizes/bold_font_size = 24
+RichTextLabel/font_sizes/normal_font_size = 24
+VScrollBar/styles/grabber = SubResource("StyleBoxFlat_0kl0n")
+VScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_0kl0n")
+VScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_0kl0n")
+VScrollBar/styles/scroll = SubResource("StyleBoxFlat_0bmvb")

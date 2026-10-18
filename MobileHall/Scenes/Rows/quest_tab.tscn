@@ -1,0 +1,37 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://MobileHall/Scripts/quest_tab.gd" id="1_ebsm4"]
+
+[node name="QuestTab" type="Button" unique_id=2073796152]
+custom_minimum_size = Vector2(0, 84)
+size_flags_horizontal = 3
+focus_mode = 0
+script = ExtResource("1_ebsm4")
+
+[node name="Col" type="VBoxContainer" parent="." unique_id=176148314]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Top" type="HBoxContainer" parent="Col" unique_id=881181668]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="Tag" type="Label" parent="Col/Top" unique_id=1757764141]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+text = "DUN"
+
+[node name="Mark" type="Label" parent="Col" unique_id=456161643]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "1"
+horizontal_alignment = 1

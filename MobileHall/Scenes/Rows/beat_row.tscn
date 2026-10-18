@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://MobileHall/Scripts/beat_row.gd" id="1_4r0pi"]
+[ext_resource type="Texture2D" path="res://Sprites/UI Icons/book-solid-full.svg" id="2_w33w8"]
+
+[node name="BeatRow" type="HBoxContainer" unique_id=567519157]
+theme_override_constants/separation = 10
+script = ExtResource("1_4r0pi")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=442251322]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+texture = ExtResource("2_w33w8")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="RichTextLabel" parent="." unique_id=518006058]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+bbcode_enabled = true
+text = "[b]The Party[/b] found a chest."
+fit_content = true
+scroll_active = false

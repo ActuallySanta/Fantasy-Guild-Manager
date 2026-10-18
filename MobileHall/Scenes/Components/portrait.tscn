@@ -1,0 +1,56 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://MobileHall/Scripts/portrait.gd" id="1_dd1of"]
+[ext_resource type="Texture2D" path="res://Sprites/Character Icons/knight_icon.png" id="2_fdxk0"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5l50i"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0.7254902, 0.7882353, 0.8392157, 1)
+border_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+corner_radius_top_left = 40
+corner_radius_top_right = 40
+corner_radius_bottom_right = 40
+corner_radius_bottom_left = 40
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ch65r"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+bg_color = Color(0, 0, 0, 0)
+draw_center = false
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+corner_radius_top_left = 40
+corner_radius_top_right = 40
+corner_radius_bottom_right = 40
+corner_radius_bottom_left = 40
+
+[node name="Portrait" type="Panel" unique_id=1225425876]
+clip_children = 2
+custom_minimum_size = Vector2(80, 80)
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_5l50i")
+script = ExtResource("1_dd1of")
+
+[node name="Art" type="TextureRect" parent="." unique_id=1065617637]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("2_fdxk0")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Frame" type="Panel" parent="." unique_id=105172624]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ch65r")
