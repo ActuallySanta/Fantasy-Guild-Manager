@@ -195,37 +195,53 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	#once the loop moves on we are done here
 	return returnString
 
-
 func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
-	var combatChance = _successChance / 100
-	combatChance = combatChance * combatChance
-	combatChance *= 100
-	if (combatChance > 90):
+	var combatChance = _successChance / 100.0
+	combatChance *= combatChance
+	combatChance *= 100.0
+
+	if combatChance > 90:
 		combatChance = 90
 
 	var returnString = ""
 	var successDetermination = randi_range(0, 100)
-	match true:
-		_ when combatChance >= successDetermination:
-			returnString = str(
-				returnString,
-				"[b]The Party[/b] was ATTACKED by a group of ",
-				QuestManager.newRegion.returnMonster(),
-				"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n",
-			)
-		_:
-			var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
-			returnString = str(
-				returnString,
-				"[b]",
-				attackedAdventurer.name,
-				"[/b] was ATTACKED by a ",
-				QuestManager.newRegion.returnMonster(),
-				". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n",
-			)
-			attackedAdventurer.injure_character()
-	return returnString
 
+	if combatChance >= successDetermination:
+		var succComDet = randi_range(1, 100)
+		if(1 <= succComDet <= 25):
+				returnString = str(
+					"[b]The Party[/b] was ATTACKED by a group of ",
+					QuestManager.newRegion.returnMonster(),
+					"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n"
+				)
+		elif (26 <= succComDet <= 50):
+				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
+				returnString = str(
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					QuestManager.newRegion.returnMonster(),
+					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
+		)
+		elif (51 <= succComDet <= 75):
+				print("equipment")
+		elif (76 <= succComDet <= 90):
+				print("gold")
+		elif (91 <= succComDet <= 100):
+				print("gold and injury")
+
+	else:
+		var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
+
+		returnString = str(
+			"[b]",
+			attackedAdventurer.name,
+			"[/b] was ATTACKED by a ",
+			QuestManager.newRegion.returnMonster(),
+			". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
+		)
+
+		attackedAdventurer.injure_character()
+
+	return returnString
 
 func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
 	var searchChance = _successChance / 100
