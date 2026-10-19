@@ -260,7 +260,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 		elif (26 <= succComDet && succComDet <= 50):
 			returnString = str(
 					"[b]The Party[/b] was ATTACKED by a group of ", QuestManager.newRegion.returnMonster(),
-					"s. They managed to defeat them, but not before [color=FD0000][b]", attackedAdventurer, " was INJURED[/b][/color] in the process.\n"
+					"s. They managed to defeat them, but not before [color=FD0000][b]", attackedAdventurer.name, " was INJURED[/b][/color] in the process.\n"
 					)
 			attackedAdventurer.injure_character()
 		elif (51 <= succComDet && succComDet <= 75):
