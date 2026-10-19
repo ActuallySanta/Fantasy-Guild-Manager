@@ -181,9 +181,28 @@ func _generate_quests() -> void:
 	else:
 		standingNum = 5
 		
+	
+	
 	for i in QUESTS_PER_DAY:
+		var currentNum = 0
+		currentNum += standingNum
+		currentNum += int(rand_bell_curve())
+		if(currentNum < 0):
+			currentNum = 0
+		elif(currentNum > 5):
+			currentNum = 5
+			
+		if(currentNum - standingNum == 2):
+			currentNum -= 1
+		elif(currentNum - standingNum == -2):
+			currentNum += 1
+		
+		if(GuildUpgrades.standing <= 5):
+			currentNum = 0
+		print(GuildUpgrades.standing)
+		print(currentNum)
 		print(int(rand_bell_curve()))
-		entries.append(_new_entry(CreatedQuest.new(), false))
+		entries.append(_new_entry(CreatedQuest.new(currentNum, 0), false))
 
 func rand_bell_curve(mean: float = 0.0, standard_deviation: float = 1.0) -> float:
 	var u1: float = randf()

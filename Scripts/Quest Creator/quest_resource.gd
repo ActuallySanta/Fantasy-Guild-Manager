@@ -55,13 +55,12 @@ var questNum: int:
 		return questNum
 
 
-func _init(dayNum := 0) -> void:
+func _init(diff := 0, dayNum := 0) -> void:
 	if (dayNum == 10):
 		_initMilestoneVars(dayNum)
 		return
 
-	difficulty = 0
-	#hard code
+	difficulty = diff
 	maxAdventurers = randi_range(1, 2)
 
 	questNum = randi_range(0, 7)
