@@ -84,7 +84,7 @@ func _init() -> void:
 	role = randi_range(0, CharacterRole.size() - 1) as CharacterRole
 	name = ExternalContentContainer.get_character_name(gender)
 	
-	hometown = Region.new()
+	hometown = QuestManager.world_regions.pick_random()
 
 	icon = ExternalContentContainer.get_character_icon(role)
 
