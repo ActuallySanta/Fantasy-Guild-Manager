@@ -4,68 +4,87 @@
 ## Scene: MobileHall/Scenes/Overlays/overlay_report.tscn
 extends Control
 
-const S := preload("res://MobileHall/Scripts/hall_style.gd")
-const ReportEntry := preload("res://MobileHall/Scenes/Rows/report_entry.tscn")
+const Style := preload("res://MobileHall/Scripts/hall_style.gd")
+const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
+const ReportEntryScene := preload("res://MobileHall/Scenes/Rows/report_entry.tscn")
 
 # ---- TEXT
 const TEXT_TITLE := "Day %d Report"
-const TEXT_WINS := "%d / %d succeeded"
+const TEXT_SUCCEEDED := "%d / %d succeeded"
 const TEXT_GOLD := "+%d gold"
-const TEXT_HURT := "%s"
-const TEXT_NO_HURT := "No injuries"
-const TEXT_NOBODY := "Nobody went out. Quests are the only way to earn gold."
-const BUTTON_START := "Start Day %d"
+const TEXT_NO_INJURIES := "No injuries"
+const TEXT_NOBODY_WENT := "Nobody went out. Quests are the only way to earn gold."
+const BUTTON_START_DAY := "Start Day %d"
 const BUTTON_CLOSE := "Close"
 
 # ---- NODES
 @onready var _title: Label = %Title
-@onready var _wins = %WinsChip
-@onready var _gold = %GoldChip
-@onready var _hurt = %HurtChip
+# Totals
+@onready var _succeeded_chip = %WinsChip      # chip.gd
+@onready var _gold_chip = %GoldChip           # chip.gd
+@onready var _injured_chip = %HurtChip        # chip.gd
+# Quest cards
 @onready var _scroll: ScrollContainer = %Scroll
-@onready var _entries: VBoxContainer = %Entries
-@onready var _empty: Label = %Empty
+@onready var _entry_list: VBoxContainer = %Entries
+@onready var _empty_label: Label = %Empty
 @onready var _action_button: Button = %ActionButton
 
-var ui
-var _shown: Dictionary = {}
+## The main hall script (state + actions), set in setup().
+var hall: HallMain
+## The report currently built on screen (to skip rebuilding the same one).
+var _built_report: Dictionary = {}
 
 
-func setup(main) -> void:
-	ui = main
-	_action_button.pressed.connect(func(): ui.close_report())
+func setup(main: HallMain) -> void:
+	hall = main
+	_action_button.pressed.connect(hall.close_report)
 
 
 func refresh() -> void:
-	var rep: Dictionary = ui.report
+	var report: Dictionary = hall.shown_report
 	# only rebuild when a different report opens (keeps open stories open)
-	if rep.get("results") == _shown.get("results") and rep.get("live") == _shown.get("live"):
+	var is_same_report: bool = report.get("results") == _built_report.get("results") \
+			and report.get("starts_next_day") == _built_report.get("starts_next_day")
+	if is_same_report:
 		return
-	_shown = rep
-	var results: Array = rep.results
-	var gold := 0
-	var wins := 0
-	var hurt := 0
-	for r in results:
-		gold += int(r.gold)
-		wins += 1 if r.succeeded else 0
-		hurt += r.get("hurt", []).size()
-	_title.text = TEXT_TITLE % rep.day
-	_wins.set_chip(TEXT_WINS % [wins, results.size()], S.GREEN_BG, S.GREEN_TEXT, "check")
-	_gold.set_chip(TEXT_GOLD % gold, S.GOLD_BG, S.GOLD_TEXT, "coins")
-	if hurt > 0:
-		_hurt.set_chip(S.count(hurt, "hurt", "hurt"), S.WAX_BG, S.WAX, "injury")
+	_built_report = report
+
+	var results: Array = report.results
+	_title.text = TEXT_TITLE % report.day
+	_show_totals(results)
+	_show_entries(results)
+
+	# after End Day the button starts the next day; from the Menu it just closes
+	var starts_next_day: bool = report.get("starts_next_day", false)
+	_action_button.text = BUTTON_START_DAY % (GameState.day + 1) if starts_next_day else BUTTON_CLOSE
+	Style.style_button(_action_button, "green" if starts_next_day else "paper", 32)
+
+
+## Chips: how many succeeded, total gold, how many got hurt.
+func _show_totals(results: Array) -> void:
+	var total_gold := 0
+	var succeeded_count := 0
+	var injured_count := 0
+	for result in results:
+		total_gold += int(result.gold)
+		if result.succeeded:
+			succeeded_count += 1
+		injured_count += result.get("injured", []).size()
+
+	_succeeded_chip.set_chip(TEXT_SUCCEEDED % [succeeded_count, results.size()], Style.GREEN_BG, Style.GREEN_TEXT, "check")
+	_succeeded_chip.visible = not results.is_empty()
+	_gold_chip.set_chip(TEXT_GOLD % total_gold, Style.GOLD_BG, Style.GOLD_TEXT, "coins")
+	if injured_count > 0:
+		_injured_chip.set_chip(Style.count_text(injured_count, "hurt", "hurt"), Style.RED_BG, Style.RED, "injury")
 	else:
-		_hurt.set_chip(TEXT_NO_HURT, S.GREEN_BG, S.GREEN_TEXT, "heart")
-	_wins.visible = not results.is_empty()
+		_injured_chip.set_chip(TEXT_NO_INJURIES, Style.GREEN_BG, Style.GREEN_TEXT, "heart")
 
-	S.clear(_entries)
-	for r in results:
-		S.add_row(_entries, ReportEntry).setup(r)
-	_empty.text = TEXT_NOBODY
-	_empty.visible = results.is_empty()
+
+## One card per quest, or a note when nobody went out.
+func _show_entries(results: Array) -> void:
+	Style.clear_children(_entry_list)
+	for result in results:
+		Style.add_row(_entry_list, ReportEntryScene).setup(result)
+	_empty_label.text = TEXT_NOBODY_WENT
+	_empty_label.visible = results.is_empty()
 	_scroll.scroll_vertical = 0
-
-	var live: bool = rep.get("live", false)
-	_action_button.text = BUTTON_START % (GameState.day + 1) if live else BUTTON_CLOSE
-	S.style_button(_action_button, "green" if live else "paper", 32)

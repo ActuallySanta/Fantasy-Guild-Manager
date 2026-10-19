@@ -4,26 +4,28 @@
 ## Scene: MobileHall/Scenes/Tabs/tab_upgrades.tscn
 extends ScrollContainer
 
-const S := preload("res://MobileHall/Scripts/hall_style.gd")
-const UpgradeCard := preload("res://MobileHall/Scenes/Rows/upgrade_card.tscn")
+const Style := preload("res://MobileHall/Scripts/hall_style.gd")
+const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
+const UpgradeCardScene := preload("res://MobileHall/Scenes/Rows/upgrade_card.tscn")
 
 # ---- TEXT
 const WALLET := "%d gold · standing %d"
-const WALLET_HINT_READY := "You can afford %s. Quests pay for the rest."
+const WALLET_HINT_AFFORDABLE := "You can afford %s. Quests pay for the rest."
 const WALLET_HINT_NONE := "Nothing affordable yet. Quests earn gold."
-const SOON := "Coming soon: %s"
+const COMING_SOON := "Coming soon: %s"
 
 # ---- NODES
 @onready var _wallet: Label = %Wallet
 @onready var _wallet_hint: Label = %WalletHint
-@onready var _list: VBoxContainer = %List
-@onready var _soon: Label = %Soon
+@onready var _card_list: VBoxContainer = %List
+@onready var _coming_soon: Label = %Soon
 
-var ui
+## The main hall script (state + actions), set in setup().
+var hall: HallMain
 
 
-func setup(main) -> void:
-	ui = main
+func setup(main: HallMain) -> void:
+	hall = main
 
 
 func scroll_to_top() -> void:
@@ -31,21 +33,39 @@ func scroll_to_top() -> void:
 
 
 func refresh() -> void:
+	var affordable: Array = hall.affordable_buildings()
+	_show_wallet(affordable)
+	_show_building_cards(affordable)
+	_show_coming_soon()
+
+
+## Gold and standing, plus how many upgrades that buys right now.
+func _show_wallet(affordable: Array) -> void:
 	_wallet.text = WALLET % [GameState.gold, GameState.standing]
-	var ups: Array = ui.upgradable()
-	_wallet_hint.text = WALLET_HINT_READY % S.count(ups.size(), "upgrade", "upgrades") if not ups.is_empty() else WALLET_HINT_NONE
-	S.color(_wallet_hint, S.GREEN_TEXT if not ups.is_empty() else S.INK_SOFT)
+	if affordable.is_empty():
+		_wallet_hint.text = WALLET_HINT_NONE
+		Style.set_font_color(_wallet_hint, Style.TEXT_SOFT)
+	else:
+		_wallet_hint.text = WALLET_HINT_AFFORDABLE % Style.count_text(affordable.size(), "upgrade", "upgrades")
+		Style.set_font_color(_wallet_hint, Style.GREEN_TEXT)
 
-	S.clear(_list)
-	var order: Array = S.buildings_in_order().filter(func(b): return GuildUpgrades.is_implemented(b))
-	# affordable first
-	order.sort_custom(func(a, b): return ups.has(a) and not ups.has(b))
-	for b in order:
-		S.add_row(_list, UpgradeCard).setup(ui, b)
 
-	var soon := PackedStringArray()
-	for b in S.buildings_in_order():
-		if not GuildUpgrades.is_implemented(b):
-			soon.append(GuildUpgrades.get_building_name(b))
-	_soon.text = SOON % ", ".join(soon)
-	_soon.visible = not soon.is_empty()
+## One card per working building, affordable ones first.
+func _show_building_cards(affordable: Array) -> void:
+	Style.clear_children(_card_list)
+	var buildings: Array = Style.buildings_in_order().filter(func(building):
+		return GuildUpgrades.is_implemented(building))
+	buildings.sort_custom(func(first, second):
+		return affordable.has(first) and not affordable.has(second))
+	for building in buildings:
+		Style.add_row(_card_list, UpgradeCardScene).setup(hall, building)
+
+
+## "Coming soon: Hospital, ..." for buildings that aren't implemented yet.
+func _show_coming_soon() -> void:
+	var names := PackedStringArray()
+	for building in Style.buildings_in_order():
+		if not GuildUpgrades.is_implemented(building):
+			names.append(GuildUpgrades.get_building_name(building))
+	_coming_soon.text = COMING_SOON % ", ".join(names)
+	_coming_soon.visible = not names.is_empty()

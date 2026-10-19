@@ -3,45 +3,52 @@
 ## Scene: MobileHall/Scenes/Screens/screen_character.tscn
 extends VBoxContainer
 
-const S := preload("res://MobileHall/Scripts/hall_style.gd")
+const Style := preload("res://MobileHall/Scripts/hall_style.gd")
+const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 
 # ---- TEXT
 const TEXT_ROLE := "the %s"
 const TEXT_INJURIES := "%s taken"
 const TEXT_NO_INJURIES := "No injuries yet"
-const TEXT_BONUS := " (+%d Armory)"
+const TEXT_ARMORY_BONUS := " (+%d Armory)"
 const TEXT_PLUCK_NOTE := "Pluck isn't used by quests yet."
 const TEXT_RECRUIT := "Recruit · not hired yet"
 const TEXT_FREE := "Free today"
-const TEXT_ON := "#%d %s (%s)"
+const TEXT_ON_QUEST := "#%d %s (%s)"
 const BUTTON_BACK := "Back"
 const BUTTON_HIRE := "Hire (free)"
 
 # ---- NODES
+# Identity
 @onready var _scroll: ScrollContainer = %Scroll
-@onready var _portrait = %Portrait
+@onready var _portrait = %Portrait            # portrait.gd
 @onready var _name: Label = %Name
 @onready var _role: Label = %Role
-@onready var _health = %HealthChip
+# Health and task
+@onready var _health_chip = %HealthChip       # chip.gd
 @onready var _injuries: Label = %Injuries
 @onready var _task: Label = %Task
+# Stats and story
 @onready var _stat_lines: VBoxContainer = %StatLines
 @onready var _pluck_note: Label = %PluckNote
-@onready var _story: Label = %Story
+@onready var _backstory: Label = %Story
+# Footer
 @onready var _back_button: Button = %BackButton
 @onready var _hire_button: Button = %HireButton
 
-var ui
+## The main hall script (state + actions), set in setup().
+var hall: HallMain
 
 
-func setup(main) -> void:
-	ui = main
-	_back_button.pressed.connect(ui.close_screen)
-	_hire_button.pressed.connect(_on_hire)
+func setup(main: HallMain) -> void:
+	hall = main
+	_back_button.pressed.connect(hall.close_screen)
+	_hire_button.pressed.connect(_on_hire_pressed)
 	_back_button.text = BUTTON_BACK
 	_hire_button.text = BUTTON_HIRE
-	S.style_button(_back_button, "paper", 28)
-	S.style_button(_hire_button, "green", 30)
+	_pluck_note.text = TEXT_PLUCK_NOTE
+	Style.style_button(_back_button, "paper", 28)
+	Style.style_button(_hire_button, "green", 30)
 
 
 func scroll_to_top() -> void:
@@ -49,50 +56,67 @@ func scroll_to_top() -> void:
 
 
 func refresh() -> void:
-	var c: GuildCharacter = ui.screen.character
-	_portrait.show_character(c)
-	_name.text = c.name
-	_role.text = TEXT_ROLE % S.role_name(c)
-	_health.set_health(c)
-	_injuries.text = TEXT_INJURIES % S.count(c.injury_count, "injury", "injuries") if c.injury_count > 0 else TEXT_NO_INJURIES
-	_show_task(c)
-	_show_stats(c)
-	_pluck_note.text = TEXT_PLUCK_NOTE
-	_story.text = S.backstory(c)
-	_hire_button.visible = CharacterContainer.hireable_characters.has(c)
-	_hire_button.disabled = ui.roster_full()
+	var character := _shown_character()
+	var is_recruit := CharacterContainer.hireable_characters.has(character)
+
+	_portrait.show_character(character)
+	_name.text = character.name
+	_role.text = TEXT_ROLE % Style.role_name(character)
+	_health_chip.set_health(character)
+	if character.injury_count > 0:
+		_injuries.text = TEXT_INJURIES % Style.count_text(character.injury_count, "injury", "injuries")
+	else:
+		_injuries.text = TEXT_NO_INJURIES
+	_show_task(character, is_recruit)
+	_show_stats(character)
+	_backstory.text = Style.clean_backstory(character)
+
+	_hire_button.visible = is_recruit
+	_hire_button.disabled = hall.is_roster_full()
 
 
-func _show_task(c: GuildCharacter) -> void:
-	if CharacterContainer.hireable_characters.has(c):
+## The character this screen is showing (set by hall.open_character).
+func _shown_character() -> GuildCharacter:
+	return hall.active_screen.character
+
+
+## "Recruit", "Free today", or "#2 Escort the Merchant (sent)".
+func _show_task(character: GuildCharacter, is_recruit: bool) -> void:
+	if is_recruit:
 		_task.text = TEXT_RECRUIT
 		return
-	var i: int = ui.entry_index_of(c)
-	if i < 0:
+	var quest_index := hall.quest_index_of(character)
+	if quest_index < 0:
 		_task.text = TEXT_FREE
-	else:
-		var e: Dictionary = ui.entries[i]
-		_task.text = TEXT_ON % [i + 1, e.quest.questTitle, "sent" if e.state == "ready" else "picked"]
+		return
+	var entry: Dictionary = hall.quest_entries[quest_index]
+	var party_state := "sent" if entry.state == Style.QUEST_STATE_SENT else "picked"
+	_task.text = TEXT_ON_QUEST % [quest_index + 1, entry.quest.questTitle, party_state]
 
 
-## One line per stat: name, value (+ Armory bonus).
-func _show_stats(c: GuildCharacter) -> void:
-	for i in 5:
-		var line: PanelContainer = _stat_lines.get_child(i)
-		var st: Dictionary = S.STATS[i]
-		var label: Label = line.get_node("Row/Name")
-		var value: Label = line.get_node("Row/Value")
-		label.text = st.name
-		S.color(label, st.color)
-		var bonus := 0
-		if i < 4:
-			bonus = GuildUpgrades.get_stat_bonus(c, i)
-		value.text = str(S.stat_value(c, i)) + (TEXT_BONUS % bonus if bonus > 0 else "")
-		S.color(value, st.color)
-		line.add_theme_stylebox_override("panel", S.flat(st.bg, 12))
+## One line per stat: name and value (+ Armory bonus), in that stat's colours.
+## The StatLines node has one authored line per stat, each with Row/Name and Row/Value.
+func _show_stats(character: GuildCharacter) -> void:
+	for stat_index in Style.STAT_COUNT:
+		var stat: Dictionary = Style.STATS[stat_index]
+		var line: PanelContainer = _stat_lines.get_child(stat_index)
+		var name_label: Label = line.get_node("Row/Name")
+		var value_label: Label = line.get_node("Row/Value")
+
+		# the Armory only boosts the quest stats, not Pluck
+		var armory_bonus := 0
+		if stat_index < Style.QUEST_STAT_COUNT:
+			armory_bonus = GuildUpgrades.get_stat_bonus(character, stat_index)
+
+		name_label.text = stat.name
+		value_label.text = str(Style.stat_value(character, stat_index))
+		if armory_bonus > 0:
+			value_label.text += TEXT_ARMORY_BONUS % armory_bonus
+		Style.set_font_color(name_label, stat.color)
+		Style.set_font_color(value_label, stat.color)
+		line.add_theme_stylebox_override("panel", Style.flat_box(stat.bg, 12))
 
 
-func _on_hire() -> void:
-	var c: GuildCharacter = ui.screen.character
-	ui.hire(c)
-	ui.close_screen()
+func _on_hire_pressed() -> void:
+	hall.hire(_shown_character())
+	hall.close_screen()
