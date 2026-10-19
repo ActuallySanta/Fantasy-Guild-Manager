@@ -66,6 +66,26 @@ var character_icons: Dictionary[GuildCharacter.CharacterRole, Texture2D] = {
 	GuildCharacter.CharacterRole.MAGE: preload("uid://bw0opsv6knijq"),
 }
 
+var knight_icons: Array[Texture2D] = [
+	preload("uid://0nieya7vg7ir"),
+	preload("uid://cuuceb25ns6i2"),
+]
+
+var priest_icons: Array[Texture2D] = [
+	preload("uid://dwkwfcgs6qeya"),
+	preload("uid://blln7mdskhtgk"),
+]
+
+var pathfinder_icons: Array[Texture2D] = [
+	preload("uid://dqfofkh0uu3x3"),
+	preload("uid://bf0c247tg34tw"),
+]
+
+var mage_icons: Array[Texture2D] = [
+	preload("uid://bw0opsv6knijq"),
+	preload("uid://bo8xpib0s758d"),
+]
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -128,7 +148,17 @@ func get_Milestone_story(quest_idx: int, story_part: int) -> String:
 
 
 func get_character_icon(_role: GuildCharacter.CharacterRole) -> Texture2D:
-	return character_icons[_role]
+	match _role:
+		GuildCharacter.CharacterRole.KNIGHT:
+			return knight_icons.pick_random()
+		GuildCharacter.CharacterRole.PRIEST:
+			return priest_icons.pick_random()
+		GuildCharacter.CharacterRole.PATHFINDER:
+			return pathfinder_icons.pick_random()
+		GuildCharacter.CharacterRole.MAGE:
+			return mage_icons.pick_random()
+		_:
+			return null
 
 
 func get_role_backstory(_char: GuildCharacter) -> String:

@@ -41,14 +41,14 @@ enum CharacterStatus {
 var name: String
 var hometown: String
 var description: String
-var max_rand_backstories : int = 3
+var max_rand_backstories: int = 3
 
 var role: CharacterRole
 
 var injury_level: InjuryLevel
-var injury_count:int
+var injury_count: int
 
-var stat_deviation : int = 2
+var stat_deviation: int = 2
 var stats: Dictionary[StatType, int] = {
 	StatType.STRENGTH: 0,
 	StatType.DEFENSE: 0,
@@ -66,6 +66,8 @@ var status: CharacterStatus
 
 var title: String
 
+var icon: Texture2D
+
 
 #The constructor, called when the object is created
 func _init() -> void:
@@ -73,6 +75,8 @@ func _init() -> void:
 	gender = randi_range(0, CharacterGender.size() - 1) as CharacterGender
 	role = randi_range(0, CharacterRole.size() - 1) as CharacterRole
 	name = ExternalContentContainer.get_character_name(gender)
+
+	icon = ExternalContentContainer.get_character_icon(role)
 
 	# Generate the main stat
 	generate_stat_spread(stats, total_points)
@@ -97,7 +101,7 @@ func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int)
 
 	#Generate random numbers and sum them all up
 	for stat in _stat_weights.size():
-		_stat_weights[stat] = randfn(_total_points/_stats.size(),stat_deviation)
+		_stat_weights[stat] = randfn(_total_points / _stats.size(), stat_deviation)
 		stat_sum += _stat_weights[stat]
 
 	#After all the stats are added together, make them proportional to the total points
@@ -107,23 +111,27 @@ func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int)
 
 	pass
 
+
 func generate_description() -> String:
-	var _description = ExternalContentContainer.get_role_backstory(self) +"\n"
-	
+	var _description = ExternalContentContainer.get_role_backstory(self) + "\n"
+
 	for i in max_rand_backstories:
-		var temp = ExternalContentContainer.get_random_backstory(self)+"\n"
-		if(!_description.containsn(temp)):
-			_description +=temp
-	
+		var temp = ExternalContentContainer.get_random_backstory(self) + "\n"
+		if (!_description.containsn(temp)):
+			_description += temp
+
 	return _description
 
-func injure_character() ->bool:
-	injury_count +=1
-	injury_level+=1
-	
-	if(injury_level == InjuryLevel.DEAD):
+
+func injure_character() -> bool:
+	injury_count += 1
+	injury_level += 1
+
+	if (injury_level == InjuryLevel.DEAD):
 		return true
-	else: return false
+	else:
+		return false
+
 
 func level_up_random_stat(_points_to_add: int):
 	for i in _points_to_add:
