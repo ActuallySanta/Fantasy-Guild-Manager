@@ -564,6 +564,7 @@ func refresh() -> void:
 	_refresh_overlays()
 
 
+
 func _refresh_header() -> void:
 	_day_value.text = HEADER_DAY % GameState.day
 	var left := days_to_drake()

@@ -39,7 +39,7 @@ enum CharacterStatus {
 }
 
 var name: String
-var hometown: String
+var hometown: Region
 var description: String
 var max_rand_backstories: int = 3
 
@@ -49,7 +49,15 @@ var injury_level: InjuryLevel
 var injury_count: int
 
 var stat_deviation: int = 2
+
 var stats: Dictionary[StatType, int] = {
+	StatType.STRENGTH: 0,
+	StatType.DEFENSE: 0,
+	StatType.WISDOM: 0,
+	StatType.SLEAZINESS: 0,
+}
+
+var temp_stats: Dictionary[StatType, int] = {
 	StatType.STRENGTH: 0,
 	StatType.DEFENSE: 0,
 	StatType.WISDOM: 0,
@@ -75,6 +83,8 @@ func _init() -> void:
 	gender = randi_range(0, CharacterGender.size() - 1) as CharacterGender
 	role = randi_range(0, CharacterRole.size() - 1) as CharacterRole
 	name = ExternalContentContainer.get_character_name(gender)
+	
+	hometown = Region.new()
 
 	icon = ExternalContentContainer.get_character_icon(role)
 
@@ -138,3 +148,11 @@ func level_up_random_stat(_points_to_add: int):
 		var stat_to_pick = stats.keys().pick_random()
 		stats[stat_to_pick] += 1
 		total_points += 1
+
+func increase_temp_stat(_stat:StatType,_points_to_add:int):
+	temp_stats[_stat] += _points_to_add
+	pass
+
+func reset_temp_stats():
+	for entry in temp_stats:
+		entry = 0
