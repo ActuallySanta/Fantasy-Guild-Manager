@@ -1,7 +1,0 @@
-[gd_resource type="ShaderMaterial" format=3]
-
-[ext_resource type="Shader" path="res://MobileDeck/icon_tint.gdshader" id="1_2y1kr"]
-
-[resource]
-shader = ExtResource("1_2y1kr")
-shader_parameter/tint = Color(1, 0.7921569, 0.15686275, 1)
