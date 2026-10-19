@@ -485,7 +485,7 @@ func _run_quest(e: Dictionary) -> Dictionary:
 	var story: String = e.quest.generateResults(party, chance)
 	var succeeded: bool = DayBarLogic._did_succeed(story)
 	var gold: int = DayBarLogic._get_gold_earned(e.quest, succeeded)
-	var standing: int = e.quest.difficulty if succeeded else 0
+	var standing: int = e.quest.difficulty + 1 if succeeded else 0
 	GameState.add_gold(gold)
 	GameState.add_standing(standing)
 	var hurt := []
