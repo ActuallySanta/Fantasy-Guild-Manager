@@ -1,17 +1,17 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bgwxd653pjox8"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_welcome.gd" id="1_k3hm8"]
+[ext_resource type="Script" uid="uid://dam4bq8y7a4o6" path="res://MobileHall/Scripts/overlay_welcome.gd" id="1_k3hm8"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/dim.tres" id="2_rqmg6"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/sheet.tres" id="3_xt6nt"]
-[ext_resource type="Texture2D" path="res://Sprites/UI Icons/book-solid-full.svg" id="4_twoe2"]
-[ext_resource type="Texture2D" path="res://Sprites/UI Icons/user-solid-full.svg" id="5_d3ton"]
-[ext_resource type="Texture2D" path="res://Sprites/UI Icons/arrow-up-solid-full.svg" id="6_qmqxm"]
+[ext_resource type="Texture2D" uid="uid://bj1hfljhsxpfe" path="res://Sprites/UI Icons/book-solid-full.svg" id="4_twoe2"]
+[ext_resource type="Texture2D" uid="uid://c0ojxw8sauffc" path="res://Sprites/UI Icons/user-solid-full.svg" id="5_d3ton"]
+[ext_resource type="Texture2D" uid="uid://wtb4ungnk6wg" path="res://Sprites/UI Icons/arrow-up-solid-full.svg" id="6_qmqxm"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green.tres" id="7_56apo"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green_down.tres" id="8_7wdo2"]
 
 [node name="OverlayWelcome" type="Control" unique_id=1913149125]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_k3hm8")
@@ -79,8 +79,8 @@ text = "Board"
 [node name="Body" type="Label" parent="Center/Sheet/Col/StepBoard/Text" unique_id=1228862905]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
 theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 21
 text = "Today's quests, all on one page. Tap one to pick its party. Your picks are kept until you send them."
 autowrap_mode = 3
 
@@ -110,9 +110,13 @@ text = "Guild"
 [node name="Body" type="Label" parent="Center/Sheet/Col/StepGuild/Text" unique_id=1588119429]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
 theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-text = "Your adventurers and today's recruits. A badge appears when new recruits arrive."
+theme_override_font_sizes/font_size = 21
+text = "Your adventurers and today's recruits. A badge appears when new recruits arrive.
+
+If your standing gets too low, your guild will become too unpopular and new recruits will stop arriving
+
+You will lose the game if you run out of live adventurers to send on quests"
 autowrap_mode = 3
 
 [node name="StepUpgrades" type="HBoxContainer" parent="Center/Sheet/Col" unique_id=420809502]
@@ -141,8 +145,8 @@ text = "Upgrades"
 [node name="Body" type="Label" parent="Center/Sheet/Col/StepUpgrades/Text" unique_id=609500633]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
 theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 21
 text = "Spend quest gold on buildings. A badge shows when you can afford one."
 autowrap_mode = 3
 
@@ -171,8 +175,8 @@ text = "The big button"
 [node name="Body" type="Label" parent="Center/Sheet/Col/StepThebigbutton/Text" unique_id=1085937320]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
 theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 21
 text = "At the bottom of the screen. It always shows what to do next."
 autowrap_mode = 3
 
@@ -181,13 +185,13 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 92)
 layout_mode = 2
 focus_mode = 0
-theme_override_styles/normal = ExtResource("7_56apo")
-theme_override_styles/pressed = ExtResource("8_7wdo2")
-theme_override_styles/hover = ExtResource("7_56apo")
-theme_override_styles/hover_pressed = ExtResource("8_7wdo2")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = ExtResource("7_56apo")
+theme_override_styles/pressed = ExtResource("8_7wdo2")
+theme_override_styles/hover = ExtResource("7_56apo")
+theme_override_styles/hover_pressed = ExtResource("8_7wdo2")
 text = "Start"

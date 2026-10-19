@@ -71,4 +71,3 @@ Where to look:
 - `Scripts/ledger_style.gd`: colours, stat / injury / odds tables, small text helpers
   (plurals, name lists), and the restyles that change at runtime.
 - Row and component scripts (`chip`, `portrait`, rows): one `setup()` each.
-

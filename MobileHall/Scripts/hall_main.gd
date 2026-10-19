@@ -38,7 +38,6 @@ extends Control
 const S := preload("res://MobileHall/Scripts/hall_style.gd")
 const DayBarLogic := preload("res://Scripts/UI/day_bar.gd")
 
-
 # ============================================================ SETTINGS
 
 ## Same as QuestList.quests_per_day.
@@ -49,7 +48,6 @@ const MILESTONE_DAY := 10
 const TABS := ["board", "guild", "upgrades"]
 ## Seconds a toast stays up before fading.
 const TOAST_SECONDS := 2.2
-
 
 # ============================================================ TEXT
 
@@ -87,7 +85,6 @@ const TOAST_RESET := "Upgrades reset"
 const TOAST_NEW_DAY := "Day %d · %s · %s for hire"
 const TOAST_MILESTONE_DAY := "Day %d. The Bone Drake is attacking!"
 
-
 # ============================================================ STATE
 
 ## Which bottom tab is showing, and which half of the Guild tab ("roster" | "hire").
@@ -99,10 +96,10 @@ var guild_seg := "roster"
 var entries: Array = []
 ## Screen over the tabs:
 ##   {} | {kind: "assign", index: int} | {kind: "character", character, back: Dictionary}
-var screen := {}
+var screen := { }
 ## Overlays. report = {live: bool, day: int, results: Array}; empty = hidden.
-var report := {}
-var last_report := {}
+var report := { }
+var last_report := { }
 var show_end_check := false
 var show_welcome := true
 var show_menu := false
@@ -116,7 +113,6 @@ var _refresh_queued := false
 var _last_view := ""
 var _toast_tween: Tween
 
-
 # ============================================================ NODES
 
 @onready var _day_value: Label = %DayValue
@@ -124,8 +120,8 @@ var _toast_tween: Tween
 @onready var _gold_value: Label = %GoldValue
 @onready var _standing_value: Label = %StandingValue
 @onready var _menu_button: Button = %MenuButton
-@onready var _tabs := {"board": %TabBoard, "guild": %TabGuild, "upgrades": %TabUpgrades}
-@onready var _screens := {"assign": %ScreenAssign, "character": %ScreenCharacter}
+@onready var _tabs := { "board": %TabBoard, "guild": %TabGuild, "upgrades": %TabUpgrades }
+@onready var _screens := { "assign": %ScreenAssign, "character": %ScreenCharacter }
 @onready var _action_bar: Control = %ActionBar
 @onready var _action_title: Label = %ActionTitle
 @onready var _action_hint: Label = %ActionHint
@@ -137,8 +133,8 @@ var _toast_tween: Tween
 @onready var _toast: PanelContainer = %Toast
 @onready var _toast_label: Label = %ToastLabel
 
-
 # ============================================================ SETUP
+
 
 func _ready() -> void:
 	for t in TABS:
@@ -175,10 +171,10 @@ func _generate_quests() -> void:
 
 
 func _new_entry(quest: CreatedQuest, milestone: bool) -> Dictionary:
-	return {"quest": quest, "state": "open", "party": [], "milestone": milestone}
-
+	return { "quest": quest, "state": "open", "party": [], "milestone": milestone }
 
 # ============================================================ QUERIES
+
 
 func roster() -> Array:
 	return CharacterContainer.active_characters
@@ -237,7 +233,7 @@ func chance_added(entry: Dictionary, c: GuildCharacter) -> int:
 ## The quest shown on Assign Party, or {}.
 func current_entry() -> Dictionary:
 	if screen.get("kind", "") != "assign" or entries.is_empty():
-		return {}
+		return { }
 	return entries[clampi(screen.index, 0, entries.size() - 1)]
 
 
@@ -265,10 +261,10 @@ func new_recruits() -> int:
 func days_to_drake() -> int:
 	return MILESTONE_DAY - GameState.day
 
-
 # ============================================================ ACTIONS
 
 # ---- navigation
+
 
 ## Switch bottom tab. Closes any screen; drafts stay on their quests.
 func open_tab(t: String, segment: String = "") -> void:
@@ -277,7 +273,7 @@ func open_tab(t: String, segment: String = "") -> void:
 		guild_seg = segment
 	if tab == "guild" and guild_seg == "hire":
 		hire_seen_day = GameState.day
-	screen = {}
+	screen = { }
 	queue_refresh()
 
 
@@ -288,19 +284,19 @@ func set_guild_seg(segment: String) -> void:
 func open_assign(i: int) -> void:
 	if entries.is_empty():
 		return
-	screen = {"kind": "assign", "index": clampi(i, 0, entries.size() - 1)}
+	screen = { "kind": "assign", "index": clampi(i, 0, entries.size() - 1) }
 	tab = "board"
 	queue_refresh()
 
 
 func open_character(c: GuildCharacter) -> void:
-	screen = {"kind": "character", "character": c, "back": screen.duplicate()}
+	screen = { "kind": "character", "character": c, "back": screen.duplicate() }
 	queue_refresh()
 
 
 ## Character goes back to wherever it was opened from; Assign goes to the Board.
 func close_screen() -> void:
-	screen = screen.get("back", {}) if screen.get("kind", "") == "character" else {}
+	screen = screen.get("back", { }) if screen.get("kind", "") == "character" else { }
 	queue_refresh()
 
 
@@ -335,8 +331,8 @@ func close_welcome() -> void:
 	show_welcome = false
 	open_tab("board")
 
-
 # ---- quests
+
 
 ## Assign Party: tap an adventurer to add or remove them. Someone already in
 ## another quest's party (sent or draft) moves over, so nobody is in two.
@@ -392,6 +388,7 @@ func deny_quest() -> void:
 		return
 	e.party.clear()
 	e.state = "denied"
+	GameState.reduce_standing(e.quest.difficulty)
 	toast(TOAST_DENIED % e.quest.questTitle)
 	_advance()
 
@@ -419,13 +416,13 @@ func reconsider() -> void:
 func _advance() -> void:
 	var next := next_open(screen.index + 1)
 	if next < 0:
-		screen = {}
+		screen = { }
 	else:
 		screen.index = next
 	queue_refresh()
 
-
 # ---- guild
+
 
 func hire(c: GuildCharacter) -> void:
 	if roster_full():
@@ -447,8 +444,8 @@ func reset_upgrades() -> void:
 	show_menu = false
 	toast(TOAST_RESET)
 
-
 # ---- end of day
+
 
 ## The End Day check: tonight's plan and anything worth buying first.
 func open_end_check() -> void:
@@ -472,8 +469,8 @@ func end_day() -> void:
 	for e in ready_entries():
 		results.append(_run_quest(e))
 	show_end_check = false
-	screen = {}
-	report = {"live": true, "day": GameState.day, "results": results}
+	screen = { }
+	report = { "live": true, "day": GameState.day, "results": results }
 	queue_refresh()
 
 
@@ -481,29 +478,40 @@ func end_day() -> void:
 func _run_quest(e: Dictionary) -> Dictionary:
 	var party: Array[GuildCharacter] = []
 	party.assign(e.party)
-	var before := {}
+	var before := { }
 	for c in party:
 		before[c] = c.injury_level
 	var chance: float = DayBarLogic._get_success_chance(e.quest, party)
 	var story: String = e.quest.generateResults(party, chance)
 	var succeeded: bool = DayBarLogic._did_succeed(story)
 	var gold: int = DayBarLogic._get_gold_earned(e.quest, succeeded)
+	var standing: int = e.quest.difficulty if succeeded else 0
 	GameState.add_gold(gold)
+	GameState.add_standing(standing)
 	var hurt := []
 	for c in party:
 		if c.injury_level > before[c]:
 			hurt.append(c)
-	return {"quest": e.quest, "party": e.party.duplicate(), "story": story, "succeeded": succeeded,
-		"chance": chance, "gold": gold, "hurt": hurt, "milestone": e.milestone}
+	return {
+		"quest": e.quest,
+		"party": e.party.duplicate(),
+		"story": story,
+		"succeeded": succeeded,
+		"chance": chance,
+		"gold": gold,
+		"standing": standing,
+		"hurt": hurt,
+		"milestone": e.milestone,
+	}
 
 
 ## DaySummary's "New Day" button. Opens on the Board.
 func start_new_day() -> void:
 	last_report = report.duplicate()
 	last_report.live = false
-	report = {}
+	report = { }
 	tab = "board"
-	screen = {}
+	screen = { }
 	GameState.start_new_day()
 	if GameState.day == MILESTONE_DAY:
 		toast(TOAST_MILESTONE_DAY % GameState.day)
@@ -517,7 +525,7 @@ func close_report() -> void:
 	if report.get("live", false):
 		start_new_day()
 	else:
-		report = {}
+		report = { }
 		queue_refresh()
 
 
@@ -530,8 +538,8 @@ func open_last_report() -> void:
 	report.live = false
 	queue_refresh()
 
-
 # ============================================================ REFRESH
+
 
 ## Ask for a refresh at the end of this frame (many changes = one refresh).
 func queue_refresh() -> void:
@@ -567,7 +575,7 @@ func _refresh_header() -> void:
 func _refresh_content() -> void:
 	# a screen whose quest vanished (new day) closes itself
 	if screen.get("kind", "") == "assign" and screen.index >= entries.size():
-		screen = {}
+		screen = { }
 	var kind: String = screen.get("kind", "")
 	for t in _tabs:
 		_tabs[t].visible = kind == "" and t == tab
@@ -655,8 +663,8 @@ func _refresh_overlays() -> void:
 		if o.visible:
 			o.refresh()
 
-
 # ============================================================ TOAST
+
 
 ## Short message just above the action bar that fades out.
 func toast(text: String) -> void:

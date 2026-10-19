@@ -1,4 +1,4 @@
-[gd_resource type="Theme" format=3]
+[gd_resource type="Theme" format=3 uid="uid://b8dl3ku854ddh"]
 
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_disabled.tres" id="1_f0m7t"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/empty.tres" id="2_drikl"]

@@ -10,18 +10,22 @@ var hireable_characters: Array[GuildCharacter] = []
 signal on_hireables_refreshed
 signal on_character_added
 
+
 func _ready() -> void:
 	#for i in max_characters:
 	#generate_new_character()
 	refresh_hireable_characters()
 	pass
 
+
 # Replaces the hiring pool with new characters on a new day
 func refresh_hireable_characters() -> void:
 	hireable_characters.clear()
-	for i in max_hireable_characters:
-		hireable_characters.append(GuildCharacter.new())
+	if (GameState.standing > GuildUpgrades.MINIMUM_STANDING):
+		for i in max_hireable_characters:
+			hireable_characters.append(GuildCharacter.new())
 	on_hireables_refreshed.emit()
+
 
 func generate_new_character() -> void:
 	if (active_characters.size() == max_characters):

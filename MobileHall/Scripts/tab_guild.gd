@@ -18,6 +18,7 @@ const BEDS_BUTTON := "Barracks"
 const EMPTY_ROSTER := "Nobody here yet. Hire someone from For Hire."
 const EMPTY_HIRE := "No recruits left today. New faces arrive every morning."
 const HIRE_NOTE := "Hiring is free. New recruits arrive every morning."
+const LOW_STANDING := "Your guild is too unpopular, and has thus failed to attract new talent"
 
 # ---- NODES
 @onready var _seg_roster: Button = %SegRoster
@@ -86,7 +87,11 @@ func _show_roster() -> void:
 func _show_hire() -> void:
 	_note.visible = true
 	_note.text = HIRE_NOTE
-	for c in CharacterContainer.hireable_characters:
-		S.add_row(_list, HireCard).setup(ui, c)
-	_empty.text = EMPTY_HIRE
+	if (GameState.standing > GuildUpgrades.MINIMUM_STANDING):
+		for c in CharacterContainer.hireable_characters:
+			S.add_row(_list, HireCard).setup(ui, c)
+		_empty.text = EMPTY_HIRE
+	else:
+		_empty.text = LOW_STANDING
+
 	_empty.visible = CharacterContainer.hireable_characters.is_empty()
