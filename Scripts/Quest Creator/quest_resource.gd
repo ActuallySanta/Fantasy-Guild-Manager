@@ -149,7 +149,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	match true:
 		_ when successDetermination >= _successChance:
 			if (numAdventurers == 1):
-				returnString = str(returnString, "[b]", _questingAdventurers[0].name, ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data))
+				returnString = str(returnString, "[b]", _questingAdventurers[0].name, " ", ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data))
 			else:
 				returnString = str(
 					returnString,
@@ -160,8 +160,8 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					" ",
 					ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data),
 				)
-			returnString = str(returnString, "Summary: The quest was [color=red][b]NOT SUCCESSFUL[/b][/color]. Your guild failed to obtain the reward.\n")
-			questSummary = str(questSummary, "Summary: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
+			returnString = str(returnString, "[b]Summary[/b]: The quest was [color=red][b]NOT SUCCESSFUL[/b][/color]. Your guild failed to obtain the reward.\n")
+			questSummary = str(questSummary, "[b]Summary[/b]: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
 
 			if (goldReward > 200):
 				returnString = str(returnString, "However, your adventurers did bring back [color=FFE700][b]", goldReward - 200, " gold[/b][/color].\n")
@@ -171,7 +171,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 				returnString = str(
 					returnString,
 					"[b]",
-					_questingAdventurers[0].name,
+					_questingAdventurers[0].name, " ",
 					ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data),
 				)
 			else:
@@ -180,11 +180,11 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					"[b]",
 					_questingAdventurers[0].name,
 					"[/b] and [b]",
-					_questingAdventurers[1].name,
+					_questingAdventurers[1].name, " ",
 					ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data),
 				)
-			returnString = str(returnString, "Summary: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=FFE700][b]", goldReward, " gold[/b][/color].\n")
-			questSummary = str(questSummary, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward, " gold.")
+			returnString = str(returnString, "[b]Summary[/b]: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=FFE700][b]", goldReward, " gold[/b][/color].\n")
+			questSummary = str(questSummary, "[b]Summary[/b]: The quest was SUCCESSFUL. Your guild gained ", goldReward, " gold.")
 
 	#loop with size based on difficulty -> higher difficulty more loops 
 	#sends combat or search to its own methods
@@ -293,13 +293,54 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 
 	var returnString = ""
 	var successDetermination = randi_range(0, 100)
-	match true:
-		_ when searchChance >= successDetermination:
+	var searchingAdventurer: GuildCharacter = _questingAdventurers.pick_random()
+	if(searchChance >= successDetermination):
+		var succSearDet = randi_range(1, 100)
+		if(1 <= succSearDet && succSearDet <= 13):
 			var extraGold = randi_range(11, 29)
 			goldReward += extraGold
 			returnString = str(returnString, "[b]The Party[/b] discovered an old chest containing [color=FFE700][b]", extraGold, " gold[/b][/color].\n")
-		_:
-			returnString = str(returnString, "[b]", _questingAdventurers[randi_range(0, numAdventurers - 1)].name, "[/b] tripped on a rock and gained [color=FD0000][b]1 INJURY[/b][/color].\n")
+		elif(14 <= succSearDet && succSearDet <= 25):
+			var extraGold = randi_range(11, 29)
+			goldReward += extraGold
+			returnString = str(returnString, "[b]", searchingAdventurer.name, 
+			"[/b] found an old chest containing [color=FFE700][b]", extraGold, " gold[/b][/color].\n")
+		elif(26 <= succSearDet && succSearDet <= 38):
+			var extraGold = randi_range(3, 15)
+			goldReward += extraGold
+			returnString = str(returnString, "[b]The Party[/b] unearthed a lockbox that contained [color=FFE700][b]", extraGold, " gold[/b][/color].\n")
+		elif(38 <= succSearDet && succSearDet <= 50):
+			var extraGold = randi_range(3, 15)
+			goldReward += extraGold
+			returnString = str(returnString, "[b]", searchingAdventurer.name, 
+			"[/b] found someone's lost wallet on the ground, which still had [color=FFE700][b]", extraGold, " gold[/b][/color] in it.\n")
+		elif(51 <= succSearDet && succSearDet <= 62):
+			var extraGold = randi_range(25, 59)
+			goldReward += extraGold
+			returnString = str(returnString, "[b]The Party[/b] discovered a secret room filled with treasure, including [color=FFE700][b]", extraGold, " gold[/b][/color].\n")
+		elif(63 <= succSearDet && succSearDet <= 75):
+			var extraGold = randi_range(24, 59)
+			goldReward += extraGold
+			returnString = str(returnString, "[b]", searchingAdventurer.name, 
+			"[/b] unearthed a rather gaudy looking artifact, which turned out to be worth [color=FFE700][b]", extraGold, " gold[/b][/color].\n")
+	else:
+		var succSearDet = randi_range(1, 100)
+		if(1 <= succSearDet && succSearDet <= 15):
+			returnString = str(returnString, "[b]", searchingAdventurer.name, "[/b] tripped on a rock and gained [color=FD0000][b]1 INJURY[/b][/color].\n")
+		elif(16 <= succSearDet && succSearDet <= 45):
+			returnString = str(returnString, "[b]The Party[/b] discovered a hidden room containing multiple chests, but [color=FD0000][b]NOTHING OF VALUE[/b][/color] was inside.\n")
+		elif(46 <= succSearDet && succSearDet <= 75):
+			returnString = str(returnString, "[b]", searchingAdventurer.name, 
+			"[/b] went off alone to search for treasure, but returned with [color=FD0000][b]NOTHING[/b][/color].\n")
+		elif(76 <= succSearDet && succSearDet <= 90):
+			var extraGold = randi_range(3, 15)
+			goldReward += extraGold
+			returnString = str(returnString, "[b]", searchingAdventurer.name, 
+			"[/b] found an old chest containing [color=FFE700][b]", extraGold, " gold[/b][/color]. However, the chest was trapped and [b]", searchingAdventurer, 
+			"[/b] was [color=FD0000][b]INJURED 1 TIME[/b][/color].]\n")
+		elif(91 <= succSearDet && succSearDet <= 100):
+			goldReward += 1
+			returnString = str(returnString, "[b]The Party[/b] unearthed a lockbox that contained [color=FFE700][b]1 gold[/b][/color].\n")
 	return returnString
 
 
