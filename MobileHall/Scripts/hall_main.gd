@@ -199,9 +199,7 @@ func _generate_quests() -> void:
 		
 		if(GuildUpgrades.standing <= 5):
 			currentNum = 0
-		print(GuildUpgrades.standing)
-		print(currentNum)
-		print(int(rand_bell_curve()))
+
 		entries.append(_new_entry(CreatedQuest.new(currentNum, 0), false))
 
 func rand_bell_curve(mean: float = 0.0, standard_deviation: float = 1.0) -> float:
