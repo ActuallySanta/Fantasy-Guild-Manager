@@ -226,9 +226,52 @@ func _generate_quests() -> void:
 	if GameState.day == MILESTONE_DAY:
 		quest_entries.append(_new_entry(CreatedQuest.new(MILESTONE_DAY), true))
 		return
-	for quest_number in QUESTS_PER_DAY:
-		quest_entries.append(_new_entry(CreatedQuest.new(), false))
+	var entries = quest_entries
+	var standingNum = 0
+	if(GuildUpgrades.standing <= 10):
+		standingNum = 0
+	elif(GuildUpgrades.standing <= 20):
+		standingNum = 1
+	elif(GuildUpgrades.standing <= 30):
+		standingNum = 2
+	elif(GuildUpgrades.standing <= 40):
+		standingNum = 3
+	elif(GuildUpgrades.standing <= 50):
+		standingNum = 4
+	else:
+		standingNum = 5
 
+	for quest_number in QUESTS_PER_DAY:
+		var currentNum = 0
+		currentNum += standingNum
+		currentNum += int(rand_bell_curve())
+		if(currentNum < 0):
+			currentNum = 0
+		elif(currentNum > 5):
+			currentNum = 5
+
+		if(currentNum - standingNum == 2):
+			currentNum -= 1
+		elif(currentNum - standingNum == -2):
+			currentNum += 1
+
+		if(GuildUpgrades.standing <= 5):
+			currentNum = 0
+
+		entries.append(_new_entry(CreatedQuest.new(currentNum, 0), false))
+
+func rand_bell_curve(mean: float = 0.0, standard_deviation: float = 1.0) -> float:
+	var u1: float = randf()
+	var u2: float = randf()
+	
+	# Avoid log(0) which is undefined
+	if u1 == 0.0: u1 = 0.0001 
+	
+	# Box-Muller transform formula
+	var standard_normal: float = sqrt(-2.0 * log(u1)) * cos(2.0 * PI * u2)
+	
+	# Scale by standard deviation and shift by the mean
+	return (standard_normal * standard_deviation) + mean
 
 func _new_entry(quest: CreatedQuest, is_milestone: bool) -> Dictionary:
 	return {"quest": quest, "state": Style.QUEST_STATE_OPEN, "party": [], "milestone": is_milestone}

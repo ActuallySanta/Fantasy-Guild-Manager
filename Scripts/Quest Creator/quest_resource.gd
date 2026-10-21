@@ -56,13 +56,12 @@ var questNum: int:
 
 var dead_adventurers : Array[GuildCharacter]
 
-func _init(dayNum := 0) -> void:
+func _init(diff := 0, dayNum := 0) -> void:
 	if (dayNum == 10):
 		_initMilestoneVars(dayNum)
 		return
 
-	difficulty = 0
-	#hard code
+	difficulty = diff
 	maxAdventurers = randi_range(1, 2)
 
 	questNum = randi_range(0, 7)
@@ -269,7 +268,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 		elif (26 <= succComDet && succComDet <= 50):
 			returnString = str(
 					"[b]The Party[/b] was ATTACKED by a group of ", QuestManager.newRegion.returnMonster(),
-					"s. They managed to defeat them, but not before [color=FD0000][b]", attackedAdventurer, " was INJURED[/b][/color] in the process.\n"
+					"s. They managed to defeat them, but not before [color=FD0000][b]", attackedAdventurer.name, " was INJURED[/b][/color] in the process.\n"
 					)
 		elif (51 <= succComDet && succComDet <= 75):
 			returnString = str(
