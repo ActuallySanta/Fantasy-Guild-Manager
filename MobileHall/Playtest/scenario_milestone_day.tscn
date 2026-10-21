@@ -12,8 +12,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_scn")
 start_day = 10
-start_standing = -10
-start_gold = 120
+start_standing = 5
+start_gold = 400
 member_injuries = Array[int]([1, 2])
 intro_toast = "Day 10. The Bone Drake is attacking!"
 
