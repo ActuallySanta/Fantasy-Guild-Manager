@@ -533,6 +533,12 @@ func _run_quest(e: Dictionary) -> Dictionary:
 	var standing: int = e.quest.difficulty + 1 if succeeded else 0
 	GameState.add_gold(gold)
 	GameState.add_standing(standing)
+	
+	#Increase character pluck by one if you succeeded
+	if(succeeded):
+		for c in party:
+			c.pluck+=1
+	
 	var hurt := []
 	for c in party:
 		if c.injury_level > before[c]:
@@ -601,6 +607,7 @@ func refresh() -> void:
 	_refresh_action_bar()
 	_refresh_nav()
 	_refresh_overlays()
+
 
 
 func _refresh_header() -> void:

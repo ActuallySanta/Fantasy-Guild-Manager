@@ -54,6 +54,7 @@ var questNum: int:
 	get:
 		return questNum
 
+var dead_adventurers : Array[GuildCharacter]
 
 func _init(diff := 0, dayNum := 0) -> void:
 	if (dayNum == 10):
@@ -183,8 +184,14 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data),
 				)
 			returnString = str(returnString, "[b]Summary[/b]: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=FFE700][b]", goldReward, " gold[/b][/color].\n")
-			questSummary = str(questSummary, "[b]Summary[/b]: The quest was SUCCESSFUL. Your guild gained ", goldReward, " gold.")
-
+			questSummary = str(questSummary, "[b]Summary[/b]: The quest was SUCCESSFUL. Your guild gained ", goldReward, " gold.\n")
+			
+	if(dead_adventurers.size()>0):
+		for char in dead_adventurers:
+			questSummary = str(questSummary,"Unfortunately [b]",char.name,"[/b] succumbed to their injuries and passed away\n")
+			returnString = str(returnString,questSummary)
+			CharacterContainer.active_characters.erase(char)
+			
 	#loop with size based on difficulty -> higher difficulty more loops 
 	#sends combat or search to its own methods
 
@@ -244,7 +251,10 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 					QuestManager.newRegion.returnMonster(), ", and defeated it, finding [color=FFE700][b] ", extraGold, 
 					" gold [/b][/color]on its corpse. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
 					)
-				attackedAdventurer.injure_character()
+				var died : bool = attackedAdventurer.injure_character()
+				
+				if(died):
+					dead_adventurers.append(attackedAdventurer)
 
 	else:
 		var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
@@ -255,19 +265,16 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 			"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ", QuestManager.newRegion.returnMonster(),
 			". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
 			)
-			attackedAdventurer.injure_character()
 		elif (26 <= succComDet && succComDet <= 50):
 			returnString = str(
 					"[b]The Party[/b] was ATTACKED by a group of ", QuestManager.newRegion.returnMonster(),
 					"s. They managed to defeat them, but not before [color=FD0000][b]", attackedAdventurer.name, " was INJURED[/b][/color] in the process.\n"
 					)
-			attackedAdventurer.injure_character()
 		elif (51 <= succComDet && succComDet <= 75):
 			returnString = str(
 					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ", QuestManager.newRegion.returnMonster(), 
 					", and defeated it, obtaining a(n) [EQUIP_NOT_IMPLEMENTED] on its corpse. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
 					)
-			attackedAdventurer.injure_character()
 		elif (76 <= succComDet && succComDet <= 90):
 			returnString = str(
 					"[b]The Party[/b] was ATTACKED by a group of ",
@@ -280,7 +287,12 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 					QuestManager.newRegion.returnMonster(),
 					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
 					)
+		
+		if(succComDet <=75):
+			var died : bool = attackedAdventurer.injure_character()
 
+			if(died):
+				dead_adventurers.append(attackedAdventurer)
 	return returnString
 
 func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:

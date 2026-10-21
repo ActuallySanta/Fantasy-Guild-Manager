@@ -33,10 +33,16 @@ func start_new_day() -> void:
 	if CharacterContainer.has_method("refresh_hireable_characters"):
 		CharacterContainer.refresh_hireable_characters()
 
+	_refresh_temp_stats()
+	
 	# Tell everything else the new day has begun.
 	day_started.emit(day)
 
-
+func _refresh_temp_stats():
+	for entry in CharacterContainer.active_characters:
+		entry.reset_temp_stats()
+	pass
+	
 func add_gold(amount: int) -> void:
 	GuildUpgrades.add_gold(amount)
 
