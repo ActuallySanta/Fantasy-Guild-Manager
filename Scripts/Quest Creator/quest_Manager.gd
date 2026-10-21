@@ -5,6 +5,9 @@ var acceptedQuests: Array[CreatedQuest]
 var acceptedQuestResults: Array[String]
 var newRegion: Region = Region.new(0)
 
+var world_regions : Array[Region]
+var total_regions : int = 10
+
 var dayNum = 0;
 
 var testQuestNumber = 0:
@@ -22,6 +25,9 @@ func _ready() -> void:
 		
 	adventurerArray = thisQuest.generatePartyDuo()
 	adventurerArrayAgain.append(adventurerArray[0])
+	
+	for i in total_regions:
+		world_regions.append(Region.new())
 	
 	var successChance = thisQuest.calcSuccessChance(adventurerArray)
 	print(successChance)

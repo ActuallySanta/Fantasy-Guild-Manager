@@ -69,21 +69,25 @@ var character_icons: Dictionary[GuildCharacter.CharacterRole, Texture2D] = {
 var knight_icons: Array[Texture2D] = [
 	preload("uid://0nieya7vg7ir"),
 	preload("uid://cuuceb25ns6i2"),
+	preload("uid://i7xp531jq21i"),
 ]
 
 var priest_icons: Array[Texture2D] = [
 	preload("uid://dwkwfcgs6qeya"),
 	preload("uid://blln7mdskhtgk"),
+	preload("uid://bhoxie2y6kbpr"),
 ]
 
 var pathfinder_icons: Array[Texture2D] = [
 	preload("uid://dqfofkh0uu3x3"),
 	preload("uid://bf0c247tg34tw"),
+	preload("uid://cgrxcaycalwpg"),
 ]
 
 var mage_icons: Array[Texture2D] = [
 	preload("uid://bw0opsv6knijq"),
 	preload("uid://bo8xpib0s758d"),
+	preload("uid://diosvf6ou13rx"),
 ]
 
 

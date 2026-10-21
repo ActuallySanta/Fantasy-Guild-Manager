@@ -597,6 +597,11 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 	GameState.add_gold(gold_earned)
 	GameState.add_standing(standing_earned)
 
+	# Increase character pluck by one if the quest succeeded.
+	if succeeded:
+		for character in party:
+			character.pluck += 1
+
 	var injured := []
 	for character in party:
 		if character.injury_level > injury_before[character]:
@@ -671,6 +676,7 @@ func refresh() -> void:
 	_refresh_overlays()
 
 # ---- header
+
 
 
 func _refresh_header() -> void:
