@@ -1,125 +1,142 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://MobileHall/Scripts/overlay_report.gd" id="1_s0qxh"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/header.tres" id="2_6ukms"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_bnucx"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/chip.tres" id="4_8tshr"]
-[ext_resource type="Script" path="res://MobileHall/Scripts/chip.gd" id="5_3md2h"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="6_fuucl"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green.tres" id="7_oiqxi"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green_down.tres" id="8_knrq5"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/wood.png" id="2_wood"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/connector.png" id="4_connector"]
 
-[node name="OverlayReport" type="Control" unique_id=646940817]
+[node name="OverlayReport" type="Control"]
 layout_mode = 3
 anchors_preset = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_s0qxh")
 
-[node name="Bg" type="ColorRect" parent="." unique_id=1021900790]
+[node name="Bg" type="TextureRect" parent="."]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.9411765, 0.9411765, 0.9411765, 1)
+texture = ExtResource("2_wood")
+expand_mode = 1
+stretch_mode = 1
 
-[node name="Layout" type="VBoxContainer" parent="." unique_id=512838239]
+[node name="Layout" type="VBoxContainer" parent="."]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_constants/separation = 0
 
-[node name="Header" type="PanelContainer" parent="Layout" unique_id=1977943461]
+[node name="HeadMargin" type="MarginContainer" parent="Layout"]
 layout_mode = 2
-theme_override_styles/panel = ExtResource("2_6ukms")
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 8
 
-[node name="Col" type="VBoxContainer" parent="Layout/Header" unique_id=1990462942]
+[node name="Head" type="HBoxContainer" parent="Layout/HeadMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="Layout/Header/Col" unique_id=1449689581]
+[node name="Title" type="Label" parent="Layout/HeadMargin/Head"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
-theme_override_colors/font_color = Color(1, 1, 1, 1)
+size_flags_horizontal = 3
+theme_type_variation = &"TitleLight"
+theme_override_font_sizes/font_size = 62
 text = "Day 1 Report"
 
-[node name="Chips" type="HBoxContainer" parent="Layout/Header/Col" unique_id=1020426321]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="WinsChip" type="PanelContainer" parent="Layout/Header/Col/Chips" unique_id=545259554 instance=ExtResource("3_bnucx")]
+[node name="Sub" type="Label" parent="Layout/HeadMargin/Head"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("4_8tshr")
-script = ExtResource("5_3md2h")
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 28
+text = "one letter tonight"
 
-[node name="GoldChip" type="PanelContainer" parent="Layout/Header/Col/Chips" unique_id=2069857636 instance=ExtResource("3_bnucx")]
+[node name="TotalsMargin" type="MarginContainer" parent="Layout"]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_right = 6
+
+[node name="Totals" type="PanelContainer" parent="Layout/TotalsMargin"]
+layout_mode = 2
+theme_type_variation = &"TornPaper"
+
+[node name="Chips" type="HBoxContainer" parent="Layout/TotalsMargin/Totals"]
+layout_mode = 2
+theme_override_constants/separation = 24
+alignment = 1
+
+[node name="WinsChip" parent="Layout/TotalsMargin/Totals/Chips" instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("4_8tshr")
-script = ExtResource("5_3md2h")
+rotation = -0.03
 
-[node name="HurtChip" type="PanelContainer" parent="Layout/Header/Col/Chips" unique_id=2117541711 instance=ExtResource("3_bnucx")]
+[node name="GoldChip" parent="Layout/TotalsMargin/Totals/Chips" instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("4_8tshr")
-script = ExtResource("5_3md2h")
+rotation = 0.015
 
-[node name="Scroll" type="ScrollContainer" parent="Layout" unique_id=1628967775]
+[node name="HurtChip" parent="Layout/TotalsMargin/Totals/Chips" instance=ExtResource("3_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+rotation = 0.03
+
+[node name="Scroll" type="ScrollContainer" parent="Layout"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="Margin" type="MarginContainer" parent="Layout/Scroll" unique_id=347502963]
+[node name="Margin" type="MarginContainer" parent="Layout/Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 14
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 20
 
-[node name="Col" type="VBoxContainer" parent="Layout/Scroll/Margin" unique_id=1135641165]
+[node name="Col" type="VBoxContainer" parent="Layout/Scroll/Margin"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Entries" type="VBoxContainer" parent="Layout/Scroll/Margin/Col" unique_id=2052586860]
+[node name="Entries" type="VBoxContainer" parent="Layout/Scroll/Margin/Col"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 26
 
-[node name="Empty" type="Label" parent="Layout/Scroll/Margin/Col" unique_id=1575770257]
+[node name="Empty" type="Label" parent="Layout/Scroll/Margin/Col"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 26
 text = "Nobody went out."
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="Footer" type="PanelContainer" parent="Layout" unique_id=1972650590]
+[node name="Footer" type="MarginContainer" parent="Layout"]
 layout_mode = 2
-theme_override_styles/panel = ExtResource("6_fuucl")
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 26
 
-[node name="ActionButton" type="Button" parent="Layout/Footer" unique_id=1041452009]
+[node name="Col" type="VBoxContainer" parent="Layout/Footer"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Connector" type="TextureRect" parent="Layout/Footer/Col"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_connector")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ActionButton" type="Button" parent="Layout/Footer/Col"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 96)
+custom_minimum_size = Vector2(0, 108)
 layout_mode = 2
 focus_mode = 0
-theme_override_styles/normal = ExtResource("7_oiqxi")
-theme_override_styles/pressed = ExtResource("8_knrq5")
-theme_override_styles/hover = ExtResource("7_oiqxi")
-theme_override_styles/hover_pressed = ExtResource("8_knrq5")
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 32
-text = "Start Day 2"
+theme_type_variation = &"WoodButton"
+theme_override_font_sizes/font_size = 46
+text = "Open the doors · Day 2"

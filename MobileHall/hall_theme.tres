@@ -1,50 +1,264 @@
 [gd_resource type="Theme" format=3 uid="uid://b8dl3ku854ddh"]
 
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_disabled.tres" id="1_f0m7t"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/empty.tres" id="2_drikl"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_paper.tres" id="3_v4jfh"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_paper_down.tres" id="4_2efbg"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0kl0n"]
-content_margin_left = 5.0
-content_margin_top = 0.0
-content_margin_right = 5.0
-content_margin_bottom = 0.0
-bg_color = Color(0, 0, 0, 0.3)
-border_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0bmvb"]
-content_margin_left = 5.0
-content_margin_top = 0.0
-content_margin_right = 5.0
-content_margin_bottom = 0.0
-bg_color = Color(0, 0, 0, 0)
-border_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
+[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_body.tres" id="f_body"]
+[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_bold.tres" id="f_bold"]
+[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_caps.tres" id="f_caps"]
+[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_italic.tres" id="f_italic"]
+[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_title.tres" id="f_title"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/empty.tres" id="s_empty"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_paper.tres" id="s_paper"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_paper_down.tres" id="s_paper_down"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_gold.tres" id="s_gold"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_gold_down.tres" id="s_gold_down"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_wood.tres" id="s_wood"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_wood_down.tres" id="s_wood_down"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_disabled.tres" id="s_disabled"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/nav_tile.tres" id="s_nav_tile"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/nav_tile_active.tres" id="s_nav_tile_active"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/folder_tab.tres" id="s_folder_tab"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/folder_tab_active.tres" id="s_folder_tab_active"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/quest_tab.tres" id="s_quest_tab"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/round_button.tres" id="s_round"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/round_button_down.tres" id="s_round_down"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/paper_card.tres" id="s_paper_card"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/paper_grid.tres" id="s_paper_grid"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/paper_ledger.tres" id="s_paper_ledger"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/paper_note.tres" id="s_paper_note"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/torn_paper.tres" id="s_torn"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/scroll_body_h.tres" id="s_scroll_h"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/scroll_body_v.tres" id="s_scroll_v"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/folder_body.tres" id="s_folder_body"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/sheet.tres" id="s_sheet"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/stamp.tres" id="s_stamp"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/ink_box.tres" id="s_ink_box"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/ink_box_thick.tres" id="s_ink_box_thick"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/pill.tres" id="s_pill"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/tag_label.tres" id="s_tag_label"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/type_seal.tres" id="s_type_seal"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/day_tile.tres" id="s_day_tile"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/badge.tres" id="s_badge"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/toast.tres" id="s_toast"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/header.tres" id="s_header"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/nav.tres" id="s_nav"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/scroll_grabber.tres" id="s_grabber"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/torn_note.tres" id="s_torn_note"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_seal.tres" id="s_seal"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_seal_down.tres" id="s_seal_down"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_seal_disabled.tres" id="s_seal_disabled"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/box_on.png" id="t_box_on"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/box_off.png" id="t_box_off"]
 
 [resource]
-default_font_size = 26
-Button/colors/font_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-Button/colors/font_disabled_color = Color(0.47843137, 0.41568628, 0.33333334, 1)
-Button/colors/font_focus_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-Button/colors/font_hover_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-Button/colors/font_hover_pressed_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-Button/colors/font_pressed_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-Button/font_sizes/font_size = 26
-Button/styles/disabled = ExtResource("1_f0m7t")
-Button/styles/focus = ExtResource("2_drikl")
-Button/styles/hover = ExtResource("3_v4jfh")
-Button/styles/hover_pressed = ExtResource("4_2efbg")
-Button/styles/normal = ExtResource("3_v4jfh")
-Button/styles/pressed = ExtResource("4_2efbg")
-Label/colors/font_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-RichTextLabel/colors/default_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-RichTextLabel/font_sizes/bold_font_size = 24
-RichTextLabel/font_sizes/normal_font_size = 24
-VScrollBar/styles/grabber = SubResource("StyleBoxFlat_0kl0n")
-VScrollBar/styles/grabber_highlight = SubResource("StyleBoxFlat_0kl0n")
-VScrollBar/styles/grabber_pressed = SubResource("StyleBoxFlat_0kl0n")
-VScrollBar/styles/scroll = SubResource("StyleBoxFlat_0bmvb")
+default_font = ExtResource("f_body")
+default_font_size = 24
+Button/colors/font_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/font_disabled_color = Color(0.3608, 0.3255, 0.2745, 1)
+Button/colors/font_focus_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/font_hover_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/font_hover_pressed_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/font_pressed_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/icon_normal_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/icon_hover_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/icon_pressed_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/icon_hover_pressed_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/icon_focus_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/constants/h_separation = 10
+Button/constants/icon_max_width = 30
+Button/fonts/font = ExtResource("f_bold")
+Button/font_sizes/font_size = 24
+Button/styles/disabled = ExtResource("s_disabled")
+Button/styles/focus = ExtResource("s_empty")
+Button/styles/hover = ExtResource("s_paper")
+Button/styles/hover_pressed = ExtResource("s_paper_down")
+Button/styles/normal = ExtResource("s_paper")
+Button/styles/pressed = ExtResource("s_paper_down")
+CapsLabel/base_type = &"Label"
+CapsLabel/colors/font_color = Color(0.4196, 0.3647, 0.3098, 1)
+CapsLabel/font_sizes/font_size = 17
+CapsLabel/fonts/font = ExtResource("f_caps")
+CapsLight/base_type = &"Label"
+CapsLight/colors/font_color = Color(0.7961, 0.7333, 0.6275, 1)
+CapsLight/font_sizes/font_size = 17
+CapsLight/fonts/font = ExtResource("f_caps")
+CheckButton/colors/font_color = Color(0.9294, 0.8902, 0.7961, 1)
+CheckButton/colors/font_hover_color = Color(0.9294, 0.8902, 0.7961, 1)
+CheckButton/colors/font_hover_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+CheckButton/colors/font_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+CheckButton/fonts/font = ExtResource("f_title")
+CheckButton/font_sizes/font_size = 26
+CheckButton/icons/checked = ExtResource("t_box_on")
+CheckButton/icons/unchecked = ExtResource("t_box_off")
+CheckButton/styles/focus = ExtResource("s_empty")
+CheckButton/styles/hover = ExtResource("s_empty")
+CheckButton/styles/hover_pressed = ExtResource("s_empty")
+CheckButton/styles/normal = ExtResource("s_empty")
+CheckButton/styles/pressed = ExtResource("s_empty")
+DayTile/base_type = &"PanelContainer"
+DayTile/styles/panel = ExtResource("s_day_tile")
+Badge/base_type = &"PanelContainer"
+Badge/styles/panel = ExtResource("s_badge")
+FolderBody/base_type = &"PanelContainer"
+FolderBody/styles/panel = ExtResource("s_folder_body")
+FolderTab/base_type = &"Button"
+FolderTab/colors/font_color = Color(0.9294, 0.8902, 0.7961, 1)
+FolderTab/colors/font_hover_color = Color(0.9294, 0.8902, 0.7961, 1)
+FolderTab/colors/font_hover_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+FolderTab/colors/font_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+FolderTab/fonts/font = ExtResource("f_bold")
+FolderTab/font_sizes/font_size = 26
+FolderTab/styles/hover = ExtResource("s_folder_tab")
+FolderTab/styles/hover_pressed = ExtResource("s_folder_tab")
+FolderTab/styles/normal = ExtResource("s_folder_tab")
+FolderTab/styles/pressed = ExtResource("s_folder_tab")
+FolderTabActive/base_type = &"Button"
+FolderTabActive/colors/font_color = Color(0.9686, 0.9412, 0.8784, 1)
+FolderTabActive/colors/font_hover_color = Color(0.9686, 0.9412, 0.8784, 1)
+FolderTabActive/colors/font_hover_pressed_color = Color(0.9686, 0.9412, 0.8784, 1)
+FolderTabActive/colors/font_pressed_color = Color(0.9686, 0.9412, 0.8784, 1)
+FolderTabActive/fonts/font = ExtResource("f_title")
+FolderTabActive/font_sizes/font_size = 30
+FolderTabActive/styles/hover = ExtResource("s_folder_tab_active")
+FolderTabActive/styles/hover_pressed = ExtResource("s_folder_tab_active")
+FolderTabActive/styles/normal = ExtResource("s_folder_tab_active")
+FolderTabActive/styles/pressed = ExtResource("s_folder_tab_active")
+GoldButton/base_type = &"Button"
+GoldButton/fonts/font = ExtResource("f_title")
+GoldButton/font_sizes/font_size = 30
+GoldButton/styles/hover = ExtResource("s_gold")
+GoldButton/styles/hover_pressed = ExtResource("s_gold_down")
+GoldButton/styles/normal = ExtResource("s_gold")
+GoldButton/styles/pressed = ExtResource("s_gold_down")
+Header/base_type = &"PanelContainer"
+Header/styles/panel = ExtResource("s_header")
+InkBox/base_type = &"PanelContainer"
+InkBox/styles/panel = ExtResource("s_ink_box")
+InkBoxThick/base_type = &"PanelContainer"
+InkBoxThick/styles/panel = ExtResource("s_ink_box_thick")
+ItalicLabel/base_type = &"Label"
+ItalicLabel/colors/font_color = Color(0.4196, 0.3647, 0.3098, 1)
+ItalicLabel/fonts/font = ExtResource("f_italic")
+ItalicLight/base_type = &"Label"
+ItalicLight/colors/font_color = Color(0.7961, 0.7333, 0.6275, 1)
+ItalicLight/fonts/font = ExtResource("f_italic")
+Label/colors/font_color = Color(0.2039, 0.1608, 0.1255, 1)
+Label/fonts/font = ExtResource("f_body")
+LabelLight/base_type = &"Label"
+LabelLight/colors/font_color = Color(0.9294, 0.8902, 0.7961, 1)
+LedgerCard/base_type = &"PanelContainer"
+LedgerCard/styles/panel = ExtResource("s_paper_ledger")
+NavBar/base_type = &"PanelContainer"
+NavBar/styles/panel = ExtResource("s_nav")
+NavTab/base_type = &"Button"
+NavTab/colors/font_color = Color(0.9294, 0.8902, 0.7961, 1)
+NavTab/colors/font_hover_color = Color(0.9294, 0.8902, 0.7961, 1)
+NavTab/colors/font_hover_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+NavTab/colors/font_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+NavTab/colors/icon_hover_color = Color(0.9294, 0.8902, 0.7961, 1)
+NavTab/colors/icon_hover_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+NavTab/colors/icon_normal_color = Color(0.9294, 0.8902, 0.7961, 1)
+NavTab/colors/icon_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+NavTab/constants/icon_max_width = 34
+NavTab/font_sizes/font_size = 26
+NavTab/styles/hover = ExtResource("s_nav_tile")
+NavTab/styles/hover_pressed = ExtResource("s_nav_tile")
+NavTab/styles/normal = ExtResource("s_nav_tile")
+NavTab/styles/pressed = ExtResource("s_nav_tile")
+NavTabActive/base_type = &"Button"
+NavTabActive/constants/icon_max_width = 34
+NavTabActive/font_sizes/font_size = 26
+NavTabActive/styles/hover = ExtResource("s_nav_tile_active")
+NavTabActive/styles/hover_pressed = ExtResource("s_nav_tile_active")
+NavTabActive/styles/normal = ExtResource("s_nav_tile_active")
+NavTabActive/styles/pressed = ExtResource("s_nav_tile_active")
+NoteCard/base_type = &"PanelContainer"
+NoteCard/styles/panel = ExtResource("s_paper_note")
+Panel/styles/panel = ExtResource("s_empty")
+PanelContainer/styles/panel = ExtResource("s_empty")
+PaperButton/base_type = &"Button"
+PaperCard/base_type = &"PanelContainer"
+PaperCard/styles/panel = ExtResource("s_paper_card")
+Pill/base_type = &"PanelContainer"
+Pill/styles/panel = ExtResource("s_pill")
+PlanCard/base_type = &"PanelContainer"
+PlanCard/styles/panel = ExtResource("s_paper_grid")
+QuestTab/base_type = &"Button"
+QuestTab/styles/hover = ExtResource("s_quest_tab")
+QuestTab/styles/hover_pressed = ExtResource("s_quest_tab")
+QuestTab/styles/normal = ExtResource("s_quest_tab")
+QuestTab/styles/pressed = ExtResource("s_quest_tab")
+RichTextLabel/colors/default_color = Color(0.2039, 0.1608, 0.1255, 1)
+RichTextLabel/font_sizes/bold_font_size = 25
+RichTextLabel/font_sizes/italics_font_size = 25
+RichTextLabel/font_sizes/normal_font_size = 25
+RichTextLabel/fonts/bold_font = ExtResource("f_bold")
+RichTextLabel/fonts/italics_font = ExtResource("f_italic")
+RichTextLabel/fonts/normal_font = ExtResource("f_body")
+RoundButton/base_type = &"Button"
+RoundButton/colors/icon_hover_color = Color(0.9294, 0.8902, 0.7961, 1)
+RoundButton/colors/icon_hover_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+RoundButton/colors/icon_normal_color = Color(0.9294, 0.8902, 0.7961, 1)
+RoundButton/colors/icon_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+RoundButton/constants/icon_max_width = 40
+RoundButton/styles/hover = ExtResource("s_round")
+RoundButton/styles/hover_pressed = ExtResource("s_round_down")
+RoundButton/styles/normal = ExtResource("s_round")
+RoundButton/styles/pressed = ExtResource("s_round_down")
+ScrollBodyH/base_type = &"PanelContainer"
+ScrollBodyH/styles/panel = ExtResource("s_scroll_h")
+ScrollBodyV/base_type = &"PanelContainer"
+ScrollBodyV/styles/panel = ExtResource("s_scroll_v")
+SealLabel/base_type = &"Label"
+SealLabel/colors/font_color = Color(0.9294, 0.8902, 0.7961, 1)
+SealLabel/fonts/font = ExtResource("f_bold")
+SealButton/base_type = &"Button"
+SealButton/fonts/font = ExtResource("f_title")
+SealButton/font_sizes/font_size = 32
+SealButton/styles/disabled = ExtResource("s_seal_disabled")
+SealButton/styles/hover = ExtResource("s_seal")
+SealButton/styles/hover_pressed = ExtResource("s_seal_down")
+SealButton/styles/normal = ExtResource("s_seal")
+SealButton/styles/pressed = ExtResource("s_seal_down")
+Sheet/base_type = &"PanelContainer"
+Sheet/styles/panel = ExtResource("s_sheet")
+Stamp/base_type = &"PanelContainer"
+Stamp/styles/panel = ExtResource("s_stamp")
+TagLabel/base_type = &"PanelContainer"
+TagLabel/styles/panel = ExtResource("s_tag_label")
+TitleLabel/base_type = &"Label"
+TitleLabel/colors/font_color = Color(0.2039, 0.1608, 0.1255, 1)
+TitleLabel/fonts/font = ExtResource("f_title")
+TitleLight/base_type = &"Label"
+TitleLight/colors/font_color = Color(0.9294, 0.8902, 0.7961, 1)
+TitleLight/colors/font_shadow_color = Color(0, 0, 0, 0.45)
+TitleLight/constants/shadow_offset_x = 0
+TitleLight/constants/shadow_offset_y = 2
+TitleLight/fonts/font = ExtResource("f_title")
+Toast/base_type = &"PanelContainer"
+Toast/styles/panel = ExtResource("s_toast")
+TornNote/base_type = &"PanelContainer"
+TornNote/styles/panel = ExtResource("s_torn_note")
+TornPaper/base_type = &"PanelContainer"
+TornPaper/styles/panel = ExtResource("s_torn")
+TypeSeal/base_type = &"PanelContainer"
+TypeSeal/styles/panel = ExtResource("s_type_seal")
+VScrollBar/styles/grabber = ExtResource("s_grabber")
+VScrollBar/styles/grabber_highlight = ExtResource("s_grabber")
+VScrollBar/styles/grabber_pressed = ExtResource("s_grabber")
+VScrollBar/styles/scroll = ExtResource("s_empty")
+WoodButton/base_type = &"Button"
+WoodButton/colors/font_color = Color(0.9294, 0.8902, 0.7961, 1)
+WoodButton/colors/font_disabled_color = Color(0.6, 0.55, 0.48, 1)
+WoodButton/colors/font_focus_color = Color(0.9294, 0.8902, 0.7961, 1)
+WoodButton/colors/font_hover_color = Color(0.9294, 0.8902, 0.7961, 1)
+WoodButton/colors/font_hover_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+WoodButton/colors/font_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+WoodButton/colors/icon_hover_color = Color(0.9294, 0.8902, 0.7961, 1)
+WoodButton/colors/icon_hover_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+WoodButton/colors/icon_normal_color = Color(0.9294, 0.8902, 0.7961, 1)
+WoodButton/colors/icon_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
+WoodButton/fonts/font = ExtResource("f_title")
+WoodButton/font_sizes/font_size = 30
+WoodButton/styles/hover = ExtResource("s_wood")
+WoodButton/styles/hover_pressed = ExtResource("s_wood_down")
+WoodButton/styles/normal = ExtResource("s_wood")
+WoodButton/styles/pressed = ExtResource("s_wood_down")

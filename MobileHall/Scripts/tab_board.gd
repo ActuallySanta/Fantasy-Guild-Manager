@@ -1,6 +1,6 @@
-## Board tab: the home screen. A three-box "Today" checklist (recruits,
-## quests, upgrades), then every quest of the day in one list so they can be
-## compared at a glance. Tap a quest to pick its party.
+## Board tab: the home screen. Three pinned "Today" notes (recruits,
+## quests decided, upgrades), then every quest of the day as a scroll in one
+## list so they can be compared at a glance. Tap a quest to pick its party.
 ## Scene: MobileHall/Scenes/Tabs/tab_board.tscn
 extends ScrollContainer
 
@@ -9,18 +9,18 @@ const QuestRow := preload("res://MobileHall/Scenes/Rows/quest_row.tscn")
 
 # ---- TEXT
 const TODAY_RECRUITS := "Recruits"
-const TODAY_QUESTS := "Quests"
+const TODAY_QUESTS := "Decided"
 const TODAY_UPGRADES := "Upgrades"
 const RECRUITS_NEW := "%d new"
-const RECRUITS_FULL := "Beds full"
-const RECRUITS_SEEN := "%d / %d in guild"
-const QUESTS_DONE := "%d / %d decided"
+const RECRUITS_FULL := "beds full"
+const RECRUITS_SEEN := "%d / %d hired"
+const QUESTS_DONE := "%d / %d"
 const UPGRADES_READY := "%d ready"
-const UPGRADES_NONE := "None ready"
+const UPGRADES_NONE := "none yet"
 const HEADING := "Today's Quests"
 const HEADING_MILESTONE := "The Bone Drake"
-const HINT := "Tap a quest to pick its party. Picks are kept until you send them."
-const HINT_DONE := "Every quest is decided. Tap one to change your mind."
+const HINT := "unroll one to staff it"
+const HINT_DONE := "all decided · tap to change"
 
 # ---- NODES
 @onready var _today_recruits = %TodayRecruits
@@ -52,17 +52,17 @@ func refresh() -> void:
 func _show_today() -> void:
 	var new: int = ui.new_recruits()
 	if ui.roster_full():
-		_today_recruits.set_item(TODAY_RECRUITS, RECRUITS_FULL, "nav_characters", "idle")
+		_today_recruits.set_item(TODAY_RECRUITS, RECRUITS_FULL, "idle")
 	elif new > 0 or ui.roster().is_empty():
-		_today_recruits.set_item(TODAY_RECRUITS, RECRUITS_NEW % CharacterContainer.hireable_characters.size(), "nav_characters", "todo")
+		_today_recruits.set_item(TODAY_RECRUITS, RECRUITS_NEW % CharacterContainer.hireable_characters.size(), "todo")
 	else:
-		_today_recruits.set_item(TODAY_RECRUITS, RECRUITS_SEEN % [ui.roster().size(), CharacterContainer.max_characters], "nav_characters", "idle")
+		_today_recruits.set_item(TODAY_RECRUITS, RECRUITS_SEEN % [ui.roster().size(), CharacterContainer.max_characters], "idle")
 
 	var total: int = ui.entries.size()
-	_today_quests.set_item(TODAY_QUESTS, QUESTS_DONE % [ui.decided(), total], "nav_quests", "done" if ui.outstanding() == 0 else "todo")
+	_today_quests.set_item(TODAY_QUESTS, QUESTS_DONE % [ui.decided(), total], "done" if ui.outstanding() == 0 else "todo")
 
 	var ups: int = ui.upgradable().size()
-	_today_upgrades.set_item(TODAY_UPGRADES, UPGRADES_READY % ups if ups > 0 else UPGRADES_NONE, "nav_upgrades", "todo" if ups > 0 else "idle")
+	_today_upgrades.set_item(TODAY_UPGRADES, UPGRADES_READY % ups if ups > 0 else UPGRADES_NONE, "todo" if ups > 0 else "idle")
 
 
 func _show_quests() -> void:

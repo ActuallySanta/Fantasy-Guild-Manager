@@ -31,8 +31,8 @@ func setup(main) -> void:
 	_reset_button.text = BUTTON_RESET
 	_close_button.text = BUTTON_CLOSE
 	for b in [_how_button, _report_button, _reset_button]:
-		S.style_button(b, "paper", 28)
-	S.style_button(_close_button, "wood", 28)
+		S.style_button(b, "paper")
+	S.style_button(_close_button, "wood")
 
 
 func refresh() -> void:

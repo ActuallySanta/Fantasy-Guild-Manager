@@ -15,7 +15,7 @@ const TEXT_RECRUIT := "Recruit · not hired yet"
 const TEXT_FREE := "Free today"
 const TEXT_ON := "#%d %s (%s)"
 const BUTTON_BACK := "Back"
-const BUTTON_HIRE := "Hire (free)"
+const BUTTON_HIRE := "Hire · free"
 
 # ---- NODES
 @onready var _scroll: ScrollContainer = %Scroll
@@ -40,8 +40,8 @@ func setup(main) -> void:
 	_hire_button.pressed.connect(_on_hire)
 	_back_button.text = BUTTON_BACK
 	_hire_button.text = BUTTON_HIRE
-	S.style_button(_back_button, "paper", 28)
-	S.style_button(_hire_button, "green", 30)
+	S.style_button(_back_button, "wood")
+	S.style_button(_hire_button, "gold")
 
 
 func scroll_to_top() -> void:
@@ -89,7 +89,7 @@ func _show_stats(c: GuildCharacter) -> void:
 			bonus = GuildUpgrades.get_stat_bonus(c, i)
 		value.text = str(S.stat_value(c, i)) + (TEXT_BONUS % bonus if bonus > 0 else "")
 		S.color(value, st.color)
-		line.add_theme_stylebox_override("panel", S.flat(st.bg, 12))
+		S.tint(line, st.color)
 
 
 func _on_hire() -> void:

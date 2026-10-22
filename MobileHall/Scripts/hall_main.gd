@@ -51,17 +51,17 @@ const TOAST_SECONDS := 2.2
 
 # ============================================================ TEXT
 
-const HEADER_DAY := "Day %d"
-const HEADER_DRAKE := "Bone Drake in %d %s"
-const HEADER_DRAKE_TODAY := "The Bone Drake attacks today!"
+const HEADER_DAY := "%d"
+## The countdown note in the header (BBCode; the day count is in red ink).
+const HEADER_DRAKE := "The Bone Drake wakes in [color=#%s]%d %s[/color]"
+const HEADER_DRAKE_TODAY := "The Bone Drake [color=#%s]attacks today![/color]"
 const HEADER_DRAKE_GONE := "The Bone Drake has come and gone"
-## Countdown colour in the last two days (light red, readable on the dark header).
-const DRAKE_WARNING := Color("#FF8A80")
-## Nav tab that isn't open.
-const NAV_IDLE := Color("#555A61")
+## Nav tab heights: the open tab stands a little taller than the others.
+const NAV_HEIGHT := 100
+const NAV_HEIGHT_OPEN := 114
 
 const ACTION_HIRE := "Hire your first adventurer"
-const ACTION_HIRE_HINT := "You need someone to send on quests"
+const ACTION_HIRE_HINT := "You need someone to send on quests."
 const ACTION_HIRE_BUTTON := "For Hire"
 const ACTION_DECIDE := "%s to decide"
 const ACTION_DECIDE_HINT := "Next: %s"
@@ -116,7 +116,7 @@ var _toast_tween: Tween
 # ============================================================ NODES
 
 @onready var _day_value: Label = %DayValue
-@onready var _drake_value: Label = %DrakeValue
+@onready var _drake_value: RichTextLabel = %DrakeValue
 @onready var _gold_value: Label = %GoldValue
 @onready var _standing_value: Label = %StandingValue
 @onready var _menu_button: Button = %MenuButton
@@ -613,13 +613,13 @@ func refresh() -> void:
 func _refresh_header() -> void:
 	_day_value.text = HEADER_DAY % GameState.day
 	var left := days_to_drake()
+	var red := S.WAX.to_html(false)
 	if left > 0:
-		_drake_value.text = HEADER_DRAKE % [left, S.plural(left, "day", "days")]
+		_drake_value.text = HEADER_DRAKE % [red, left, S.plural(left, "day", "days")]
 	elif left == 0:
-		_drake_value.text = HEADER_DRAKE_TODAY
+		_drake_value.text = HEADER_DRAKE_TODAY % red
 	else:
 		_drake_value.text = HEADER_DRAKE_GONE
-	S.color(_drake_value, DRAKE_WARNING if left <= 2 and left >= 0 else S.CREAM)
 	_gold_value.text = str(GameState.gold)
 	_standing_value.text = str(GameState.standing)
 
@@ -651,38 +651,32 @@ func _refresh_action_bar() -> void:
 	# screens put their own buttons in this spot (Deny / Send, Back / Hire)
 	_action_bar.visible = screen.is_empty()
 	if roster().is_empty() and can_hire_anyone():
-		_set_action(ACTION_HIRE, ACTION_HIRE_HINT, ACTION_HIRE_BUTTON, "blue")
+		_set_action(ACTION_HIRE, ACTION_HIRE_HINT, ACTION_HIRE_BUTTON)
 	elif outstanding() > 0:
 		var out := outstanding()
 		var next: Dictionary = entries[next_open(0)]
-		_set_action(ACTION_DECIDE % S.count(out, "quest", "quests"), ACTION_DECIDE_HINT % next.quest.questTitle, ACTION_DECIDE_BUTTON, "blue")
+		_set_action(ACTION_DECIDE % S.count(out, "quest", "quests"), ACTION_DECIDE_HINT % next.quest.questTitle, ACTION_DECIDE_BUTTON)
 	else:
 		var going := ready_entries().size()
 		var hint := ACTION_END_HINT % S.count(going, "party", "parties") if going > 0 else ACTION_END_HINT_NONE
-		_set_action(ACTION_END % GameState.day, hint, ACTION_END_BUTTON, "green")
+		_set_action(ACTION_END % GameState.day, hint, ACTION_END_BUTTON)
 
 
-func _set_action(title: String, hint: String, button: String, kind: String) -> void:
+func _set_action(title: String, hint: String, button: String) -> void:
 	_action_title.text = title
 	_action_hint.text = hint
 	_action_button.text = button
-	S.style_button(_action_button, kind, 30)
 
 
-## Bottom tabs: the open one is white; each has a badge when it needs a visit.
+## Bottom tabs: the open one is parchment (NavTabActive in hall_theme), the
+## rest dark wood (NavTab); each has a badge when it needs a visit.
 func _refresh_nav() -> void:
 	var current := "board" if screen.get("kind", "") == "assign" else tab
 	for t in TABS:
 		var b := _nav_button(t)
 		var active: bool = t == current
-		var sb := S.flat(S.WHITE if active else NAV_IDLE, 10, 3 if active else 0, S.BLUE_TEXT, Vector4(4, 8, 4, 8))
-		for st in ["normal", "hover", "pressed", "hover_pressed"]:
-			b.add_theme_stylebox_override(st, sb)
-		for st in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
-			b.add_theme_color_override(st, S.INK if active else S.WHITE)
-		b.add_theme_color_override("icon_normal_color", S.INK if active else S.WHITE)
-		b.add_theme_color_override("icon_hover_color", S.INK if active else S.WHITE)
-		b.add_theme_color_override("icon_pressed_color", S.INK if active else S.WHITE)
+		b.theme_type_variation = &"NavTabActive" if active else &"NavTab"
+		b.custom_minimum_size.y = NAV_HEIGHT_OPEN if active else NAV_HEIGHT
 		var badge := _badge_for(t)
 		var badge_node: Control = b.get_node("Badge")
 		badge_node.visible = badge != ""

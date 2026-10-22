@@ -17,9 +17,9 @@ const TEXT_BUTTON := "%d gold"
 
 func setup(main, b: int) -> void:
 	var lvl := GuildUpgrades.get_level(b)
-	S.style_tag(_tag_box, _tag, S.BUILDING_TAGS.get(b, "?"), GuildUpgrades.get_building_color(b).darkened(0.25))
+	S.seal(_tag_box, _tag, S.BUILDINGS.get(b, {}).get("tag", "?"), GuildUpgrades.get_building_color(b).darkened(0.35))
 	_name.text = TEXT_NAME % [GuildUpgrades.get_building_name(b), lvl + 1]
 	_effect.text = GuildUpgrades.get_effect_text(b, lvl + 1)
 	_button.text = TEXT_BUTTON % GuildUpgrades.get_next_gold_cost(b)
-	S.style_button(_button, "green", 24)
+	S.style_button(_button, "gold", 28)
 	_button.pressed.connect(main.upgrade.bind(b))

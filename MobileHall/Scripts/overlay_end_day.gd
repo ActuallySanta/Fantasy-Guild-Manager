@@ -39,8 +39,8 @@ func setup(main) -> void:
 	_dim.gui_input.connect(func(ev): if ev is InputEventMouseButton and ev.pressed: ui.close_end_check())
 	_back_button.text = BUTTON_BACK
 	_end_button.text = BUTTON_END
-	S.style_button(_back_button, "paper", 28)
-	S.style_button(_end_button, "green", 32)
+	S.style_button(_back_button, "paper")
+	S.style_button(_end_button, "gold")
 
 
 func refresh() -> void:

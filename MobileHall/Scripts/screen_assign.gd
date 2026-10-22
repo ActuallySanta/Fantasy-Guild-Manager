@@ -1,12 +1,13 @@
 ## Assign Party: one quest at a time, with every other quest one tap away.
 ## Scene: MobileHall/Scenes/Screens/screen_assign.tscn
 ##
-##   strip   - back to the Board, then one tab per quest (state-coloured);
-##             switching keeps every quest's picks
-##   quest   - type, title, reward, party size, favored stat
-##   party   - the seats (tap to remove) and the live success chance
+##   strip   - back to the Board, then one little scroll per quest
+##             (state-coloured); switching keeps every quest's picks
+##   writ    - the quest as an unrolled scroll: type, title, reward, party
+##             size, favored stat, the pinned party (tap to remove) and the
+##             live success chance
 ##   picker  - every adventurer, best fit first, with stats and what they add
-##   footer  - Deny / Send (or Recall / Reconsider once decided)
+##   footer  - Deny / Seal & send (or Recall / Reconsider once decided)
 extends VBoxContainer
 
 const S := preload("res://MobileHall/Scripts/hall_style.gd")
@@ -16,23 +17,26 @@ const PickRow := preload("res://MobileHall/Scenes/Rows/pick_row.tscn")
 
 # ---- TEXT
 const TEXT_TYPE := "%s · Rank %s"
+const TEXT_ODDS_WORD := "Chance of success"
 const TEXT_GOLD := "%d gold"
 const TEXT_SLOTS := "Up to %d"
 const TEXT_SLOTS_ONE := "Solo"
 const TEXT_FAV := "Favors %s"
 const TEXT_ODDS := "%d%%"
 const TEXT_ODDS_NONE := "--"
-const STATUS_OPEN := "Pick up to %s. Their stats add up to the chance."
-const STATUS_DRAFT := "Picks are kept if you look at another quest."
+const STATUS_OPEN := "Pin up to %s. Their stats add up to the chance."
+const STATUS_DRAFT := "Your picks stay pinned if you look at another quest."
 const STATUS_SENT := "Sent. Tap someone to change the party, or recall it."
 const STATUS_DENIED := "Denied. Reconsider to put it back on the board."
-const PICK_HEADING := "Your adventurers · best fit first"
-const PICK_HEADING_HIDDEN := "Free adventurers · %d busy hidden"
+const PICK_HEADING := "Your adventurers"
+const PICK_HINT := "best fit first"
+const PICK_HINT_HIDDEN := "best fit first · %d busy hidden"
 const BUTTON_SHOW_BUSY := "Show busy"
 const NO_ROSTER := "You have no adventurers yet."
 const BUTTON_DENY := "Deny"
-const BUTTON_SEND := "Send Party"
-const BUTTON_SEND_EMPTY := "Pick someone"
+const BUTTON_SEND := "Seal & send %s"
+const BUTTON_SEND_PARTY := "Seal & send party"
+const BUTTON_SEND_EMPTY := "Pin someone first"
 const BUTTON_RECALL := "Recall"
 const BUTTON_NEXT := "Next Quest"
 const BUTTON_BOARD := "Board"
@@ -42,7 +46,6 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _back_button: Button = %BackButton
 @onready var _tabs: HBoxContainer = %QuestTabs
 @onready var _scroll: ScrollContainer = %Scroll
-@onready var _quest_card: PanelContainer = %QuestCard
 @onready var _type_label: Label = %TypeLabel
 @onready var _title: Label = %Title
 @onready var _gold_chip = %GoldChip
@@ -50,12 +53,14 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _fav_chip = %FavChip
 @onready var _status: Label = %Status
 @onready var _party_box: Control = %PartyBox
-@onready var _slots: HBoxContainer = %Slots
+@onready var _slots: VBoxContainer = %Slots
 @onready var _odds_value: Label = %OddsValue
 @onready var _odds_word: Label = %OddsWord
+@onready var _odds_circle: TextureRect = %Circle
 @onready var _odds_bar = %OddsBar
 @onready var _pick_header: Control = %PickHeader
 @onready var _pick_heading: Label = %PickHeading
+@onready var _pick_hint: Label = %PickHint
 @onready var _busy_toggle: CheckButton = %BusyToggle
 @onready var _all_busy: Label = %AllBusy
 @onready var _pick_list: VBoxContainer = %PickList
@@ -75,8 +80,7 @@ func setup(main) -> void:
 	_right_button.pressed.connect(_on_right)
 	_busy_toggle.toggled.connect(func(on): ui.set_show_busy(on))
 	_busy_toggle.text = BUTTON_SHOW_BUSY
-	S.style_button(_back_button, "paper", 22)
-	S.style_button(_hire_button, "blue", 26)
+	_back_button.text = BUTTON_BOARD
 
 
 func scroll_to_top() -> void:
@@ -104,24 +108,24 @@ func _show_tabs() -> void:
 func _show_quest(e: Dictionary) -> void:
 	var info := S.type_info(e)
 	var q: CreatedQuest = e.quest
-	_type_label.text = TEXT_TYPE % [info.name, S.rank_letter(q)]
+	_type_label.text = TEXT_TYPE % [info.writ, S.rank_letter(q)]
 	S.color(_type_label, info.color)
 	_title.text = q.questTitle
-	_gold_chip.set_chip(TEXT_GOLD % q.goldReward, S.GOLD_BG, S.GOLD_TEXT, "coins")
+	_gold_chip.set_chip(TEXT_GOLD % q.goldReward, S.INK, "coins")
 	var n: int = ui.slot_count(e)
-	_slots_chip.set_chip(TEXT_SLOTS_ONE if n == 1 else TEXT_SLOTS % n, S.BLUE_BG, S.BLUE_TEXT, "nav_characters")
+	_slots_chip.set_chip(TEXT_SLOTS_ONE if n == 1 else TEXT_SLOTS % n, S.INK, "person")
 	var fav: Dictionary = S.STATS[S.favored_index(q)]
-	_fav_chip.set_chip(TEXT_FAV % fav.name, fav.bg, fav.color, "", true)
+	_fav_chip.set_chip(TEXT_FAV % fav.name, fav.color, "", "pill")
 	match e.state:
 		"ready":
 			_status.text = STATUS_SENT
-			S.style_panel(_quest_card, Color("#E8F5E9"), S.GREEN, 4, 18, Vector4(20, 14, 20, 14))
+			S.color(_status, S.GREEN_TEXT)
 		"denied":
 			_status.text = STATUS_DENIED
-			S.style_panel(_quest_card, Color("#EEEEEE"), S.WAX, 4, 18, Vector4(20, 14, 20, 14))
+			S.color(_status, S.WAX)
 		_:
 			_status.text = STATUS_DRAFT if not e.party.is_empty() else STATUS_OPEN % S.count(n, "adventurer", "adventurers")
-			S.style_panel(_quest_card, S.CREAM, info.color, 4, 18, Vector4(20, 14, 20, 14))
+			S.color(_status, S.INK_SOFT)
 
 
 func _show_party(e: Dictionary) -> void:
@@ -129,13 +133,13 @@ func _show_party(e: Dictionary) -> void:
 	S.clear(_slots)
 	for i in ui.slot_count(e):
 		var c: GuildCharacter = e.party[i] if i < e.party.size() else null
-		S.add_row(_slots, PartySlot).setup(ui, c)
+		S.add_row(_slots, PartySlot).setup(ui, e, c)
 	var chance: int = ui.chance_for(e, e.party)
 	var o := S.odds(chance)
 	_odds_value.text = TEXT_ODDS % mini(chance, 100) if chance >= 0 else TEXT_ODDS_NONE
-	_odds_word.text = o[0]
+	_odds_word.text = TEXT_ODDS_WORD if chance >= 0 else o[0]
 	S.color(_odds_value, o[1])
-	S.color(_odds_word, o[1])
+	S.tint(_odds_circle, o[1])
 	_odds_bar.set_chance(mini(chance, 100))
 
 
@@ -160,9 +164,9 @@ func _show_picker(e: Dictionary) -> void:
 	for c in list:
 		S.add_row(_pick_list, PickRow).setup(ui, e, c)
 	var open: bool = e.state != "denied"
-	_pick_heading.text = PICK_HEADING_HIDDEN % hidden if hidden > 0 else PICK_HEADING
+	_pick_heading.text = PICK_HEADING
+	_pick_hint.text = PICK_HINT_HIDDEN % hidden if hidden > 0 else PICK_HINT
 	_busy_toggle.set_pressed_no_signal(ui.show_busy)
-	S.style_button(_busy_toggle, "blue" if ui.show_busy else "paper", 21)
 	_pick_header.visible = open and not ui.roster().is_empty()
 	_pick_list.visible = open
 	_all_busy.visible = open and list.is_empty() and hidden > 0
@@ -170,28 +174,30 @@ func _show_picker(e: Dictionary) -> void:
 
 
 ## Left / right footer buttons depend on the quest's state:
-##   open   -> Deny | Send Party
+##   open   -> Deny | Seal & send <name>
 ##   ready  -> Recall | Next Quest (or Board)
 ##   denied -> Board | Reconsider
+## The left button is always wood; the right one is the wax-sealed button.
 func _show_footer(e: Dictionary) -> void:
 	_right_button.disabled = false
+	_left_button.icon = null
 	match e.state:
 		"ready":
 			_left_button.text = BUTTON_RECALL
-			S.style_button(_left_button, "paper", 28)
 			_right_button.text = BUTTON_NEXT if ui.outstanding() > 0 else BUTTON_BOARD
-			S.style_button(_right_button, "blue", 30)
 		"denied":
 			_left_button.text = BUTTON_BOARD
-			S.style_button(_left_button, "paper", 28)
 			_right_button.text = BUTTON_RECONSIDER
-			S.style_button(_right_button, "blue", 30)
 		_:
 			_left_button.text = BUTTON_DENY
-			S.style_button(_left_button, "red", 28)
-			_right_button.text = BUTTON_SEND if not e.party.is_empty() else BUTTON_SEND_EMPTY
+			_left_button.icon = S.icon_tex("x")
+			if e.party.is_empty():
+				_right_button.text = BUTTON_SEND_EMPTY
+			elif e.party.size() == 1:
+				_right_button.text = BUTTON_SEND % e.party[0].name
+			else:
+				_right_button.text = BUTTON_SEND_PARTY
 			_right_button.disabled = e.party.is_empty()
-			S.style_button(_right_button, "green", 30)
 
 
 func _on_left() -> void:

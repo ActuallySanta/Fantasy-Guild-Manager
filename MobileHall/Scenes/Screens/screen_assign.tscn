@@ -1,266 +1,306 @@
 [gd_scene format=3 uid="uid://bt1iwlgoqgjw0"]
 
 [ext_resource type="Script" uid="uid://bftkb3j4ulonv" path="res://MobileHall/Scripts/screen_assign.gd" id="1_xf810"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/card.tres" id="2_46v2f"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_l7prp"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/card_plain.tres" id="6_dfpv4"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/arrow_left.svg" id="2_back"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/roller_h.png" id="3_roller"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="4_chip"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/divider.tscn" id="5_divider"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/ink_circle.png" id="6_circle"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/odds_bar.tscn" id="7_kj605"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_blue.tres" id="9_vnsqt"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_blue_down.tres" id="10_rcbg2"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="11_2v3ys"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_red.tres" id="12_cyqj5"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_red_down.tres" id="13_e0yn0"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green.tres" id="14_inevt"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green_down.tres" id="15_no8ti"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="8_footer"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/x.svg" id="9_x"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/seal_button.tscn" id="10_seal"]
 
-[node name="ScreenAssign" type="VBoxContainer" unique_id=216972609]
+[node name="ScreenAssign" type="VBoxContainer"]
 theme_override_constants/separation = 0
 script = ExtResource("1_xf810")
 
-[node name="StripMargin" type="MarginContainer" parent="." unique_id=2051644731]
+[node name="StripMargin" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 6
 
-[node name="Strip" type="HBoxContainer" parent="StripMargin" unique_id=753211833]
+[node name="Strip" type="HBoxContainer" parent="StripMargin"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 12
 
-[node name="BackButton" type="Button" parent="StripMargin/Strip" unique_id=585058831]
+[node name="BackButton" type="Button" parent="StripMargin/Strip"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(118, 84)
+custom_minimum_size = Vector2(150, 76)
 layout_mode = 2
+size_flags_vertical = 0
 focus_mode = 0
-theme_override_font_sizes/font_size = 22
+theme_type_variation = &"WoodButton"
+theme_override_font_sizes/font_size = 30
 text = "Board"
+icon = ExtResource("2_back")
 
-[node name="QuestTabs" type="HBoxContainer" parent="StripMargin/Strip" unique_id=883630]
+[node name="QuestTabs" type="HBoxContainer" parent="StripMargin/Strip"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="Scroll" type="ScrollContainer" parent="." unique_id=666989905]
+[node name="Scroll" type="ScrollContainer" parent="."]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="Margin" type="MarginContainer" parent="Scroll" unique_id=177251602]
+[node name="Margin" type="MarginContainer" parent="Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 6
+theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 16
 
-[node name="Col" type="VBoxContainer" parent="Scroll/Margin" unique_id=606801109]
+[node name="Col" type="VBoxContainer" parent="Scroll/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 16
 
-[node name="QuestCard" type="PanelContainer" parent="Scroll/Margin/Col" unique_id=3038105]
+[node name="Writ" type="VBoxContainer" parent="Scroll/Margin/Col"]
+layout_mode = 2
+theme_override_constants/separation = -6
+
+[node name="RollerTop" type="NinePatchRect" parent="Scroll/Margin/Col/Writ"]
+z_index = 1
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+texture = ExtResource("3_roller")
+patch_margin_left = 22
+patch_margin_right = 22
+
+[node name="WritMargin" type="MarginContainer" parent="Scroll/Margin/Col/Writ"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+
+[node name="QuestCard" type="PanelContainer" parent="Scroll/Margin/Col/Writ/WritMargin"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_styles/panel = ExtResource("2_46v2f")
+theme_type_variation = &"ScrollBodyV"
 
-[node name="Col" type="VBoxContainer" parent="Scroll/Margin/Col/QuestCard" unique_id=1410912009]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="TypeLine" type="HBoxContainer" parent="Scroll/Margin/Col/QuestCard/Col" unique_id=878928912]
+[node name="Col" type="VBoxContainer" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="TypeLabel" type="Label" parent="Scroll/Margin/Col/QuestCard/Col/TypeLine" unique_id=217088025]
+[node name="TypeLabel" type="Label" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
-text = "Clear Dungeon · Rank F"
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 20
+text = "Writ of Scouting · Rank F"
+uppercase = true
 
-[node name="Title" type="Label" parent="Scroll/Margin/Col/QuestCard/Col" unique_id=1250405350]
+[node name="Title" type="Label" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Raid the Goblin Caves"
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 48
+theme_override_constants/line_spacing = -8
+text = "Explore Mistwater Marsh"
 autowrap_mode = 3
 
-[node name="Chips" type="HFlowContainer" parent="Scroll/Margin/Col/QuestCard/Col" unique_id=653945197]
+[node name="Chips" type="HFlowContainer" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col"]
 layout_mode = 2
-theme_override_constants/h_separation = 8
+theme_override_constants/h_separation = 18
 theme_override_constants/v_separation = 6
 
-[node name="GoldChip" parent="Scroll/Margin/Col/QuestCard/Col/Chips" unique_id=545259554 instance=ExtResource("3_l7prp")]
+[node name="GoldChip" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/Chips" instance=ExtResource("4_chip")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="SlotsChip" parent="Scroll/Margin/Col/QuestCard/Col/Chips" unique_id=1396657642 instance=ExtResource("3_l7prp")]
+[node name="SlotsChip" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/Chips" instance=ExtResource("4_chip")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="FavChip" parent="Scroll/Margin/Col/QuestCard/Col/Chips" unique_id=1458827758 instance=ExtResource("3_l7prp")]
+[node name="FavChip" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/Chips" instance=ExtResource("4_chip")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Status" type="Label" parent="Scroll/Margin/Col/QuestCard/Col" unique_id=796154579]
+[node name="Status" type="Label" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 20
-text = "Pick up to 2 adventurers."
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 23
+text = "Pin up to 1 adventurer. Their stats add up to the chance."
 autowrap_mode = 3
 
-[node name="PartyBox" type="PanelContainer" parent="Scroll/Margin/Col" unique_id=1868541545]
+[node name="Divider" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col" instance=ExtResource("5_divider")]
+layout_mode = 2
+
+[node name="PartyBox" type="VBoxContainer" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_styles/panel = ExtResource("6_dfpv4")
+theme_override_constants/separation = 16
 
-[node name="Col" type="VBoxContainer" parent="Scroll/Margin/Col/PartyBox" unique_id=729066343]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="Row" type="HBoxContainer" parent="Scroll/Margin/Col/PartyBox/Col" unique_id=420483244]
+[node name="Row" type="HBoxContainer" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Slots" type="HBoxContainer" parent="Scroll/Margin/Col/PartyBox/Col/Row" unique_id=2030456919]
+[node name="Slots" type="VBoxContainer" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox/Row"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
-theme_override_constants/separation = 10
+size_flags_vertical = 4
+theme_override_constants/separation = 12
 
-[node name="OddsCol" type="VBoxContainer" parent="Scroll/Margin/Col/PartyBox/Col/Row" unique_id=920032808]
+[node name="OddsCol" type="VBoxContainer" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 0
+size_flags_vertical = 4
+theme_override_constants/separation = 4
 alignment = 1
 
-[node name="OddsValue" type="Label" parent="Scroll/Margin/Col/PartyBox/Col/Row/OddsCol" unique_id=1768188593]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 56
-text = "--"
-horizontal_alignment = 2
-
-[node name="OddsWord" type="Label" parent="Scroll/Margin/Col/PartyBox/Col/Row/OddsCol" unique_id=1952636974]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 22
-text = "No party yet"
-horizontal_alignment = 2
-
-[node name="OddsBar" parent="Scroll/Margin/Col/PartyBox/Col" unique_id=1205212220 instance=ExtResource("7_kj605")]
-unique_name_in_owner = true
+[node name="OddsHolder" type="CenterContainer" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox/Row/OddsCol"]
 layout_mode = 2
 
-[node name="PickHeader" type="HBoxContainer" parent="Scroll/Margin/Col" unique_id=1674572973]
+[node name="OddsStack" type="Control" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox/Row/OddsCol/OddsHolder"]
+custom_minimum_size = Vector2(210, 100)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Circle" type="TextureRect" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox/Row/OddsCol/OddsHolder/OddsStack"]
+unique_name_in_owner = true
+self_modulate = Color(0.1843, 0.2902, 0.4, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("6_circle")
+expand_mode = 1
+
+[node name="OddsValue" type="Label" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox/Row/OddsCol/OddsHolder/OddsStack"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 66
+text = "87%"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="OddsWord" type="Label" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox/Row/OddsCol"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 19
+text = "Chance of success"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="OddsBar" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox" instance=ExtResource("7_kj605")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="RollerBottom" type="NinePatchRect" parent="Scroll/Margin/Col/Writ"]
+z_index = 1
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+texture = ExtResource("3_roller")
+patch_margin_left = 22
+patch_margin_right = 22
+
+[node name="PickHeader" type="HBoxContainer" parent="Scroll/Margin/Col"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="PickHeading" type="Label" parent="Scroll/Margin/Col/PickHeader" unique_id=809079663]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
+[node name="PickTitles" type="VBoxContainer" parent="Scroll/Margin/Col/PickHeader"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 22
-text = "Your adventurers · best fit first"
-autowrap_mode = 3
+theme_override_constants/separation = -4
 
-[node name="BusyToggle" type="CheckButton" parent="Scroll/Margin/Col/PickHeader" unique_id=1722838710]
+[node name="PickHeading" type="Label" parent="Scroll/Margin/Col/PickHeader/PickTitles"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TitleLight"
+theme_override_font_sizes/font_size = 42
+text = "Your adventurers"
+
+[node name="PickHint" type="Label" parent="Scroll/Margin/Col/PickHeader/PickTitles"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 21
+text = "2 busy hidden"
+
+[node name="BusyToggle" type="CheckButton" parent="Scroll/Margin/Col/PickHeader"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 64)
 layout_mode = 2
+size_flags_vertical = 4
 focus_mode = 0
-theme_override_font_sizes/font_size = 21
 text = "Show busy"
 
-[node name="PickList" type="VBoxContainer" parent="Scroll/Margin/Col" unique_id=497382464]
+[node name="PickList" type="VBoxContainer" parent="Scroll/Margin/Col"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 12
 
-[node name="AllBusy" type="Label" parent="Scroll/Margin/Col" unique_id=289815029]
+[node name="AllBusy" type="Label" parent="Scroll/Margin/Col"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 22
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 23
 text = "Everyone is on another quest. Turn on Show busy to move someone here."
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="NoRoster" type="VBoxContainer" parent="Scroll/Margin/Col" unique_id=1964584831]
+[node name="NoRoster" type="VBoxContainer" parent="Scroll/Margin/Col"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 12
 
-[node name="Text" type="Label" parent="Scroll/Margin/Col/NoRoster" unique_id=1061045484]
+[node name="Text" type="Label" parent="Scroll/Margin/Col/NoRoster"]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_type_variation = &"ItalicLight"
 theme_override_font_sizes/font_size = 24
 text = "You have no adventurers yet."
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="HireButton" type="Button" parent="Scroll/Margin/Col/NoRoster" unique_id=858448673]
+[node name="HireButton" type="Button" parent="Scroll/Margin/Col/NoRoster"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 84)
 layout_mode = 2
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 26
-theme_override_styles/normal = ExtResource("9_vnsqt")
-theme_override_styles/pressed = ExtResource("10_rcbg2")
-theme_override_styles/hover = ExtResource("9_vnsqt")
-theme_override_styles/hover_pressed = ExtResource("10_rcbg2")
+theme_type_variation = &"GoldButton"
 text = "Hire adventurers"
 
-[node name="Footer" type="PanelContainer" parent="." unique_id=757856942]
+[node name="Footer" type="PanelContainer" parent="."]
 layout_mode = 2
-theme_override_styles/panel = ExtResource("11_2v3ys")
+theme_override_styles/panel = ExtResource("8_footer")
 
-[node name="Row" type="HBoxContainer" parent="Footer" unique_id=1670078887]
+[node name="Row" type="HBoxContainer" parent="Footer"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 26
 
-[node name="LeftButton" type="Button" parent="Footer/Row" unique_id=39157295]
+[node name="LeftButton" type="Button" parent="Footer/Row"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(200, 92)
 layout_mode = 2
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 28
-theme_override_styles/normal = ExtResource("12_cyqj5")
-theme_override_styles/pressed = ExtResource("13_e0yn0")
-theme_override_styles/hover = ExtResource("12_cyqj5")
-theme_override_styles/hover_pressed = ExtResource("13_e0yn0")
+theme_type_variation = &"WoodButton"
+theme_override_font_sizes/font_size = 36
 text = "Deny"
+icon = ExtResource("9_x")
 
-[node name="RightButton" type="Button" parent="Footer/Row" unique_id=570300543]
+[node name="RightButton" parent="Footer/Row" instance=ExtResource("10_seal")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 92)
 layout_mode = 2
-size_flags_horizontal = 3
-focus_mode = 0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 30
-theme_override_styles/normal = ExtResource("14_inevt")
-theme_override_styles/pressed = ExtResource("15_no8ti")
-theme_override_styles/hover = ExtResource("14_inevt")
-theme_override_styles/hover_pressed = ExtResource("15_no8ti")
-text = "Send Party"
+text = "Seal & send Maria"

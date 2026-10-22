@@ -1,70 +1,85 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://MobileHall/Scripts/tab_upgrades.gd" id="1_2kjtj"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/card_plain.tres" id="2_l0ver"]
-[ext_resource type="Texture2D" path="res://Sprites/UI Icons/coins-solid-full.svg" id="3_neatd"]
 
-[node name="TabUpgrades" type="ScrollContainer" unique_id=229603043]
+[node name="TabUpgrades" type="ScrollContainer"]
 horizontal_scroll_mode = 0
 script = ExtResource("1_2kjtj")
 
-[node name="Margin" type="MarginContainer" parent="." unique_id=1015830774]
+[node name="Margin" type="MarginContainer" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/margin_left = 14
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 14
-theme_override_constants/margin_bottom = 20
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 24
 
-[node name="Col" type="VBoxContainer" parent="Margin" unique_id=762175634]
+[node name="Col" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
-theme_override_constants/separation = 12
+theme_override_constants/separation = 20
 
-[node name="WalletBox" type="PanelContainer" parent="Margin/Col" unique_id=580025596]
+[node name="WalletBox" type="PanelContainer" parent="Margin/Col"]
 layout_mode = 2
-theme_override_styles/panel = ExtResource("2_l0ver")
+theme_type_variation = &"LedgerCard"
 
-[node name="Col" type="VBoxContainer" parent="Margin/Col/WalletBox" unique_id=503860126]
+[node name="Col" type="VBoxContainer" parent="Margin/Col/WalletBox"]
 layout_mode = 2
-theme_override_constants/separation = 2
+theme_override_constants/separation = -4
 
-[node name="Row" type="HBoxContainer" parent="Margin/Col/WalletBox/Col" unique_id=1558771732]
+[node name="Caps" type="Label" parent="Margin/Col/WalletBox/Col"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_type_variation = &"CapsLabel"
+theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
+theme_override_font_sizes/font_size = 19
+text = "Treasury ledger"
+uppercase = true
 
-[node name="Icon" type="TextureRect" parent="Margin/Col/WalletBox/Col/Row" unique_id=1202745279]
-custom_minimum_size = Vector2(36, 36)
+[node name="Row" type="HBoxContainer" parent="Margin/Col/WalletBox/Col"]
 layout_mode = 2
-mouse_filter = 2
-texture = ExtResource("3_neatd")
-expand_mode = 1
-stretch_mode = 5
+theme_override_constants/separation = 10
 
-[node name="Wallet" type="Label" parent="Margin/Col/WalletBox/Col/Row" unique_id=525777926]
+[node name="Wallet" type="Label" parent="Margin/Col/WalletBox/Col/Row"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 58
+text = "600 gold"
+
+[node name="Standing" type="Label" parent="Margin/Col/WalletBox/Col/Row"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 26
+text = "· Standing 1"
+
+[node name="WalletHint" type="Label" parent="Margin/Col/WalletBox/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 30
+text = "You can afford 2 upgrades. Quests pay for the rest."
+autowrap_mode = 3
+
+[node name="List" type="VBoxContainer" parent="Margin/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="SoonBox" type="VBoxContainer" parent="Margin/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Soon" type="Label" parent="Margin/Col/SoonBox"]
+layout_mode = 2
+theme_type_variation = &"ItalicLight"
 theme_override_font_sizes/font_size = 28
-text = "600 gold · standing 1"
+text = "Still rolled up · coming soon"
 
-[node name="WalletHint" type="Label" parent="Margin/Col/WalletBox/Col" unique_id=144497310]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 21
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-text = "You can afford 1 upgrade."
-autowrap_mode = 3
-
-[node name="List" type="VBoxContainer" parent="Margin/Col" unique_id=1250073826]
+[node name="SoonRow" type="HFlowContainer" parent="Margin/Col/SoonBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Soon" type="Label" parent="Margin/Col" unique_id=1115500127]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 21
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-text = "Coming soon: Office, Training Yard, Hospital"
-autowrap_mode = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10

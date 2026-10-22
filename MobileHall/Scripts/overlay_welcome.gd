@@ -13,7 +13,7 @@ var ui
 func setup(main) -> void:
 	ui = main
 	_start_button.pressed.connect(ui.close_welcome)
-	S.style_button(_start_button, "green", 32)
+	S.style_button(_start_button, "gold")
 
 
 func refresh() -> void:

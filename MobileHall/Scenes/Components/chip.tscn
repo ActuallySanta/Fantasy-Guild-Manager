@@ -1,30 +1,27 @@
 [gd_scene format=3]
 
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/chip.tres" id="1_6o3rb"]
-[ext_resource type="Script" path="res://MobileHall/Scripts/chip.gd" id="2_ip4r3"]
-[ext_resource type="Texture2D" path="res://Sprites/UI Icons/coins-solid-full.svg" id="3_rxama"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/chip.gd" id="1_chip"]
 
-[node name="Chip" type="PanelContainer" unique_id=545259554]
+[node name="Chip" type="PanelContainer"]
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_styles/panel = ExtResource("1_6o3rb")
-script = ExtResource("2_ip4r3")
+script = ExtResource("1_chip")
 
-[node name="Row" type="HBoxContainer" parent="." unique_id=1222955971]
+[node name="Row" type="HBoxContainer" parent="."]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
-[node name="Icon" type="TextureRect" parent="Row" unique_id=1771900742]
+[node name="Icon" type="TextureRect" parent="Row"]
 visible = false
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
+size_flags_vertical = 4
 mouse_filter = 2
-texture = ExtResource("3_rxama")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="Row" unique_id=1190919144]
+[node name="Text" type="Label" parent="Row"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 22
 text = "Chip"

@@ -8,7 +8,7 @@ const S := preload("res://MobileHall/Scripts/hall_style.gd")
 @onready var _text: RichTextLabel = $Text
 
 
-func setup(icon_name: String, tint: Color, bbcode: String) -> void:
+## icon_name = a name from hall_style ICONS.
+func setup(icon_name: String, bbcode: String) -> void:
 	_icon.texture = S.icon_tex(icon_name)
-	_icon.modulate = tint
 	_text.text = bbcode

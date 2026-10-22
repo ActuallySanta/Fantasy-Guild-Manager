@@ -1,27 +1,28 @@
-## One quest on the Board: type, title, reward, party size and favored stat on
-## the left; its state (party picked, sent, denied) and odds on the right.
-## Tap it to open Assign Party on that quest.
+## One quest on the Board, drawn as a scroll: type seal, title, rank, reward,
+## party size and favored stat; on the right its state (party picked, sent,
+## denied) and odds. Tap it to open Assign Party on that quest.
 ## Scene: MobileHall/Scenes/Rows/quest_row.tscn
 extends "res://MobileHall/Scripts/tap_panel.gd"
 
 const S := preload("res://MobileHall/Scripts/hall_style.gd")
 const Portrait := preload("res://MobileHall/Scenes/Components/portrait.tscn")
 
-const MINI_PORTRAIT := 44
+const MINI_PORTRAIT := 40
+const DENIED_FADE := Color(1, 1, 1, 0.7)
 
 # ---- TEXT
-const TEXT_RANK := "Rank %s"
+const TEXT_RANK := "RANK %s"
 const TEXT_GOLD := "%d"
 const TEXT_SLOTS := "%d max"
 const TEXT_OPEN := "Pick a party"
 const TEXT_DRAFT := "Party picked"
 const TEXT_SENT := "Sent"
 const TEXT_DENIED := "Denied"
-const TEXT_DENIED_HINT := "Tap to reconsider"
+const TEXT_DENIED_HINT := "tap to reconsider"
 const TEXT_ODDS := "%d%%"
 
 # ---- NODES
-@onready var _type_tile: PanelContainer = %TypeTile
+@onready var _type_seal: PanelContainer = %TypeSeal
 @onready var _type_tag: Label = %TypeTag
 @onready var _title: Label = %Title
 @onready var _rank_chip = %RankChip
@@ -43,19 +44,20 @@ func setup(main, index: int) -> void:
 
 func _show_quest(main, e: Dictionary) -> void:
 	var info := S.type_info(e)
-	S.style_tag(_type_tile, _type_tag, info.tag, info.color)
+	S.seal(_type_seal, _type_tag, info.tag, info.color)
 	_title.text = e.quest.questTitle
-	_rank_chip.set_chip(TEXT_RANK % S.rank_letter(e.quest), S.PAPER, S.INK)
-	_gold_chip.set_chip(TEXT_GOLD % e.quest.goldReward, S.GOLD_BG, S.GOLD_TEXT, "coins")
-	_slots_chip.set_chip(TEXT_SLOTS % main.slot_count(e), S.BLUE_BG, S.BLUE_TEXT, "nav_characters")
+	_rank_chip.set_chip(TEXT_RANK % S.rank_letter(e.quest), S.INK, "", "box")
+	_gold_chip.set_chip(TEXT_GOLD % e.quest.goldReward, S.INK, "coins")
+	_slots_chip.set_chip(TEXT_SLOTS % main.slot_count(e), S.INK, "person")
 	var fav: Dictionary = S.STATS[S.favored_index(e.quest)]
-	_fav_chip.set_chip(fav.short, fav.bg, fav.color, "", true)
+	_fav_chip.set_chip(fav.short, fav.color, "", "pill")
 
 
 func _show_state(main, e: Dictionary) -> void:
 	S.clear(_party)
 	for c in e.party:
 		var p := Portrait.instantiate()
+		p.round = true
 		p.custom_minimum_size = Vector2.ONE * MINI_PORTRAIT
 		_party.add_child(p)
 		p.show_character(c)
@@ -67,15 +69,12 @@ func _show_state(main, e: Dictionary) -> void:
 		"ready":
 			_state_label.text = TEXT_SENT
 			S.color(_state_label, S.GREEN_TEXT)
-			S.style_panel(self, Color("#E8F5E9"), S.GREEN, 4)
 		"denied":
 			_state_label.text = TEXT_DENIED
 			S.color(_state_label, S.WAX)
 			_sub_label.visible = true
 			_sub_label.text = TEXT_DENIED_HINT
-			S.style_panel(self, Color("#EEEEEE"), S.LINE, 2)
-			modulate = Color(1, 1, 1, 0.75)
+			modulate = DENIED_FADE
 		_:
 			_state_label.text = TEXT_DRAFT if not e.party.is_empty() else TEXT_OPEN
 			S.color(_state_label, S.BLUE_TEXT)
-			S.style_panel(self, S.CREAM, S.LINE, 2)

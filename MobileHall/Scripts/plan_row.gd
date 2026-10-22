@@ -16,7 +16,7 @@ const TEXT_ODDS := "%d%%"
 
 func setup(main, e: Dictionary) -> void:
 	var info := S.type_info(e)
-	S.style_tag(_tag_box, _tag, info.tag, info.color)
+	S.seal(_tag_box, _tag, info.tag, info.color)
 	_title.text = e.quest.questTitle
 	_party.text = S.names(e.party)
 	var chance: int = main.chance_for(e, e.party)

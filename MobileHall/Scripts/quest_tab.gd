@@ -1,10 +1,13 @@
-## One quest in Assign Party's strip: its number and type tag, coloured by state
-## (white = open, blue = party picked, green SENT = sent, red NO = denied,
-## thick dark outline = showing).
+## One quest in Assign Party's strip: a little scroll with the quest number on
+## a band in its type colour (green = sent, red = denied), and the type tag
+## (or SENT / NO) under it. The quest being shown has a parchment band.
 ## Scene: MobileHall/Scenes/Rows/quest_tab.tscn
-extends Button
+extends VBoxContainer
 
 const S := preload("res://MobileHall/Scripts/hall_style.gd")
+
+## Band colour on the quest being shown.
+const CURRENT_BAND := Color("#F0E7D2")
 
 # ---- TEXT
 const MARK := "%d"
@@ -12,32 +15,26 @@ const TAG_SENT := "SENT"
 const TAG_DENIED := "NO"
 
 # ---- NODES
-@onready var _tag: Label = %Tag
+@onready var _tab: Button = %Tab
+@onready var _band: Panel = %Band
 @onready var _mark: Label = %Mark
+@onready var _tag: Label = %Tag
 
 
 func setup(main, index: int, current: bool) -> void:
 	var e: Dictionary = main.entries[index]
-	pressed.connect(main.open_assign.bind(index))
-	_tag.text = S.type_info(e).tag
+	_tab.pressed.connect(main.open_assign.bind(index))
 	_mark.text = MARK % (index + 1)
-	var fill := S.CREAM
-	var edge := S.BLUE_TEXT
+	var info := S.type_info(e)
+	var band: Color = info.color
+	_tag.text = info.tag
 	match e.state:
 		"ready":
 			_tag.text = TAG_SENT
-			fill = S.GREEN_BG
-			edge = S.GREEN
+			band = S.GREEN_TEXT
 		"denied":
 			_tag.text = TAG_DENIED
-			fill = S.WAX_BG
-			edge = S.WAX
-		_:
-			if not e.party.is_empty():
-				fill = S.BLUE_BG
-	S.color(_mark, edge)
-	S.color(_tag, edge)
-	var border := 5 if current else 2
-	var sb := S.flat(fill if not current else fill.lightened(0.3), 14, border, edge if not current else S.INK, Vector4(4, 4, 4, 4))
-	for st in ["normal", "hover", "pressed", "hover_pressed"]:
-		add_theme_stylebox_override(st, sb)
+			band = S.WAX
+	S.tint(_band, CURRENT_BAND if current else band)
+	S.color(_mark, S.INK if current else S.CREAM)
+	S.color(_tag, S.CREAM if current else S.CREAM_SOFT)

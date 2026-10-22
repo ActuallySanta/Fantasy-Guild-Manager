@@ -1,4 +1,4 @@
-## One adventurer in the Guild tab's roster: portrait, health, what they're
+## One adventurer in the Guild tab's roster (a parchment card): portrait, health, what they're
 ## doing today, and all five stats. Tap for details.
 ## Scene: MobileHall/Scenes/Rows/member_card.tscn
 extends "res://MobileHall/Scripts/tap_panel.gd"
@@ -29,9 +29,8 @@ func setup(main, c: GuildCharacter) -> void:
 	_stats.show_stats(c)
 	var i: int = main.entry_index_of(c)
 	if i < 0:
-		_task.set_chip(TEXT_FREE, S.PAPER, S.INK_SOFT)
+		_task.set_chip(TEXT_FREE, S.INK_SOFT)
 	elif main.entries[i].state == "ready":
-		_task.set_chip(TEXT_SENT % (i + 1), S.GREEN_BG, S.GREEN_TEXT, "check")
+		_task.set_chip(TEXT_SENT % (i + 1), S.GREEN_TEXT, "check")
 	else:
-		_task.set_chip(TEXT_DRAFT % (i + 1), S.BLUE_BG, S.BLUE_TEXT, "nav_quests")
-	S.style_panel(self, S.CREAM, S.LINE, 2, 16)
+		_task.set_chip(TEXT_DRAFT % (i + 1), S.BLUE_TEXT, "scroll")
