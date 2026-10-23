@@ -15,6 +15,7 @@ extends Node
 @export var monsters_2D_test_path: String = "res://External Content/Quest Stuff (Test)/2D Monster Test.txt" #test path for monstrs
 @export var quest_story_test_path: String = "res://External Content/Quest Stuff (Test)/Story Parts.txt" #test path
 @export var milestone_story_path: String = "res://External Content/Quest Stuff (Test)/Milestone Story Parts.txt"
+@export var boglands_location_path: String = "res://External Content/Quest Stuff (Test)/The Boglands (Locations).txt"
 
 #Character Names
 var male_character_names: Array[String]
