@@ -1,17 +1,15 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dlabay3h5v4fb"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_report.gd" id="1_s0qxh"]
+[ext_resource type="Script" uid="uid://cpybvnpe5d7yb" path="res://MobileHall/Scripts/overlay_report.gd" id="1_s0qxh"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/header.tres" id="2_6ukms"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_bnucx"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/chip.tres" id="4_8tshr"]
-[ext_resource type="Script" path="res://MobileHall/Scripts/chip.gd" id="5_3md2h"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="6_fuucl"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green.tres" id="7_oiqxi"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green_down.tres" id="8_knrq5"]
 
 [node name="OverlayReport" type="Control" unique_id=646940817]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_s0qxh")
@@ -39,37 +37,25 @@ theme_override_constants/separation = 8
 [node name="Title" type="Label" parent="Layout/Header/Col" unique_id=1449689581]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
 theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 36
 text = "Day 1 Report"
 
 [node name="Chips" type="HBoxContainer" parent="Layout/Header/Col" unique_id=1020426321]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="WinsChip" type="PanelContainer" parent="Layout/Header/Col/Chips" unique_id=545259554 instance=ExtResource("3_bnucx")]
+[node name="WinsChip" parent="Layout/Header/Col/Chips" unique_id=545259554 instance=ExtResource("3_bnucx")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("4_8tshr")
-script = ExtResource("5_3md2h")
 
-[node name="GoldChip" type="PanelContainer" parent="Layout/Header/Col/Chips" unique_id=2069857636 instance=ExtResource("3_bnucx")]
+[node name="GoldChip" parent="Layout/Header/Col/Chips" unique_id=2069857636 instance=ExtResource("3_bnucx")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("4_8tshr")
-script = ExtResource("5_3md2h")
 
-[node name="HurtChip" type="PanelContainer" parent="Layout/Header/Col/Chips" unique_id=2117541711 instance=ExtResource("3_bnucx")]
+[node name="HurtChip" parent="Layout/Header/Col/Chips" unique_id=2117541711 instance=ExtResource("3_bnucx")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("4_8tshr")
-script = ExtResource("5_3md2h")
 
 [node name="Scroll" type="ScrollContainer" parent="Layout" unique_id=1628967775]
 unique_name_in_owner = true
@@ -98,8 +84,8 @@ theme_override_constants/separation = 12
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
 theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 24
 text = "Nobody went out."
 horizontal_alignment = 1
 autowrap_mode = 3
@@ -113,13 +99,13 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 focus_mode = 0
-theme_override_styles/normal = ExtResource("7_oiqxi")
-theme_override_styles/pressed = ExtResource("8_knrq5")
-theme_override_styles/hover = ExtResource("7_oiqxi")
-theme_override_styles/hover_pressed = ExtResource("8_knrq5")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = ExtResource("7_oiqxi")
+theme_override_styles/pressed = ExtResource("8_knrq5")
+theme_override_styles/hover = ExtResource("7_oiqxi")
+theme_override_styles/hover_pressed = ExtResource("8_knrq5")
 text = "Start Day 2"
