@@ -41,7 +41,7 @@ const DayBarLogic := preload("res://Scripts/UI/day_bar.gd")
 # ============================================================ SETTINGS
 
 ## Same as QuestList.quests_per_day.
-const QUESTS_PER_DAY := 5
+var QUESTS_PER_DAY := 5
 ## The day QuestList swaps the board for the milestone quest.
 const MILESTONE_DAY := 10
 ## Bottom tabs, left to right (ids match the Tab_<id> buttons in the scene).
@@ -168,6 +168,17 @@ func _generate_quests() -> void:
 	if GameState.day == MILESTONE_DAY:
 		entries.append(_new_entry(CreatedQuest.new(2, 10), true))
 		return
+		
+	if GameState.day == 1:
+		QUESTS_PER_DAY = 1
+	elif GameState.day <= 3:
+		QUESTS_PER_DAY = 2
+	elif GameState.day <= 5:
+		QUESTS_PER_DAY = 3
+	elif GameState.day <= 10:
+		QUESTS_PER_DAY = 4
+	else:
+		QUESTS_PER_DAY = 5
 		
 	var standingNum = 0
 	if(GuildUpgrades.standing <= 10):

@@ -66,7 +66,7 @@ var temp_stats: Dictionary[StatType, int] = {
 
 var pluck: int = 0
 
-var total_points: int = 20
+var total_points: int = 17
 
 var gender: CharacterGender
 
@@ -119,6 +119,15 @@ func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int)
 		var _proportion: float = _stat_weights[stat] / stat_sum
 		_stats[stat] = (_proportion * _total_points)
 
+	match(role):
+		0:
+			_stats[1] += 3
+		1:
+			_stats[2] += 3
+		2:
+			_stats[3] += 3
+		3:
+			_stats[0] += 3
 	pass
 
 
