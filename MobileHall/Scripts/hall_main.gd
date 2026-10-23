@@ -166,8 +166,7 @@ func _generate_quests() -> void:
 	
 	print("day", GameState.day)
 	if GameState.day == MILESTONE_DAY:
-		entries.append(_new_entry(CreatedQuest.new(MILESTONE_DAY), true))
-		#print(entries[0].questTitle)
+		entries.append(_new_entry(CreatedQuest.new(2, 10), true))
 		return
 		
 	var standingNum = 0
