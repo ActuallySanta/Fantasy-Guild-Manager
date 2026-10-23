@@ -163,8 +163,11 @@ func _on_day_started(_day: int) -> void:
 ## Mirrors QuestList.populate / _generate_quests.
 func _generate_quests() -> void:
 	entries.clear()
+	
+	print("day", GameState.day)
 	if GameState.day == MILESTONE_DAY:
 		entries.append(_new_entry(CreatedQuest.new(MILESTONE_DAY), true))
+		#print(entries[0].questTitle)
 		return
 		
 	var standingNum = 0
@@ -528,6 +531,9 @@ func _run_quest(e: Dictionary) -> Dictionary:
 		before[c] = c.injury_level
 	var chance: float = DayBarLogic._get_success_chance(e.quest, party)
 	var story: String = e.quest.generateResults(party, chance)
+	if(GameState.day == MILESTONE_DAY):
+		story = e.quest.generateMilestoneResults(party, chance)
+	print(story)
 	var succeeded: bool = DayBarLogic._did_succeed(story)
 	var gold: int = DayBarLogic._get_gold_earned(e.quest, succeeded)
 	var standing: int = e.quest.difficulty + 1 if succeeded else 0

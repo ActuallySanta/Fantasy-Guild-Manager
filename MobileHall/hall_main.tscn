@@ -10,7 +10,7 @@
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_wood_down.tres" id="8_efxwo"]
 [ext_resource type="Texture2D" uid="uid://ccw8frov4muxu" path="res://Sprites/UI Icons/gear-solid-full.svg" id="9_csala"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_board.tscn" id="10_mpynf"]
-[ext_resource type="PackedScene" uid="uid://diwdybd70ky7l" path="res://MobileHall/Scenes/Tabs/tab_guild.tscn" id="12_cbnp0"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_guild.tscn" id="12_cbnp0"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_upgrades.tscn" id="14_v8b36"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Screens/screen_assign.tscn" id="16_tj44p"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Screens/screen_character.tscn" id="18_c5uvo"]
@@ -27,7 +27,7 @@
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_end_day.tscn" id="30_cwf4i"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_menu.tscn" id="32_kg28u"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_report.tscn" id="34_6fy20"]
-[ext_resource type="PackedScene" uid="uid://bgwxd653pjox8" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
 
 [node name="MobileHall" type="Control" unique_id=1778077561]
 layout_mode = 3
