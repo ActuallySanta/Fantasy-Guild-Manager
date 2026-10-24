@@ -76,6 +76,10 @@ var title: String
 
 var icon: Texture2D
 
+var equipped_items: Array[StandardItem]
+
+var max_items: int = 2
+
 
 #The constructor, called when the object is created
 func _init() -> void:
@@ -83,7 +87,7 @@ func _init() -> void:
 	gender = randi_range(0, CharacterGender.size() - 1) as CharacterGender
 	role = randi_range(0, CharacterRole.size() - 1) as CharacterRole
 	name = ExternalContentContainer.get_character_name(gender)
-	
+
 	hometown = QuestManager.world_regions.pick_random()
 
 	icon = ExternalContentContainer.get_character_icon(role)
@@ -149,10 +153,29 @@ func level_up_random_stat(_points_to_add: int):
 		stats[stat_to_pick] += 1
 		total_points += 1
 
-func increase_temp_stat(_stat:StatType,_points_to_add:int):
+
+func increase_temp_stat(_stat: StatType, _points_to_add: int):
 	temp_stats[_stat] += _points_to_add
 	pass
+
 
 func reset_temp_stats():
 	for entry in temp_stats:
 		entry = 0
+
+
+##Add all the stats from the equipped item slots
+func add_passive_item_stats():
+	for item in equipped_items:
+		if (item is PassiveItem):
+			var pass_item: PassiveItem = item as PassiveItem
+			increase_temp_stat(pass_item.affected_stat, pass_item.stat_amount)
+
+
+##Attempt to add an item in, returns true if the item was added, false if it wasn't able to
+func try_add_item(_item: StandardItem) -> bool:
+	if (equipped_items.size() < max_items):
+		equipped_items.append(_item)
+		return true
+	else:
+		return false
