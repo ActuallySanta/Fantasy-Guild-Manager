@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_board.tscn" id="10_mpynf"]
 [ext_resource type="PackedScene" uid="uid://diwdybd70ky7l" path="res://MobileHall/Scenes/Tabs/tab_guild.tscn" id="12_cbnp0"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_upgrades.tscn" id="14_v8b36"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_shop.tscn" id="15_shop1"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Screens/screen_assign.tscn" id="16_tj44p"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Screens/screen_character.tscn" id="18_c5uvo"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="20_7dlno"]
@@ -168,6 +169,13 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 
 [node name="TabUpgrades" parent="Layout/Content" unique_id=229603043 instance=ExtResource("14_v8b36")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TabShop" parent="Layout/Content" instance=ExtResource("15_shop1")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -346,6 +354,42 @@ mouse_filter = 2
 theme_override_styles/panel = ExtResource("26_t8oow")
 
 [node name="Text" type="Label" parent="Layout/Nav/Row/Nav_upgrades/Badge" unique_id=1757162546]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "5"
+horizontal_alignment = 1
+
+[node name="Nav_shop" type="Button" parent="Layout/Nav/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_constants/icon_max_width = 34
+theme_override_font_sizes/font_size = 22
+theme_override_styles/normal = ExtResource("24_bpy6t")
+theme_override_styles/pressed = ExtResource("24_bpy6t")
+theme_override_styles/hover = ExtResource("24_bpy6t")
+theme_override_styles/hover_pressed = ExtResource("24_bpy6t")
+text = "Shop"
+icon = ExtResource("5_5hrq8")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Badge" type="PanelContainer" parent="Layout/Nav/Row/Nav_shop"]
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -10.0
+offset_top = -6.0
+offset_right = 6.0
+offset_bottom = 28.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("26_t8oow")
+
+[node name="Text" type="Label" parent="Layout/Nav/Row/Nav_shop/Badge"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 20

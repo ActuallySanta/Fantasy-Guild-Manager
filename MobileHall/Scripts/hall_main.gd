@@ -4,11 +4,13 @@
 ##
 ## Shell, top to bottom:
 ##   header      - day, Bone Drake countdown, gold, standing, menu button
-##   content     - one of three tabs (Board, Guild, Upgrades), or a screen
+##   content     - one of four tabs (Board, Members, Guild, Shop), or a screen
 ##                 over them (Assign Party, Character)
 ##   action bar  - one big "what to do next" button (hidden on screens, which
-##                 have their own buttons in that spot)
-##   nav         - Board / Guild / Upgrades with badges, always visible
+##                 have their own buttons in that spot, and on the Shop tab,
+##                 whose Buy bar sits there)
+##   nav         - Board / Members / Guild / Shop with badges, always visible
+##                 (ids: board / guild / upgrades / shop)
 ## Overlays over everything: End Day check, Day Report, Welcome, Menu.
 ## (The Training Yard and Hospital live on the Upgrades tab's Tonight half.)
 ## On top of all of it: the colorblind filter (set from the Menu, saved to disk).
@@ -52,7 +54,9 @@ const QUESTS_PER_DAY := 5
 ## The day QuestList swaps the board for the milestone (Bone Drake) quest.
 const MILESTONE_DAY := 10
 ## Bottom tabs, left to right (ids match the Nav_<id> buttons and Tab nodes in the scene).
-const TAB_IDS := ["board", "guild", "upgrades"]
+const TAB_IDS := ["board", "guild", "upgrades", "shop"]
+## The Shop tab (groundwork only: nothing can be bought yet).
+const TAB_SHOP := "shop"
 ## Screen kinds that can cover the tabs (see `active_screen`).
 const SCREEN_ASSIGN := "assign"
 const SCREEN_CHARACTER := "character"
@@ -195,7 +199,7 @@ var _toast_tween: Tween
 @onready var _menu_button: Button = %MenuButton
 
 # ---- content
-@onready var _tabs := {"board": %TabBoard, "guild": %TabGuild, "upgrades": %TabUpgrades}
+@onready var _tabs := {"board": %TabBoard, "guild": %TabGuild, "upgrades": %TabUpgrades, "shop": %TabShop}
 @onready var _screens := {SCREEN_ASSIGN: %ScreenAssign, SCREEN_CHARACTER: %ScreenCharacter}
 
 # ---- action bar
@@ -928,8 +932,9 @@ func _refresh_content() -> void:
 
 
 func _refresh_action_bar() -> void:
-	# screens put their own buttons in this spot (Deny / Send, Back / Hire)
-	_action_bar.visible = active_screen.is_empty()
+	# screens put their own buttons in this spot (Deny / Send, Back / Hire),
+	# and so does the Shop tab (its Buy bar)
+	_action_bar.visible = active_screen.is_empty() and active_tab != TAB_SHOP
 
 	if roster().is_empty() and can_hire_anyone():
 		_set_action(ACTION_HIRE, ACTION_HIRE_HINT, ACTION_HIRE_BUTTON, "blue")

@@ -1,0 +1,84 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://MobileHall/Scripts/shop_tile.gd" id="1_tile"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/chip.tres" id="2_chip"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_price"]
+content_margin_left = 14.0
+content_margin_top = 2.0
+content_margin_right = 14.0
+content_margin_bottom = 2.0
+bg_color = Color(0.95686275, 0.8980392, 0.6745098, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[node name="ShopTile" type="Button"]
+custom_minimum_size = Vector2(0, 176)
+size_flags_horizontal = 3
+focus_mode = 0
+script = ExtResource("1_tile")
+
+[node name="Col" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 10.0
+offset_right = -8.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="Tag" type="PanelContainer" parent="Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("2_chip")
+
+[node name="TagText" type="Label" parent="Col/Tag"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "TON"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ItemName" type="Label" parent="Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "Tonic"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Price" type="PanelContainer" parent="Col"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_price")
+
+[node name="PriceText" type="Label" parent="Col/Price"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.47843137, 0.3529412, 0.07058824, 1)
+theme_override_font_sizes/font_size = 21
+text = "80g"
+horizontal_alignment = 1
+
+[node name="SoldNote" type="Label" parent="Col"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 20
+text = "Back tomorrow"
+horizontal_alignment = 1
