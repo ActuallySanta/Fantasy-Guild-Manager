@@ -17,6 +17,7 @@ const TEXT_ROLE := "the %s"
 const TEXT_PICKED_FOR := "Picked for %s"
 const TEXT_SENT_ON := "Sent on %s"
 const TEXT_QUEST_NAME := "#%d %s"
+const TEXT_TRAINING := "Training %s"
 # Right-hand box
 const TEXT_ADDS := "+%d%%"
 const TEXT_ADDS_SUB := "to odds"
@@ -24,6 +25,8 @@ const TEXT_IN_PARTY := "Added"
 const TEXT_IN_PARTY_SUB := "in party"
 const TEXT_CANT_GO := "-"
 const TEXT_CANT_GO_SUB := "Can't go"
+const TEXT_IN_BED_SUB := "In a bed"
+const TEXT_TRAINING_SUB := "Training"
 
 # ---- NODES
 # Who they are
@@ -56,6 +59,11 @@ func setup(hall: HallMain, entry: Dictionary, character: GuildCharacter) -> void
 func _show_elsewhere(hall: HallMain, entry: Dictionary, character: GuildCharacter) -> void:
 	var other_index := hall.quest_index_of(character)
 	var other_entry: Dictionary = hall.quest_entries[other_index] if other_index >= 0 else {}
+	if other_index < 0 and GuildUpgrades.is_training(character):
+		_elsewhere_label.visible = true
+		_elsewhere_label.text = TEXT_TRAINING % Style.STATS[GuildUpgrades.get_training_stat(character)].name
+		Style.set_font_color(_elsewhere_label, Style.BLUE_TEXT)
+		return
 	_elsewhere_label.visible = other_index >= 0 and other_entry != entry
 	if not _elsewhere_label.visible:
 		return
@@ -73,9 +81,14 @@ func _show_pick_state(hall: HallMain, entry: Dictionary, character: GuildCharact
 		_adds_sub.text = TEXT_IN_PARTY_SUB
 		Style.set_font_color(_adds_value, Style.GREEN_TEXT)
 		Style.style_panel(self, Style.SENT_CARD_BG, Style.GREEN, 4, 16)
-	elif Style.is_dead(character):
+	elif not hall.can_go_on_quests(character):
 		_adds_value.text = TEXT_CANT_GO
-		_adds_sub.text = TEXT_CANT_GO_SUB
+		if Style.is_dead(character):
+			_adds_sub.text = TEXT_CANT_GO_SUB
+		elif GuildUpgrades.is_patient(character):
+			_adds_sub.text = TEXT_IN_BED_SUB
+		else:
+			_adds_sub.text = TEXT_TRAINING_SUB
 		Style.set_font_color(_adds_value, Style.TEXT_SOFT)
 		Style.style_panel(self, Style.DENIED_CARD_BG, Style.BORDER, 2, 16)
 		modulate = Color(1, 1, 1, CANT_GO_OPACITY)

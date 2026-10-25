@@ -11,6 +11,8 @@ const TEXT_ROLE := "the %s"
 const TEXT_FREE := "Free today"
 const TEXT_PICKED_FOR := "Picked for #%d"
 const TEXT_SENT_ON := "Sent on #%d"
+const TEXT_TRAINING := "Training %s"
+const TEXT_IN_BED := "In a Hospital bed"
 
 # ---- NODES
 @onready var _portrait = %Portrait            # portrait.gd
@@ -32,10 +34,17 @@ func setup(hall: HallMain, character: GuildCharacter) -> void:
 	Style.style_panel(self, Style.CARD_BG, Style.BORDER, 2, 16)
 
 
-## Today's task chip: free, picked for a quest (blue) or sent on one (green).
+## Today's task chip: free, picked for a quest (blue), sent on one (green),
+## training a stat (that stat's colours) or in a Hospital bed (orange).
 func _show_task(hall: HallMain, character: GuildCharacter) -> void:
 	var quest_index := hall.quest_index_of(character)
-	if quest_index < 0:
+	if quest_index < 0 and GuildUpgrades.is_patient(character):
+		var bed_look: Dictionary = Style.INJURY_LOOKS[2]
+		_task_chip.set_chip(TEXT_IN_BED, bed_look.bg, bed_look.text)
+	elif quest_index < 0 and GuildUpgrades.is_training(character):
+		var stat: Dictionary = Style.STATS[GuildUpgrades.get_training_stat(character)]
+		_task_chip.set_chip(TEXT_TRAINING % stat.short, stat.bg, stat.color, "", true)
+	elif quest_index < 0:
 		_task_chip.set_chip(TEXT_FREE, Style.NEUTRAL_BG, Style.TEXT_SOFT)
 	elif hall.quest_entries[quest_index].state == Style.QUEST_STATE_SENT:
 		_task_chip.set_chip(TEXT_SENT_ON % (quest_index + 1), Style.GREEN_BG, Style.GREEN_TEXT, "check")

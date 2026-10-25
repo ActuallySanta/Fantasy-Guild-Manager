@@ -26,8 +26,14 @@
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/toast.tres" id="29_n8ylg"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_end_day.tscn" id="30_cwf4i"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_menu.tscn" id="32_kg28u"]
+[ext_resource type="Shader" path="res://MobileHall/Styles/colorblind_filter.gdshader" id="39_cbf01"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_report.tscn" id="34_6fy20"]
 [ext_resource type="PackedScene" uid="uid://bgwxd653pjox8" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cbf01"]
+shader = ExtResource("39_cbf01")
+shader_parameter/mode = 0
+shader_parameter/strength = 1.0
 
 [node name="MobileHall" type="Control" unique_id=1778077561]
 layout_mode = 3
@@ -286,7 +292,7 @@ theme_override_styles/normal = ExtResource("24_bpy6t")
 theme_override_styles/pressed = ExtResource("24_bpy6t")
 theme_override_styles/hover = ExtResource("24_bpy6t")
 theme_override_styles/hover_pressed = ExtResource("24_bpy6t")
-text = "Guild"
+text = "Members"
 icon = ExtResource("27_8udri")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -322,7 +328,7 @@ theme_override_styles/normal = ExtResource("24_bpy6t")
 theme_override_styles/pressed = ExtResource("24_bpy6t")
 theme_override_styles/hover = ExtResource("24_bpy6t")
 theme_override_styles/hover_pressed = ExtResource("24_bpy6t")
-text = "Upgrades"
+text = "Guild"
 icon = ExtResource("28_whkse")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -403,3 +409,17 @@ visible = false
 layout_mode = 1
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="ColorFilterLayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="ColorFilter" type="ColorRect" parent="ColorFilterLayer"]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_cbf01")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

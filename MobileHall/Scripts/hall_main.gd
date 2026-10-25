@@ -10,6 +10,8 @@
 ##                 have their own buttons in that spot)
 ##   nav         - Board / Guild / Upgrades with badges, always visible
 ## Overlays over everything: End Day check, Day Report, Welcome, Menu.
+## (The Training Yard and Hospital live on the Upgrades tab's Tonight half.)
+## On top of all of it: the colorblind filter (set from the Menu, saved to disk).
 ##
 ## What the feedback asked for, and where it lives:
 ##   - every quest on one screen to compare        -> Board tab
@@ -31,7 +33,7 @@
 ##
 ## UI only: every rule comes from the existing systems (CharacterContainer,
 ## GuildCharacter, CreatedQuest, GameState, GuildUpgrades, DayBar's scoring
-## helpers). Nothing in those scripts is changed.
+## helpers). Training and healing rules live in GuildUpgrades (run_night).
 ##
 ## Sections:
 ##   SETTINGS · TEXT · STATE · NODES · SETUP · QUERIES ·
@@ -57,11 +59,20 @@ const SCREEN_CHARACTER := "character"
 ## Halves of the Guild tab.
 const GUILD_SECTION_ROSTER := "roster"
 const GUILD_SECTION_HIRE := "hire"
+## Halves of the Upgrades tab.
+const UPGRADES_SECTION_TONIGHT := "tonight"
+const UPGRADES_SECTION_BUILD := "build"
 ## Seconds a toast stays fully visible, then how long it takes to fade.
 const TOAST_SECONDS := 2.2
 const TOAST_FADE_SECONDS := 0.4
 ## The Bone Drake countdown turns red when this many days (or fewer) are left.
 const DRAKE_WARNING_DAYS := 2
+## Colorblind filter choices, in Menu order. Index = the shader's `mode`.
+const COLOR_FILTERS := ["Off", "Red-weak", "Green-weak", "Blue-yellow"]
+## Where player settings are saved, and the section / key for the filter.
+const SETTINGS_PATH := "user://settings.cfg"
+const SETTINGS_SECTION := "accessibility"
+const SETTINGS_COLOR_FILTER := "color_filter"
 
 
 # ============================================================ TEXT
@@ -104,6 +115,16 @@ const TOAST_UPGRADED := "%s upgraded to level %d!"
 const TOAST_RESET := "Upgrades reset"
 const TOAST_NEW_DAY := "Day %d · %s · %s for hire"
 const TOAST_MILESTONE_DAY := "Day %d. The Bone Drake is attacking!"
+const TOAST_TRAINING := "%s is training %s"
+const TOAST_STOPPED_TRAINING := "%s stopped training"
+const TOAST_SLOTS_FULL := "Every slot is taken. Upgrade the Training Yard for more."
+const TOAST_TOO_HURT := "%s is too hurt to train. Try the Hospital (Guild > Tonight)."
+const TOAST_ADMITTED := "%s is in a Hospital bed"
+const TOAST_DISCHARGED := "%s went home"
+const TOAST_REVIVED := "%s is back from the dead!"
+const TOAST_IN_HOSPITAL := "%s is in the Hospital. Discharge them first."
+const TOAST_IN_TRAINING := "%s is training. Take them out of the Training Yard first."
+const TOAST_LEFT_QUEST := "%s left %s"
 
 
 # ============================================================ STATE
@@ -123,6 +144,10 @@ var quest_entries: Array = []
 var active_tab := "board"
 ## Which half of the Guild tab is showing (GUILD_SECTION_ROSTER | GUILD_SECTION_HIRE).
 var guild_section := GUILD_SECTION_ROSTER
+## Which half of the Upgrades tab is showing (UPGRADES_SECTION_TONIGHT | _BUILD).
+var upgrades_section := UPGRADES_SECTION_TONIGHT
+## Upgrades > Tonight: the "+ Add a hero" list under the Training Yard is open.
+var training_picker_open := false
 ## The screen covering the tabs, or {} for none:
 ##   {kind: SCREEN_ASSIGN, quest_index: int}
 ##   {kind: SCREEN_CHARACTER, character: GuildCharacter, return_to: Dictionary}
@@ -148,6 +173,8 @@ var is_menu_open := false
 var show_busy_adventurers := false
 ## The day the player last opened For Hire (the Guild badge clears then).
 var for_hire_last_seen_day := 0
+## Colorblind filter: index into COLOR_FILTERS (0 = off). Saved in SETTINGS_PATH.
+var color_filter := 0
 
 # ---- internal
 
@@ -187,6 +214,9 @@ var _toast_tween: Tween
 @onready var _toast: PanelContainer = %Toast
 @onready var _toast_label: Label = %ToastLabel
 
+# ---- colorblind filter
+@onready var _color_filter: ColorRect = %ColorFilter
+
 
 # ============================================================ SETUP
 
@@ -207,9 +237,11 @@ func _ready() -> void:
 	GameState.day_started.connect(_on_day_started)
 	GameState.resources_changed.connect(queue_refresh)
 	GuildUpgrades.upgrades_changed.connect(queue_refresh)
+	GuildUpgrades.home_changed.connect(queue_refresh)
 	CharacterContainer.on_character_added.connect(queue_refresh)
 	CharacterContainer.on_hireables_refreshed.connect(queue_refresh)
 
+	_load_settings()
 	_generate_quests()
 	refresh()
 
@@ -333,6 +365,18 @@ func quest_index_of(character: GuildCharacter) -> int:
 	return -1
 
 
+## False for anyone who can't be put in a party (dead, training, or in a Hospital bed).
+func can_go_on_quests(character: GuildCharacter) -> bool:
+	return not Style.is_dead(character) and not GuildUpgrades.is_patient(character) \
+			and not GuildUpgrades.is_training(character)
+
+
+## Hurt heroes who aren't in a Hospital bed (the Upgrades > Tonight badge).
+func hurt_waiting_count() -> int:
+	return roster().filter(func(character):
+		return GuildUpgrades.needs_care(character) and not GuildUpgrades.is_patient(character)).size()
+
+
 ## How many adventurers a quest takes at most.
 func party_size_limit(entry: Dictionary) -> int:
 	return QuestCard.get_slot_count(entry.quest)
@@ -386,11 +430,13 @@ func days_until_drake() -> int:
 # ---- navigation
 
 ## Switch bottom tab. Closes any screen; party drafts stay on their quests.
-## `section` optionally picks the Guild tab's half (GUILD_SECTION_*).
+## `section` optionally picks the tab's half (GUILD_SECTION_* or UPGRADES_SECTION_*).
 func open_tab(tab_id: String, section: String = "") -> void:
 	active_tab = tab_id
-	if section != "":
+	if section != "" and tab_id == "guild":
 		guild_section = section
+	elif section != "" and tab_id == "upgrades":
+		upgrades_section = section
 	if active_tab == "guild" and guild_section == GUILD_SECTION_HIRE:
 		for_hire_last_seen_day = GameState.day
 	active_screen = {}
@@ -400,6 +446,11 @@ func open_tab(tab_id: String, section: String = "") -> void:
 ## The Guild tab's Your Guild / For Hire buttons.
 func show_guild_section(section: String) -> void:
 	open_tab("guild", section)
+
+
+## The Upgrades tab's Tonight / Build buttons.
+func show_upgrades_section(section: String) -> void:
+	open_tab("upgrades", section)
 
 
 ## Open Assign Party on one quest.
@@ -479,6 +530,12 @@ func toggle_in_party(character: GuildCharacter) -> void:
 	# can't be added
 	if Style.is_dead(character):
 		show_toast(TOAST_DEAD % character.name)
+		return
+	if GuildUpgrades.is_patient(character):
+		show_toast(TOAST_IN_HOSPITAL % character.name)
+		return
+	if GuildUpgrades.is_training(character):
+		show_toast(TOAST_IN_TRAINING % character.name)
 		return
 	var size_limit := party_size_limit(entry)
 	if entry.party.size() >= size_limit and size_limit > 1:
@@ -581,6 +638,102 @@ func upgrade_building(building: int) -> void:
 	queue_refresh()
 
 
+# ---- Upgrades > Tonight: Training Yard and Hospital
+
+
+## "+ Add a hero" under the Training Yard: show / hide who can train.
+func toggle_training_picker() -> void:
+	training_picker_open = not training_picker_open
+	queue_refresh()
+
+
+## Put a hero in a training slot drilling `stat`, or change their stat.
+## Someone in a quest's party leaves it first.
+func train(character: GuildCharacter, stat: int) -> void:
+	if not GuildUpgrades.can_train(character):
+		show_toast(TOAST_TOO_HURT % character.name)
+		return
+	var is_new := not GuildUpgrades.is_training(character)
+	if is_new and not GuildUpgrades.has_free_training_slot():
+		show_toast(TOAST_SLOTS_FULL)
+		return
+	_leave_quest(character)
+	GuildUpgrades.set_training(character, stat)
+	if is_new:
+		show_toast(TOAST_TRAINING % [character.name, Style.STATS[stat].name])
+	# the pick list closes itself once every slot is taken
+	if not GuildUpgrades.has_free_training_slot():
+		training_picker_open = false
+	queue_refresh()
+
+
+func stop_training(character: GuildCharacter) -> void:
+	GuildUpgrades.stop_training(character)
+	show_toast(TOAST_STOPPED_TRAINING % character.name)
+	queue_refresh()
+
+
+## Put a hurt hero in a Hospital bed (they leave any party or training slot).
+func admit(character: GuildCharacter) -> void:
+	_leave_quest(character)
+	if GuildUpgrades.admit(character):
+		show_toast(TOAST_ADMITTED % character.name)
+	queue_refresh()
+
+
+func discharge(character: GuildCharacter) -> void:
+	GuildUpgrades.discharge(character)
+	show_toast(TOAST_DISCHARGED % character.name)
+	queue_refresh()
+
+
+func revive(character: GuildCharacter) -> void:
+	if GuildUpgrades.revive(character):
+		show_toast(TOAST_REVIVED % character.name)
+	queue_refresh()
+
+
+## Take a hero out of whatever quest party they're in (sent or draft).
+func _leave_quest(character: GuildCharacter) -> void:
+	var quest_index := quest_index_of(character)
+	if quest_index < 0:
+		return
+	var entry: Dictionary = quest_entries[quest_index]
+	_remove_from_party(entry, character)
+	show_toast(TOAST_LEFT_QUEST % [character.name, entry.quest.questTitle])
+
+
+# ---- settings
+
+
+## Menu's colorblind button: Off -> Red-weak -> Green-weak -> Blue-yellow -> Off.
+func cycle_color_filter() -> void:
+	set_color_filter((color_filter + 1) % COLOR_FILTERS.size())
+
+
+func set_color_filter(filter_index: int) -> void:
+	color_filter = clampi(filter_index, 0, COLOR_FILTERS.size() - 1)
+	_apply_color_filter()
+	var config := ConfigFile.new()
+	config.load(SETTINGS_PATH)
+	config.set_value(SETTINGS_SECTION, SETTINGS_COLOR_FILTER, color_filter)
+	config.save(SETTINGS_PATH)
+	queue_refresh()
+
+
+func _load_settings() -> void:
+	var config := ConfigFile.new()
+	if config.load(SETTINGS_PATH) == OK:
+		color_filter = clampi(int(config.get_value(SETTINGS_SECTION, SETTINGS_COLOR_FILTER, 0)), 0, COLOR_FILTERS.size() - 1)
+	_apply_color_filter()
+
+
+## Off = the filter rect is hidden, so it costs nothing.
+func _apply_color_filter() -> void:
+	_color_filter.visible = color_filter > 0
+	(_color_filter.material as ShaderMaterial).set_shader_parameter("mode", color_filter)
+
+
 ## Menu's debug button.
 func reset_upgrades() -> void:
 	GuildUpgrades.reset()
@@ -609,12 +762,15 @@ func close_end_check() -> void:
 func end_day() -> void:
 	if undecided_count() > 0:
 		return
+	# training and healing happen first, so nobody heals the night they're hurt
+	var home := GuildUpgrades.run_night()
 	var results := []
 	for entry in sent_entries():
 		results.append(_run_quest(entry))
 	is_end_check_open = false
+	training_picker_open = false
 	active_screen = {}
-	shown_report = {"starts_next_day": true, "day": GameState.day, "results": results}
+	shown_report = {"starts_next_day": true, "day": GameState.day, "results": results, "home": home}
 	queue_refresh()
 
 
@@ -757,7 +913,7 @@ func _refresh_content() -> void:
 	var view_key: String
 	if screen_kind == "":
 		shown_view = _tabs[active_tab]
-		view_key = "tab:%s:%s" % [active_tab, guild_section]
+		view_key = "tab:%s:%s:%s" % [active_tab, guild_section, upgrades_section]
 	else:
 		shown_view = _screens[screen_kind]
 		view_key = "screen:%s:%d" % [screen_kind, active_screen.get("quest_index", 0)]

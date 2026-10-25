@@ -14,6 +14,9 @@ const TEXT_SUCCEEDED := "%d / %d succeeded"
 const TEXT_GOLD := "+%d gold"
 const TEXT_NO_INJURIES := "No injuries"
 const TEXT_NOBODY_WENT := "Nobody went out. Quests are the only way to earn gold."
+const TEXT_HOME := "At home: %s"
+const TEXT_TRAINED := "%s +%d %s"
+const TEXT_HEALED := "%s %s → %s"
 const BUTTON_START_DAY := "Start Day %d"
 const BUTTON_CLOSE := "Close"
 
@@ -23,6 +26,7 @@ const BUTTON_CLOSE := "Close"
 @onready var _succeeded_chip = %WinsChip      # chip.gd
 @onready var _gold_chip = %GoldChip           # chip.gd
 @onready var _injured_chip = %HurtChip        # chip.gd
+@onready var _home_note: Label = %HomeNote
 # Quest cards
 @onready var _scroll: ScrollContainer = %Scroll
 @onready var _entry_list: VBoxContainer = %Entries
@@ -44,7 +48,9 @@ func refresh() -> void:
 	var report: Dictionary = hall.shown_report
 	# only rebuild when a different report opens (keeps open stories open)
 	var is_same_report: bool = report.get("results") == _built_report.get("results") \
-			and report.get("starts_next_day") == _built_report.get("starts_next_day")
+			and report.get("starts_next_day") == _built_report.get("starts_next_day") \
+			and report.get("day") == _built_report.get("day") \
+			and report.get("home") == _built_report.get("home")
 	if is_same_report:
 		return
 	_built_report = report
@@ -52,6 +58,7 @@ func refresh() -> void:
 	var results: Array = report.results
 	_title.text = TEXT_TITLE % report.day
 	_show_totals(results)
+	_show_home(report.get("home", {}))
 	_show_entries(results)
 
 	# after End Day the button starts the next day; from the Menu it just closes
@@ -78,6 +85,19 @@ func _show_totals(results: Array) -> void:
 		_injured_chip.set_chip(Style.count_text(injured_count, "hurt", "hurt"), Style.RED_BG, Style.RED, "injury")
 	else:
 		_injured_chip.set_chip(TEXT_NO_INJURIES, Style.GREEN_BG, Style.GREEN_TEXT, "heart")
+
+
+## One line for the night at home: who trained, who healed (see GuildUpgrades.run_night).
+func _show_home(home: Dictionary) -> void:
+	var parts := PackedStringArray()
+	for trained in home.get("trained", []):
+		parts.append(TEXT_TRAINED % [trained.character.name, trained.gain, Style.STATS[trained.stat].short])
+	for healed in home.get("healed", []):
+		var from_label: String = Style.INJURY_LOOKS[healed.from].label
+		var to_label: String = Style.INJURY_LOOKS[healed.to].label
+		parts.append(TEXT_HEALED % [healed.character.name, from_label, to_label])
+	_home_note.text = TEXT_HOME % " · ".join(parts)
+	_home_note.visible = not parts.is_empty()
 
 
 ## One card per quest, or a note when nobody went out.

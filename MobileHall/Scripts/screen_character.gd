@@ -15,6 +15,8 @@ const TEXT_PLUCK_NOTE := "Pluck isn't used by quests yet."
 const TEXT_RECRUIT := "Recruit · not hired yet"
 const TEXT_FREE := "Free today"
 const TEXT_ON_QUEST := "#%d %s (%s)"
+const TEXT_TRAINING := "Training %s tonight (+%d)"
+const TEXT_IN_BED := "In a Hospital bed · healthy in %s"
 const BUTTON_BACK := "Back"
 const BUTTON_HIRE := "Hire (free)"
 
@@ -86,6 +88,14 @@ func _show_task(character: GuildCharacter, is_recruit: bool) -> void:
 		_task.text = TEXT_RECRUIT
 		return
 	var quest_index := hall.quest_index_of(character)
+	if quest_index < 0 and GuildUpgrades.is_patient(character):
+		var nights := GuildUpgrades.get_nights_until_healthy(character, true)
+		_task.text = TEXT_IN_BED % Style.count_text(nights, "night", "nights")
+		return
+	if quest_index < 0 and GuildUpgrades.is_training(character):
+		var stat_name: String = Style.STATS[GuildUpgrades.get_training_stat(character)].name
+		_task.text = TEXT_TRAINING % [stat_name, GuildUpgrades.get_training_gain()]
+		return
 	if quest_index < 0:
 		_task.text = TEXT_FREE
 		return

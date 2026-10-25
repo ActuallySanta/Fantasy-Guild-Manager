@@ -47,7 +47,7 @@ func setup(main: HallMain) -> void:
 	hall = main
 	_roster_section_button.pressed.connect(func(): hall.show_guild_section(HallMain.GUILD_SECTION_ROSTER))
 	_hire_section_button.pressed.connect(func(): hall.show_guild_section(HallMain.GUILD_SECTION_HIRE))
-	_barracks_button.pressed.connect(func(): hall.open_tab("upgrades"))
+	_barracks_button.pressed.connect(func(): hall.open_tab("upgrades", HallMain.UPGRADES_SECTION_BUILD))
 	_barracks_button.text = BEDS_BUTTON
 	Style.style_button(_barracks_button, "paper", 22)
 

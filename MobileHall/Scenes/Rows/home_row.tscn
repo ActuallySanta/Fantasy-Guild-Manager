@@ -1,0 +1,126 @@
+[gd_scene format=3]
+
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/card.tres" id="1_card"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/home_row.gd" id="2_row"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/portrait.tscn" id="3_portrait"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="4_chip"]
+
+[node name="HomeRow" type="PanelContainer"]
+theme_override_styles/panel = ExtResource("1_card")
+script = ExtResource("2_row")
+
+[node name="Col" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Row" type="HBoxContainer" parent="Col"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Portrait" parent="Col/Row" instance=ExtResource("3_portrait")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Info" type="VBoxContainer" parent="Col/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5
+
+[node name="Top" type="HBoxContainer" parent="Col/Row/Info"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Name" type="Label" parent="Col/Row/Info/Top"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Name"
+
+[node name="Role" type="Label" parent="Col/Row/Info/Top"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 19
+text = "the Knight"
+text_overrun_behavior = 3
+
+[node name="Chips" type="HBoxContainer" parent="Col/Row/Info"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HealthChip" parent="Col/Row/Info/Chips" instance=ExtResource("4_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TaskChip" parent="Col/Row/Info/Chips" instance=ExtResource("4_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Note" type="Label" parent="Col/Row/Info"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 19
+text = "Note"
+autowrap_mode = 3
+
+[node name="SideButton" type="Button" parent="Col/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 72)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "Remove"
+
+[node name="MainButton" type="Button" parent="Col/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(130, 72)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_override_font_sizes/font_size = 22
+text = "Add"
+
+[node name="StatPicker" type="HBoxContainer" parent="Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Str" type="Button" parent="Col/StatPicker"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+custom_minimum_size = Vector2(0, 64)
+theme_override_font_sizes/font_size = 22
+text = "Str"
+
+[node name="Def" type="Button" parent="Col/StatPicker"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+custom_minimum_size = Vector2(0, 64)
+theme_override_font_sizes/font_size = 22
+text = "Def"
+
+[node name="Wis" type="Button" parent="Col/StatPicker"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+custom_minimum_size = Vector2(0, 64)
+theme_override_font_sizes/font_size = 22
+text = "Wis"
+
+[node name="Slz" type="Button" parent="Col/StatPicker"]
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+custom_minimum_size = Vector2(0, 64)
+theme_override_font_sizes/font_size = 22
+text = "Slz"
+
