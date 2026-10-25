@@ -180,7 +180,7 @@ func get_effect_text(building: int, level: int) -> String:
 			return text
 		Building.ARMORY:
 			var bonus: Vector2i = ARMORY_BONUS[i]
-			return "Every hero: Strength +%d, Defense +%d" % [bonus.x, bonus.y]
+			return "Every hero: Power +%d, Defense +%d" % [bonus.x, bonus.y]
 		Building.BARRACKS:
 			return "Room for %d heroes" % BARRACKS_MAX_HEROES[i]
 	return ""
@@ -466,7 +466,7 @@ func get_stat_bonus(character: GuildCharacter, stat: GuildCharacter.StatType) ->
 	return 0
 
 
-## "Strength: 5 (+1)" — base stat with the upgrade bonus shown separately.
+## "Power: 5 (+1)" — base stat with the upgrade bonus shown separately.
 ## character.stats already includes the bonus, so quests use the boosted value.
 func format_stat(character: GuildCharacter, stat: GuildCharacter.StatType, label: String) -> String:
 	var total: int = character.stats[stat]
@@ -481,7 +481,7 @@ func _patch_character_card(card: Node) -> void:
 		return
 	var character: GuildCharacter = card.loaded_character
 	sync_characters()
-	card.strength_label.text = format_stat(character, GuildCharacter.StatType.STRENGTH, "Strength")
+	card.strength_label.text = format_stat(character, GuildCharacter.StatType.STRENGTH, "Power")
 	card.defense_label.text = format_stat(character, GuildCharacter.StatType.DEFENSE, "Defense")
 
 # ---------------------------------------------------------------- nav bar hookup

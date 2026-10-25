@@ -92,13 +92,13 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Str" type="Button" parent="Col/StatPicker"]
+[node name="Pow" type="Button" parent="Col/StatPicker"]
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
 custom_minimum_size = Vector2(0, 64)
 theme_override_font_sizes/font_size = 22
-text = "Str"
+text = "Pow"
 
 [node name="Def" type="Button" parent="Col/StatPicker"]
 layout_mode = 2

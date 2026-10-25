@@ -190,7 +190,7 @@ theme_override_constants/separation = 12
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 26
-text = "Strength"
+text = "Power"
 
 [node name="Value" type="Label" parent="Scroll/Margin/Col/StatLines/Stat0/Row" unique_id=706212762]
 layout_mode = 2
@@ -209,7 +209,7 @@ theme_override_constants/separation = 12
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 26
-text = "Strength"
+text = "Power"
 
 [node name="Value" type="Label" parent="Scroll/Margin/Col/StatLines/Stat1/Row" unique_id=950791820]
 layout_mode = 2
@@ -228,7 +228,7 @@ theme_override_constants/separation = 12
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 26
-text = "Strength"
+text = "Power"
 
 [node name="Value" type="Label" parent="Scroll/Margin/Col/StatLines/Stat2/Row" unique_id=855251439]
 layout_mode = 2
@@ -247,7 +247,7 @@ theme_override_constants/separation = 12
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 26
-text = "Strength"
+text = "Power"
 
 [node name="Value" type="Label" parent="Scroll/Margin/Col/StatLines/Stat3/Row" unique_id=100645640]
 layout_mode = 2
@@ -266,7 +266,7 @@ theme_override_constants/separation = 12
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 26
-text = "Strength"
+text = "Power"
 
 [node name="Value" type="Label" parent="Scroll/Margin/Col/StatLines/Stat4/Row" unique_id=1680068538]
 layout_mode = 2

@@ -37,7 +37,7 @@ func set_health(character: GuildCharacter) -> void:
 	set_chip(look.label, look.bg, look.text, icon_name)
 
 
-## One stat as "Str 6" in that stat's colours.
+## One stat as "Pow 6" in that stat's colours.
 func set_stat(character: GuildCharacter, stat_index: int, is_favored: bool = false) -> void:
 	var stat: Dictionary = Style.STATS[stat_index]
 	var text := "%s %d" % [stat.short, Style.stat_value(character, stat_index)]

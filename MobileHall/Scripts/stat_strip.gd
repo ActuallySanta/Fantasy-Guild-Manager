@@ -1,4 +1,4 @@
-## A row of stat chips ("Str 6", "Def 4", ...). The quest's favored stat gets a
+## A row of stat chips ("Pow 6", "Def 4", ...). The quest's favored stat gets a
 ## heavy outline so you can see who fits without reading numbers.
 ## Scene: MobileHall/Scenes/Components/stat_strip.tscn
 ## (The scene has one chip child per stat, in hall_style STATS order.)

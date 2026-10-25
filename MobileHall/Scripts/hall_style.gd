@@ -83,7 +83,8 @@ const QUEST_TYPES := {
 
 # ---- stats
 
-## How many stats a character has (Strength, Defense, Wisdom, Sleaziness, Pluck).
+## How many stats a character has (Power, Defense, Wisdom, Sleaziness, Pluck).
+## Power is GuildCharacter.StatType.STRENGTH; only the name shown to players differs.
 const STAT_COUNT := 5
 ## How many of those quests actually use (all but Pluck).
 const QUEST_STAT_COUNT := 4
@@ -93,7 +94,7 @@ const PLUCK_INDEX := 4
 ## The five stats in GuildCharacter.StatType order (Pluck last).
 ## name = full name, short = chip label, color = text / outline, bg = chip fill.
 const STATS := [
-	{"name": "Strength", "short": "Str", "color": Color("#A3262A"), "bg": Color("#F2D5CB")},
+	{"name": "Power", "short": "Pow", "color": Color("#A3262A"), "bg": Color("#F2D5CB")},
 	{"name": "Defense", "short": "Def", "color": Color("#2F5F8A"), "bg": Color("#D3E1EE")},
 	{"name": "Wisdom", "short": "Wis", "color": Color("#5B3F8C"), "bg": Color("#E2D9EF")},
 	{"name": "Sleaziness", "short": "Slz", "color": Color("#3E6B35"), "bg": Color("#D9E8CF")},
