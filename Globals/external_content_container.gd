@@ -84,10 +84,10 @@ var mage_icons: Array[Texture2D] = [
 	preload("uid://diosvf6ou13rx"),
 ]
 
-var knight_item_names: Array[String]
-var pathfinder_item_names: Array[String]
-var mage_item_names: Array[String]
-var priest_item_names: Array[String]
+var knight_item_names: Array[String] = ["Sword", "Axe", "Claymore"]
+var pathfinder_item_names: Array[String] = ["Dagger", "Mask", "Disguise"]
+var mage_item_names: Array[String] = ["Staff", "Orb", "Pointy Hat"]
+var priest_item_names: Array[String] = ["Sigil", "Incense", "Idol"]
 
 
 # Called when the node enters the scene tree for the first time.
