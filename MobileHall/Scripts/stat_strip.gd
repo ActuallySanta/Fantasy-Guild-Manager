@@ -1,14 +1,17 @@
 ## A row of stat chips ("Str 6", "Def 4", ...). The quest's favored stat gets a
 ## heavy outline so you can see who fits without reading numbers.
 ## Scene: MobileHall/Scenes/Components/stat_strip.tscn
+## (The scene has one chip child per stat, in hall_style STATS order.)
 extends HBoxContainer
 
+const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 
-## favored = index into hall_style STATS (-1 = none). Pluck isn't used by
-## quests yet, so it's only shown where `with_pluck` is on.
-func show_stats(c: GuildCharacter, favored: int = -1, with_pluck: bool = true) -> void:
-	for i in 5:
-		var chip := get_child(i)
-		chip.visible = i < 4 or with_pluck
-		if chip.visible:
-			chip.set_stat(c, i, i == favored)
+
+## favored_stat_index = index into hall_style STATS (-1 = none).
+## Pluck isn't used by quests yet, so it's only shown when `include_pluck` is on.
+func show_stats(character: GuildCharacter, favored_stat_index: int = -1, include_pluck: bool = true) -> void:
+	for stat_index in Style.STAT_COUNT:
+		var stat_chip := get_child(stat_index)
+		stat_chip.visible = stat_index != Style.PLUCK_INDEX or include_pluck
+		if stat_chip.visible:
+			stat_chip.set_stat(character, stat_index, stat_index == favored_stat_index)

@@ -1,8 +1,11 @@
 ## Autoload "GuildUpgrades" — owns guild building levels, upgrade costs and
-## the (placeholder) gold / standing wallet, and applies upgrade effects to
+## the gold / standing wallet, and applies upgrade effects to
 ## the rest of the game:
 ##   - Armory   -> adds STRENGTH / DEFENSE to every hero in CharacterContainer
 ##   - Barracks -> sets CharacterContainer.max_characters
+##   - Training Yard -> heroes in a training slot gain a stat each night
+##   - Hospital -> injuries heal over the nights, faster for patients
+##     (run_night() applies both; the MobileHall UI calls it at End Day)
 ## Other UI is kept in sync without editing it: hiring-page totals are refreshed
 ## after an upgrade, and character cards show boosted stats as "5 (+1)".
 ## It also wires itself to the "UpgrButton" on the nav bar at runtime, so no
@@ -13,7 +16,8 @@ extends Node
 
 signal upgrades_changed
 signal resources_changed
-signal building_upgraded(building: int, new_level: int)
+## Someone started / stopped training, was admitted / discharged, or the night ran.
+signal home_changed
 
 enum Building { OFFICE, TRAINING_YARD, HOSPITAL, ARMORY, BARRACKS }
 
@@ -26,11 +30,11 @@ const HOOKED_META := "guild_upgrades_hooked"
 const CHARACTER_PAGE_NAME := "Guild Character Page"
 
 ## Display info for each building. "implemented" = its effect actually does
-## something in the game yet (prototype: Armory + Barracks only).
+## something in the game yet.
 const BUILDING_INFO := {
 	Building.OFFICE: { "name": "Office", "implemented": false, "color": Color(0.96, 0.73, 0.23) },
-	Building.TRAINING_YARD: { "name": "Training Yard", "implemented": false, "color": Color(0.89, 0.38, 0.30) },
-	Building.HOSPITAL: { "name": "Hospital", "implemented": false, "color": Color(0.94, 0.60, 0.24) },
+	Building.TRAINING_YARD: { "name": "Training Yard", "implemented": true, "color": Color(0.89, 0.38, 0.30) },
+	Building.HOSPITAL: { "name": "Hospital", "implemented": true, "color": Color(0.94, 0.60, 0.24) },
 	Building.ARMORY: { "name": "Armory", "implemented": true, "color": Color(0.31, 0.59, 0.85) },
 	Building.BARRACKS: { "name": "Barracks", "implemented": true, "color": Color(0.44, 0.75, 0.29) },
 }
@@ -45,7 +49,6 @@ const HOSPITAL_RECOVERY_REDUCTION := [2, 2, 3, 4, 4]
 ## x = STRENGTH (ATK) bonus, y = DEFENSE bonus
 const ARMORY_BONUS := [Vector2i(1, 1), Vector2i(2, 1), Vector2i(2, 2), Vector2i(3, 2), Vector2i(3, 3)]
 const BARRACKS_MAX_HEROES := [4, 6, 8, 10, 12]
-const BARRACKS_RECRUITS_PER_DAY := [1, 1, 2, 2, 3]
 
 # ---- Costs (PLACEHOLDER numbers — tune these) ----
 ## Gold to reach level N is UPGRADE_GOLD_COST[N - 1]. Level 1 is free (owned at start).
@@ -53,25 +56,41 @@ const UPGRADE_GOLD_COST := [0, 150, 300, 500, 800]
 ## Standing needed to buy level N.
 const UPGRADE_STANDING_REQ := [0, 1, 2, 3, 4]
 
-# ---- Placeholder economy (no gold/standing system exists yet) ----
+# ---- Economy: the wallet a new run starts with, and the standing floor for recruits ----
 const STARTING_GOLD := 600
 const STARTING_STANDING := 1
 const MINIMUM_STANDING := -10
 
-## Write gold/standing into the top bar's GoldLabel / StanLabel.
-const DRIVE_TOP_BAR_LABELS := false
 ## Show the +gold / +standing test buttons on the upgrades page.
 const SHOW_DEBUG_BUTTONS := true
+
+# ---- Training Yard / Hospital tuning
+## Nights at home to heal one injury level, indexed by GuildCharacter.InjuryLevel
+## (Healthy, Sore, Hurt, Gravely hurt, Dead).
+const HOME_HEAL_NIGHTS := [0, 2, 4, 6, 0]
+## A Hospital bed never takes fewer nights than this per level.
+const HOSPITAL_MIN_NIGHTS := 1
+## Worst injury a hero can still train with.
+const TRAINING_MAX_INJURY := GuildCharacter.InjuryLevel.SORE
+## Hospital level that unlocks reviving, and how many revives a run gets.
+const REVIVE_LEVEL := 5
+const REVIVES_PER_RUN := 1
+## Character metadata: Vector2i(injury level, nights spent healing it).
+const RECOVERY_META := "recovery_nights"
 
 var gold: int = STARTING_GOLD
 var standing: int = STARTING_STANDING
 var levels: Dictionary = { }
+## Heroes in a training slot -> the GuildCharacter.StatType they drill.
+var training: Dictionary = { }
+## Heroes in a Hospital bed.
+var patients: Array[GuildCharacter] = []
+## Revives used this run (Hospital level 5).
+var revives_used := 0
 
 var _page: Control
 var _character_page: Control
 var _hidden_content: Array[CanvasItem] = []
-var _gold_label: Label
-var _standing_label: Label
 var _last_character_count := -1
 
 
@@ -185,29 +204,24 @@ func try_upgrade(building: int) -> bool:
 	levels[building] = get_level(building) + 1
 	_apply_effects()
 
-	building_upgraded.emit(building, levels[building])
 	resources_changed.emit()
 	upgrades_changed.emit()
-	_update_top_bar()
 	return true
 
 
 func add_gold(amount: int) -> void:
 	gold = maxi(gold + amount, 0)
 	resources_changed.emit()
-	_update_top_bar()
 
 
 func add_standing(amount: int) -> void:
 	standing += amount
 	resources_changed.emit()
-	_update_top_bar()
 
 
 func reduce_standing(amount: int) -> void:
 	standing -= amount
 	resources_changed.emit()
-	_update_top_bar()
 
 
 ## Back to a fresh guild (all level 1, starting wallet). Armory bonus is
@@ -217,10 +231,188 @@ func reset() -> void:
 		levels[b] = 1
 	gold = STARTING_GOLD
 	standing = STARTING_STANDING
+	training.clear()
+	patients.clear()
+	revives_used = 0
 	_apply_effects()
+	home_changed.emit()
 	resources_changed.emit()
 	upgrades_changed.emit()
-	_update_top_bar()
+
+# ---------------------------------------------------------------- training yard
+# Heroes in a training slot stay home and drill one stat; it goes up by
+# TRAINING_STAT_GAIN when the day ends (run_night). Slots stay filled day to
+# day until the player changes them.
+
+
+func get_training_slots() -> int:
+	return TRAINING_SLOTS[get_level(Building.TRAINING_YARD) - 1]
+
+
+func get_training_gain() -> int:
+	return TRAINING_STAT_GAIN[get_level(Building.TRAINING_YARD) - 1]
+
+
+func is_training(character: GuildCharacter) -> bool:
+	return training.has(character)
+
+
+## The GuildCharacter.StatType a hero is drilling, or -1 if they aren't training.
+func get_training_stat(character: GuildCharacter) -> int:
+	return training.get(character, -1)
+
+
+func has_free_training_slot() -> bool:
+	return training.size() < get_training_slots()
+
+
+## Alive, no worse than Sore, and not in the Hospital.
+func can_train(character: GuildCharacter) -> bool:
+	return character.injury_level <= TRAINING_MAX_INJURY and not is_patient(character)
+
+
+## Put a hero in a slot, or change the stat they drill.
+## False when they can't train or every slot is taken.
+func set_training(character: GuildCharacter, stat: int) -> bool:
+	if not can_train(character):
+		return false
+	if not is_training(character) and not has_free_training_slot():
+		return false
+	training[character] = stat
+	home_changed.emit()
+	return true
+
+
+func stop_training(character: GuildCharacter) -> void:
+	if training.erase(character):
+		home_changed.emit()
+
+# ---------------------------------------------------------------- hospital
+# Injuries heal one level at a time. At home a level takes HOME_HEAL_NIGHTS;
+# in the Hospital it takes HOSPITAL_RECOVERY_REDUCTION fewer (never below
+# HOSPITAL_MIN_NIGHTS). Patients can't go on quests. Healthy patients are sent
+# home automatically. Progress on the current level is kept as metadata.
+
+
+func get_hospital_reduction() -> int:
+	return HOSPITAL_RECOVERY_REDUCTION[get_level(Building.HOSPITAL) - 1]
+
+
+func is_patient(character: GuildCharacter) -> bool:
+	return patients.has(character)
+
+
+## Hurt but alive (Sore, Hurt or Gravely hurt).
+func needs_care(character: GuildCharacter) -> bool:
+	return character.injury_level > GuildCharacter.InjuryLevel.HEALTHY \
+			and character.injury_level < GuildCharacter.InjuryLevel.DEAD
+
+
+## Nights it takes to heal one level down from `level`.
+func get_heal_nights(level: int, in_hospital: bool) -> int:
+	var nights: int = HOME_HEAL_NIGHTS[clampi(level, 0, HOME_HEAL_NIGHTS.size() - 1)]
+	if in_hospital and nights > 0:
+		nights = maxi(nights - get_hospital_reduction(), HOSPITAL_MIN_NIGHTS)
+	return nights
+
+
+## Nights until a hero is Healthy again, counting progress already made.
+func get_nights_until_healthy(character: GuildCharacter, in_hospital: bool) -> int:
+	if not needs_care(character):
+		return 0
+	var total := 0
+	for level in range(int(character.injury_level), 0, -1):
+		total += get_heal_nights(level, in_hospital)
+	return maxi(total - _recovery_progress(character), 1)
+
+
+func admit(character: GuildCharacter) -> bool:
+	if not needs_care(character) or is_patient(character):
+		return false
+	patients.append(character)
+	training.erase(character)
+	home_changed.emit()
+	return true
+
+
+func discharge(character: GuildCharacter) -> void:
+	if patients.has(character):
+		patients.erase(character)
+		home_changed.emit()
+
+
+## Hospital level 5: bring back one fallen hero per run (Gravely hurt, in a bed).
+func can_revive() -> bool:
+	return get_level(Building.HOSPITAL) >= REVIVE_LEVEL and revives_used < REVIVES_PER_RUN
+
+
+func revive(character: GuildCharacter) -> bool:
+	if not can_revive() or character.injury_level < GuildCharacter.InjuryLevel.DEAD:
+		return false
+	character.injury_level = GuildCharacter.InjuryLevel.GRAVELY_INJURED
+	character.set_meta(RECOVERY_META, Vector2i(GuildCharacter.InjuryLevel.GRAVELY_INJURED, 0))
+	revives_used += 1
+	patients.append(character)
+	home_changed.emit()
+	return true
+
+# ---------------------------------------------------------------- the night
+
+
+## Tonight at home: heroes in training gain their stat and injured heroes heal.
+## Call once when the day ends, before the quests are played out (so nobody
+## heals the same night they get hurt). Returns what happened, for the report:
+##   {trained: [{character, stat, gain}],
+##    healed:  [{character, from, to, in_hospital}]}
+func run_night() -> Dictionary:
+	_forget_missing_heroes()
+
+	var trained := []
+	var gain := get_training_gain()
+	for character: GuildCharacter in training:
+		var stat: int = training[character]
+		character.stats[stat] += gain
+		character.total_points += gain
+		trained.append({"character": character, "stat": stat, "gain": gain})
+
+	var healed := []
+	for character in CharacterContainer.active_characters:
+		if character == null or not needs_care(character):
+			continue
+		var in_hospital := is_patient(character)
+		var nights := _recovery_progress(character) + 1
+		var level := int(character.injury_level)
+		if nights >= get_heal_nights(level, in_hospital):
+			character.injury_level = (level - 1) as GuildCharacter.InjuryLevel
+			nights = 0
+			healed.append({"character": character, "from": level, "to": level - 1, "in_hospital": in_hospital})
+		character.set_meta(RECOVERY_META, Vector2i(int(character.injury_level), nights))
+
+	# healed patients go home
+	for character in patients.duplicate():
+		if not needs_care(character):
+			patients.erase(character)
+
+	home_changed.emit()
+	return {"trained": trained, "healed": healed}
+
+
+## Nights already spent healing the hero's current level. Stored with the
+## level it belongs to, so a new injury starts the count again.
+func _recovery_progress(character: GuildCharacter) -> int:
+	var progress: Vector2i = character.get_meta(RECOVERY_META, Vector2i(-1, 0))
+	return progress.y if progress.x == int(character.injury_level) else 0
+
+
+## Drop heroes who left the roster, died, or got too hurt for their slot.
+func _forget_missing_heroes() -> void:
+	var roster: Array = CharacterContainer.active_characters
+	for character: GuildCharacter in training.keys():
+		if not roster.has(character) or not can_train(character):
+			training.erase(character)
+	for character in patients.duplicate():
+		if not roster.has(character) or not needs_care(character):
+			patients.erase(character)
 
 # ---------------------------------------------------------------- effects
 
@@ -310,13 +502,6 @@ func _on_node_added(node: Node) -> void:
 	elif node is CharacterUICard:
 		# Runs after the card's own _ready has filled in its labels.
 		_patch_character_card.call_deferred(node)
-	elif node is Label and DRIVE_TOP_BAR_LABELS:
-		if node.name == "GoldLabel":
-			_gold_label = node
-			_update_top_bar.call_deferred()
-		elif node.name == "StanLabel":
-			_standing_label = node
-			_update_top_bar.call_deferred()
 
 
 func _scan_tree(node: Node) -> void:
@@ -395,12 +580,3 @@ func _restore_other_content() -> void:
 		if is_instance_valid(node):
 			node.show()
 	_hidden_content.clear()
-
-
-func _update_top_bar() -> void:
-	if not DRIVE_TOP_BAR_LABELS:
-		return
-	if _gold_label != null and is_instance_valid(_gold_label):
-		_gold_label.text = "Gold: %d" % gold
-	if _standing_label != null and is_instance_valid(_standing_label):
-		_standing_label.text = "Standing: %d" % standing
