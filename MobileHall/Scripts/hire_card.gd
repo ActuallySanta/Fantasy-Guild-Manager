@@ -7,7 +7,7 @@ const S := preload("res://MobileHall/Scripts/hall_style.gd")
 
 # ---- TEXT
 const TEXT_ROLE := "the %s · stat total %d"
-const TEXT_HIRE := "Hire (free)"
+var TEXT_HIRE := "WHy you no chsnge"
 const TEXT_FULL := "No beds"
 
 # ---- NODES
@@ -25,6 +25,7 @@ func setup(main, c: GuildCharacter) -> void:
 	_hire_button.pressed.connect(main.hire.bind(c))
 	_portrait.show_character(c)
 	_name.text = c.name
+	TEXT_HIRE = str("Hire ($", c.cost, ")")
 	var total := 0
 	for i in 4:
 		total += S.stat_value(c, i)

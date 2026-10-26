@@ -76,6 +76,10 @@ var title: String
 
 var icon: Texture2D
 
+var cost: int:
+	get:
+		return cost
+
 
 #The constructor, called when the object is created
 func _init() -> void:
@@ -98,6 +102,13 @@ func _init() -> void:
 
 	title = name + " the " + str(CharacterRole.find_key(role))
 
+	if (GameState.day >= 5):
+		cost = 200
+	elif(GameState.day >= 3):
+		cost = 100
+	else:
+		cost = 0
+	
 	pass
 
 
@@ -165,3 +176,4 @@ func increase_temp_stat(_stat:StatType,_points_to_add:int):
 func reset_temp_stats():
 	for entry in temp_stats:
 		entry = 0
+		

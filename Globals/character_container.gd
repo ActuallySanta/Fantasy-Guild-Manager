@@ -51,9 +51,9 @@ func add_character_to_guild(_character: GuildCharacter) -> bool:
 	if (active_characters.size() == max_characters):
 		return false
 	
-	if(GameState.day >= 4 && GameState.gold >= 200):
-		print("GameState.add_gold(-200)")
-	elif(GameState.day >= 4):
+	if(GameState.day >= 3 && GameState.gold >= _character.cost):
+		GameState.add_gold(-(_character.cost))
+	elif(GameState.day >= 3):
 		return false
 	
 	active_characters.append(_character)
