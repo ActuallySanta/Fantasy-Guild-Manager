@@ -16,14 +16,14 @@
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Screens/screen_character.tscn" id="18_c5uvo"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="20_7dlno"]
 [ext_resource type="Texture2D" uid="uid://cb420nxynjehg" path="res://MobileHall/Art/Icons/scroll.svg" id="25_board"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/person.svg" id="27_guild"]
+[ext_resource type="Texture2D" uid="uid://cv5023acxlou6" path="res://MobileHall/Art/Icons/person.svg" id="27_guild"]
 [ext_resource type="Texture2D" uid="uid://cjywbau63ujgi" path="res://MobileHall/Art/Icons/hammer.svg" id="28_upgrades"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/stall.svg" id="29_shop"]
+[ext_resource type="Texture2D" uid="uid://du8qg2ro1ddxi" path="res://MobileHall/Art/Icons/stall.svg" id="29_shop"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_end_day.tscn" id="30_cwf4i"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_menu.tscn" id="32_kg28u"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_report.tscn" id="34_6fy20"]
 [ext_resource type="PackedScene" uid="uid://bgwxd653pjox8" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
-[ext_resource type="Shader" path="res://MobileHall/Styles/colorblind_filter.gdshader" id="39_cbf01"]
+[ext_resource type="Shader" uid="uid://dkvytyy35gk2p" path="res://MobileHall/Styles/colorblind_filter.gdshader" id="39_cbf01"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cbf01"]
 shader = ExtResource("39_cbf01")
@@ -206,7 +206,7 @@ layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="TabShop" parent="Layout/Content" instance=ExtResource("15_shop1")]
+[node name="TabShop" parent="Layout/Content" unique_id=1648591991 instance=ExtResource("15_shop1")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -387,7 +387,7 @@ text = "2"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Nav_shop" type="Button" parent="Layout/Nav/Row"]
+[node name="Nav_shop" type="Button" parent="Layout/Nav/Row" unique_id=995203544]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
@@ -400,7 +400,7 @@ icon = ExtResource("29_shop")
 icon_alignment = 1
 vertical_icon_alignment = 0
 
-[node name="Badge" type="PanelContainer" parent="Layout/Nav/Row/Nav_shop"]
+[node name="Badge" type="PanelContainer" parent="Layout/Nav/Row/Nav_shop" unique_id=1191919301]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -413,7 +413,7 @@ grow_horizontal = 0
 mouse_filter = 2
 theme_type_variation = &"Badge"
 
-[node name="Text" type="Label" parent="Layout/Nav/Row/Nav_shop/Badge"]
+[node name="Text" type="Label" parent="Layout/Nav/Row/Nav_shop/Badge" unique_id=723039896]
 layout_mode = 2
 theme_type_variation = &"LabelLight"
 theme_override_fonts/font = ExtResource("5_title")
@@ -485,10 +485,10 @@ layout_mode = 1
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ColorFilterLayer" type="CanvasLayer" parent="."]
+[node name="ColorFilterLayer" type="CanvasLayer" parent="." unique_id=2131547255]
 layer = 100
 
-[node name="ColorFilter" type="ColorRect" parent="ColorFilterLayer"]
+[node name="ColorFilter" type="ColorRect" parent="ColorFilterLayer" unique_id=2002895824]
 unique_name_in_owner = true
 visible = false
 material = SubResource("ShaderMaterial_cbf01")
