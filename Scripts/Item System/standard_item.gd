@@ -25,8 +25,11 @@ var total_rarity: int = 100
 
 var initial_cost = 250
 
-## How much more each rarity tier costs than the one below it (0.2 = +20%)
-var rarity_cost_step: float = 0.2
+## How much more each rarity tier costs than the one below it (0.4 = +40%)
+var rarity_cost_step: float = 0.4
+
+## Final prices are rounded to the nearest multiple of this (237 -> 250)
+var cost_rounding: int = 50
 
 var cost: int
 
@@ -37,12 +40,12 @@ func _init(_role: GuildCharacter.CharacterRole) -> void:
 	rarity = get_rarity()
 	name = str(Rarity.find_key(rarity)) + " " + ExternalContentContainer.get_item_title(_role)
 
-	#Each rarity tier costs 20% more than the one below it (Common = initial_cost)
+	#Each rarity tier costs 40% more than the one below it (Common = initial_cost)
 	var tier: int = Rarity.values().find(rarity)
 	mean_cost = roundi(initial_cost * pow(1.0 + rarity_cost_step, tier))
 
-	#Deviate a little bit around the intial mean
-	cost = maxi(roundi(randfn(mean_cost, max_cost_deviation)), 1)
+	#Deviate a little bit around the intial mean, then round to a clean price
+	cost = maxi(snappedi(roundi(randfn(mean_cost, max_cost_deviation)), cost_rounding), cost_rounding)
 
 	curr_user = null
 	pass
