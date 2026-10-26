@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[node name="HomeHeading" type="Label"]
+custom_minimum_size = Vector2(40, 0)
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 20
+text = "SLOTS"
+autowrap_mode = 3

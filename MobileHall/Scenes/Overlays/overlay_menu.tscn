@@ -55,6 +55,14 @@ focus_mode = 0
 theme_override_font_sizes/font_size = 28
 text = "ReportButton"
 
+[node name="ColorButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "ColorButton"
+
 [node name="ResetButton" type="Button" parent="Center/Sheet/Col" unique_id=1210881435]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 88)

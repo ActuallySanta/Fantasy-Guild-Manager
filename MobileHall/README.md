@@ -52,11 +52,36 @@ replace them later.
 | Board (tab) | Today checklist (Recruits / Quests / Upgrades, each tappable), then all quests. Rows show *Pick a party*, *Party picked*, *Sent* or *Denied* with odds and mini portraits |
 | Assign Party | Quest strip; quest card; party seats (tap to remove) with live odds; picker sorted best fit first. Adventurers already in another quest's party are hidden unless **Show busy** is on; shown, they say "Picked for / Sent on #N" and move over when tapped. Footer: Deny / Send Party, or Recall / Next Quest, or Board / Reconsider |
 | Guild (tab) | Your Guild (roster with health, today's task, all five stats) / For Hire (recruit cards with Hire). Bed count links to the Barracks |
-| Upgrades (tab) | Wallet, affordable buildings first, level pips, now/next effect, cost or what's missing |
+| Upgrades (tab) | Two halves. **Tonight**: the Training Yard card (heroes in a slot with a Str / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital card (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: wallet, affordable buildings first, level pips, now/next effect, cost or what's missing. Badge = upgrades you can afford |
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
 | Day Report | Totals (succeeded, gold, injuries), one short card per quest, story on demand |
-| Menu | How to play, last night's report, reset upgrades (debug) |
+| Menu | How to play, last night's report, colorblind filter (tap to cycle Off / Red-weak / Green-weak / Blue-yellow, saved to `user://settings.cfg`), reset upgrades (debug) |
+
+## Colorblind filter
+
+`Styles/colorblind_filter.gdshader` is a full-screen daltonize pass on a CanvasLayer
+(layer 100) at the bottom of `hall_main.tscn`, so it recolours everything, overlays and
+art included. It moves the colour differences a player can't see into ones they can.
+It doesn't fake colourblindness. When it's Off the rect is hidden and costs nothing.
+`strength` on the material (0-1) softens it.
+
+## Training Yard and Hospital
+
+Both live on the Upgrades tab's **Tonight** half (`Scenes/Rows/home_section.tscn`, one card each). The rules
+live in `Globals/guild_upgrades.gd` (`run_night()`, called by End Day before the quests
+are played out), and the tuning numbers sit at the top of that file.
+
+- **Training:** a hero in a slot gets +`TRAINING_STAT_GAIN` to the stat they picked each
+  night. Slots stay filled from day to day. Heroes can be Healthy or Sore, but not in a bed.
+  **Trainees can't be sent on quests**: take them out of their slot first. "Move here"
+  pulls a hero out of a quest party and into a slot.
+- **Healing:** injuries now heal one level at a time. At home each level takes
+  `HOME_HEAL_NIGHTS` (Sore 2, Hurt 4, Gravely 6). In a Hospital bed it takes
+  `HOSPITAL_RECOVERY_REDUCTION` fewer nights (never less than 1). Heroes in a bed can't
+  go on quests, and they go home on their own once they're Healthy.
+- **Revive:** Hospital level 5 brings one fallen hero back per run, Gravely hurt and in a bed.
+- The Day Report's header has an "At home" line with who trained and who healed.
 
 ## Things to watch in the playtest
 
@@ -72,7 +97,7 @@ replace them later.
 - `Scenes/Tabs/`: Board, Guild, Upgrades
 - `Scenes/Screens/`: Assign Party, Character
 - `Scenes/Overlays/`: End Day check, Day Report, Welcome, Menu
-- `Scenes/Rows/`: list rows (quest row, quest tab, party seat, picker row, roster / hire cards, upgrade card, Today box, plan row, upgrade suggestion, report entry, story line)
+- `Scenes/Rows/`: list rows (quest row, quest tab, party seat, picker row, roster / hire cards, upgrade card, Today box, plan row, upgrade suggestion, report entry, story line, Training / Hospital card, row and heading)
 - `Scenes/Components/`: chip, portrait, stat strip, odds bar
 - `Styles/` + `hall_theme.tres`: shared boxes and the base theme
 - `Scripts/hall_style.gd`: colours, stat / injury / odds tables, quest-type and building tags, icon table, text helpers, restyles
@@ -91,5 +116,4 @@ game state themselves.
 
 - Dead adventurers are shown greyed out and can't be picked in this UI, but the game
   systems themselves don't stop them.
-- Injuries never heal yet (Hospital isn't implemented).
 - Quest text typos ("ATTACHING") come from the quest data.

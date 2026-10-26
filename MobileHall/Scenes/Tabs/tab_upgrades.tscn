@@ -3,36 +3,141 @@
 [ext_resource type="Script" path="res://MobileHall/Scripts/tab_upgrades.gd" id="1_2kjtj"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/card_plain.tres" id="2_l0ver"]
 [ext_resource type="Texture2D" path="res://Sprites/UI Icons/coins-solid-full.svg" id="3_neatd"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_wood.tres" id="4_wood"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_paper.tres" id="5_paper"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/badge.tres" id="6_badge"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Rows/home_section.tscn" id="7_section"]
 
-[node name="TabUpgrades" type="ScrollContainer" unique_id=229603043]
-horizontal_scroll_mode = 0
+[node name="TabUpgrades" type="VBoxContainer" unique_id=229603043]
+theme_override_constants/separation = 0
 script = ExtResource("1_2kjtj")
 
-[node name="Margin" type="MarginContainer" parent="." unique_id=1015830774]
+[node name="SegMargin" type="MarginContainer" parent="."]
 layout_mode = 2
-size_flags_horizontal = 3
 theme_override_constants/margin_left = 14
 theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 6
+
+[node name="Seg" type="HBoxContainer" parent="SegMargin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="SegTonight" type="Button" parent="SegMargin/Seg"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = ExtResource("4_wood")
+text = "Tonight"
+
+[node name="TonightBadge" type="PanelContainer" parent="SegMargin/Seg/SegTonight"]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -46.0
+offset_top = -8.0
+offset_bottom = 30.0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("6_badge")
+
+[node name="TonightBadgeText" type="Label" parent="SegMargin/Seg/SegTonight/TonightBadge"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "2"
+horizontal_alignment = 1
+
+[node name="SegBuild" type="Button" parent="SegMargin/Seg"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+theme_override_styles/normal = ExtResource("5_paper")
+text = "Build"
+
+[node name="BuildBadge" type="PanelContainer" parent="SegMargin/Seg/SegBuild"]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -46.0
+offset_top = -8.0
+offset_bottom = 30.0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("6_badge")
+
+[node name="BuildBadgeText" type="Label" parent="SegMargin/Seg/SegBuild/BuildBadge"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 20
+text = "2"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Scroll" unique_id=1015830774]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 14
 theme_override_constants/margin_bottom = 20
 
-[node name="Col" type="VBoxContainer" parent="Margin" unique_id=762175634]
+[node name="Col" type="VBoxContainer" parent="Scroll/Margin" unique_id=762175634]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="WalletBox" type="PanelContainer" parent="Margin/Col" unique_id=580025596]
+[node name="Tonight" type="VBoxContainer" parent="Scroll/Margin/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TrainingSection" parent="Scroll/Margin/Col/Tonight" instance=ExtResource("7_section")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HospitalSection" parent="Scroll/Margin/Col/Tonight" instance=ExtResource("7_section")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TonightNote" type="Label" parent="Scroll/Margin/Col/Tonight"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+text = "Heroes in training or in a bed can't be sent on quests. Changes happen when the day ends."
+autowrap_mode = 3
+
+[node name="Build" type="VBoxContainer" parent="Scroll/Margin/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="WalletBox" type="PanelContainer" parent="Scroll/Margin/Col/Build" unique_id=580025596]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("2_l0ver")
 
-[node name="Col" type="VBoxContainer" parent="Margin/Col/WalletBox" unique_id=503860126]
+[node name="Col" type="VBoxContainer" parent="Scroll/Margin/Col/Build/WalletBox" unique_id=503860126]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="Row" type="HBoxContainer" parent="Margin/Col/WalletBox/Col" unique_id=1558771732]
+[node name="Row" type="HBoxContainer" parent="Scroll/Margin/Col/Build/WalletBox/Col" unique_id=1558771732]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Icon" type="TextureRect" parent="Margin/Col/WalletBox/Col/Row" unique_id=1202745279]
+[node name="Icon" type="TextureRect" parent="Scroll/Margin/Col/Build/WalletBox/Col/Row" unique_id=1202745279]
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
 mouse_filter = 2
@@ -40,13 +145,13 @@ texture = ExtResource("3_neatd")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Wallet" type="Label" parent="Margin/Col/WalletBox/Col/Row" unique_id=525777926]
+[node name="Wallet" type="Label" parent="Scroll/Margin/Col/Build/WalletBox/Col/Row" unique_id=525777926]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 28
 text = "600 gold · standing 1"
 
-[node name="WalletHint" type="Label" parent="Margin/Col/WalletBox/Col" unique_id=144497310]
+[node name="WalletHint" type="Label" parent="Scroll/Margin/Col/Build/WalletBox/Col" unique_id=144497310]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
@@ -55,16 +160,16 @@ theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
 text = "You can afford 1 upgrade."
 autowrap_mode = 3
 
-[node name="List" type="VBoxContainer" parent="Margin/Col" unique_id=1250073826]
+[node name="List" type="VBoxContainer" parent="Scroll/Margin/Col/Build" unique_id=1250073826]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Soon" type="Label" parent="Margin/Col" unique_id=1115500127]
+[node name="Soon" type="Label" parent="Scroll/Margin/Col/Build" unique_id=1115500127]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 21
 theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-text = "Coming soon: Office, Training Yard, Hospital"
+text = "Coming soon: Office"
 autowrap_mode = 3
