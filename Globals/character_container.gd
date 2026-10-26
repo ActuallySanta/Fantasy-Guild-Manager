@@ -21,6 +21,16 @@ func _ready() -> void:
 # Replaces the hiring pool with new characters on a new day
 func refresh_hireable_characters() -> void:
 	hireable_characters.clear()
+	
+	if(GameState.day <= 1):
+		max_hireable_characters = 2
+	elif(GameState.day <= 3):
+		max_hireable_characters = 1
+	elif(GameState.day <= 10):
+		max_hireable_characters = 2
+	else:
+		max_hireable_characters = 3
+		
 	if (GameState.standing > GuildUpgrades.MINIMUM_STANDING):
 		for i in max_hireable_characters:
 			hireable_characters.append(GuildCharacter.new())
@@ -40,7 +50,12 @@ func generate_new_character() -> void:
 func add_character_to_guild(_character: GuildCharacter) -> bool:
 	if (active_characters.size() == max_characters):
 		return false
-
+	
+	if(GameState.day >= 4 && GameState.gold >= 200):
+		print("GameState.add_gold(-200)")
+	elif(GameState.day >= 4):
+		return false
+	
 	active_characters.append(_character)
 	hireable_characters.erase(_character) # char hired, so no longer for hire
 	print(_character.name + " HAS JOINED THE GUILD")
