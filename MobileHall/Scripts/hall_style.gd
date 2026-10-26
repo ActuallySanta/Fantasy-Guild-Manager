@@ -136,6 +136,18 @@ const ODDS_NO_PARTY := {"min": -1, "word": "No party yet", "text_color": TEXT_SO
 ## GuildUpgrades.Building -> short tag shown in the building's colour box.
 const BUILDING_TAGS := {0: "OFF", 1: "TRN", 2: "HSP", 3: "ARM", 4: "BRK"}
 
+# ---- items
+
+## StandardItem.Rarity name -> short tag and colour (shop tiles, gear rows).
+const ITEM_RARITY_LOOKS := {
+	"COMMON": {"tag": "COM", "color": Color("#7D7D7D")},
+	"UNCOMMON": {"tag": "UNC", "color": Color("#3F7A2E")},
+	"RARE": {"tag": "RAR", "color": Color("#2F5F8A")},
+	"LEGENDARY": {"tag": "LEG", "color": Color("#5B3F8C")},
+	"MYTHIC": {"tag": "MYT", "color": Color("#B8862B")},
+	"NAMED": {"tag": "NAM", "color": Color("#A3262A")},
+}
+
 
 # ============================================================ TEXT HELPERS
 
@@ -221,6 +233,38 @@ static func injury_look(character: GuildCharacter) -> Dictionary:
 
 static func is_dead(character: GuildCharacter) -> bool:
 	return character.injury_level >= GuildCharacter.InjuryLevel.DEAD
+
+# ---- items
+
+
+## {name, short, tag, color, effect} for a StandardItem, e.g.
+## name "Rare Sword", short "Sword", tag "RAR", effect "+16 Power · Knights only".
+static func item_look(item: StandardItem) -> Dictionary:
+	var rarity_name := str(StandardItem.Rarity.find_key(item.rarity))
+	var rarity_look: Dictionary = ITEM_RARITY_LOOKS.get(rarity_name, ITEM_RARITY_LOOKS.COMMON)
+	var full_name := item.name.capitalize()
+	var space := full_name.find(" ")
+	return {
+		"name": full_name,
+		"short": full_name.substr(space + 1) if space >= 0 else full_name,
+		"tag": rarity_look.tag,
+		"color": rarity_look.color,
+		"effect": item_effect(item),
+	}
+
+
+## "+16 Power · Knights only"
+static func item_effect(item: StandardItem) -> String:
+	var role_text := "%ss only" % item_role_name(item)
+	if item is PassiveItem:
+		var passive := item as PassiveItem
+		return "+%d %s · %s" % [passive.stat_amount, STATS[passive.affected_stat].name, role_text]
+	return role_text
+
+
+## The role that can use an item, as a word ("Knight").
+static func item_role_name(item: StandardItem) -> String:
+	return str(GuildCharacter.CharacterRole.find_key(item.role)).capitalize()
 
 # ---- buildings
 
