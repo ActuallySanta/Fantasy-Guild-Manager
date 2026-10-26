@@ -105,7 +105,7 @@ theme_override_constants/separation = 0
 [node name="Name" type="Label" parent="Center/Sheet/Col/StepGuild/Text" unique_id=1238163460]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Guild"
+text = "Members"
 
 [node name="Body" type="Label" parent="Center/Sheet/Col/StepGuild/Text" unique_id=1588119429]
 custom_minimum_size = Vector2(40, 0)
@@ -140,7 +140,7 @@ theme_override_constants/separation = 0
 [node name="Name" type="Label" parent="Center/Sheet/Col/StepUpgrades/Text" unique_id=966362498]
 layout_mode = 2
 theme_override_font_sizes/font_size = 24
-text = "Upgrades"
+text = "Guild"
 
 [node name="Body" type="Label" parent="Center/Sheet/Col/StepUpgrades/Text" unique_id=609500633]
 custom_minimum_size = Vector2(40, 0)

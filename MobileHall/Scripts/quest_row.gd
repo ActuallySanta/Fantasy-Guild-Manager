@@ -4,15 +4,21 @@
 ## Scene: MobileHall/Scenes/Rows/quest_row.tscn
 extends "res://MobileHall/Scripts/tap_panel.gd"
 
-const S := preload("res://MobileHall/Scripts/hall_style.gd")
-const Portrait := preload("res://MobileHall/Scenes/Components/portrait.tscn")
+const Style := preload("res://MobileHall/Scripts/hall_style.gd")
+const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
+const PortraitScene := preload("res://MobileHall/Scenes/Components/portrait.tscn")
 
-const MINI_PORTRAIT := 44
+## Size (pixels) of the little party portraits under the state.
+const MINI_PORTRAIT_SIZE := 44
+## Denied quests fade back so the open ones stand out.
+const DENIED_OPACITY := 0.75
 
 # ---- TEXT
+# Quest facts (left)
 const TEXT_RANK := "Rank %s"
 const TEXT_GOLD := "%d"
-const TEXT_SLOTS := "%d max"
+const TEXT_PARTY_SIZE := "%d max"
+# State (right)
 const TEXT_OPEN := "Pick a party"
 const TEXT_DRAFT := "Party picked"
 const TEXT_SENT := "Sent"
@@ -21,61 +27,71 @@ const TEXT_DENIED_HINT := "Tap to reconsider"
 const TEXT_ODDS := "%d%%"
 
 # ---- NODES
+# Quest facts (left)
 @onready var _type_tile: PanelContainer = %TypeTile
 @onready var _type_tag: Label = %TypeTag
 @onready var _title: Label = %Title
-@onready var _rank_chip = %RankChip
-@onready var _gold_chip = %GoldChip
-@onready var _slots_chip = %SlotsChip
-@onready var _fav_chip = %FavChip
+@onready var _rank_chip = %RankChip           # chip.gd
+@onready var _gold_chip = %GoldChip           # chip.gd
+@onready var _party_size_chip = %SlotsChip    # chip.gd
+@onready var _favored_chip = %FavChip         # chip.gd
+# State (right)
 @onready var _state_label: Label = %StateLabel
 @onready var _odds_label: Label = %OddsLabel
 @onready var _sub_label: Label = %SubLabel
-@onready var _party: HBoxContainer = %Party
+@onready var _party_portraits: HBoxContainer = %Party
 
 
-func setup(main, index: int) -> void:
-	var e: Dictionary = main.entries[index]
-	pressed.connect(main.open_assign.bind(index))
-	_show_quest(main, e)
-	_show_state(main, e)
+func setup(hall: HallMain, quest_index: int) -> void:
+	var entry: Dictionary = hall.quest_entries[quest_index]
+	pressed.connect(hall.open_assign.bind(quest_index))
+	_show_quest_facts(hall, entry)
+	_show_party(hall, entry)
+	_show_state(entry)
 
 
-func _show_quest(main, e: Dictionary) -> void:
-	var info := S.type_info(e)
-	S.style_tag(_type_tile, _type_tag, info.tag, info.color)
-	_title.text = e.quest.questTitle
-	_rank_chip.set_chip(TEXT_RANK % S.rank_letter(e.quest), S.PAPER, S.INK)
-	_gold_chip.set_chip(TEXT_GOLD % e.quest.goldReward, S.GOLD_BG, S.GOLD_TEXT, "coins")
-	_slots_chip.set_chip(TEXT_SLOTS % main.slot_count(e), S.BLUE_BG, S.BLUE_TEXT, "nav_characters")
-	var fav: Dictionary = S.STATS[S.favored_index(e.quest)]
-	_fav_chip.set_chip(fav.short, fav.bg, fav.color, "", true)
+## Type tag, title, rank, reward, party size, favored stat.
+func _show_quest_facts(hall: HallMain, entry: Dictionary) -> void:
+	var type_info := Style.quest_type_info(entry)
+	Style.style_tag(_type_tile, _type_tag, type_info.tag, type_info.color)
+	_title.text = entry.quest.questTitle
+	_rank_chip.set_chip(TEXT_RANK % Style.rank_letter(entry.quest), Style.NEUTRAL_BG, Style.TEXT_MAIN)
+	_gold_chip.set_chip(TEXT_GOLD % entry.quest.goldReward, Style.GOLD_BG, Style.GOLD_TEXT, "coins")
+	_party_size_chip.set_chip(TEXT_PARTY_SIZE % hall.party_size_limit(entry), Style.BLUE_BG, Style.BLUE_TEXT, "nav_characters")
+	var favored_stat: Dictionary = Style.STATS[Style.favored_stat_index(entry.quest)]
+	_favored_chip.set_chip(favored_stat.short, favored_stat.bg, favored_stat.color, "", true)
 
 
-func _show_state(main, e: Dictionary) -> void:
-	S.clear(_party)
-	for c in e.party:
-		var p := Portrait.instantiate()
-		p.custom_minimum_size = Vector2.ONE * MINI_PORTRAIT
-		_party.add_child(p)
-		p.show_character(c)
-	var chance: int = main.chance_for(e, e.party)
+## Mini portraits of the picked party and their success chance.
+func _show_party(hall: HallMain, entry: Dictionary) -> void:
+	Style.clear_children(_party_portraits)
+	for character in entry.party:
+		var portrait := PortraitScene.instantiate()
+		portrait.custom_minimum_size = Vector2.ONE * MINI_PORTRAIT_SIZE
+		_party_portraits.add_child(portrait)
+		portrait.show_character(character)
+
+	var chance: int = hall.success_chance(entry, entry.party)
 	_odds_label.visible = chance >= 0
 	_odds_label.text = TEXT_ODDS % mini(chance, 100)
-	S.color(_odds_label, S.odds(chance)[1])
-	match e.state:
-		"ready":
+	Style.set_font_color(_odds_label, Style.odds_look(chance).text_color)
+
+
+## State word and the row's colours: green = sent, grey = denied, white = open.
+func _show_state(entry: Dictionary) -> void:
+	match entry.state:
+		Style.QUEST_STATE_SENT:
 			_state_label.text = TEXT_SENT
-			S.color(_state_label, S.GREEN_TEXT)
-			S.style_panel(self, Color("#E8F5E9"), S.GREEN, 4)
-		"denied":
+			Style.set_font_color(_state_label, Style.GREEN_TEXT)
+			Style.style_panel(self, Style.SENT_CARD_BG, Style.GREEN, 4)
+		Style.QUEST_STATE_DENIED:
 			_state_label.text = TEXT_DENIED
-			S.color(_state_label, S.WAX)
+			Style.set_font_color(_state_label, Style.RED)
 			_sub_label.visible = true
 			_sub_label.text = TEXT_DENIED_HINT
-			S.style_panel(self, Color("#EEEEEE"), S.LINE, 2)
-			modulate = Color(1, 1, 1, 0.75)
+			Style.style_panel(self, Style.DENIED_CARD_BG, Style.BORDER, 2)
+			modulate = Color(1, 1, 1, DENIED_OPACITY)
 		_:
-			_state_label.text = TEXT_DRAFT if not e.party.is_empty() else TEXT_OPEN
-			S.color(_state_label, S.BLUE_TEXT)
-			S.style_panel(self, S.CREAM, S.LINE, 2)
+			_state_label.text = TEXT_DRAFT if not entry.party.is_empty() else TEXT_OPEN
+			Style.set_font_color(_state_label, Style.BLUE_TEXT)
+			Style.style_panel(self, Style.CARD_BG, Style.BORDER, 2)
