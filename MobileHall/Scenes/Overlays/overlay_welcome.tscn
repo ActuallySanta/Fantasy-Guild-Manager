@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://dam4bq8y7a4o6" path="res://MobileHall/Scripts/overlay_welcome.gd" id="1_k3hm8"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/dim.tres" id="2_rqmg6"]
 [ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/scroll.svg" id="4_twoe2"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/shield.svg" id="5_d3ton"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/person.svg" id="5_d3ton"]
 [ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/hammer.svg" id="6_qmqxm"]
 
 [node name="OverlayWelcome" type="Control" unique_id=1913149125]
@@ -107,7 +107,7 @@ theme_override_constants/separation = 0
 layout_mode = 2
 theme_type_variation = &"TitleLabel"
 theme_override_font_sizes/font_size = 32
-text = "Guild"
+text = "Members"
 
 [node name="Body" type="Label" parent="Center/Sheet/Col/StepGuild/Text" unique_id=1588119429]
 custom_minimum_size = Vector2(40, 0)
@@ -144,7 +144,7 @@ theme_override_constants/separation = 0
 layout_mode = 2
 theme_type_variation = &"TitleLabel"
 theme_override_font_sizes/font_size = 32
-text = "Upgrades"
+text = "Guild"
 
 [node name="Body" type="Label" parent="Center/Sheet/Col/StepUpgrades/Text" unique_id=609500633]
 custom_minimum_size = Vector2(40, 0)

@@ -128,7 +128,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 25
-text = "Now · Every hero: Strength +1, Defense +1"
+text = "Now · Every hero: Power +1, Defense +1"
 autowrap_mode = 3
 
 [node name="Next" type="Label" parent="Col"]
@@ -137,7 +137,7 @@ custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
 theme_override_font_sizes/font_size = 25
-text = "Next · Every hero: Strength +2, Defense +1"
+text = "Next · Every hero: Power +2, Defense +1"
 autowrap_mode = 3
 
 [node name="Bottom" type="HBoxContainer" parent="Col"]

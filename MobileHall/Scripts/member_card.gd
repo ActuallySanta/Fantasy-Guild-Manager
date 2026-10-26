@@ -1,36 +1,51 @@
-## One adventurer in the Guild tab's roster (a parchment card): portrait, health, what they're
-## doing today, and all five stats. Tap for details.
+## One adventurer in the Guild tab's roster (a parchment card): portrait,
+## health, what they're doing today, and all five stats. Tap for details.
 ## Scene: MobileHall/Scenes/Rows/member_card.tscn
 extends "res://MobileHall/Scripts/tap_panel.gd"
 
-const S := preload("res://MobileHall/Scripts/hall_style.gd")
+const Style := preload("res://MobileHall/Scripts/hall_style.gd")
+const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 
 # ---- TEXT
 const TEXT_ROLE := "the %s"
 const TEXT_FREE := "Free today"
-const TEXT_DRAFT := "Picked for #%d"
-const TEXT_SENT := "Sent on #%d"
+const TEXT_PICKED_FOR := "Picked for #%d"
+const TEXT_SENT_ON := "Sent on #%d"
+const TEXT_TRAINING := "Training %s"
+const TEXT_IN_BED := "In a Hospital bed"
 
 # ---- NODES
-@onready var _portrait = %Portrait
+@onready var _portrait = %Portrait            # portrait.gd
 @onready var _name: Label = %Name
 @onready var _role: Label = %Role
-@onready var _health = %HealthChip
-@onready var _task = %TaskChip
-@onready var _stats = %Stats
+@onready var _health_chip = %HealthChip       # chip.gd
+@onready var _task_chip = %TaskChip           # chip.gd
+@onready var _stats = %Stats                  # stat_strip.gd
 
 
-func setup(main, c: GuildCharacter) -> void:
-	pressed.connect(main.open_character.bind(c))
-	_portrait.show_character(c)
-	_name.text = c.name
-	_role.text = TEXT_ROLE % S.role_name(c)
-	_health.set_health(c)
-	_stats.show_stats(c)
-	var i: int = main.entry_index_of(c)
-	if i < 0:
-		_task.set_chip(TEXT_FREE, S.INK_SOFT)
-	elif main.entries[i].state == "ready":
-		_task.set_chip(TEXT_SENT % (i + 1), S.GREEN_TEXT, "check")
+func setup(hall: HallMain, character: GuildCharacter) -> void:
+	pressed.connect(hall.open_character.bind(character))
+	_portrait.show_character(character)
+	_name.text = character.name
+	_role.text = TEXT_ROLE % Style.role_name(character)
+	_health_chip.set_health(character)
+	_stats.show_stats(character)
+	_show_task(hall, character)
+
+
+## Today's task in ink: free, picked for a quest (blue), sent on one (green),
+## training a stat (that stat's ink, in a pill) or in a Hospital bed (orange).
+func _show_task(hall: HallMain, character: GuildCharacter) -> void:
+	var quest_index := hall.quest_index_of(character)
+	if quest_index < 0 and GuildUpgrades.is_patient(character):
+		var bed_look: Dictionary = Style.INJURY_LOOKS[2]
+		_task_chip.set_chip(TEXT_IN_BED, bed_look.bg, bed_look.text, "bed")
+	elif quest_index < 0 and GuildUpgrades.is_training(character):
+		var stat: Dictionary = Style.STATS[GuildUpgrades.get_training_stat(character)]
+		_task_chip.set_chip(TEXT_TRAINING % stat.short, stat.bg, stat.color, "", true)
+	elif quest_index < 0:
+		_task_chip.set_chip(TEXT_FREE, Style.NEUTRAL_BG, Style.TEXT_SOFT)
+	elif hall.quest_entries[quest_index].state == Style.QUEST_STATE_SENT:
+		_task_chip.set_chip(TEXT_SENT_ON % (quest_index + 1), Style.GREEN_BG, Style.GREEN_TEXT, "check")
 	else:
-		_task.set_chip(TEXT_DRAFT % (i + 1), S.BLUE_TEXT, "scroll")
+		_task_chip.set_chip(TEXT_PICKED_FOR % (quest_index + 1), Style.BLUE_BG, Style.BLUE_TEXT, "nav_quests")

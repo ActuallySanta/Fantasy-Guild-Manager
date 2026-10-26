@@ -4,28 +4,28 @@
 ## Scene: MobileHall/Scenes/Rows/report_entry.tscn
 extends PanelContainer
 
-const S := preload("res://MobileHall/Scripts/hall_style.gd")
-const BeatRow := preload("res://MobileHall/Scenes/Rows/beat_row.tscn")
+const Style := preload("res://MobileHall/Scripts/hall_style.gd")
+const BeatRowScene := preload("res://MobileHall/Scenes/Rows/beat_row.tscn")
 
-## generateResults writes bright BBCode colours meant for a dark screen;
-## these swap them for inks that read on parchment.
-const RECOLOR := {
+## CreatedQuest.generateResults writes bright BBCode colours meant for a dark
+## screen; these swap them for inks that read on parchment.
+const STORY_RECOLORS := {
 	"[color=FFE700]": "[color=#6B5A1E]", "[color=gold]": "[color=#6B5A1E]",
 	"[color=green]": "[color=#3D5A2A]",
 	"[color=FD0000]": "[color=#8B2E2A]", "[color=red]": "[color=#8B2E2A]",
 }
 ## Story lines the letter says in its own words instead (the closing line).
-const SKIP_LINES := ["Summary", "However"]
-## Icon for a story line (matched on the plain text); first match wins.
-const BEAT_ICONS := [
-	["succumbed", "skull"],
-	["ATTACKED", "swords"],
-	["INJUR", "swords"],
-	["chest", "chest"],
-	["lockbox", "chest"],
-	["wallet", "chest"],
-	["secret room", "chest"],
-	["artifact", "chest"],
+const SKIPPED_LINE_STARTS := ["Summary", "However"]
+## Icon for a story line (matched on its plain text); the first matching rule wins.
+const BEAT_ICON_RULES := [
+	{"text": "succumbed", "icon": "skull"},
+	{"text": "ATTACKED", "icon": "swords"},
+	{"text": "INJUR", "icon": "swords"},
+	{"text": "chest", "icon": "chest"},
+	{"text": "lockbox", "icon": "chest"},
+	{"text": "wallet", "icon": "chest"},
+	{"text": "secret room", "icon": "chest"},
+	{"text": "artifact", "icon": "chest"},
 ]
 const BEAT_ICON_DEFAULT := "scroll"
 
@@ -33,69 +33,79 @@ const BEAT_ICON_DEFAULT := "scroll"
 const TEXT_SUCCESS := "Success"
 const TEXT_FAILED := "Failed"
 const TEXT_FROM := "From %s · sent at %d%%"
-const TEXT_HURT := "Hurt: %s"
+const TEXT_INJURED := "Hurt: %s"
 const TEXT_WON := "It is done, master. The reward is ours: %d gold. — %s."
 const TEXT_LOST_GOLD := "Sorry, master. No reward this time, but %s brought back %d gold. — %s."
 const TEXT_LOST := "Sorry, master. No reward this time. — %s."
 
 # ---- NODES
+# Head
 @onready var _type_seal: PanelContainer = %TypeSeal
 @onready var _type_tag: Label = %TypeTag
 @onready var _title: Label = %Title
-@onready var _from: Label = %From
-@onready var _hurt_tag: Control = %HurtTag
-@onready var _hurt_text: Label = %HurtText
-@onready var _beats: VBoxContainer = %Beats
-@onready var _closing: Label = %Closing
-@onready var _stamp: Control = %Stamp
+@onready var _from_line: Label = %From
+@onready var _result_stamp: Control = %Stamp
 @onready var _stamp_text: Label = %StampText
+@onready var _injured_tag: Control = %HurtTag
+@onready var _injured_text: Label = %HurtText
+# Story and sign-off
+@onready var _beat_list: VBoxContainer = %Beats
+@onready var _closing_line: Label = %Closing
 
-var _tags := RegEx.create_from_string("\\[[^\\]]*\\]")
-
-
-func setup(r: Dictionary) -> void:
-	var ok: bool = r.succeeded
-	var info := S.type_info(r)
-	S.seal(_type_seal, _type_tag, info.tag, info.color)
-	_title.text = r.quest.questTitle
-	_from.text = TEXT_FROM % [S.names(r.party), mini(int(r.chance), 100)]
-	_stamp_text.text = TEXT_SUCCESS if ok else TEXT_FAILED
-	var ink := S.GREEN_TEXT if ok else S.WAX
-	S.tint(_stamp, ink)
-	S.color(_stamp_text, ink)
-	var hurt: Array = r.get("hurt", [])
-	_hurt_tag.visible = not hurt.is_empty()
-	_hurt_text.text = TEXT_HURT % S.names(hurt, ", ")
-	_fill_story(r.story)
-	_closing.text = _closing_line(r)
+## Matches BBCode tags, to test story lines on their plain text.
+var _bbcode_tags := RegEx.create_from_string("\\[[^\\]]*\\]")
 
 
-func _fill_story(story: String) -> void:
-	for k in RECOLOR:
-		story = story.replace(k, RECOLOR[k])
+## result = one quest result from hall_main._run_quest.
+func setup(result: Dictionary) -> void:
+	var succeeded: bool = result.succeeded
+	var type_info := Style.quest_type_info(result)
+	Style.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
+	_title.text = result.quest.questTitle
+	_from_line.text = TEXT_FROM % [Style.join_names(result.party), mini(int(result.chance), 100)]
+
+	# the stamp is white art inked green or red
+	_stamp_text.text = TEXT_SUCCESS if succeeded else TEXT_FAILED
+	var stamp_ink := Style.GREEN_TEXT if succeeded else Style.RED
+	Style.tint_art(_result_stamp, stamp_ink)
+	Style.set_font_color(_stamp_text, stamp_ink)
+
+	var injured: Array = result.get("injured", [])
+	_injured_tag.visible = not injured.is_empty()
+	_injured_text.text = TEXT_INJURED % Style.join_names(injured, ", ")
+
+	_build_story_beats(result.story)
+	_closing_line.text = _closing_text(result)
+
+
+## One beat row per story line (summary lines are left to the sign-off).
+func _build_story_beats(story: String) -> void:
+	for bright_tag in STORY_RECOLORS:
+		story = story.replace(bright_tag, STORY_RECOLORS[bright_tag])
 	for line in story.split("\n"):
-		var text := line.strip_edges()
-		var plain := _tags.sub(text, "", true).strip_edges()
-		if plain == "" or SKIP_LINES.any(func(w): return plain.begins_with(w)):
+		var beat_text := line.strip_edges()
+		var plain_text := _bbcode_tags.sub(beat_text, "", true).strip_edges()
+		if plain_text == "" or SKIPPED_LINE_STARTS.any(func(start): return plain_text.begins_with(start)):
 			continue
-		S.add_row(_beats, BeatRow).setup(_beat_icon(plain), text)
+		Style.add_row(_beat_list, BeatRowScene).setup(_icon_for_beat(plain_text), Style.TEXT_SOFT, beat_text)
 
 
-func _beat_icon(plain: String) -> String:
-	for rule in BEAT_ICONS:
-		if plain.contains(rule[0]):
-			return rule[1]
+func _icon_for_beat(plain_text: String) -> String:
+	for rule in BEAT_ICON_RULES:
+		if plain_text.contains(rule.text):
+			return rule.icon
 	return BEAT_ICON_DEFAULT
 
 
 ## "Sorry, master. ... — M." signed with the party's initials.
-func _closing_line(r: Dictionary) -> String:
+func _closing_text(result: Dictionary) -> String:
 	var initials := PackedStringArray()
-	for c in r.party:
-		initials.append(c.name.left(1))
-	var signed := " & ".join(initials)
-	if r.succeeded:
-		return TEXT_WON % [r.gold, signed]
-	if r.gold > 0:
-		return TEXT_LOST_GOLD % ["I" if r.party.size() == 1 else "we", r.gold, signed]
-	return TEXT_LOST % signed
+	for character in result.party:
+		initials.append(character.name.left(1))
+	var signature := " & ".join(initials)
+	if result.succeeded:
+		return TEXT_WON % [result.gold, signature]
+	if result.gold > 0:
+		var speaker := "I" if result.party.size() == 1 else "we"
+		return TEXT_LOST_GOLD % [speaker, result.gold, signature]
+	return TEXT_LOST % signature

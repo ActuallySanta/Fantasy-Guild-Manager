@@ -11,16 +11,24 @@
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_board.tscn" id="10_mpynf"]
 [ext_resource type="PackedScene" uid="uid://diwdybd70ky7l" path="res://MobileHall/Scenes/Tabs/tab_guild.tscn" id="12_cbnp0"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_upgrades.tscn" id="14_v8b36"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_shop.tscn" id="15_shop1"]
 [ext_resource type="PackedScene" uid="uid://bt1iwlgoqgjw0" path="res://MobileHall/Scenes/Screens/screen_assign.tscn" id="16_tj44p"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Screens/screen_character.tscn" id="18_c5uvo"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="20_7dlno"]
 [ext_resource type="Texture2D" uid="uid://cb420nxynjehg" path="res://MobileHall/Art/Icons/scroll.svg" id="25_board"]
-[ext_resource type="Texture2D" uid="uid://b7f3ai3fc4j6r" path="res://MobileHall/Art/Icons/shield.svg" id="27_guild"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/person.svg" id="27_guild"]
 [ext_resource type="Texture2D" uid="uid://cjywbau63ujgi" path="res://MobileHall/Art/Icons/hammer.svg" id="28_upgrades"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/stall.svg" id="29_shop"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_end_day.tscn" id="30_cwf4i"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_menu.tscn" id="32_kg28u"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_report.tscn" id="34_6fy20"]
 [ext_resource type="PackedScene" uid="uid://bgwxd653pjox8" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
+[ext_resource type="Shader" path="res://MobileHall/Styles/colorblind_filter.gdshader" id="39_cbf01"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cbf01"]
+shader = ExtResource("39_cbf01")
+shader_parameter/mode = 0
+shader_parameter/strength = 1.0
 
 [node name="MobileHall" type="Control" unique_id=279222940]
 texture_repeat = 2
@@ -198,6 +206,13 @@ layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 
+[node name="TabShop" parent="Layout/Content" instance=ExtResource("15_shop1")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
 [node name="ScreenAssign" parent="Layout/Content" unique_id=978985788 instance=ExtResource("16_tj44p")]
 unique_name_in_owner = true
 visible = false
@@ -310,7 +325,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 8
 focus_mode = 0
 theme_type_variation = &"NavTab"
-text = "Guild"
+text = "Members"
 icon = ExtResource("27_guild")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -345,7 +360,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 8
 focus_mode = 0
 theme_type_variation = &"NavTab"
-text = "Upgrades"
+text = "Guild"
 icon = ExtResource("28_upgrades")
 icon_alignment = 1
 vertical_icon_alignment = 0
@@ -364,6 +379,41 @@ mouse_filter = 2
 theme_type_variation = &"Badge"
 
 [node name="Text" type="Label" parent="Layout/Nav/Row/Nav_upgrades/Badge" unique_id=769313509]
+layout_mode = 2
+theme_type_variation = &"LabelLight"
+theme_override_fonts/font = ExtResource("5_title")
+theme_override_font_sizes/font_size = 26
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Nav_shop" type="Button" parent="Layout/Nav/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+focus_mode = 0
+theme_type_variation = &"NavTab"
+text = "Shop"
+icon = ExtResource("29_shop")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Badge" type="PanelContainer" parent="Layout/Nav/Row/Nav_shop"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -32.0
+offset_top = -18.0
+offset_right = 10.0
+offset_bottom = 24.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"Badge"
+
+[node name="Text" type="Label" parent="Layout/Nav/Row/Nav_shop/Badge"]
 layout_mode = 2
 theme_type_variation = &"LabelLight"
 theme_override_fonts/font = ExtResource("5_title")
@@ -434,3 +484,17 @@ z_index = 10
 layout_mode = 1
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="ColorFilterLayer" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="ColorFilter" type="ColorRect" parent="ColorFilterLayer"]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_cbf01")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2

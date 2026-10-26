@@ -3,18 +3,22 @@
 ## Scene: MobileHall/Scenes/Overlays/overlay_welcome.tscn
 extends Control
 
-const S := preload("res://MobileHall/Scripts/hall_style.gd")
+const Style := preload("res://MobileHall/Scripts/hall_style.gd")
+const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 
+# ---- NODES
 @onready var _start_button: Button = %StartButton
 
-var ui
+## The main hall script (state + actions), set in setup().
+var hall: HallMain
 
 
-func setup(main) -> void:
-	ui = main
-	_start_button.pressed.connect(ui.close_welcome)
-	S.style_button(_start_button, "gold")
+func setup(main: HallMain) -> void:
+	hall = main
+	_start_button.pressed.connect(hall.close_welcome)
+	Style.style_button(_start_button, "green", 32)
 
 
+## Nothing changes while it's open; hall_main calls this on every overlay.
 func refresh() -> void:
 	pass

@@ -39,6 +39,10 @@ border width, open the matching `Styles/*.tres` and change its *Texture Margin*.
 | `strip_tab.png` | Little scrolls in Assign Party's quest strip | 26 left / right | `quest_tab.tres` |
 | `stamp.png` | "Success" / "Failed" stamp (white, tinted in code) | 16 | `stamp.tres` |
 | `odds_track.png`, `odds_fill.png`, `odds_over.png` | Success-chance bar: track, hatched fill (white, tinted by odds), border + ticks on top | 6 | `Scenes/Components/odds_bar.tscn` |
+| `speech_bubble.png` | The shopkeeper's speech bubble (the tail sits in the bottom-left corner) | 96 left, 30 top / right, 40 bottom | `speech_bubble.tres` |
+| `shop_sign.png` | The shop's hanging name sign (the ropes sit in the top corners) | 56 left / right, 44 top, 14 bottom | `shop_sign.tres` |
+| `goods_tag.png`, `goods_tag_selected.png` | Shop goods as price tags (normal / picked) | 34 | `goods_tag*.tres` |
+| `awning.png` | Striped awning over the shopkeeper (tiles sideways) | none | set on `Awning` in `tab_shop.tscn` |
 
 ### Ornaments (drawn as-is, any size): `Art/Textures`
 
@@ -56,13 +60,15 @@ border width, open the matching `Styles/*.tres` and change its *Texture Margin*.
 | `connector.png` | Dashed line above the report's big button |
 | `dash.png` | Dashed underlines (tiles) |
 | `box_on.png`, `box_off.png` | "Show busy" checkbox |
+| `tag_hole.png` | The string hole at the top of each shop price tag |
+| `../shopkeeper_placeholder.svg` | Grizzle behind his counter on the Shop tab (stand-in from the Shop groundwork) |
 
 ### Icons: `Art/Icons`
 
 Line icons, **white** so the UI can tint them (ink on paper, cream on wood). Keep your
 replacements white on transparent and they'll be tinted the same way. The table that maps
-names to files is `ICONS` in `Scripts/hall_style.gd`; add a row there to add an icon.
-Buildings pick their icon in `BUILDINGS` in the same file.
+names to files is `ICON_FILES` in `Scripts/hall_style.gd`; add a row there to add an icon.
+Buildings pick their icon in `BUILDING_ICONS` in the same file. `stall.svg` is the Shop tab.
 
 ## Fonts: `Art/Fonts`
 

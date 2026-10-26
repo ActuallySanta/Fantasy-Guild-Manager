@@ -40,7 +40,7 @@ custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 19
 theme_type_variation = &"ItalicLabel"
-text = "Every hero: Strength +2, Defense +1"
+text = "Every hero: Power +2, Defense +1"
 autowrap_mode = 3
 
 [node name="BuyButton" type="Button" parent="." unique_id=660429843]

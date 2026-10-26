@@ -47,6 +47,10 @@
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_seal_disabled.tres" id="s_seal_disabled"]
 [ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/box_on.png" id="t_box_on"]
 [ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/box_off.png" id="t_box_off"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/speech_bubble.tres" id="s_speech_bubble"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/shop_sign.tres" id="s_shop_sign"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/goods_tag.tres" id="s_goods_tag"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/goods_tag_selected.tres" id="s_goods_tag_selected"]
 
 [resource]
 default_font = ExtResource("f_body")
@@ -262,3 +266,20 @@ WoodButton/styles/hover = ExtResource("s_wood")
 WoodButton/styles/hover_pressed = ExtResource("s_wood_down")
 WoodButton/styles/normal = ExtResource("s_wood")
 WoodButton/styles/pressed = ExtResource("s_wood_down")
+GoodsTag/base_type = &"Button"
+GoodsTag/colors/font_disabled_color = Color(0.4196, 0.3647, 0.3098, 1)
+GoodsTag/styles/disabled = ExtResource("s_goods_tag")
+GoodsTag/styles/hover = ExtResource("s_goods_tag")
+GoodsTag/styles/hover_pressed = ExtResource("s_goods_tag")
+GoodsTag/styles/normal = ExtResource("s_goods_tag")
+GoodsTag/styles/pressed = ExtResource("s_goods_tag")
+GoodsTagSelected/base_type = &"Button"
+GoodsTagSelected/styles/disabled = ExtResource("s_goods_tag_selected")
+GoodsTagSelected/styles/hover = ExtResource("s_goods_tag_selected")
+GoodsTagSelected/styles/hover_pressed = ExtResource("s_goods_tag_selected")
+GoodsTagSelected/styles/normal = ExtResource("s_goods_tag_selected")
+GoodsTagSelected/styles/pressed = ExtResource("s_goods_tag_selected")
+ShopSign/base_type = &"PanelContainer"
+ShopSign/styles/panel = ExtResource("s_shop_sign")
+SpeechBubble/base_type = &"PanelContainer"
+SpeechBubble/styles/panel = ExtResource("s_speech_bubble")

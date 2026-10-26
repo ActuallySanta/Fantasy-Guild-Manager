@@ -4,9 +4,11 @@
 ## Scene: MobileHall/Scenes/Rows/party_slot.tscn
 extends "res://MobileHall/Scripts/tap_panel.gd"
 
-const S := preload("res://MobileHall/Scripts/hall_style.gd")
+const Style := preload("res://MobileHall/Scripts/hall_style.gd")
+const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 
-const EMPTY_FADE := Color(1, 1, 1, 0.55)
+## Empty seats fade back.
+const EMPTY_SEAT_OPACITY := 0.55
 
 # ---- TEXT
 const TEXT_ROLE := "the %s"
@@ -14,24 +16,25 @@ const TEXT_EMPTY := "Empty seat"
 const TEXT_EMPTY_HINT := "pin someone below"
 
 # ---- NODES
-@onready var _portrait = %Portrait
+@onready var _portrait = %Portrait            # portrait.gd
 @onready var _name: Label = %SlotName
 @onready var _hint: Label = %SlotHint
-@onready var _fav = %FavChip
+@onready var _favored_chip = %FavChip         # chip.gd
 
 
-func setup(main, e: Dictionary, c: GuildCharacter) -> void:
-	var filled := c != null
-	_portrait.visible = filled
-	_fav.visible = filled
-	if filled:
-		_portrait.show_character(c)
-		_name.text = c.name
-		_hint.text = TEXT_ROLE % S.role_name(c)
-		_fav.set_stat(c, S.favored_index(e.quest), true)
-		pressed.connect(main.toggle_pick.bind(c))
+## seated = the adventurer in this seat, or null for an empty seat.
+func setup(hall: HallMain, entry: Dictionary, seated: GuildCharacter) -> void:
+	var is_filled := seated != null
+	_portrait.visible = is_filled
+	_favored_chip.visible = is_filled
+	if is_filled:
+		_portrait.show_character(seated)
+		_name.text = seated.name
+		_hint.text = TEXT_ROLE % Style.role_name(seated)
+		_favored_chip.set_stat(seated, Style.favored_stat_index(entry.quest), true)
+		pressed.connect(hall.toggle_in_party.bind(seated))
 	else:
 		_name.text = TEXT_EMPTY
 		_hint.text = TEXT_EMPTY_HINT
-		S.color(_name, S.INK_SOFT)
-		modulate = EMPTY_FADE
+		Style.set_font_color(_name, Style.TEXT_SOFT)
+		modulate = Color(1, 1, 1, EMPTY_SEAT_OPACITY)

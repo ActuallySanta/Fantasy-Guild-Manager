@@ -1,32 +1,155 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://MobileHall/Scripts/tab_upgrades.gd" id="1_2kjtj"]
+[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_title.tres" id="2_title"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Rows/home_section.tscn" id="7_section"]
 
-[node name="TabUpgrades" type="ScrollContainer"]
-horizontal_scroll_mode = 0
+[node name="TabUpgrades" type="VBoxContainer"]
+theme_override_constants/separation = 0
 script = ExtResource("1_2kjtj")
 
-[node name="Margin" type="MarginContainer" parent="."]
+[node name="SegMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = -2
+
+[node name="Seg" type="HBoxContainer" parent="SegMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SegTonight" type="Button" parent="SegMargin/Seg"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 20
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 24
+size_flags_vertical = 8
+focus_mode = 0
+theme_type_variation = &"FolderTabActive"
+text = "Tonight"
 
-[node name="Col" type="VBoxContainer" parent="Margin"]
+[node name="TonightBadge" type="PanelContainer" parent="SegMargin/Seg/SegTonight"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -34.0
+offset_top = -16.0
+offset_right = 8.0
+offset_bottom = 26.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"Badge"
+
+[node name="TonightBadgeText" type="Label" parent="SegMargin/Seg/SegTonight/TonightBadge"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"LabelLight"
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 26
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SegBuild" type="Button" parent="SegMargin/Seg"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+focus_mode = 0
+theme_type_variation = &"FolderTab"
+text = "Build"
+
+[node name="BuildBadge" type="PanelContainer" parent="SegMargin/Seg/SegBuild"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -34.0
+offset_top = -16.0
+offset_right = 8.0
+offset_bottom = 26.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"Badge"
+
+[node name="BuildBadgeText" type="Label" parent="SegMargin/Seg/SegBuild/BuildBadge"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"LabelLight"
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 26
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FolderMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="Folder" type="PanelContainer" parent="FolderMargin"]
+layout_mode = 2
+theme_type_variation = &"FolderBody"
+
+[node name="Scroll" type="ScrollContainer" parent="FolderMargin/Folder"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="FolderMargin/Folder/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 12
+
+[node name="Col" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Tonight" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="TrainingSection" parent="FolderMargin/Folder/Scroll/Margin/Col/Tonight" instance=ExtResource("7_section")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HospitalSection" parent="FolderMargin/Folder/Scroll/Margin/Col/Tonight" instance=ExtResource("7_section")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TonightNote" type="Label" parent="FolderMargin/Folder/Scroll/Margin/Col/Tonight"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 23
+text = "Heroes in training or in a bed can't be sent on quests. Changes happen when the day ends."
+autowrap_mode = 3
+
+[node name="Build" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="WalletBox" type="PanelContainer" parent="Margin/Col"]
+[node name="WalletBox" type="PanelContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build"]
 layout_mode = 2
 theme_type_variation = &"LedgerCard"
 
-[node name="Col" type="VBoxContainer" parent="Margin/Col/WalletBox"]
+[node name="Col" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/WalletBox"]
 layout_mode = 2
 theme_override_constants/separation = -4
 
-[node name="Caps" type="Label" parent="Margin/Col/WalletBox/Col"]
+[node name="Caps" type="Label" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/WalletBox/Col"]
 layout_mode = 2
 theme_type_variation = &"CapsLabel"
 theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
@@ -34,18 +157,18 @@ theme_override_font_sizes/font_size = 19
 text = "Treasury ledger"
 uppercase = true
 
-[node name="Row" type="HBoxContainer" parent="Margin/Col/WalletBox/Col"]
+[node name="Row" type="HBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/WalletBox/Col"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Wallet" type="Label" parent="Margin/Col/WalletBox/Col/Row"]
+[node name="Wallet" type="Label" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/WalletBox/Col/Row"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"TitleLabel"
 theme_override_font_sizes/font_size = 58
 text = "600 gold"
 
-[node name="Standing" type="Label" parent="Margin/Col/WalletBox/Col/Row"]
+[node name="Standing" type="Label" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/WalletBox/Col/Row"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 4
@@ -53,7 +176,7 @@ theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 26
 text = "· Standing 1"
 
-[node name="WalletHint" type="Label" parent="Margin/Col/WalletBox/Col"]
+[node name="WalletHint" type="Label" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/WalletBox/Col"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
@@ -62,23 +185,23 @@ theme_override_font_sizes/font_size = 30
 text = "You can afford 2 upgrades. Quests pay for the rest."
 autowrap_mode = 3
 
-[node name="List" type="VBoxContainer" parent="Margin/Col"]
+[node name="List" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 20
 
-[node name="SoonBox" type="VBoxContainer" parent="Margin/Col"]
+[node name="SoonBox" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Soon" type="Label" parent="Margin/Col/SoonBox"]
+[node name="Soon" type="Label" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/SoonBox"]
 layout_mode = 2
 theme_type_variation = &"ItalicLight"
 theme_override_font_sizes/font_size = 28
 text = "Still rolled up · coming soon"
 
-[node name="SoonRow" type="HFlowContainer" parent="Margin/Col/SoonBox"]
+[node name="SoonRow" type="HFlowContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/SoonBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 10

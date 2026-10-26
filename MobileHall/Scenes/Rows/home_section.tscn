@@ -1,0 +1,117 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://MobileHall/Scripts/home_section.gd" id="2_sec"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/pin.png" id="3_pin"]
+
+[node name="HomeSection" type="PanelContainer"]
+theme_type_variation = &"PlanCard"
+script = ExtResource("2_sec")
+
+[node name="Col" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Top" type="HBoxContainer" parent="Col"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TagBox" type="PanelContainer" parent="Col/Top"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_type_variation = &"TypeSeal"
+
+[node name="Tag" type="Label" parent="Col/Top/TagBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SealLabel"
+theme_override_font_sizes/font_size = 22
+text = "TRN"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Names" type="VBoxContainer" parent="Col/Top"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = -4
+alignment = 1
+
+[node name="NameRow" type="HBoxContainer" parent="Col/Top/Names"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Name" type="Label" parent="Col/Top/Names/NameRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 46
+text = "Training Yard"
+
+[node name="Level" type="Label" parent="Col/Top/Names/NameRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "Lv 1"
+
+[node name="Summary" type="Label" parent="Col/Top/Names"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 28
+text = "1 of 2 slots · +1 a night"
+autowrap_mode = 3
+
+[node name="List" type="VBoxContainer" parent="Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Empty" type="Label" parent="Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
+text = "Nobody is training."
+autowrap_mode = 3
+
+[node name="AddButton" type="Button" parent="Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "+ Add a hero"
+
+[node name="Nails" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TopLeft" type="TextureRect" parent="Nails"]
+layout_mode = 0
+offset_left = -16.0
+offset_top = -12.0
+offset_right = 4.0
+offset_bottom = 8.0
+mouse_filter = 2
+texture = ExtResource("3_pin")
+expand_mode = 1
+
+[node name="TopRight" type="TextureRect" parent="Nails"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -4.0
+offset_top = -12.0
+offset_right = 16.0
+offset_bottom = 8.0
+grow_horizontal = 0
+mouse_filter = 2
+texture = ExtResource("3_pin")
+expand_mode = 1

@@ -1,100 +1,277 @@
 ## Shared look and helpers for the Mobile Hall UI.
 ##
+## Every other MobileHall script preloads this file as `Style` and calls its
+## static helpers (Style.style_button(...), Style.QUEST_STATE_SENT, ...).
+## Nothing here holds state except the icon texture cache.
+##
 ## The look: a guild hall at night. Dark wood behind everything, parchment
-## cards, blackletter titles, ink colours that mean something (each stat has its
-## own ink, green = good / sent, red = bad / denied, blue = odds / to do,
-## gold = money).
+## cards, blackletter titles, and ink colours that mean something (each stat
+## has its own ink, green = good / sent, red = bad / denied / hurt,
+## blue = odds / to do, gold = money).
 ##
-## Where the art lives (see MobileHall/Art/README.md for how to swap it):
-##   - Art/Textures, Art/Icons, Art/Fonts: every image and font file. Replace a
-##     file with your own art of the same name and the whole UI picks it up.
-##   - Styles/*.tres: one StyleBox per surface (paper card, gold button...).
-##   - hall_theme.tres: fonts, text colours, and the named looks scenes use
-##     (theme_type_variation = TitleLabel, PaperCard, GoldButton...).
+## Where things live (see MobileHall/Art/README.md for how to swap the art):
+##   - Layout: every screen, row and widget is a .tscn under MobileHall/Scenes.
+##   - Art:    every image, icon and font is in MobileHall/Art. Replace a file
+##             with your own of the same name and the whole UI picks it up.
+##   - Boxes:  one StyleBox per surface (paper card, gold button...) in
+##             MobileHall/Styles, and hall_theme.tres names the looks scenes use
+##             (theme_type_variation = TitleLabel, PaperCard, GoldButton...).
 ##   - This file: ink colours, display tables, the icon table, text helpers,
-##     game lookups, and the restyles that change with game state.
+##     game lookups, and the restyles that change with game state. Restyles
+##     never build boxes for the art: they pick a theme look or tint white art.
 ##
-## Sections: PALETTE · DISPLAY TABLES · ICONS · TEXT HELPERS · GAME LOOKUPS ·
-##           RESTYLES · SCENE HELPERS
+## Sections:
+##   QUEST STATES · PALETTE · DISPLAY TABLES · TEXT HELPERS · GAME LOOKUPS ·
+##   ICONS · STYLE BOXES · RESTYLES · SCENE HELPERS
 extends RefCounted
+
+
+# ============================================================ QUEST STATES
+# Every quest entry on the day's board is in exactly one of these states.
+# (See hall_main.gd -> quest_entries for the full entry layout.)
+
+## Not decided yet. Its party (if any) is a draft that is kept until changed.
+const QUEST_STATE_OPEN := "open"
+## The party has been sent; it goes out when the day ends.
+const QUEST_STATE_SENT := "sent"
+## Turned down. It stays on the board and can be reconsidered.
+const QUEST_STATE_DENIED := "denied"
 
 
 # ============================================================ PALETTE
 
-const INK := Color("#342920")         ## main text on paper
-const INK_SOFT := Color("#6B5D4F")    ## secondary text on paper
-const CREAM := Color("#EDE3CB")       ## text on wood
-const CREAM_SOFT := Color("#CBBBA0")  ## secondary text on wood
-const LINE := Color("#9C8B70")        ## rules and dashes on paper
-const WAX := Color("#8B2E2A")         ## red ink: deny, failed, hurt
-const GOLD_TEXT := Color("#6B5A1E")
-const GREEN_TEXT := Color("#3D5A2A")
-const BLUE_TEXT := Color("#2F4A66")
+# ---- ink on paper
+const TEXT_MAIN := Color("#342920")       ## main text, outlines
+const TEXT_SOFT := Color("#6B5D4F")       ## secondary text, hints
+const LINE := Color("#9C8B70")            ## rules and dashes on paper
+
+# ---- ink on wood
+const CREAM := Color("#EDE3CB")           ## text on the wood background
+const CREAM_SOFT := Color("#CBBBA0")      ## secondary text on wood
+
+# ---- paper tints (multiplied over the parchment art by style_panel)
+const CARD_BG := Color("#FFFFFF")         ## plain parchment (no tint)
+const NEUTRAL_BG := Color("#EFE9DD")      ## neutral inset
+const BORDER := Color("#9C8B70")          ## default border ink
 const WHITE := Color("#FFFFFF")
+const SENT_CARD_BG := Color("#E4EED8")    ## sent quest, picked adventurer, affordable upgrade
+const DENIED_CARD_BG := Color("#E2DDD5")  ## denied quest, adventurer who can't go
+const EMPTY_SEAT_BG := Color("#EFE9DD")   ## empty party seat
+
+# ---- meaning inks: [ink, text ink, paper tint]
+const RED := Color("#8B2E2A")             ## deny, failed, hurt, warnings
+const RED_BG := Color("#F2DCD4")
+const GOLD := Color("#B8913A")
+const GOLD_TEXT := Color("#6B5A1E")
+const GOLD_BG := Color("#F3E7C6")
+const GREEN := Color("#4A6B35")           ## success, sent, done
+const GREEN_TEXT := Color("#3D5A2A")
+const GREEN_BG := Color("#E0EBD3")
+const BLUE_TEXT := Color("#2F4A66")       ## odds, to do, picked
+const BLUE_BG := Color("#DDE5EC")
+## The navy ink for names on letters and sign-offs.
+const NAVY := Color("#26304A")
 
 
 # ============================================================ DISPLAY TABLES
 
-## CreatedQuest.QuestType (5 = milestone) -> seal colour, name, writ, short tag.
-const TYPES := {
+# ---- quest types
+
+## Key used for the milestone (Bone Drake) quest; it isn't a CreatedQuest.QuestType.
+const MILESTONE_TYPE_ID := 5
+
+## CreatedQuest.QuestType (plus MILESTONE_TYPE_ID) -> display name, writ name
+## (the Assign Party scroll), seal colour, short tag.
+const QUEST_TYPES := {
 	1: {"name": "Clear Dungeon", "writ": "Writ of Clearing", "color": Color("#4A5E32"), "tag": "DUN"},
 	2: {"name": "Escort", "writ": "Writ of Escort", "color": Color("#7A5236"), "tag": "ESC"},
 	3: {"name": "Scout Terrain", "writ": "Writ of Scouting", "color": Color("#3F5A74"), "tag": "SCT"},
 	4: {"name": "Gather Intel", "writ": "Writ of Intelligence", "color": Color("#5B4A7A"), "tag": "INT"},
-	5: {"name": "Milestone", "writ": "Writ of the Drake", "color": Color("#7D2A26"), "tag": "BOSS"},
+	MILESTONE_TYPE_ID: {"name": "Milestone", "writ": "Writ of the Drake", "color": Color("#7D2A26"), "tag": "BOSS"},
 }
+
+# ---- stats
+
+## How many stats a character has (Power, Defense, Wisdom, Sleaziness, Pluck).
+## Power is GuildCharacter.StatType.STRENGTH; only the name shown to players differs.
+const STAT_COUNT := 5
+## How many of those quests actually use (all but Pluck).
+const QUEST_STAT_COUNT := 4
+## Pluck is stored on its own field, not in GuildCharacter.stats.
+const PLUCK_INDEX := 4
 
 ## The five stats in GuildCharacter.StatType order (Pluck last).
+## name = full name, short = chip label, color = the stat's ink, bg = a paper tint.
 const STATS := [
-	{"name": "Strength", "short": "Str", "color": Color("#8B2E2A")},
-	{"name": "Defense", "short": "Def", "color": Color("#2F4A66")},
-	{"name": "Wisdom", "short": "Wis", "color": Color("#5B4A7A")},
-	{"name": "Sleaziness", "short": "Slz", "color": Color("#3D5A2A")},
-	{"name": "Pluck", "short": "Plk", "color": Color("#7A4A1E")},
+	{"name": "Power", "short": "Pow", "color": Color("#8B2E2A"), "bg": Color("#F2DCD4")},
+	{"name": "Defense", "short": "Def", "color": Color("#2F4A66"), "bg": Color("#DDE5EC")},
+	{"name": "Wisdom", "short": "Wis", "color": Color("#5B4A7A"), "bg": Color("#E6E0EE")},
+	{"name": "Sleaziness", "short": "Slz", "color": Color("#3D5A2A"), "bg": Color("#E0EBD3")},
+	{"name": "Pluck", "short": "Plk", "color": Color("#7A4A1E"), "bg": Color("#F0E0CC")},
 ]
 
-## GuildCharacter.InjuryLevel -> [label, ink].
-const INJURY := [
-	["Healthy", GREEN_TEXT],
-	["Sore", Color("#6E5410")],
-	["Hurt", Color("#8A4A10")],
-	["Gravely hurt", WAX],
-	["Dead", Color("#4A3B4F")],
+# ---- health
+
+## GuildCharacter.InjuryLevel -> label, ink (text) and a paper tint (bg).
+const INJURY_LOOKS := [
+	{"label": "Healthy", "bg": Color("#E0EBD3"), "text": Color("#3D5A2A")},
+	{"label": "Sore", "bg": Color("#F3E7C6"), "text": Color("#6E5410")},
+	{"label": "Hurt", "bg": Color("#F2E0CC"), "text": Color("#8A4A10")},
+	{"label": "Gravely hurt", "bg": Color("#F2DCD4"), "text": Color("#8B2E2A")},
+	{"label": "Dead", "bg": Color("#E2DDE3"), "text": Color("#4A3B4F")},
 ]
 
-## Portrait ground per GuildCharacter.CharacterRole.
-const ROLE_GROUNDS := [Color("#D9D3C2"), Color("#E3D7BD"), Color("#D3D7C0"), Color("#DCD3CA")]
+# ---- portraits
 
-## Success chance -> [word, ink]. Checked top to bottom.
-const ODDS := [
-	[80, "Strong odds", BLUE_TEXT],
-	[60, "Fair odds", GOLD_TEXT],
-	[40, "Risky", Color("#8A4A1E")],
-	[0, "Long shot", WAX],
+## Portrait ground colour per GuildCharacter.CharacterRole.
+const ROLE_PORTRAIT_BGS := [Color("#D9D3C2"), Color("#E3D7BD"), Color("#D3D7C0"), Color("#DCD3CA")]
+
+# ---- success odds
+
+## Success chance bands, checked top to bottom: the first band whose `min`
+## the chance reaches is used. word = label, text_color = numbers and words,
+## bar_color = the ink the odds bar's hatching is tinted.
+const ODDS_BANDS := [
+	{"min": 80, "word": "Strong odds", "text_color": BLUE_TEXT, "bar_color": BLUE_TEXT},
+	{"min": 60, "word": "Fair odds", "text_color": GOLD_TEXT, "bar_color": GOLD_TEXT},
+	{"min": 40, "word": "Risky", "text_color": Color("#8A4A1E"), "bar_color": Color("#8A4A1E")},
+	{"min": 0, "word": "Long shot", "text_color": RED, "bar_color": RED},
 ]
-const ODDS_UNKNOWN := ["No party yet", INK_SOFT]
+## Shown when a quest has nobody in its party yet (chance = -1).
+const ODDS_NO_PARTY := {"min": -1, "word": "No party yet", "text_color": TEXT_SOFT, "bar_color": LINE}
 
-## Building -> short tag and icon (an ICONS name).
-const BUILDINGS := {
-	0: {"tag": "OFF", "icon": "quill"},
-	1: {"tag": "TRN", "icon": "target"},
-	2: {"tag": "HSP", "icon": "cross"},
-	3: {"tag": "ARM", "icon": "swords"},
-	4: {"tag": "BRK", "icon": "bed"},
-}
+# ---- buildings
+
+## GuildUpgrades.Building -> short tag shown on the building's seal.
+const BUILDING_TAGS := {0: "OFF", 1: "TRN", 2: "HSP", 3: "ARM", 4: "BRK"}
+## GuildUpgrades.Building -> icon (an ICON_FILES name) drawn on its plan.
+const BUILDING_ICONS := {0: "quill", 1: "target", 2: "cross", 3: "swords", 4: "bed"}
+
+
+# ============================================================ TEXT HELPERS
+
+## The right word for an amount: pick_plural(1, "quest", "quests") -> "quest".
+static func pick_plural(amount: int, singular: String, plural: String) -> String:
+	return singular if amount == 1 else plural
+
+
+## An amount with its word: count_text(3, "quest", "quests") -> "3 quests".
+static func count_text(amount: int, singular: String, plural: String) -> String:
+	return "%d %s" % [amount, pick_plural(amount, singular, plural)]
+
+
+## Character names joined for display, e.g. "Alex & Gwen".
+static func join_names(characters: Array, separator := " & ") -> String:
+	var name_list := PackedStringArray()
+	for character in characters:
+		name_list.append(character.name)
+	return separator.join(name_list)
+
+
+## A character's backstory with blank lines and stray spaces removed.
+static func clean_backstory(character: GuildCharacter) -> String:
+	var kept_lines := PackedStringArray()
+	for line in character.description.strip_edges().split("\n"):
+		var trimmed := line.strip_edges()
+		if trimmed != "":
+			kept_lines.append(trimmed)
+	return "\n".join(kept_lines)
+
+
+## The odds band for a success chance (0-100, or -1 = no party yet).
+## Returns {word, text_color, bar_color}.
+static func odds_look(chance: int) -> Dictionary:
+	if chance < 0:
+		return ODDS_NO_PARTY
+	for band in ODDS_BANDS:
+		if chance >= band.min:
+			return band
+	return ODDS_NO_PARTY
+
+
+## A number in Roman numerals: roman_numeral(14) -> "XIV".
+static func roman_numeral(number: int) -> String:
+	var numerals := [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"],
+			[50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]]
+	var text := ""
+	for numeral in numerals:
+		while number >= numeral[0]:
+			text += numeral[1]
+			number -= numeral[0]
+	return text
+
+
+# ============================================================ GAME LOOKUPS
+
+# ---- quests
+
+## Key into QUEST_TYPES for a quest entry (the milestone gets its own key).
+static func quest_type_id(entry: Dictionary) -> int:
+	return MILESTONE_TYPE_ID if entry.get("milestone", false) else int(entry.quest.type)
+
+
+## {name, writ, color, tag} for a quest entry's type (falls back to Clear Dungeon).
+static func quest_type_info(entry: Dictionary) -> Dictionary:
+	return QUEST_TYPES.get(quest_type_id(entry), QUEST_TYPES[1])
+
+
+## Index into STATS for the stat a quest favors.
+static func favored_stat_index(quest: CreatedQuest) -> int:
+	return clampi(int(quest.favStat), 0, STAT_COUNT - 1)
+
+
+## Rank letter for a quest ("F" ... "S").
+static func rank_letter(quest: CreatedQuest) -> String:
+	return str(CreatedQuest.QuestDifficulty.find_key(quest.difficulty))
+
+# ---- characters
+
+
+## Role as a word ("Fighter", "Rogue", ...).
+static func role_name(character: GuildCharacter) -> String:
+	return str(GuildCharacter.CharacterRole.find_key(character.role)).capitalize()
+
+
+## A character's value for STATS[stat_index] (Pluck is stored separately).
+static func stat_value(character: GuildCharacter, stat_index: int) -> int:
+	return character.pluck if stat_index == PLUCK_INDEX else int(character.stats[stat_index])
+
+
+## The four quest stats added up (the applicant letter's "Stat total").
+static func quest_stat_total(character: GuildCharacter) -> int:
+	var total := 0
+	for stat_index in QUEST_STAT_COUNT:
+		total += stat_value(character, stat_index)
+	return total
+
+
+## {label, bg, text} for a character's current injury level.
+static func injury_look(character: GuildCharacter) -> Dictionary:
+	return INJURY_LOOKS[clampi(int(character.injury_level), 0, INJURY_LOOKS.size() - 1)]
+
+
+static func is_dead(character: GuildCharacter) -> bool:
+	return character.injury_level >= GuildCharacter.InjuryLevel.DEAD
+
+# ---- buildings
+
+
+## Buildings in display order: working ones first, "coming soon" after.
+static func buildings_in_order() -> Array:
+	var buildings: Array = GuildUpgrades.Building.values()
+	buildings.sort_custom(func(first, second):
+		return GuildUpgrades.is_implemented(first) and not GuildUpgrades.is_implemented(second))
+	return buildings
 
 
 # ============================================================ ICONS
 
-const ART := "res://MobileHall/Art/"
+const ART_FOLDER := "res://MobileHall/Art/"
 
-## Icon names used by the screens -> files. Line icons are white so they can be
-## tinted; swap any file for your own art (keep it white to keep the tinting).
-const ICONS := {
-	"board": "Icons/scroll.svg",
-	"guild": "Icons/shield.svg",
-	"upgrades": "Icons/hammer.svg",
-	"gear": "Icons/gear.svg",
+## Icon names used by the screens -> file in ART_FOLDER. Line icons are white
+## so they can be tinted; swap any file for your own art (keep it white to
+## keep the tinting). Names not listed here have no icon, so it's hidden.
+const ICON_FILES := {
 	"coins": "Icons/coins.svg",
 	"person": "Icons/person.svg",
 	"bed": "Icons/bed.svg",
@@ -111,173 +288,121 @@ const ICONS := {
 	"quill": "Icons/quill.svg",
 	"skull": "Icons/skull.svg",
 	"heart": "Icons/heart.svg",
+	"stall": "Icons/stall.svg",
+	"nav_settings": "Icons/gear.svg",
+	"nav_quests": "Icons/scroll.svg",
+	"nav_characters": "Icons/person.svg",
+	"nav_upgrades": "Icons/hammer.svg",
+	"nav_shop": "Icons/stall.svg",
 }
 
-static var _texture_cache := {}
+## Loaded icon textures by path, so each file is only loaded once.
+static var _icon_cache := {}
 
 
-## The texture for a name in ICONS, or null.
-static func icon_tex(icon_name: String) -> Texture2D:
-	if not ICONS.has(icon_name):
+## The texture for a name in ICON_FILES, or null if it has none.
+static func icon_texture(icon_name: String) -> Texture2D:
+	if not ICON_FILES.has(icon_name):
 		return null
-	var path: String = ART + ICONS[icon_name]
-	if not _texture_cache.has(path):
-		_texture_cache[path] = load(path)
-	return _texture_cache[path]
+	var path: String = ART_FOLDER + ICON_FILES[icon_name]
+	if not _icon_cache.has(path):
+		_icon_cache[path] = load(path)
+	return _icon_cache[path]
 
 
-# ============================================================ TEXT HELPERS
+# ============================================================ STYLE BOXES
 
-## Picks the right word for n ("1 quest" / "3 quests").
-static func plural(n: int, one: String, many: String) -> String:
-	return one if n == 1 else many
-
-
-## "3 quests"
-static func count(n: int, one: String, many: String) -> String:
-	return "%d %s" % [n, plural(n, one, many)]
-
-
-## Party names joined for display, e.g. "Alex & Gwen".
-static func names(party: Array, separator := " & ") -> String:
-	var list := PackedStringArray()
-	for c in party:
-		list.append(c.name)
-	return separator.join(list)
-
-
-## A character's backstory with blank lines removed.
-static func backstory(c: GuildCharacter) -> String:
-	var lines := PackedStringArray()
-	for line in c.description.strip_edges().split("\n"):
-		if line.strip_edges() != "":
-			lines.append(line.strip_edges())
-	return "\n".join(lines)
-
-
-## [word, ink] for a success chance (-1 = no party yet).
-static func odds(chance: int) -> Array:
-	if chance < 0:
-		return ODDS_UNKNOWN
-	for row in ODDS:
-		if chance >= row[0]:
-			return row.slice(1)
-	return ODDS_UNKNOWN
-
-
-## 14 -> "XIV"
-static func roman(n: int) -> String:
-	var out := ""
-	for pair in [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"], [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]]:
-		while n >= pair[0]:
-			out += pair[1]
-			n -= pair[0]
-	return out
-
-
-# ============================================================ GAME LOOKUPS
-
-static func type_key(e: Dictionary) -> int:
-	return 5 if e.get("milestone", false) else int(e.quest.type)
-
-
-static func type_info(e: Dictionary) -> Dictionary:
-	return TYPES.get(type_key(e), TYPES[1])
-
-
-## Index into STATS for a quest's favored stat.
-static func favored_index(quest: CreatedQuest) -> int:
-	return clampi(int(quest.favStat), 0, 4)
-
-
-static func role_name(c: GuildCharacter) -> String:
-	return str(GuildCharacter.CharacterRole.find_key(c.role)).capitalize()
-
-
-static func rank_letter(quest: CreatedQuest) -> String:
-	return str(CreatedQuest.QuestDifficulty.find_key(quest.difficulty))
-
-
-## A character's value for STATS[i] (Pluck is stored separately).
-static func stat_value(c: GuildCharacter, i: int) -> int:
-	return c.pluck if i == 4 else int(c.stats[i])
-
-
-static func stat_total(c: GuildCharacter) -> int:
-	var total := 0
-	for i in 4:
-		total += stat_value(c, i)
-	return total
-
-
-static func injury(c: GuildCharacter) -> Array:
-	return INJURY[clampi(int(c.injury_level), 0, 4)]
-
-
-static func is_dead(c: GuildCharacter) -> bool:
-	return c.injury_level >= GuildCharacter.InjuryLevel.DEAD
-
-
-## Buildings in display order: working ones first, "coming soon" after.
-static func buildings_in_order() -> Array:
-	var order: Array = GuildUpgrades.Building.values()
-	order.sort_custom(func(a, b): return GuildUpgrades.is_implemented(a) and not GuildUpgrades.is_implemented(b))
-	return order
+## A flat rounded box. padding = content margins (left, top, right, bottom).
+## For simple shapes drawn in code; anything with art uses a theme look instead.
+static func flat_box(fill: Color, corner_radius: int = 12, border_width: int = 0, border_color: Color = TEXT_MAIN, padding: Vector4 = Vector4(12, 6, 12, 6)) -> StyleBoxFlat:
+	var box := StyleBoxFlat.new()
+	box.bg_color = fill
+	box.set_corner_radius_all(corner_radius)
+	box.set_border_width_all(border_width)
+	box.border_color = border_color
+	box.content_margin_left = padding.x
+	box.content_margin_top = padding.y
+	box.content_margin_right = padding.z
+	box.content_margin_bottom = padding.w
+	box.anti_aliasing = true
+	return box
 
 
 # ============================================================ RESTYLES
 
-## Button kinds -> theme_type_variation in hall_theme.tres.
+## Button kinds -> theme_type_variation in hall_theme.tres. The old colour
+## names still work: green / blue = gold (go), red / wood = dark wood, paper = paper.
 const BUTTON_KINDS := {
 	"gold": &"GoldButton",
+	"green": &"GoldButton",
+	"blue": &"GoldButton",
 	"wood": &"WoodButton",
+	"red": &"WoodButton",
 	"paper": &"PaperButton",
 	"seal": &"SealButton",
 }
 
+## Every Button state that should share one box / one font colour.
+const BUTTON_BOX_STATES := ["normal", "hover", "pressed", "hover_pressed"]
+const BUTTON_FONT_STATES := ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]
 
-## Pick a button's look by kind (gold | wood | paper | seal). font_size 0 keeps the theme's.
-static func style_button(b: Button, kind: String = "gold", font_size: int = 0) -> void:
-	b.theme_type_variation = BUTTON_KINDS.get(kind, &"PaperButton")
+## The parchment look style_panel puts on a panel that has none of its own.
+const PAPER_LOOK := &"PaperCard"
+
+
+## Pick a button's look by kind (see BUTTON_KINDS). font_size 0 keeps the theme's.
+static func style_button(button: Button, kind: String = "gold", font_size: int = 0) -> void:
+	button.theme_type_variation = BUTTON_KINDS.get(kind, &"PaperButton")
 	if font_size > 0:
-		b.add_theme_font_size_override("font_size", font_size)
+		button.add_theme_font_size_override("font_size", font_size)
+
+
+## A coloured seal (white art tinted `fill`) with a short tag on it (quest type, building).
+static func style_tag(tag_panel: Control, tag_label: Label, text: String, fill: Color) -> void:
+	tag_panel.theme_type_variation = &"TypeSeal"
+	tint_art(tag_panel, fill)
+	tag_label.text = text
+	tag_label.theme_type_variation = &"SealLabel"
+
+
+## Card state colours: the panel keeps (or gets) its parchment look and the
+## paper is tinted with `fill` (CARD_BG / WHITE = no tint). The border and
+## shape arguments are kept for older callers; the art decides those now.
+static func style_panel(panel: Control, fill: Color, _border_color: Color = BORDER, _border_width: int = 3, _corner_radius: int = 14, _padding: Vector4 = Vector4.ZERO) -> void:
+	if panel.theme_type_variation == &"":
+		panel.theme_type_variation = PAPER_LOOK
+	tint_art(panel, fill)
 
 
 ## Swap a panel's look for another theme variation (PaperCard, PlanCard...).
-static func look(p: Control, variation: StringName) -> void:
-	p.theme_type_variation = variation
+static func set_look(panel: Control, variation: StringName) -> void:
+	panel.theme_type_variation = variation
 
 
-## Ink a white piece of art (seal disc, stamp, outline box, icon) in a colour.
-## self_modulate tints the node's own drawing, not its children.
-static func tint(p: CanvasItem, c: Color) -> void:
-	p.self_modulate = c
+## Ink a white piece of art (seal disc, stamp, outline box, icon) or tint
+## parchment. self_modulate tints the node's own drawing, not its children.
+static func tint_art(node: CanvasItem, ink: Color) -> void:
+	node.self_modulate = ink
 
 
-## A coloured seal or tag with short text on it (quest type, building).
-static func seal(p: Control, l: Label, text: String, fill: Color) -> void:
-	tint(p, fill)
-	l.text = text
-	color(l, CREAM)
-
-
-## Recolour a label.
-static func color(l: Control, c: Color) -> void:
-	l.add_theme_color_override("font_color", c)
-	l.add_theme_color_override("default_color", c)
+## Recolour a label's (or button's, or rich text's) text.
+static func set_font_color(control: Control, font_color: Color) -> void:
+	control.add_theme_color_override("font_color", font_color)
+	control.add_theme_color_override("default_color", font_color)
 
 
 # ============================================================ SCENE HELPERS
 
-## Remove every child from a list container before refilling it.
-static func clear(list: Node) -> void:
-	for c in list.get_children():
-		list.remove_child(c)
-		c.queue_free()
+## Remove and free every child of a list container before refilling it.
+static func clear_children(container: Node) -> void:
+	for child in container.get_children():
+		container.remove_child(child)
+		child.queue_free()
 
 
-## Instance a row scene at the end of `list` and return it (call its setup next).
-static func add_row(list: Node, scene: PackedScene) -> Node:
-	var row := scene.instantiate()
-	list.add_child(row)
+## Instance a row scene at the end of `container` and return it
+## (call the row's setup(...) right after).
+static func add_row(container: Node, row_scene: PackedScene) -> Node:
+	var row := row_scene.instantiate()
+	container.add_child(row)
 	return row

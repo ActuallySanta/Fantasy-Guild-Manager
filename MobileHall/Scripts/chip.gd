@@ -1,35 +1,47 @@
-## A small ink label: text, an optional icon, an optional outline.
+## A small ink label, optionally with an icon and an outline.
+## Used for stats, health, gold, rank, party size and other short facts.
+## The outline is white art (Styles/pill.tres or ink_box.tres) tinted the ink colour.
 ## Scene: MobileHall/Scenes/Components/chip.tscn
 extends PanelContainer
 
-const S := preload("res://MobileHall/Scripts/hall_style.gd")
+const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 
-## box -> theme variation drawn around the chip (white art, tinted the ink colour).
-const BOXES := { "": &"", "pill": &"Pill", "box": &"InkBox" }
-
+# ---- NODES
 @onready var _icon: TextureRect = $Row/Icon
 @onready var _label: Label = $Row/Text
 
 
-## icon = a name from hall_style ICONS ("" = no icon).
-## box = "" (just ink) | "pill" (rounded outline) | "box" (square outline).
-func set_chip(text: String, ink: Color, icon: String = "", box: String = "") -> void:
+## icon_name = a name from hall_style ICON_FILES ("" or unknown = no icon).
+## outlined = a rounded outline in the text colour (the quest's favored stat).
+## background is no longer drawn (chips are ink on paper); it's kept so older
+## callers still work.
+func set_chip(text: String, _background: Color, text_color: Color, icon_name: String = "", outlined: bool = false) -> void:
+	_set_ink(text, text_color, icon_name, &"Pill" if outlined else &"")
+
+
+## Text in a square ink outline ("RANK F", the report's totals).
+func set_box(text: String, text_color: Color, icon_name: String = "") -> void:
+	_set_ink(text, text_color, icon_name, &"InkBox")
+
+
+func _set_ink(text: String, text_color: Color, icon_name: String, outline_look: StringName) -> void:
 	_label.text = text
-	S.color(_label, ink)
-	_icon.texture = S.icon_tex(icon)
+	Style.set_font_color(_label, text_color)
+	_icon.texture = Style.icon_texture(icon_name)
 	_icon.visible = _icon.texture != null
-	_icon.modulate = ink
-	theme_type_variation = BOXES.get(box, &"")
-	S.tint(self, ink)
+	_icon.modulate = text_color
+	theme_type_variation = outline_look
+	Style.tint_art(self, text_color)
 
 
-## Health from a character's injury level, e.g. "Healthy" in green.
-func set_health(c: GuildCharacter) -> void:
-	var row := S.injury(c)
-	set_chip(row[0], row[1])
+## Health from a character's injury level ("Healthy" in green, "Hurt"...).
+func set_health(character: GuildCharacter) -> void:
+	var look := Style.injury_look(character)
+	set_chip(look.label, look.bg, look.text)
 
 
-## One stat as "Str 6". The quest's favored stat gets a pill in its colour.
-func set_stat(c: GuildCharacter, i: int, favored: bool = false) -> void:
-	var st: Dictionary = S.STATS[i]
-	set_chip("%s %d" % [st.short, S.stat_value(c, i)], st.color if favored else S.INK, "", "pill" if favored else "")
+## One stat as "Pow 6". The favored stat gets a pill in its colour.
+func set_stat(character: GuildCharacter, stat_index: int, is_favored: bool = false) -> void:
+	var stat: Dictionary = Style.STATS[stat_index]
+	var text := "%s %d" % [stat.short, Style.stat_value(character, stat_index)]
+	set_chip(text, stat.bg, stat.color if is_favored else Style.TEXT_MAIN, "", is_favored)
