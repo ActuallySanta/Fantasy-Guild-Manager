@@ -35,7 +35,9 @@ var goldReward: int
 #var for statReward if applicable
 
 var location: String
-var regionNum: int
+var regionNum: int:
+	get:
+		return regionNum
 #var/vars for other flavors (characters/items/etc)
 
 var difficulty: QuestDifficulty
