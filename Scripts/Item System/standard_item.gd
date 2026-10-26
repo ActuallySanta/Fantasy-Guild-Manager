@@ -37,6 +37,7 @@ var curr_user: GuildCharacter
 
 
 func _init(_role: GuildCharacter.CharacterRole) -> void:
+	role = _role
 	rarity = get_rarity()
 	name = str(Rarity.find_key(rarity)) + " " + ExternalContentContainer.get_item_title(_role)
 
