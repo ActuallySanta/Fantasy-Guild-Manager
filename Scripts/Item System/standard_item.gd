@@ -1,4 +1,5 @@
 @abstract class_name StandardItem
+
 extends Resource
 
 @export var name: String
