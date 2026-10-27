@@ -181,7 +181,7 @@ func increase_temp_stat(_stat: StatType, _points_to_add: int):
 
 func reset_temp_stats():
 	for entry in temp_stats:
-		entry = 0
+		temp_stats[entry] = 0
 
 ##Add all the stats from the equipped item slots
 func add_passive_item_stats():
