@@ -108,11 +108,13 @@ func _init() -> void:
 
 	if (GameState.day >= 5):
 		cost = 200
-	elif(GameState.day >= 3):
+	elif (GameState.day >= 3):
 		cost = 100
 	else:
 		cost = 0
-	
+
+	add_pluck_temp_stats()
+
 	pass
 
 
@@ -134,7 +136,7 @@ func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int)
 		var _proportion: float = _stat_weights[stat] / stat_sum
 		_stats[stat] = (_proportion * _total_points)
 
-	match(role):
+	match (role):
 		0:
 			_stats[1] += 3
 		1:
@@ -183,12 +185,24 @@ func reset_temp_stats():
 	for entry in temp_stats:
 		temp_stats[entry] = 0
 
+		##Since pluck is always applied, reapply it
+		add_pluck_temp_stats()
+
+
 ##Add all the stats from the equipped item slots
 func add_passive_item_stats():
 	for item in equipped_items:
 		if (item is PassiveItem):
 			var pass_item: PassiveItem = item as PassiveItem
 			increase_temp_stat(pass_item.affected_stat, pass_item.stat_amount)
+
+
+##Give a 10% increase in every stat for each level in pluck
+func add_pluck_temp_stats():
+	for stat in stats.keys():
+		var stat_increase = (1 + (pluck / 10)) * stats[stat]
+		increase_temp_stat(stat, stat_increase)
+	pass
 
 
 ##Attempt to add an item in, returns true if the item was added, false if it wasn't able to

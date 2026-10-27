@@ -10,7 +10,7 @@
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_wood_down.tres" id="8_efxwo"]
 [ext_resource type="Texture2D" uid="uid://ccw8frov4muxu" path="res://Sprites/UI Icons/gear-solid-full.svg" id="9_csala"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_board.tscn" id="10_mpynf"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_guild.tscn" id="12_cbnp0"]
+[ext_resource type="PackedScene" uid="uid://diwdybd70ky7l" path="res://MobileHall/Scenes/Tabs/tab_guild.tscn" id="12_cbnp0"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_upgrades.tscn" id="14_v8b36"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Tabs/tab_shop.tscn" id="15_shop1"]
 [ext_resource type="PackedScene" uid="uid://bt1iwlgoqgjw0" path="res://MobileHall/Scenes/Screens/screen_assign.tscn" id="16_tj44p"]
@@ -25,11 +25,11 @@
 [ext_resource type="Texture2D" uid="uid://c0ojxw8sauffc" path="res://Sprites/UI Icons/user-solid-full.svg" id="27_8udri"]
 [ext_resource type="Texture2D" uid="uid://wtb4ungnk6wg" path="res://Sprites/UI Icons/arrow-up-solid-full.svg" id="28_whkse"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/toast.tres" id="29_n8ylg"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_end_day.tscn" id="30_cwf4i"]
+[ext_resource type="PackedScene" uid="uid://b3yimxougfeoe" path="res://MobileHall/Scenes/Overlays/overlay_end_day.tscn" id="30_cwf4i"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_menu.tscn" id="32_kg28u"]
-[ext_resource type="Shader" path="res://MobileHall/Styles/colorblind_filter.gdshader" id="39_cbf01"]
 [ext_resource type="PackedScene" uid="uid://dlabay3h5v4fb" path="res://MobileHall/Scenes/Overlays/overlay_report.tscn" id="34_6fy20"]
 [ext_resource type="PackedScene" uid="uid://bgwxd653pjox8" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
+[ext_resource type="Shader" uid="uid://dkvytyy35gk2p" path="res://MobileHall/Styles/colorblind_filter.gdshader" id="39_cbf01"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cbf01"]
 shader = ExtResource("39_cbf01")
@@ -175,7 +175,7 @@ layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="TabShop" parent="Layout/Content" instance=ExtResource("15_shop1")]
+[node name="TabShop" parent="Layout/Content" unique_id=116845369 instance=ExtResource("15_shop1")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -360,7 +360,7 @@ theme_override_font_sizes/font_size = 20
 text = "5"
 horizontal_alignment = 1
 
-[node name="Nav_shop" type="Button" parent="Layout/Nav/Row"]
+[node name="Nav_shop" type="Button" parent="Layout/Nav/Row" unique_id=1584058458]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
@@ -377,7 +377,7 @@ icon = ExtResource("5_5hrq8")
 icon_alignment = 1
 vertical_icon_alignment = 0
 
-[node name="Badge" type="PanelContainer" parent="Layout/Nav/Row/Nav_shop"]
+[node name="Badge" type="PanelContainer" parent="Layout/Nav/Row/Nav_shop" unique_id=1750051631]
 layout_mode = 0
 anchor_left = 1.0
 anchor_right = 1.0
@@ -389,7 +389,7 @@ grow_horizontal = 0
 mouse_filter = 2
 theme_override_styles/panel = ExtResource("26_t8oow")
 
-[node name="Text" type="Label" parent="Layout/Nav/Row/Nav_shop/Badge"]
+[node name="Text" type="Label" parent="Layout/Nav/Row/Nav_shop/Badge" unique_id=685883215]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 20
@@ -427,7 +427,6 @@ autowrap_mode = 3
 unique_name_in_owner = true
 visible = false
 layout_mode = 1
-anchors_preset = 15
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -453,10 +452,10 @@ layout_mode = 1
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ColorFilterLayer" type="CanvasLayer" parent="."]
+[node name="ColorFilterLayer" type="CanvasLayer" parent="." unique_id=1299503409]
 layer = 100
 
-[node name="ColorFilter" type="ColorRect" parent="ColorFilterLayer"]
+[node name="ColorFilter" type="ColorRect" parent="ColorFilterLayer" unique_id=1396004113]
 unique_name_in_owner = true
 visible = false
 material = SubResource("ShaderMaterial_cbf01")
