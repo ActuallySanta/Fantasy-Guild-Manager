@@ -7,11 +7,11 @@ class_name PassiveItem
 
 var stat_addition_table: Dictionary[StandardItem.Rarity, int] = {
 	StandardItem.Rarity.COMMON: 2,
-	StandardItem.Rarity.UNCOMMON: 8,
-	StandardItem.Rarity.RARE: 16,
-	StandardItem.Rarity.LEGENDARY: 24,
-	StandardItem.Rarity.MYTHIC: 32,
-	StandardItem.Rarity.NAMED: 40,
+	StandardItem.Rarity.UNCOMMON: 4,
+	StandardItem.Rarity.RARE: 6,
+	StandardItem.Rarity.LEGENDARY: 8,
+	StandardItem.Rarity.MYTHIC: 10,
+	StandardItem.Rarity.NAMED: 12,
 }
 
 
