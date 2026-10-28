@@ -55,7 +55,7 @@ var QUESTS_PER_DAY := 5
 const MILESTONE_DAY := 10
 ## Bottom tabs, left to right (ids match the Nav_<id> buttons and Tab nodes in the scene).
 const TAB_IDS := ["board", "guild", "upgrades", "shop"]
-## The Shop tab (groundwork only: nothing can be bought yet).
+## The Shop tab (goods come from the ItemShop autoload).
 const TAB_SHOP := "shop"
 ## Screen kinds that can cover the tabs (see `active_screen`).
 const SCREEN_ASSIGN := "assign"
@@ -129,6 +129,13 @@ const TOAST_REVIVED := "%s is back from the dead!"
 const TOAST_IN_HOSPITAL := "%s is in the Hospital. Discharge them first."
 const TOAST_IN_TRAINING := "%s is training. Take them out of the Training Yard first."
 const TOAST_LEFT_QUEST := "%s left %s"
+const TOAST_BOUGHT := "Bought the %s! Equip it from a hero's page."
+const TOAST_CANT_BUY := "Not enough gold for that."
+const TOAST_EQUIPPED := "%s equipped the %s"
+const TOAST_UNEQUIPPED := "%s took off the %s"
+const TOAST_WRONG_ROLE := "Only %ss can use the %s."
+const TOAST_HANDS_FULL := "%s's hands are full. Take something off first."
+const TOAST_GEAR_DEAD := "%s can't use gear anymore."
 
 
 # ============================================================ STATE
@@ -244,6 +251,8 @@ func _ready() -> void:
 	GuildUpgrades.home_changed.connect(queue_refresh)
 	CharacterContainer.on_character_added.connect(queue_refresh)
 	CharacterContainer.on_hireables_refreshed.connect(queue_refresh)
+	ItemShop.stock_changed.connect(queue_refresh)
+	ItemShop.gear_changed.connect(queue_refresh)
 
 	_load_settings()
 	_generate_quests()
@@ -651,6 +660,46 @@ func hire(character: GuildCharacter) -> void:
 func upgrade_building(building: int) -> void:
 	if GuildUpgrades.try_upgrade(building):
 		show_toast(TOAST_UPGRADED % [GuildUpgrades.get_building_name(building), GuildUpgrades.get_level(building)])
+	queue_refresh()
+
+
+# ---- Shop and gear (ItemShop autoload)
+
+
+## Buy one of today's goods (index into ItemShop.stock).
+func buy_item(index: int) -> void:
+	var item := ItemShop.get_item(index)
+	if item == null or ItemShop.is_sold(index):
+		return
+	if ItemShop.buy(index):
+		show_toast(TOAST_BOUGHT % Style.item_look(item).name)
+	else:
+		show_toast(TOAST_CANT_BUY)
+	queue_refresh()
+
+
+## Put an owned item on a hero (moves it off whoever had it).
+func equip_item(item: StandardItem, character: GuildCharacter) -> void:
+	var item_name: String = Style.item_look(item).name
+	var result: int = ItemShop.equip(item, character)
+	if result == ItemShop.EquipResult.OK:
+		show_toast(TOAST_EQUIPPED % [character.name, item_name])
+	elif result == ItemShop.EquipResult.WRONG_ROLE:
+		show_toast(TOAST_WRONG_ROLE % [Style.item_role_name(item), item_name])
+	elif result == ItemShop.EquipResult.SLOTS_FULL:
+		show_toast(TOAST_HANDS_FULL % character.name)
+	elif result == ItemShop.EquipResult.DEAD:
+		show_toast(TOAST_GEAR_DEAD % character.name)
+	queue_refresh()
+
+
+## Take an item off whoever is wearing it (it goes back in the pack).
+func unequip_item(item: StandardItem) -> void:
+	var user: GuildCharacter = item.curr_user
+	if user == null:
+		return
+	ItemShop.unequip(item)
+	show_toast(TOAST_UNEQUIPPED % [user.name, Style.item_look(item).name])
 	queue_refresh()
 
 
