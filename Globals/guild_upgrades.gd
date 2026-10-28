@@ -57,7 +57,7 @@ const UPGRADE_GOLD_COST := [0, 150, 300, 500, 800]
 const UPGRADE_STANDING_REQ := [0, 1, 2, 3, 4]
 
 # ---- Economy: the wallet a new run starts with, and the standing floor for recruits ----
-const STARTING_GOLD := 600
+const STARTING_GOLD := 0
 const STARTING_STANDING := 1
 const MINIMUM_STANDING := -10
 
