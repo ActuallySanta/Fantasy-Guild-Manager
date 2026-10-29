@@ -64,7 +64,7 @@ func _show_today_checklist() -> void:
 
 
 func _show_recruits_box() -> void:
-	var roster_size: int = hall.roster().size()
+	var roster_size: int = CharacterContainer.living_count()
 	if hall.is_roster_full():
 		_today_recruits.set_item(TODAY_RECRUITS, RECRUITS_FULL, "nav_characters", "idle")
 	elif hall.unseen_recruit_count() > 0 or roster_size == 0:

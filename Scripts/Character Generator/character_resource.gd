@@ -48,6 +48,10 @@ var role: CharacterRole
 var injury_level: InjuryLevel
 var injury_count: int
 
+## The day and quest this character died on (-1 / "" while alive).
+var died_on_day: int = -1
+var died_on_quest: String = ""
+
 var stat_deviation: int = 2
 
 var stats: Dictionary[StatType, int] = {
@@ -160,6 +164,10 @@ func generate_description() -> String:
 
 
 func injure_character() -> bool:
+	# already dead: nothing more can happen to them
+	if (injury_level >= InjuryLevel.DEAD):
+		return false
+
 	injury_count += 1
 	injury_level += 1
 

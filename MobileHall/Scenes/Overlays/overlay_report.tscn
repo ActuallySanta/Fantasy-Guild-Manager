@@ -57,6 +57,11 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="DeadChip" parent="Layout/Header/Col/Chips" instance=ExtResource("3_bnucx")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
 [node name="HomeNote" type="Label" parent="Layout/Header/Col"]
 unique_name_in_owner = true
 visible = false
