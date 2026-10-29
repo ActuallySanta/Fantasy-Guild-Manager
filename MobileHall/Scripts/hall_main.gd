@@ -43,8 +43,15 @@
 ##   REFRESH (header, content, action bar, nav, overlays) · TOAST
 extends Control
 
+## Fired at the end of each player action, for the tutorial coach
+## (overlay_tutorial.gd). event: tab, hire, character, close, assign, pick,
+## send, deny, end_check, end_day, new_day, upgrade, training_picker, train,
+## admit, buy, equip.
+signal tutorial_event(event: String, data: Variant)
+
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const DayBarLogic := preload("res://Scripts/UI/day_bar.gd")
+const TutorialScript := preload("res://MobileHall/Scripts/overlay_tutorial.gd")
 
 
 # ============================================================ SETTINGS
@@ -136,6 +143,7 @@ const TOAST_UNEQUIPPED := "%s took off the %s"
 const TOAST_WRONG_ROLE := "Only %ss can use the %s."
 const TOAST_HANDS_FULL := "%s's hands are full. Take something off first."
 const TOAST_GEAR_DEAD := "%s can't use gear anymore."
+const TOAST_TAB_LOCKED := "Pip will open this on Day %d."
 
 
 # ============================================================ STATE
@@ -194,6 +202,8 @@ var _is_refresh_queued := false
 ## Which tab / screen was showing at the last refresh (to know when to scroll to top).
 var _last_view_key := ""
 var _toast_tween: Tween
+## Pip, the tutorial coach (built in _ready, sits on top of every overlay).
+var tutorial: Control
 
 
 # ============================================================ NODES
@@ -253,6 +263,12 @@ func _ready() -> void:
 	CharacterContainer.on_hireables_refreshed.connect(queue_refresh)
 	ItemShop.stock_changed.connect(queue_refresh)
 	ItemShop.gear_changed.connect(queue_refresh)
+
+	# the tutorial coach goes on top of everything; on Day 1 it replaces the Welcome card
+	tutorial = TutorialScript.new()
+	tutorial.name = "OverlayTutorial"
+	add_child(tutorial)
+	tutorial.setup(self)
 
 	_load_settings()
 	_generate_quests()
@@ -457,6 +473,9 @@ func days_until_drake() -> int:
 ## Switch bottom tab. Closes any screen; party drafts stay on their quests.
 ## `section` optionally picks the tab's half (GUILD_SECTION_* or UPGRADES_SECTION_*).
 func open_tab(tab_id: String, section: String = "") -> void:
+	if tutorial and tutorial.is_tab_locked(tab_id):
+		show_toast(TOAST_TAB_LOCKED % tutorial.unlock_day(tab_id))
+		return
 	active_tab = tab_id
 	if section != "" and tab_id == "guild":
 		guild_section = section
@@ -466,6 +485,7 @@ func open_tab(tab_id: String, section: String = "") -> void:
 		for_hire_last_seen_day = GameState.day
 	active_screen = {}
 	queue_refresh()
+	tutorial_event.emit("tab", {"tab": active_tab, "guild": guild_section, "upgrades": upgrades_section})
 
 
 ## The Guild tab's Your Guild / For Hire buttons.
@@ -485,12 +505,14 @@ func open_assign(quest_index: int) -> void:
 	active_screen = {"kind": SCREEN_ASSIGN, "quest_index": clampi(quest_index, 0, quest_entries.size() - 1)}
 	active_tab = "board"
 	queue_refresh()
+	tutorial_event.emit("assign", quest_index)
 
 
 ## Open a character's details over whatever is showing.
 func open_character(character: GuildCharacter) -> void:
 	active_screen = {"kind": SCREEN_CHARACTER, "character": character, "return_to": active_screen.duplicate()}
 	queue_refresh()
+	tutorial_event.emit("character", character)
 
 
 ## Character goes back to wherever it was opened from; Assign Party goes to the Board.
@@ -500,6 +522,7 @@ func close_screen() -> void:
 	else:
 		active_screen = {}
 	queue_refresh()
+	tutorial_event.emit("close", null)
 
 
 ## The action bar's button: always the next thing to do
@@ -580,6 +603,7 @@ func toggle_in_party(character: GuildCharacter) -> void:
 
 	entry.party.append(character)
 	queue_refresh()
+	tutorial_event.emit("pick", entry)
 
 
 ## Take someone out of a party. A sent quest left with nobody goes back to open.
@@ -603,6 +627,7 @@ func send_party() -> void:
 	entry.state = Style.QUEST_STATE_SENT
 	show_toast(TOAST_SENT % entry.quest.questTitle)
 	_go_to_next_undecided()
+	tutorial_event.emit("send", entry)
 
 
 ## Turn the quest down (costs standing), then jump to the next undecided quest.
@@ -615,6 +640,7 @@ func deny_quest() -> void:
 	GameState.reduce_standing(entry.quest.difficulty)
 	show_toast(TOAST_DENIED % entry.quest.questTitle)
 	_go_to_next_undecided()
+	tutorial_event.emit("deny", entry)
 
 
 ## Undo Send: the party goes back to being a draft.
@@ -654,12 +680,14 @@ func hire(character: GuildCharacter) -> void:
 		show_toast(TOAST_ROSTER_FULL)
 	elif CharacterContainer.add_character_to_guild(character):
 		show_toast(TOAST_HIRED % character.name)
+		tutorial_event.emit("hire", character)
 	queue_refresh()
 
 
 func upgrade_building(building: int) -> void:
 	if GuildUpgrades.try_upgrade(building):
 		show_toast(TOAST_UPGRADED % [GuildUpgrades.get_building_name(building), GuildUpgrades.get_level(building)])
+		tutorial_event.emit("upgrade", building)
 	queue_refresh()
 
 
@@ -673,6 +701,7 @@ func buy_item(index: int) -> void:
 		return
 	if ItemShop.buy(index):
 		show_toast(TOAST_BOUGHT % Style.item_look(item).name)
+		tutorial_event.emit("buy", item)
 	else:
 		show_toast(TOAST_CANT_BUY)
 	queue_refresh()
@@ -684,6 +713,7 @@ func equip_item(item: StandardItem, character: GuildCharacter) -> void:
 	var result: int = ItemShop.equip(item, character)
 	if result == ItemShop.EquipResult.OK:
 		show_toast(TOAST_EQUIPPED % [character.name, item_name])
+		tutorial_event.emit("equip", item)
 	elif result == ItemShop.EquipResult.WRONG_ROLE:
 		show_toast(TOAST_WRONG_ROLE % [Style.item_role_name(item), item_name])
 	elif result == ItemShop.EquipResult.SLOTS_FULL:
@@ -710,6 +740,7 @@ func unequip_item(item: StandardItem) -> void:
 func toggle_training_picker() -> void:
 	training_picker_open = not training_picker_open
 	queue_refresh()
+	tutorial_event.emit("training_picker", training_picker_open)
 
 
 ## Put a hero in a training slot drilling `stat`, or change their stat.
@@ -730,6 +761,7 @@ func train(character: GuildCharacter, stat: int) -> void:
 	if not GuildUpgrades.has_free_training_slot():
 		training_picker_open = false
 	queue_refresh()
+	tutorial_event.emit("train", character)
 
 
 func stop_training(character: GuildCharacter) -> void:
@@ -743,6 +775,7 @@ func admit(character: GuildCharacter) -> void:
 	_leave_quest(character)
 	if GuildUpgrades.admit(character):
 		show_toast(TOAST_ADMITTED % character.name)
+		tutorial_event.emit("admit", character)
 	queue_refresh()
 
 
@@ -816,6 +849,7 @@ func open_end_check() -> void:
 		return
 	is_end_check_open = true
 	queue_refresh()
+	tutorial_event.emit("end_check", null)
 
 
 func close_end_check() -> void:
@@ -837,6 +871,7 @@ func end_day() -> void:
 	active_screen = {}
 	shown_report = {"starts_next_day": true, "day": GameState.day, "results": results, "home": home}
 	queue_refresh()
+	tutorial_event.emit("end_day", results)
 
 
 ## Play out one quest with DayBar's helpers and pay its gold and standing.
@@ -900,6 +935,7 @@ func start_new_day() -> void:
 		var quests_text := Style.count_text(quest_entries.size(), "new quest", "new quests")
 		show_toast(TOAST_NEW_DAY % [GameState.day, quests_text, CharacterContainer.hireable_characters.size()])
 	queue_refresh()
+	tutorial_event.emit("new_day", GameState.day)
 
 
 ## The report's button: starts the next day after End Day, otherwise just closes.
@@ -1045,6 +1081,8 @@ func _refresh_nav() -> void:
 
 ## What a nav tab's badge says ("" = no badge).
 func _badge_text_for(tab_id: String) -> String:
+	if tutorial and tutorial.is_tab_locked(tab_id):
+		return "Day %d" % tutorial.unlock_day(tab_id)
 	match tab_id:
 		"board":
 			return str(undecided_count()) if undecided_count() > 0 else ""
