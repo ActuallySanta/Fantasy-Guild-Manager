@@ -9,6 +9,8 @@
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="7_ye445"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green.tres" id="8_cvwy1"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green_down.tres" id="9_i7ea7"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/dim.tres" id="10_rdim1"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/sheet.tres" id="11_rsht1"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5l50i"]
 content_margin_left = 12.0
@@ -348,6 +350,15 @@ focus_mode = 0
 theme_override_font_sizes/font_size = 28
 text = "Back"
 
+[node name="ReleaseButton" type="Button" parent="Footer/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "Release"
+
 [node name="HireButton" type="Button" parent="Footer/Row" unique_id=1178814079]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 92)
@@ -364,3 +375,75 @@ theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 30
 text = "Hire (free)"
+
+[node name="ReleaseConfirm" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+top_level = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ReleaseDim" type="PanelContainer" parent="ReleaseConfirm"]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = ExtResource("10_rdim1")
+
+[node name="Sheet" type="PanelContainer" parent="ReleaseConfirm"]
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_vertical = 0
+theme_override_styles/panel = ExtResource("11_rsht1")
+
+[node name="Col" type="VBoxContainer" parent="ReleaseConfirm/Sheet"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ReleaseTitle" type="Label" parent="ReleaseConfirm/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 36
+text = "Release Name?"
+autowrap_mode = 3
+
+[node name="ReleaseSub" type="Label" parent="ReleaseConfirm/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 22
+text = "They leave the guild for good."
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="ReleaseConfirm/Sheet/Col"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ReleaseCancelButton" type="Button" parent="ReleaseConfirm/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(210, 92)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "Cancel"
+
+[node name="ReleaseConfirmButton" type="Button" parent="ReleaseConfirm/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 30
+text = "Release"
