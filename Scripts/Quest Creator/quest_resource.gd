@@ -35,7 +35,9 @@ var goldReward: int
 #var for statReward if applicable
 
 var location: String
-var regionNum: int
+var regionNum: int:
+	get:
+		return regionNum
 #var/vars for other flavors (characters/items/etc)
 
 var difficulty: QuestDifficulty
@@ -68,7 +70,11 @@ func _init(diff := 0, dayNum := 0) -> void:
 	questNum = randi_range(0, 7)
 	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
 	location = QuestManager.world_regions[regionNum].returnName(type)
-	goldReward = 100 + (150 * difficulty)
+	
+	if(maxAdventurers == 1):
+		goldReward = 100 + (150 * difficulty)
+	else:
+		goldReward = 150 + (175 * difficulty)
 
 	match type:
 		1:

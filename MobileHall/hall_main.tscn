@@ -175,7 +175,7 @@ layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="TabShop" parent="Layout/Content" unique_id=116845369 instance=ExtResource("15_shop1")]
+[node name="TabShop" parent="Layout/Content" unique_id=1075990509 instance=ExtResource("15_shop1")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
