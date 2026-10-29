@@ -37,8 +37,12 @@ func set_health(character: GuildCharacter) -> void:
 	set_chip(look.label, look.bg, look.text, icon_name)
 
 
-## One stat as "Pow 6" in that stat's colours.
+## One stat as "Pow 6" in that stat's colours, or "Pow 5+3" when Armory, gear
+## or Pluck add to it (quests use the sum).
 func set_stat(character: GuildCharacter, stat_index: int, is_favored: bool = false) -> void:
 	var stat: Dictionary = Style.STATS[stat_index]
-	var text := "%s %d" % [stat.short, Style.stat_value(character, stat_index)]
+	var bonus := Style.stat_bonus(character, stat_index)
+	var text := "%s %d" % [stat.short, Style.quest_stat_value(character, stat_index) - bonus]
+	if bonus > 0:
+		text += "+%d" % bonus
 	set_chip(text, stat.bg, stat.color, "", is_favored)

@@ -221,9 +221,27 @@ static func role_name(character: GuildCharacter) -> String:
 	return str(GuildCharacter.CharacterRole.find_key(character.role)).capitalize()
 
 
-## A character's value for STATS[stat_index] (Pluck is stored separately).
+## A character's base value for STATS[stat_index] (Pluck is stored separately).
+## Doesn't include temp stats (gear, pluck bonus); see quest_stat_value.
 static func stat_value(character: GuildCharacter, stat_index: int) -> int:
 	return character.pluck if stat_index == PLUCK_INDEX else int(character.stats[stat_index])
+
+
+## The value quests use: base stat + temp stats (gear and pluck bonus).
+static func quest_stat_value(character: GuildCharacter, stat_index: int) -> int:
+	if stat_index == PLUCK_INDEX:
+		return character.pluck
+	character.reset_temp_stats()
+	return character.get_quest_stat(stat_index)
+
+
+## Everything added on top of a character's own stat: Armory + gear + Pluck bonus.
+## quest_stat_value - stat_bonus is the stat before any bonus.
+static func stat_bonus(character: GuildCharacter, stat_index: int) -> int:
+	if stat_index == PLUCK_INDEX:
+		return 0
+	var armory_bonus := GuildUpgrades.get_stat_bonus(character, stat_index)
+	return armory_bonus + quest_stat_value(character, stat_index) - stat_value(character, stat_index)
 
 
 ## {label, bg, text} for a character's current injury level.

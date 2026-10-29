@@ -185,8 +185,15 @@ func reset_temp_stats():
 	for entry in temp_stats:
 		temp_stats[entry] = 0
 
-		##Since pluck is always applied, reapply it
-		add_pluck_temp_stats()
+	##Since pluck and equipped gear are always applied, reapply them.
+	##Pluck is worked out from the base stats only, so it doesn't stack on gear
+	add_pluck_temp_stats()
+	add_passive_item_stats()
+
+
+##The stat value quests use: the base stat plus any temp stats (pluck, etc.)
+func get_quest_stat(_stat: StatType) -> int:
+	return stats[_stat] + temp_stats[_stat]
 
 
 ##Add all the stats from the equipped item slots
@@ -200,9 +207,14 @@ func add_passive_item_stats():
 ##Give a 10% increase in every stat for each level in pluck
 func add_pluck_temp_stats():
 	for stat in stats.keys():
-		var stat_increase = (1 + (pluck / 10)) * stats[stat]
-		increase_temp_stat(stat, stat_increase)
+		increase_temp_stat(stat, get_pluck_stat_bonus(stat))
 	pass
+
+
+##How much a stat is raised by pluck: 10% of the base stat per level, rounded down,
+##but always at least +1 per level so low stats still get something
+func get_pluck_stat_bonus(_stat: StatType) -> int:
+	return maxi(pluck, int(stats[_stat] * pluck / 10.0))
 
 
 ##Attempt to add an item in, returns true if the item was added, false if it wasn't able to
