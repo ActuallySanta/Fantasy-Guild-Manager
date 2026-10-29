@@ -5,9 +5,10 @@
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/chip.tres" id="3_i0o57"]
 [ext_resource type="Script" path="res://MobileHall/Scripts/chip.gd" id="4_fcy4g"]
 
-[node name="StatStrip" type="HBoxContainer" unique_id=33119571]
+[node name="StatStrip" type="HFlowContainer" unique_id=33119571]
 mouse_filter = 2
-theme_override_constants/separation = 6
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
 script = ExtResource("1_mh62l")
 
 [node name="Stat0" type="PanelContainer" parent="." unique_id=545259554 instance=ExtResource("2_d5pfk")]

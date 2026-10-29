@@ -1,5 +1,5 @@
 ## Character details: portrait, health, today's task, all five stats with the
-## Armory and gear bonuses shown, gear slots, and the full backstory.
+## Armory, gear and Pluck bonuses shown, gear slots, and the full backstory.
 ## Recruits get a Hire button.
 ## Gear: one row per equipped item (Take off) and per empty slot (Equip). Equip
 ## opens a pick list of owned items this hero's role can use; items worn by
@@ -17,6 +17,7 @@ const TEXT_INJURIES := "%s taken"
 const TEXT_NO_INJURIES := "No injuries yet"
 const TEXT_ARMORY_BONUS := " (+%d Armory)"
 const TEXT_GEAR_BONUS := " (+%d gear)"
+const TEXT_PLUCK_BONUS := " (+%d Pluck)"
 const TEXT_EMPTY_SLOT := "Empty slot"
 const TEXT_EMPTY_HINT := "%s gear only"
 const TEXT_GEAR_NOTE := "Holds %s. Buy gear in the Shop."
@@ -28,7 +29,7 @@ const BUTTON_EQUIP := "Equip"
 const BUTTON_TAKE := "Take"
 const BUTTON_TAKE_OFF := "Take off"
 const BUTTON_CANCEL := "Cancel"
-const TEXT_PLUCK_NOTE := "Pluck isn't used by quests yet."
+const TEXT_PLUCK_NOTE := "Pluck goes up by 1 for every quest this hero wins. Each level adds 10% of their base Power, Defense, Wisdom and Sleaziness (rounded down), but never less than +1 per level."
 const TEXT_RECRUIT := "Recruit · not hired yet"
 const TEXT_FREE := "Free today"
 const TEXT_ON_QUEST := "#%d %s (%s)"
@@ -129,7 +130,8 @@ func _show_task(character: GuildCharacter, is_recruit: bool) -> void:
 	_task.text = TEXT_ON_QUEST % [quest_index + 1, entry.quest.questTitle, party_state]
 
 
-## One line per stat: name and value (+ Armory bonus), in that stat's colours.
+## One line per stat: name and base value, then the Armory, gear and Pluck bonuses
+## as separate tags ("5 (+1 Armory) (+2 gear)"), in that stat's colours.
 ## The StatLines node has one authored line per stat, each with Row/Name and Row/Value.
 func _show_stats(character: GuildCharacter) -> void:
 	for stat_index in Style.STAT_COUNT:
@@ -147,12 +149,20 @@ func _show_stats(character: GuildCharacter) -> void:
 		if stat_index < Style.QUEST_STAT_COUNT:
 			gear_bonus = ItemShop.get_item_bonus(character, stat_index)
 
+		# Pluck raises the quest stats (not itself); the amount comes from the character
+		var pluck_bonus := 0
+		if stat_index < Style.QUEST_STAT_COUNT:
+			pluck_bonus = character.get_pluck_stat_bonus(stat_index)
+
+		# the number is the stat before any bonus, like the stat chips; quests use the sum
 		name_label.text = stat.name
-		value_label.text = str(Style.stat_value(character, stat_index))
+		value_label.text = str(Style.quest_stat_value(character, stat_index) - Style.stat_bonus(character, stat_index))
 		if armory_bonus > 0:
 			value_label.text += TEXT_ARMORY_BONUS % armory_bonus
 		if gear_bonus > 0:
 			value_label.text += TEXT_GEAR_BONUS % gear_bonus
+		if pluck_bonus > 0:
+			value_label.text += TEXT_PLUCK_BONUS % pluck_bonus
 		Style.set_font_color(name_label, stat.color)
 		Style.set_font_color(value_label, stat.color)
 		line.add_theme_stylebox_override("panel", Style.flat_box(stat.bg, 12))

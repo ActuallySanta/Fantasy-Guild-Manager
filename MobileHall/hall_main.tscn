@@ -360,7 +360,7 @@ theme_override_font_sizes/font_size = 20
 text = "5"
 horizontal_alignment = 1
 
-[node name="Nav_shop" type="Button" parent="Layout/Nav/Row" unique_id=715797126]
+[node name="Nav_shop" type="Button" parent="Layout/Nav/Row" unique_id=1584058458]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
@@ -377,7 +377,7 @@ icon = ExtResource("5_5hrq8")
 icon_alignment = 1
 vertical_icon_alignment = 0
 
-[node name="Badge" type="PanelContainer" parent="Layout/Nav/Row/Nav_shop" unique_id=871257419]
+[node name="Badge" type="PanelContainer" parent="Layout/Nav/Row/Nav_shop" unique_id=1750051631]
 layout_mode = 0
 anchor_left = 1.0
 anchor_right = 1.0
@@ -389,7 +389,7 @@ grow_horizontal = 0
 mouse_filter = 2
 theme_override_styles/panel = ExtResource("26_t8oow")
 
-[node name="Text" type="Label" parent="Layout/Nav/Row/Nav_shop/Badge" unique_id=1372166639]
+[node name="Text" type="Label" parent="Layout/Nav/Row/Nav_shop/Badge" unique_id=685883215]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 20
@@ -452,10 +452,10 @@ layout_mode = 1
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ColorFilterLayer" type="CanvasLayer" parent="." unique_id=1067166279]
+[node name="ColorFilterLayer" type="CanvasLayer" parent="." unique_id=1299503409]
 layer = 100
 
-[node name="ColorFilter" type="ColorRect" parent="ColorFilterLayer" unique_id=495087625]
+[node name="ColorFilter" type="ColorRect" parent="ColorFilterLayer" unique_id=1396004113]
 unique_name_in_owner = true
 visible = false
 material = SubResource("ShaderMaterial_cbf01")

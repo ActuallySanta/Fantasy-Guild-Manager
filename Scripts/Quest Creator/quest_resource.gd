@@ -101,17 +101,21 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 	var statTotal = 0.0
 
 	for adventurer in _questingAdventurers:
-		statTotal += adventurer.stats[0] + adventurer.stats[1] + adventurer.stats[2] + adventurer.stats[3]
+		# Rebuild the temp stats first so the pluck bonus matches the current
+		# pluck level and base stats (both change after quests, training, gear...)
+		adventurer.reset_temp_stats()
+
+		statTotal += adventurer.get_quest_stat(0) + adventurer.get_quest_stat(1) + adventurer.get_quest_stat(2) + adventurer.get_quest_stat(3)
 		match favStat:
 			0:
-				statTotal += adventurer.stats[0]
+				statTotal += adventurer.get_quest_stat(0)
 				#regioncheck
 			1:
-				statTotal += adventurer.stats[1]
+				statTotal += adventurer.get_quest_stat(1)
 			2:
-				statTotal += adventurer.stats[2]
+				statTotal += adventurer.get_quest_stat(2)
 			3:
-				statTotal += adventurer.stats[3]
+				statTotal += adventurer.get_quest_stat(3)
 
 	return (snapped((statTotal / statHitNum), 0.01) * 100)
 
