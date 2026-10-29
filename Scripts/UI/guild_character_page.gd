@@ -22,7 +22,7 @@ func _load_characters_onto_page():
 	for characters in CharacterContainer.active_characters:
 		var _char_icon := CHARACTER_DISPLAY_BUTTON.instantiate()
 		_char_icon.held_character = characters
-		_char_icon.icon = ExternalContentContainer.get_character_icon(characters.role)
+		_char_icon.icon = characters.icon
 		_char_icon.text = characters.title
 		drag_drop_grid.add_child(_char_icon)
 		pass

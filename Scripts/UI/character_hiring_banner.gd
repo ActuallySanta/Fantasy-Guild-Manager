@@ -22,7 +22,7 @@ func _ready() -> void:
 	wisdom_label.text = "Wisdom: " + str(loaded_character.stats[GuildCharacter.StatType.WISDOM])
 	sleaziness_label.text = "Sleaziness: " + str(loaded_character.stats[GuildCharacter.StatType.SLEAZINESS])
 	pluck_label.text = "Pluck: " + str(loaded_character.pluck)
-	character_icon.texture = ExternalContentContainer.get_character_icon(loaded_character.role)
+	character_icon.texture = loaded_character.icon
 
 pass # Replace with function body.
 
