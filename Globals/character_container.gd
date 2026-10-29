@@ -37,8 +37,20 @@ func refresh_hireable_characters() -> void:
 	on_hireables_refreshed.emit()
 
 
+## Living members of the guild. The dead stay on the roster (so they can be
+## revived) but don't take up a bed.
+func living_count() -> int:
+	return active_characters.filter(func(character):
+		return character.injury_level < GuildCharacter.InjuryLevel.DEAD).size()
+
+
+## True when there's a bed for one more living member.
+func has_free_bed() -> bool:
+	return living_count() < max_characters
+
+
 func generate_new_character() -> void:
-	if (active_characters.size() == max_characters):
+	if (not has_free_bed()):
 		return
 
 	var _new_char := GuildCharacter.new()
@@ -48,7 +60,7 @@ func generate_new_character() -> void:
 
 
 func add_character_to_guild(_character: GuildCharacter) -> bool:
-	if (active_characters.size() == max_characters):
+	if (not has_free_bed()):
 		return false
 	
 	if(GameState.day >= 3 && GameState.gold >= _character.cost):
