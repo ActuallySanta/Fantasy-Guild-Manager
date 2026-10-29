@@ -1,6 +1,8 @@
 ## Character details: portrait, health, today's task, all five stats with the
 ## Armory, gear and Pluck bonuses shown, gear slots, and the full backstory.
 ## Recruits get a Hire button.
+## Guild members (living or fallen) get a Release button. It opens a confirm
+## sheet over the screen that says what releasing costs before anything happens.
 ## Gear: one row per equipped item (Take off) and per empty slot (Equip). Equip
 ## opens a pick list of owned items this hero's role can use; items worn by
 ## another hero can be taken from them. Rules live in the ItemShop autoload.
@@ -31,6 +33,7 @@ const BUTTON_TAKE_OFF := "Take off"
 const BUTTON_CANCEL := "Cancel"
 const TEXT_PLUCK_NOTE := "Pluck goes up by 1 for every quest this hero wins. Each level adds 10% of their base Power, Defense, Wisdom and Sleaziness (rounded down), but never less than +1 per level."
 const TEXT_RECRUIT := "Recruit · not hired yet"
+const TEXT_RETURNING := "Former member · wants back in"
 const TEXT_FREE := "Free today"
 const TEXT_DIED_ON := "Died on Day %d · %s"
 const TEXT_FALLEN := "Fallen"
@@ -39,6 +42,14 @@ const TEXT_TRAINING := "Training %s tonight (+%d)"
 const TEXT_IN_BED := "In a Hospital bed · healthy in %s"
 const BUTTON_BACK := "Back"
 const BUTTON_HIRE := "Hire (free)"
+const BUTTON_HIRE_COST := "Hire (%d gold)"
+const BUTTON_RELEASE := "Release"
+# Release confirm sheet
+const TEXT_RELEASE_TITLE := "Release %s?"
+const TEXT_RELEASE_COST := "%s leaves the guild for good. Their gear goes back to your pack. Costs %d standing."
+const TEXT_RELEASE_FALLEN := "Say goodbye to %s. Their gear goes back to your pack."
+const TEXT_RELEASE_QUEST := " They'll leave %s."
+const BUTTON_RELEASE_CONFIRM := "Release"
 
 # ---- NODES
 # Identity
@@ -61,23 +72,45 @@ const BUTTON_HIRE := "Hire (free)"
 # Footer
 @onready var _back_button: Button = %BackButton
 @onready var _hire_button: Button = %HireButton
+@onready var _release_button: Button = %ReleaseButton
+# Release confirm sheet (top_level in the scene, so the VBox doesn't lay it out
+# and it covers the whole hall like the other overlays)
+@onready var _release_confirm: Control = %ReleaseConfirm
+@onready var _release_dim: Control = %ReleaseDim
+@onready var _release_title: Label = %ReleaseTitle
+@onready var _release_sub: Label = %ReleaseSub
+@onready var _release_cancel_button: Button = %ReleaseCancelButton
+@onready var _release_confirm_button: Button = %ReleaseConfirmButton
 
 ## The main hall script (state + actions), set in setup().
 var hall: HallMain
 ## The Equip pick list is open (view state; closes when another hero is shown).
 var _is_picking_gear := false
 var _gear_character: GuildCharacter
+## The Release confirm sheet is open (view state; closes when another hero is shown).
+var _is_confirming_release := false
+var _release_character: GuildCharacter
 
 
 func setup(main: HallMain) -> void:
 	hall = main
 	_back_button.pressed.connect(hall.close_screen)
 	_hire_button.pressed.connect(_on_hire_pressed)
+	_release_button.pressed.connect(_on_release_pressed)
+	_release_cancel_button.pressed.connect(_on_release_cancelled)
+	_release_confirm_button.pressed.connect(_on_release_confirmed)
+	_release_dim.gui_input.connect(_on_release_dim_input)
 	_back_button.text = BUTTON_BACK
 	_hire_button.text = BUTTON_HIRE
+	_release_button.text = BUTTON_RELEASE
+	_release_cancel_button.text = BUTTON_CANCEL
+	_release_confirm_button.text = BUTTON_RELEASE_CONFIRM
 	_pluck_note.text = TEXT_PLUCK_NOTE
 	Style.style_button(_back_button, "paper", 28)
 	Style.style_button(_hire_button, "green", 30)
+	Style.style_button(_release_button, "red", 28)
+	Style.style_button(_release_cancel_button, "paper", 28)
+	Style.style_button(_release_confirm_button, "red", 30)
 
 
 func scroll_to_top() -> void:
@@ -103,6 +136,12 @@ func refresh() -> void:
 
 	_hire_button.visible = is_recruit
 	_hire_button.disabled = hall.is_roster_full()
+	if character.cost > 0:
+		_hire_button.text = BUTTON_HIRE_COST % character.cost
+	else:
+		_hire_button.text = BUTTON_HIRE
+	_release_button.visible = not is_recruit
+	_show_release_confirm(character, is_recruit)
 
 
 ## The character this screen is showing (set by hall.open_character).
@@ -110,8 +149,11 @@ func _shown_character() -> GuildCharacter:
 	return hall.active_screen.character
 
 
-## "Recruit", "Free today", "Died on Day 4 · Raid the Crypt", or "#2 Escort the Merchant (sent)".
+## "Recruit", "Former member", "Free today", or "#2 Escort the Merchant (sent)".
 func _show_task(character: GuildCharacter, is_recruit: bool) -> void:
+	if is_recruit and CharacterContainer.released_characters.has(character):
+		_task.text = TEXT_RETURNING
+		return
 	if is_recruit:
 		_task.text = TEXT_RECRUIT
 		return
@@ -243,3 +285,50 @@ func _on_gear_picked(item: StandardItem) -> void:
 func _on_hire_pressed() -> void:
 	hall.hire(_shown_character())
 	hall.close_screen()
+
+
+## The Release confirm sheet: "Release Mira?" plus what it costs and, if they're
+## in a party, which quest they'll leave. Hidden for recruits and when not open.
+func _show_release_confirm(character: GuildCharacter, is_recruit: bool) -> void:
+	# a different hero (or a recruit) never opens with the sheet already up
+	if character != _release_character or is_recruit:
+		_release_character = character
+		_is_confirming_release = false
+	_release_confirm.visible = _is_confirming_release
+	if not _is_confirming_release:
+		return
+
+	_release_title.text = TEXT_RELEASE_TITLE % character.name
+	var standing_cost := hall.release_standing_cost(character)
+	if standing_cost > 0:
+		_release_sub.text = TEXT_RELEASE_COST % [character.name, standing_cost]
+	else:
+		_release_sub.text = TEXT_RELEASE_FALLEN % character.name
+	var quest_index := hall.quest_index_of(character)
+	if quest_index >= 0:
+		_release_sub.text += TEXT_RELEASE_QUEST % hall.quest_entries[quest_index].quest.questTitle
+
+
+## Footer Release button: open the confirm sheet (nothing happens yet).
+func _on_release_pressed() -> void:
+	_is_confirming_release = true
+	hall.queue_refresh()
+
+
+func _on_release_cancelled() -> void:
+	_is_confirming_release = false
+	hall.queue_refresh()
+
+
+## Confirmed: the hall does the releasing, then the screen goes back to where it
+## was opened from (this hero isn't in the guild anymore).
+func _on_release_confirmed() -> void:
+	_is_confirming_release = false
+	hall.release(_shown_character())
+	hall.close_screen()
+
+
+## Tapping the dimmed background cancels, like the End Day sheet.
+func _on_release_dim_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed:
+		_on_release_cancelled()

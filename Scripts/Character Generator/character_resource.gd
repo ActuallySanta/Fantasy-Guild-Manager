@@ -110,16 +110,20 @@ func _init() -> void:
 
 	title = name + " the " + str(CharacterRole.find_key(role))
 
-	if (GameState.day >= 5):
-		cost = 200
-	elif (GameState.day >= 3):
-		cost = 100
-	else:
-		cost = 0
+	cost = recruit_cost_for_day(GameState.day)
 
 	add_pluck_temp_stats()
 
 	pass
+
+
+## What a new recruit costs to hire on a given day (free for the first two days).
+static func recruit_cost_for_day(day: int) -> int:
+	if (day >= 5):
+		return 200
+	elif (day >= 3):
+		return 100
+	return 0
 
 
 ## Generate the stats using normalized random number sampling

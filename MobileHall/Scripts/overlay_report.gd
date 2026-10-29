@@ -1,5 +1,6 @@
-## Day Report: the night's results, short. A totals line, then one card per
-## quest (result, gold, who went, who got hurt); the full story is behind
+## Day Report: the night's results, short. A totals line, a line for the night
+## at home, a line for anyone released that day, then one card per quest
+## (result, gold, who went, who got hurt); the full story is behind
 ## "Read the story" on each card.
 ## Scene: MobileHall/Scenes/Overlays/overlay_report.tscn
 extends Control
@@ -17,6 +18,9 @@ const TEXT_NOBODY_WENT := "Nobody went out. Quests are the only way to earn gold
 const TEXT_HOME := "At home: %s"
 const TEXT_TRAINED := "%s +%d %s"
 const TEXT_HEALED := "%s %s → %s"
+const TEXT_RELEASED := "Left the guild: %s"
+const TEXT_RELEASED_COST := "%s (-%d standing)"
+const TEXT_RELEASED_FALLEN := "%s (fallen)"
 const BUTTON_START_DAY := "Start Day %d"
 const BUTTON_CLOSE := "Close"
 
@@ -28,6 +32,7 @@ const BUTTON_CLOSE := "Close"
 @onready var _injured_chip = %HurtChip        # chip.gd
 @onready var _dead_chip = %DeadChip           # chip.gd
 @onready var _home_note: Label = %HomeNote
+@onready var _released_note: Label = %ReleasedNote
 # Quest cards
 @onready var _scroll: ScrollContainer = %Scroll
 @onready var _entry_list: VBoxContainer = %Entries
@@ -51,7 +56,8 @@ func refresh() -> void:
 	var is_same_report: bool = report.get("results") == _built_report.get("results") \
 			and report.get("starts_next_day") == _built_report.get("starts_next_day") \
 			and report.get("day") == _built_report.get("day") \
-			and report.get("home") == _built_report.get("home")
+			and report.get("home") == _built_report.get("home") \
+			and report.get("released") == _built_report.get("released")
 	if is_same_report:
 		return
 	_built_report = report
@@ -60,6 +66,7 @@ func refresh() -> void:
 	_title.text = TEXT_TITLE % report.day
 	_show_totals(results)
 	_show_home(report.get("home", {}))
+	_show_released(report.get("released", []))
 	_show_entries(results)
 
 	# after End Day the button starts the next day; from the Menu it just closes
@@ -107,6 +114,20 @@ func _show_home(home: Dictionary) -> void:
 		parts.append(TEXT_HEALED % [healed.character.name, from_label, to_label])
 	_home_note.text = TEXT_HOME % " · ".join(parts)
 	_home_note.visible = not parts.is_empty()
+
+
+## One line for heroes released today (see HallMain.released_today), with the
+## standing each one cost. Fallen heroes are marked instead, since they were free.
+func _show_released(released: Array) -> void:
+	var parts := PackedStringArray()
+	for release in released:
+		var hero_name: String = release.character.name
+		if release.fallen:
+			parts.append(TEXT_RELEASED_FALLEN % hero_name)
+		else:
+			parts.append(TEXT_RELEASED_COST % [hero_name, release.standing])
+	_released_note.text = TEXT_RELEASED % " · ".join(parts)
+	_released_note.visible = not parts.is_empty()
 
 
 ## One card per quest, or a note when nobody went out.
