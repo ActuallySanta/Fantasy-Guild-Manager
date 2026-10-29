@@ -62,10 +62,20 @@ func _add_returning_characters() -> void:
 		if randf() < RETURN_CHANCE:
 			released_character.cost = return_cost
 			hireable_characters.append(released_character)
+## Living members of the guild. The dead stay on the roster (so they can be
+## revived) but don't take up a bed.
+func living_count() -> int:
+	return active_characters.filter(func(character):
+		return character.injury_level < GuildCharacter.InjuryLevel.DEAD).size()
+
+
+## True when there's a bed for one more living member.
+func has_free_bed() -> bool:
+	return living_count() < max_characters
 
 
 func generate_new_character() -> void:
-	if (active_characters.size() == max_characters):
+	if (not has_free_bed()):
 		return
 
 	var _new_char := GuildCharacter.new()
@@ -75,7 +85,7 @@ func generate_new_character() -> void:
 
 
 func add_character_to_guild(_character: GuildCharacter) -> bool:
-	if (active_characters.size() == max_characters):
+	if (not has_free_bed()):
 		return false
 	
 	# anyone with a price pays it (returning heroes cost gold even on days 1-2)

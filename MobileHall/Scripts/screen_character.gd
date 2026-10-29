@@ -35,6 +35,8 @@ const TEXT_PLUCK_NOTE := "Pluck goes up by 1 for every quest this hero wins. Eac
 const TEXT_RECRUIT := "Recruit · not hired yet"
 const TEXT_RETURNING := "Former member · wants back in"
 const TEXT_FREE := "Free today"
+const TEXT_DIED_ON := "Died on Day %d · %s"
+const TEXT_FALLEN := "Fallen"
 const TEXT_ON_QUEST := "#%d %s (%s)"
 const TEXT_TRAINING := "Training %s tonight (+%d)"
 const TEXT_IN_BED := "In a Hospital bed · healthy in %s"
@@ -154,6 +156,12 @@ func _show_task(character: GuildCharacter, is_recruit: bool) -> void:
 		return
 	if is_recruit:
 		_task.text = TEXT_RECRUIT
+		return
+	if Style.is_dead(character):
+		if character.died_on_day >= 0:
+			_task.text = TEXT_DIED_ON % [character.died_on_day, character.died_on_quest]
+		else:
+			_task.text = TEXT_FALLEN
 		return
 	var quest_index := hall.quest_index_of(character)
 	if quest_index < 0 and GuildUpgrades.is_patient(character):

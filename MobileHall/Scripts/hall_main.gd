@@ -131,6 +131,7 @@ const TOAST_TOO_HURT := "%s is too hurt to train. Try the Hospital (Guild > Toni
 const TOAST_ADMITTED := "%s is in a Hospital bed"
 const TOAST_DISCHARGED := "%s went home"
 const TOAST_REVIVED := "%s is back from the dead!"
+const TOAST_REVIVE_NO_BED := "No free bed for %s. Upgrade the Barracks first."
 const TOAST_IN_HOSPITAL := "%s is in the Hospital. Discharge them first."
 const TOAST_IN_TRAINING := "%s is training. Take them out of the Training Yard first."
 const TOAST_LEFT_QUEST := "%s left %s"
@@ -355,9 +356,9 @@ func roster() -> Array:
 	return CharacterContainer.active_characters
 
 
-## True when every bed is taken (no more hiring).
+## True when every bed is taken by a living hero (no more hiring or reviving).
 func is_roster_full() -> bool:
-	return roster().size() >= CharacterContainer.max_characters
+	return not CharacterContainer.has_free_bed()
 
 
 ## Standing it costs to release this hero: nothing for the fallen, otherwise
@@ -794,6 +795,8 @@ func discharge(character: GuildCharacter) -> void:
 func revive(character: GuildCharacter) -> void:
 	if GuildUpgrades.revive(character):
 		show_toast(TOAST_REVIVED % character.name)
+	elif is_roster_full():
+		show_toast(TOAST_REVIVE_NO_BED % character.name)
 	queue_refresh()
 
 
@@ -881,8 +884,9 @@ func end_day() -> void:
 
 ## Play out one quest with DayBar's helpers and pay its gold and standing.
 ## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, injured, milestone}
-## (injured = the party members whose injury level went up on this quest)
+##   {quest, party, story, succeeded, chance, gold, standing, injured, died, milestone}
+## (injured = the party members whose injury level went up on this quest but
+## who survived; died = the party members who died on it)
 func _run_quest(entry: Dictionary) -> Dictionary:
 	var party: Array[GuildCharacter] = []
 	party.assign(entry.party)
@@ -908,9 +912,15 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		for character in party:
 			character.pluck += 1
 
+	# the dead are listed apart from the hurt, and remember where they fell
 	var injured := []
+	var died := []
 	for character in party:
-		if character.injury_level > injury_before[character]:
+		if Style.is_dead(character) and injury_before[character] < GuildCharacter.InjuryLevel.DEAD:
+			died.append(character)
+			character.died_on_day = GameState.day
+			character.died_on_quest = entry.quest.questTitle
+		elif character.injury_level > injury_before[character]:
 			injured.append(character)
 
 	return {
@@ -922,6 +932,7 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		"gold": gold_earned,
 		"standing": standing_earned,
 		"injured": injured,
+		"died": died,
 		"milestone": entry.milestone,
 	}
 

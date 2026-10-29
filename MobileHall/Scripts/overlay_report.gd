@@ -30,6 +30,7 @@ const BUTTON_CLOSE := "Close"
 @onready var _succeeded_chip = %WinsChip      # chip.gd
 @onready var _gold_chip = %GoldChip           # chip.gd
 @onready var _injured_chip = %HurtChip        # chip.gd
+@onready var _dead_chip = %DeadChip           # chip.gd
 @onready var _home_note: Label = %HomeNote
 @onready var _released_note: Label = %ReleasedNote
 # Quest cards
@@ -74,16 +75,18 @@ func refresh() -> void:
 	Style.style_button(_action_button, "green" if starts_next_day else "paper", 32)
 
 
-## Chips: how many succeeded, total gold, how many got hurt.
+## Chips: how many succeeded, total gold, how many got hurt, how many died.
 func _show_totals(results: Array) -> void:
 	var total_gold := 0
 	var succeeded_count := 0
 	var injured_count := 0
+	var dead_count := 0
 	for result in results:
 		total_gold += int(result.gold)
 		if result.succeeded:
 			succeeded_count += 1
 		injured_count += result.get("injured", []).size()
+		dead_count += result.get("died", []).size()
 
 	_succeeded_chip.set_chip(TEXT_SUCCEEDED % [succeeded_count, results.size()], Style.GREEN_BG, Style.GREEN_TEXT, "check")
 	_succeeded_chip.visible = not results.is_empty()
@@ -92,6 +95,12 @@ func _show_totals(results: Array) -> void:
 		_injured_chip.set_chip(Style.count_text(injured_count, "hurt", "hurt"), Style.RED_BG, Style.RED, "injury")
 	else:
 		_injured_chip.set_chip(TEXT_NO_INJURIES, Style.GREEN_BG, Style.GREEN_TEXT, "heart")
+	# "No injuries" next to a death would read wrong, so it hides when someone died
+	_injured_chip.visible = injured_count > 0 or dead_count == 0
+
+	var dead_look: Dictionary = Style.INJURY_LOOKS[GuildCharacter.InjuryLevel.DEAD]
+	_dead_chip.set_chip(Style.count_text(dead_count, "death", "deaths"), dead_look.bg, dead_look.text, "injury")
+	_dead_chip.visible = dead_count > 0
 
 
 ## One line for the night at home: who trained, who healed (see GuildUpgrades.run_night).

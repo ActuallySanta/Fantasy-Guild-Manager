@@ -13,6 +13,7 @@ const TEXT_PICKED_FOR := "Picked for #%d"
 const TEXT_SENT_ON := "Sent on #%d"
 const TEXT_TRAINING := "Training %s"
 const TEXT_IN_BED := "In a Hospital bed"
+const TEXT_DIED_ON := "Died on Day %d"
 
 # ---- NODES
 @onready var _portrait = %Portrait            # portrait.gd
@@ -35,10 +36,15 @@ func setup(hall: HallMain, character: GuildCharacter) -> void:
 
 
 ## Today's task chip: free, picked for a quest (blue), sent on one (green),
-## training a stat (that stat's colours) or in a Hospital bed (orange).
+## training a stat (that stat's colours), in a Hospital bed (orange), or the
+## day they died (hidden if that wasn't recorded; the Dead chip says enough).
 func _show_task(hall: HallMain, character: GuildCharacter) -> void:
 	var quest_index := hall.quest_index_of(character)
-	if quest_index < 0 and GuildUpgrades.is_patient(character):
+	if Style.is_dead(character):
+		var dead_look: Dictionary = Style.INJURY_LOOKS[GuildCharacter.InjuryLevel.DEAD]
+		_task_chip.set_chip(TEXT_DIED_ON % character.died_on_day, dead_look.bg, dead_look.text, "", true)
+		_task_chip.visible = character.died_on_day >= 0
+	elif quest_index < 0 and GuildUpgrades.is_patient(character):
 		var bed_look: Dictionary = Style.INJURY_LOOKS[2]
 		_task_chip.set_chip(TEXT_IN_BED, bed_look.bg, bed_look.text)
 	elif quest_index < 0 and GuildUpgrades.is_training(character):

@@ -349,7 +349,12 @@ func can_revive() -> bool:
 func revive(character: GuildCharacter) -> bool:
 	if not can_revive() or character.injury_level < GuildCharacter.InjuryLevel.DEAD:
 		return false
+	# the dead don't take a bed, so coming back needs a free one
+	if not CharacterContainer.has_free_bed():
+		return false
 	character.injury_level = GuildCharacter.InjuryLevel.GRAVELY_INJURED
+	character.died_on_day = -1
+	character.died_on_quest = ""
 	character.set_meta(RECOVERY_META, Vector2i(GuildCharacter.InjuryLevel.GRAVELY_INJURED, 0))
 	revives_used += 1
 	patients.append(character)
