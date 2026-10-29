@@ -884,9 +884,10 @@ func end_day() -> void:
 
 ## Play out one quest with DayBar's helpers and pay its gold and standing.
 ## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, injured, died, milestone}
+##   {quest, party, story, succeeded, chance, gold, standing, injured, died, items, milestone}
 ## (injured = the party members whose injury level went up on this quest but
-## who survived; died = the party members who died on it)
+## who survived; died = the party members who died on it; items = the
+## equipment found while searching, already added to the pack)
 func _run_quest(entry: Dictionary) -> Dictionary:
 	var party: Array[GuildCharacter] = []
 	party.assign(entry.party)
@@ -898,14 +899,24 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 
 	# play it out
 	var chance: float = DayBarLogic._get_success_chance(entry.quest, party)
-	var story: String = entry.quest.generateResults(party, chance)
+	# only play the quest out once, or its loot and injuries would be rolled twice
+	var story: String
 	if(GameState.day == MILESTONE_DAY):
 		story = entry.quest.generateMilestoneResults(party, chance)
+	else:
+		story = entry.quest.generateResults(party, chance)
 	var succeeded: bool = DayBarLogic._did_succeed(story)
 	var gold_earned: int = DayBarLogic._get_gold_earned(entry.quest, succeeded)
 	var standing_earned: int = entry.quest.difficulty + 1 if succeeded else 0
 	GameState.add_gold(gold_earned)
 	GameState.add_standing(standing_earned)
+
+	# equipment found while searching goes to the pack, even if the quest failed
+	var found_items: Array[StandardItem] = entry.quest.found_items.duplicate()
+	if not found_items.is_empty():
+		ItemContainer.owned_items.append_array(found_items)
+		# refresh gear rows and unworn counts
+		ItemShop.gear_changed.emit()
 
 	# Increase character pluck by one if the quest succeeded.
 	if succeeded:
@@ -933,6 +944,7 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		"standing": standing_earned,
 		"injured": injured,
 		"died": died,
+		"items": found_items,
 		"milestone": entry.milestone,
 	}
 

@@ -12,6 +12,8 @@ const STORY_RECOLORS := {
 	"[color=FFE700]": "[color=#7A5A12]", "[color=gold]": "[color=#7A5A12]",
 	"[color=green]": "[color=#2F6A22]",
 	"[color=FD0000]": "[color=#A3262A]", "[color=red]": "[color=#A3262A]",
+	# found equipment
+	"[color=4FC3F7]": "[color=#2F5F8A]",
 }
 
 ## Icon for a story line; the first matching rule wins.
@@ -21,6 +23,8 @@ const SUMMARY_ICON := "SUMMARY"
 const BEAT_ICON_RULES := [
 	{"test": "contains", "text": "passed away", "icon": "injury"},
 	{"test": "contains", "text": "INJUR", "icon": "injury"},
+	{"test": "contains", "text": "hidden cache", "icon": "rook"},
+	{"test": "contains", "text": "Equipment found", "icon": "rook"},
 	{"test": "contains", "text": "chest", "icon": "coins"},
 	{"test": "contains", "text": "without sustaining", "icon": "defense"},
 	{"test": "starts_with", "text": "Summary", "icon": SUMMARY_ICON},
@@ -38,6 +42,7 @@ const TEXT_PARTY := "%s · %d%% chance"
 const TEXT_INJURED := "Hurt: %s"
 const TEXT_NO_INJURIES := "Everyone came back unhurt"
 const TEXT_DIED := "Died: %s"
+const TEXT_FOUND_ITEMS := "Found: %s"
 const BUTTON_OPEN_STORY := "Read the story"
 const BUTTON_HIDE_STORY := "Hide the story"
 
@@ -49,6 +54,7 @@ const BUTTON_HIDE_STORY := "Hide the story"
 @onready var _party_line: Label = %PartyLine
 @onready var _injured_line: Label = %HurtLine
 @onready var _died_line: Label = %DiedLine
+@onready var _items_line: Label = %ItemsLine
 # Story
 @onready var _story_button: Button = %StoryButton
 @onready var _beat_list: VBoxContainer = %Beats
@@ -75,7 +81,8 @@ func setup(result: Dictionary) -> void:
 	Style.style_panel(self, Style.CARD_BG, border_color, 3, 16, CARD_PADDING)
 
 
-## Stamp, title, gold, who went (with their chance), who got hurt, who died.
+## Stamp, title, gold, who went (with their chance), who got hurt, who died,
+## and what equipment was found.
 func _show_summary(result: Dictionary) -> void:
 	if _succeeded:
 		_result_stamp.set_chip(TEXT_SUCCESS, Style.GREEN, Style.WHITE, "check")
@@ -99,6 +106,15 @@ func _show_summary(result: Dictionary) -> void:
 	_died_line.visible = not died.is_empty()
 	_died_line.text = TEXT_DIED % Style.join_names(died, ", ")
 	Style.set_font_color(_died_line, Style.RED)
+
+	# equipment found while searching (kept whether or not the quest succeeded)
+	var found_items: Array = result.get("items", [])
+	var found_item_names: Array[String] = []
+	for found_item in found_items:
+		found_item_names.append(found_item.name)
+	_items_line.visible = not found_items.is_empty()
+	_items_line.text = TEXT_FOUND_ITEMS % ", ".join(found_item_names)
+	Style.set_font_color(_items_line, Style.BLUE_TEXT)
 
 
 # ---- story
