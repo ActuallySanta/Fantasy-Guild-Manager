@@ -56,7 +56,11 @@ func _show_quest_facts(hall: HallMain, entry: Dictionary) -> void:
 	Style.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
 	_title.text = entry.quest.questTitle
 	_rank_chip.set_box(TEXT_RANK % Style.rank_letter(entry.quest), Style.TEXT_MAIN)
-	_gold_chip.set_chip(TEXT_GOLD % entry.quest.goldReward, Style.GOLD_BG, Style.TEXT_MAIN, "coins")
+	# item quests pay pre-rolled equipment instead of gold: show the count and rarities
+	if entry.quest.pays_in_items():
+		_gold_chip.set_chip(entry.quest.get_reward_text(), Style.BLUE_BG, Style.BLUE_TEXT, "chest")
+	else:
+		_gold_chip.set_chip(TEXT_GOLD % entry.quest.goldReward, Style.GOLD_BG, Style.TEXT_MAIN, "coins")
 	_party_size_chip.set_chip(TEXT_PARTY_SIZE % hall.party_size_limit(entry), Style.BLUE_BG, Style.TEXT_MAIN, "person")
 	var favored_stat: Dictionary = Style.STATS[Style.favored_stat_index(entry.quest)]
 	_favored_chip.set_chip(favored_stat.short, favored_stat.bg, favored_stat.color, "", true)

@@ -18,6 +18,7 @@ const TEXT_LETTERS := "%s tonight"
 const TEXT_NO_LETTERS := "a quiet night"
 const TEXT_SUCCEEDED := "%d / %d succeeded"
 const TEXT_GOLD := "+%d gold"
+const TEXT_GOLD_AND_ITEMS := "+%d gold · +%s"
 const TEXT_NO_INJURIES := "nobody hurt"
 const TEXT_NOBODY_WENT := "Nobody went out. Quests are the only way to earn gold."
 const TEXT_HOME := "At home: %s"
@@ -92,8 +93,11 @@ func _show_totals(results: Array) -> void:
 	var succeeded_count := 0
 	var injured_count := 0
 	var dead_count := 0
+	# equipment gained tonight: found while searching plus item-quest rewards
+	var item_count := 0
 	for result in results:
 		total_gold += int(result.gold)
+		item_count += result.get("items", []).size() + result.get("reward_items", []).size()
 		if result.succeeded:
 			succeeded_count += 1
 		injured_count += result.get("injured", []).size()
@@ -101,7 +105,11 @@ func _show_totals(results: Array) -> void:
 
 	_succeeded_chip.set_box(TEXT_SUCCEEDED % [succeeded_count, results.size()], Style.BLUE_TEXT)
 	_succeeded_chip.visible = not results.is_empty()
-	_gold_chip.set_box(TEXT_GOLD % total_gold, Style.GOLD_TEXT)
+	if item_count > 0:
+		var items_text := Style.count_text(item_count, "item", "items")
+		_gold_chip.set_box(TEXT_GOLD_AND_ITEMS % [total_gold, items_text], Style.GOLD_TEXT)
+	else:
+		_gold_chip.set_box(TEXT_GOLD % total_gold, Style.GOLD_TEXT)
 	if injured_count > 0:
 		_injured_chip.set_box(Style.count_text(injured_count, "hurt", "hurt"), Style.RED)
 	else:

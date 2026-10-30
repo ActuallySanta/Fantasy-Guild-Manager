@@ -133,7 +133,11 @@ func _show_quest_card(entry: Dictionary) -> void:
 	_title.text = quest.questTitle
 
 	# chips: reward, party size, favored stat
-	_gold_chip.set_chip(TEXT_GOLD % quest.goldReward, Style.GOLD_BG, Style.TEXT_MAIN, "coins")
+	# item quests pay pre-rolled equipment instead of gold: show the count and rarities
+	if quest.pays_in_items():
+		_gold_chip.set_chip(quest.get_reward_text(), Style.BLUE_BG, Style.BLUE_TEXT, "chest")
+	else:
+		_gold_chip.set_chip(TEXT_GOLD % quest.goldReward, Style.GOLD_BG, Style.TEXT_MAIN, "coins")
 	var size_text := TEXT_PARTY_SIZE_SOLO if size_limit == 1 else TEXT_PARTY_SIZE % size_limit
 	_party_size_chip.set_chip(size_text, Style.BLUE_BG, Style.TEXT_MAIN, "person")
 	var favored_stat: Dictionary = Style.STATS[Style.favored_stat_index(quest)]

@@ -43,6 +43,8 @@ const TEXT_INJURED := "Hurt: %s"
 const TEXT_DIED := "Died: %s"
 const TEXT_FOUND := "Found: %s"
 const TEXT_WON := "It is done, master. The reward is ours: %d gold. — %s."
+const TEXT_WON_ITEMS := "It is done, master. The reward is ours: %s. — %s."
+const TEXT_ITEMS_AND_GOLD := "%s, and %d gold"
 const TEXT_LOST_GOLD := "Sorry, master. No reward this time, but %s brought back %d gold. — %s."
 const TEXT_LOST := "Sorry, master. No reward this time. — %s."
 const TEXT_NOBODY_CAME_BACK := "Nobody came back to write this letter."
@@ -132,6 +134,16 @@ func _closing_text(result: Dictionary) -> String:
 	for character in survivors:
 		initials.append(character.name.left(1))
 	var signature := " & ".join(initials)
+	# an item quest's reward replaces its gold; any gold is bonus found on the way
+	var reward_items: Array = result.get("reward_items", [])
+	if result.succeeded and not reward_items.is_empty():
+		var reward_names := PackedStringArray()
+		for reward_item in reward_items:
+			reward_names.append(reward_item.name)
+		var reward_text := ", ".join(reward_names)
+		if result.gold > 0:
+			reward_text = TEXT_ITEMS_AND_GOLD % [reward_text, result.gold]
+		return TEXT_WON_ITEMS % [reward_text, signature]
 	if result.succeeded:
 		return TEXT_WON % [result.gold, signature]
 	if result.gold > 0:

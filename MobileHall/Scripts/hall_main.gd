@@ -921,10 +921,11 @@ func end_day() -> void:
 
 ## Play out one quest with DayBar's helpers and pay its gold and standing.
 ## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, injured, died, items, milestone}
+##   {quest, party, story, succeeded, chance, gold, standing, injured, died, items, reward_items, milestone}
 ## (injured = the party members whose injury level went up on this quest but
 ## who survived; died = the party members who died on it; items = the
-## equipment found while searching, already added to the pack)
+## equipment found while searching, already added to the pack; reward_items =
+## an item quest's reward, added to the pack only when the quest succeeded)
 func _run_quest(entry: Dictionary) -> Dictionary:
 	var party: Array[GuildCharacter] = []
 	party.assign(entry.party)
@@ -950,8 +951,13 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 
 	# equipment found while searching goes to the pack, even if the quest failed
 	var found_items: Array[StandardItem] = entry.quest.found_items.duplicate()
-	if not found_items.is_empty():
+	# an item quest's reward replaces its gold, so it's only paid on a success
+	var reward_items: Array[StandardItem] = []
+	if succeeded and entry.quest.pays_in_items():
+		reward_items = entry.quest.reward_items.duplicate()
+	if not found_items.is_empty() or not reward_items.is_empty():
 		ItemContainer.owned_items.append_array(found_items)
+		ItemContainer.owned_items.append_array(reward_items)
 		# refresh gear rows and unworn counts
 		ItemShop.gear_changed.emit()
 
@@ -982,6 +988,7 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		"injured": injured,
 		"died": died,
 		"items": found_items,
+		"reward_items": reward_items,
 		"milestone": entry.milestone,
 	}
 
