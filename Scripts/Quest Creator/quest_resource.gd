@@ -356,7 +356,7 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 			var extraGold = randi_range(3, 15)
 			goldReward += extraGold
 			returnString = str(returnString, "[b]", searchingAdventurer.name, 
-			"[/b] found an old chest containing [color=FFE700][b]", extraGold, " gold[/b][/color]. However, the chest was trapped and [b]", searchingAdventurer, 
+			"[/b] found an old chest containing [color=FFE700][b]", extraGold, " gold[/b][/color]. However, the chest was trapped and [b]", searchingAdventurer.name, 
 			"[/b] was [color=FD0000][b]INJURED 1 TIME[/b][/color].]\n")
 		elif(91 <= succSearDet && succSearDet <= 100):
 			goldReward += 1
