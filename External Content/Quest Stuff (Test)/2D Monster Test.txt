@@ -1,6 +1,6 @@
-Ghost|Skeleton|Troll
-Goblin|Specter|Titan
-Ghoul|Shadow|Tiny Baby Zombie
-Gorgon|Siren|Treant
-Golem|Sprite|Trogladyte
-Gremlin|Stray Cat|Tarantula
+Ghost|Skeleton|Troll|AAAA
+Goblin|Specter|Titan|BBBB
+Ghoul|Shadow|Tiny Baby Zombie|CCCC
+Gorgon|Siren|Treant|DDDD
+Golem|Sprite|Trogladyte|EEEE
+Gremlin|Stray Cat|Tarantula|FFFF

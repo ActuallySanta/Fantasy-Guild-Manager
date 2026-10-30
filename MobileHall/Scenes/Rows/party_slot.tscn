@@ -1,68 +1,50 @@
 [gd_scene format=3]
 
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/card.tres" id="1_a0wkm"]
-[ext_resource type="Script" path="res://MobileHall/Scripts/party_slot.gd" id="2_ykb1u"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/portrait.tscn" id="3_lqydf"]
-[ext_resource type="Script" path="res://MobileHall/Scripts/portrait.gd" id="4_37l88"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/party_slot.gd" id="1_slot"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5l50i"]
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
-bg_color = Color(0.7254902, 0.7882353, 0.8392157, 1)
-border_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-corner_radius_top_left = 40
-corner_radius_top_right = 40
-corner_radius_bottom_right = 40
-corner_radius_bottom_left = 40
+[node name="PartySlot" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 118)
+theme_type_variation = &"PaperCard"
+script = ExtResource("1_slot")
 
-[node name="PartySlot" type="PanelContainer" unique_id=76911501]
-custom_minimum_size = Vector2(150, 0)
-mouse_filter = 1
-theme_override_styles/panel = ExtResource("1_a0wkm")
-script = ExtResource("2_ykb1u")
-
-[node name="Col" type="VBoxContainer" parent="." unique_id=1701391907]
+[node name="Row" type="HBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 2
-alignment = 1
+mouse_filter = 2
+theme_override_constants/separation = 14
 
-[node name="Holder" type="CenterContainer" parent="Col" unique_id=1994163050]
-custom_minimum_size = Vector2(0, 80)
-layout_mode = 2
-
-[node name="Portrait" type="Panel" parent="Col/Holder" unique_id=1225425876 instance=ExtResource("3_lqydf")]
+[node name="Portrait" parent="Row" instance=ExtResource("2_portrait")]
 unique_name_in_owner = true
-clip_children = 2
-custom_minimum_size = Vector2(76, 76)
+custom_minimum_size = Vector2(72, 88)
 layout_mode = 2
 size_flags_vertical = 4
+pinned = true
+
+[node name="Info" type="VBoxContainer" parent="Row"]
+layout_mode = 2
+size_flags_horizontal = 3
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_5l50i")
-script = ExtResource("4_37l88")
+theme_override_constants/separation = 0
+alignment = 1
 
-[node name="EmptyMark" type="Label" parent="Col/Holder" unique_id=2125969604]
+[node name="SlotName" type="Label" parent="Row/Info"]
 unique_name_in_owner = true
-visible = false
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 50
-theme_override_colors/font_color = Color(0.73333335, 0.73333335, 0.73333335, 1)
-text = "+"
-
-[node name="SlotName" type="Label" parent="Col" unique_id=1867466893]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "Name"
-horizontal_alignment = 1
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 36
+text = "Maria"
 text_overrun_behavior = 3
 
-[node name="SlotHint" type="Label" parent="Col" unique_id=1736704737]
+[node name="SlotHint" type="Label" parent="Row/Info"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 17
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-text = "tap to remove"
-horizontal_alignment = 1
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
+text = "the Knight"
+
+[node name="FavChip" parent="Row/Info" instance=ExtResource("3_chip")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0

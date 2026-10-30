@@ -43,8 +43,15 @@
 ##   REFRESH (header, content, action bar, nav, overlays) · TOAST
 extends Control
 
+## Fired at the end of each player action, for the tutorial coach
+## (overlay_tutorial.gd). event: tab, hire, character, close, assign, pick,
+## send, deny, end_check, end_day, new_day, upgrade, training_picker, train,
+## admit, buy, equip.
+signal tutorial_event(event: String, data: Variant)
+
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const DayBarLogic := preload("res://Scripts/UI/day_bar.gd")
+const TutorialScript := preload("res://MobileHall/Scripts/overlay_tutorial.gd")
 
 
 # ============================================================ SETTINGS
@@ -85,20 +92,22 @@ const SETTINGS_COLOR_FILTER := "color_filter"
 # ============================================================ TEXT
 
 # ---- header
-const HEADER_DAY := "Day %d"
-const HEADER_DRAKE := "Bone Drake in %d %s"
-const HEADER_DRAKE_TODAY := "The Bone Drake attacks today!"
+## The day number on the DAY tile.
+const HEADER_DAY := "%d"
+## The countdown note (BBCode); the days left are in red ink, and the whole
+## note turns red once DRAKE_WARNING_DAYS or fewer are left.
+const HEADER_DRAKE := "The Bone Drake wakes in [color=#%s]%d %s[/color]"
+const HEADER_DRAKE_TODAY := "The Bone Drake [color=#%s]attacks today![/color]"
 const HEADER_DRAKE_GONE := "The Bone Drake has come and gone"
-## Countdown colour in the last days (light red, readable on the dark header).
-const DRAKE_WARNING_COLOR := Color("#FF8A80")
 
 # ---- nav
-## Background of a nav tab that isn't open.
-const NAV_IDLE_BG := Color("#555A61")
+## Nav tab heights: the open tab stands a little taller than the others.
+const NAV_HEIGHT := 100
+const NAV_HEIGHT_OPEN := 114
 
 # ---- action bar
 const ACTION_HIRE := "Hire your first adventurer"
-const ACTION_HIRE_HINT := "You need someone to send on quests"
+const ACTION_HIRE_HINT := "You need someone to send on quests."
 const ACTION_HIRE_BUTTON := "For Hire"
 const ACTION_DECIDE := "%s to decide"
 const ACTION_DECIDE_HINT := "Next: %s"
@@ -142,6 +151,7 @@ const TOAST_UNEQUIPPED := "%s took off the %s"
 const TOAST_WRONG_ROLE := "Only %ss can use the %s."
 const TOAST_HANDS_FULL := "%s's hands are full. Take something off first."
 const TOAST_GEAR_DEAD := "%s can't use gear anymore."
+const TOAST_TAB_LOCKED := "Pip will open this on Day %d."
 
 
 # ============================================================ STATE
@@ -205,13 +215,15 @@ var _is_refresh_queued := false
 ## Which tab / screen was showing at the last refresh (to know when to scroll to top).
 var _last_view_key := ""
 var _toast_tween: Tween
+## Pip, the tutorial coach (built in _ready, sits on top of every overlay).
+var tutorial: Control
 
 
 # ============================================================ NODES
 
 # ---- header
 @onready var _day_value: Label = %DayValue
-@onready var _drake_value: Label = %DrakeValue
+@onready var _drake_value: RichTextLabel = %DrakeValue
 @onready var _gold_value: Label = %GoldValue
 @onready var _standing_value: Label = %StandingValue
 @onready var _menu_button: Button = %MenuButton
@@ -265,6 +277,12 @@ func _ready() -> void:
 	CharacterContainer.on_hireables_refreshed.connect(queue_refresh)
 	ItemShop.stock_changed.connect(queue_refresh)
 	ItemShop.gear_changed.connect(queue_refresh)
+
+	# the tutorial coach goes on top of everything; on Day 1 it replaces the Welcome card
+	tutorial = TutorialScript.new()
+	tutorial.name = "OverlayTutorial"
+	add_child(tutorial)
+	tutorial.setup(self)
 
 	_load_settings()
 	_generate_quests()
@@ -477,6 +495,9 @@ func days_until_drake() -> int:
 ## Switch bottom tab. Closes any screen; party drafts stay on their quests.
 ## `section` optionally picks the tab's half (GUILD_SECTION_* or UPGRADES_SECTION_*).
 func open_tab(tab_id: String, section: String = "") -> void:
+	if tutorial and tutorial.is_tab_locked(tab_id):
+		show_toast(TOAST_TAB_LOCKED % tutorial.unlock_day(tab_id))
+		return
 	active_tab = tab_id
 	if section != "" and tab_id == "guild":
 		guild_section = section
@@ -486,6 +507,7 @@ func open_tab(tab_id: String, section: String = "") -> void:
 		for_hire_last_seen_day = GameState.day
 	active_screen = {}
 	queue_refresh()
+	tutorial_event.emit("tab", {"tab": active_tab, "guild": guild_section, "upgrades": upgrades_section})
 
 
 ## The Guild tab's Your Guild / For Hire buttons.
@@ -505,12 +527,14 @@ func open_assign(quest_index: int) -> void:
 	active_screen = {"kind": SCREEN_ASSIGN, "quest_index": clampi(quest_index, 0, quest_entries.size() - 1)}
 	active_tab = "board"
 	queue_refresh()
+	tutorial_event.emit("assign", quest_index)
 
 
 ## Open a character's details over whatever is showing.
 func open_character(character: GuildCharacter) -> void:
 	active_screen = {"kind": SCREEN_CHARACTER, "character": character, "return_to": active_screen.duplicate()}
 	queue_refresh()
+	tutorial_event.emit("character", character)
 
 
 ## Character goes back to wherever it was opened from; Assign Party goes to the Board.
@@ -520,6 +544,7 @@ func close_screen() -> void:
 	else:
 		active_screen = {}
 	queue_refresh()
+	tutorial_event.emit("close", null)
 
 
 ## The action bar's button: always the next thing to do
@@ -600,6 +625,7 @@ func toggle_in_party(character: GuildCharacter) -> void:
 
 	entry.party.append(character)
 	queue_refresh()
+	tutorial_event.emit("pick", entry)
 
 
 ## Take someone out of a party. A sent quest left with nobody goes back to open.
@@ -623,6 +649,7 @@ func send_party() -> void:
 	entry.state = Style.QUEST_STATE_SENT
 	show_toast(TOAST_SENT % entry.quest.questTitle)
 	_go_to_next_undecided()
+	tutorial_event.emit("send", entry)
 
 
 ## Turn the quest down (costs standing), then jump to the next undecided quest.
@@ -635,6 +662,7 @@ func deny_quest() -> void:
 	GameState.reduce_standing(entry.quest.difficulty)
 	show_toast(TOAST_DENIED % entry.quest.questTitle)
 	_go_to_next_undecided()
+	tutorial_event.emit("deny", entry)
 
 
 ## Undo Send: the party goes back to being a draft.
@@ -674,6 +702,7 @@ func hire(character: GuildCharacter) -> void:
 		show_toast(TOAST_ROSTER_FULL)
 	elif CharacterContainer.add_character_to_guild(character):
 		show_toast(TOAST_HIRED % character.name)
+		tutorial_event.emit("hire", character)
 	queue_refresh()
 
 
@@ -700,6 +729,7 @@ func release(character: GuildCharacter) -> void:
 func upgrade_building(building: int) -> void:
 	if GuildUpgrades.try_upgrade(building):
 		show_toast(TOAST_UPGRADED % [GuildUpgrades.get_building_name(building), GuildUpgrades.get_level(building)])
+		tutorial_event.emit("upgrade", building)
 	queue_refresh()
 
 
@@ -713,6 +743,7 @@ func buy_item(index: int) -> void:
 		return
 	if ItemShop.buy(index):
 		show_toast(TOAST_BOUGHT % Style.item_look(item).name)
+		tutorial_event.emit("buy", item)
 	else:
 		show_toast(TOAST_CANT_BUY)
 	queue_refresh()
@@ -724,6 +755,7 @@ func equip_item(item: StandardItem, character: GuildCharacter) -> void:
 	var result: int = ItemShop.equip(item, character)
 	if result == ItemShop.EquipResult.OK:
 		show_toast(TOAST_EQUIPPED % [character.name, item_name])
+		tutorial_event.emit("equip", item)
 	elif result == ItemShop.EquipResult.WRONG_ROLE:
 		show_toast(TOAST_WRONG_ROLE % [Style.item_role_name(item), item_name])
 	elif result == ItemShop.EquipResult.SLOTS_FULL:
@@ -750,6 +782,7 @@ func unequip_item(item: StandardItem) -> void:
 func toggle_training_picker() -> void:
 	training_picker_open = not training_picker_open
 	queue_refresh()
+	tutorial_event.emit("training_picker", training_picker_open)
 
 
 ## Put a hero in a training slot drilling `stat`, or change their stat.
@@ -770,6 +803,7 @@ func train(character: GuildCharacter, stat: int) -> void:
 	if not GuildUpgrades.has_free_training_slot():
 		training_picker_open = false
 	queue_refresh()
+	tutorial_event.emit("train", character)
 
 
 func stop_training(character: GuildCharacter) -> void:
@@ -783,6 +817,7 @@ func admit(character: GuildCharacter) -> void:
 	_leave_quest(character)
 	if GuildUpgrades.admit(character):
 		show_toast(TOAST_ADMITTED % character.name)
+		tutorial_event.emit("admit", character)
 	queue_refresh()
 
 
@@ -858,6 +893,7 @@ func open_end_check() -> void:
 		return
 	is_end_check_open = true
 	queue_refresh()
+	tutorial_event.emit("end_check", null)
 
 
 func close_end_check() -> void:
@@ -880,6 +916,7 @@ func end_day() -> void:
 	shown_report = {"starts_next_day": true, "day": GameState.day, "results": results, "home": home,
 			"released": released_today.duplicate()}
 	queue_refresh()
+	tutorial_event.emit("end_day", results)
 
 
 ## Play out one quest with DayBar's helpers and pay its gold and standing.
@@ -965,6 +1002,7 @@ func start_new_day() -> void:
 		var quests_text := Style.count_text(quest_entries.size(), "new quest", "new quests")
 		show_toast(TOAST_NEW_DAY % [GameState.day, quests_text, CharacterContainer.hireable_characters.size()])
 	queue_refresh()
+	tutorial_event.emit("new_day", GameState.day)
 
 
 ## The report's button: starts the next day after End Day, otherwise just closes.
@@ -1013,15 +1051,17 @@ func refresh() -> void:
 func _refresh_header() -> void:
 	_day_value.text = HEADER_DAY % GameState.day
 
+	# the days left are always in red ink; in the last days the whole note is
 	var days_left := days_until_drake()
+	var red_ink := Style.RED.to_html(false)
 	if days_left > 0:
-		_drake_value.text = HEADER_DRAKE % [days_left, Style.pick_plural(days_left, "day", "days")]
+		_drake_value.text = HEADER_DRAKE % [red_ink, days_left, Style.pick_plural(days_left, "day", "days")]
 	elif days_left == 0:
-		_drake_value.text = HEADER_DRAKE_TODAY
+		_drake_value.text = HEADER_DRAKE_TODAY % red_ink
 	else:
 		_drake_value.text = HEADER_DRAKE_GONE
 	var is_drake_close := days_left >= 0 and days_left <= DRAKE_WARNING_DAYS
-	Style.set_font_color(_drake_value, DRAKE_WARNING_COLOR if is_drake_close else Style.WHITE)
+	Style.set_font_color(_drake_value, Style.RED if is_drake_close else Style.TEXT_MAIN)
 
 	_gold_value.text = str(GameState.gold)
 	_standing_value.text = str(GameState.standing)
@@ -1065,42 +1105,36 @@ func _refresh_action_bar() -> void:
 	_action_bar.visible = active_screen.is_empty() and active_tab != TAB_SHOP
 
 	if roster().is_empty() and can_hire_anyone():
-		_set_action(ACTION_HIRE, ACTION_HIRE_HINT, ACTION_HIRE_BUTTON, "blue")
+		_set_action(ACTION_HIRE, ACTION_HIRE_HINT, ACTION_HIRE_BUTTON)
 	elif undecided_count() > 0:
 		var next_entry: Dictionary = quest_entries[next_undecided_index(0)]
 		var title := ACTION_DECIDE % Style.count_text(undecided_count(), "quest", "quests")
-		_set_action(title, ACTION_DECIDE_HINT % next_entry.quest.questTitle, ACTION_DECIDE_BUTTON, "blue")
+		_set_action(title, ACTION_DECIDE_HINT % next_entry.quest.questTitle, ACTION_DECIDE_BUTTON)
 	else:
 		var parties_going := sent_entries().size()
 		var hint := ACTION_END_HINT % Style.count_text(parties_going, "party", "parties") if parties_going > 0 else ACTION_END_HINT_NONE
-		_set_action(ACTION_END % GameState.day, hint, ACTION_END_BUTTON, "green")
+		_set_action(ACTION_END % GameState.day, hint, ACTION_END_BUTTON)
 
 
-func _set_action(title: String, hint: String, button_text: String, button_kind: String) -> void:
+## The torn banner's title, hint and gold button (its look is set in the scene).
+func _set_action(title: String, hint: String, button_text: String) -> void:
 	_action_title.text = title
 	_action_hint.text = hint
 	_action_button.text = button_text
-	Style.style_button(_action_button, button_kind, 30)
 
 # ---- nav
 
 
-## Bottom tabs: the open one is white; each has a badge when it needs a visit.
+## Bottom tabs: the open one is parchment (NavTabActive in hall_theme) and
+## stands taller, the rest dark wood (NavTab); each has a badge when it needs a visit.
 func _refresh_nav() -> void:
 	# Assign Party counts as part of the Board
 	var highlighted_tab := "board" if active_screen.get("kind", "") == SCREEN_ASSIGN else active_tab
 	for tab_id in TAB_IDS:
 		var nav_button := _nav_button(tab_id)
 		var is_active: bool = tab_id == highlighted_tab
-		var content_color := Style.TEXT_MAIN if is_active else Style.WHITE
-
-		var box := Style.flat_box(Style.WHITE if is_active else NAV_IDLE_BG, 10, 3 if is_active else 0, Style.BLUE_TEXT, Vector4(4, 8, 4, 8))
-		for box_state in Style.BUTTON_BOX_STATES:
-			nav_button.add_theme_stylebox_override(box_state, box)
-		for font_state in Style.BUTTON_FONT_STATES:
-			nav_button.add_theme_color_override(font_state, content_color)
-		for icon_state in ["icon_normal_color", "icon_hover_color", "icon_pressed_color"]:
-			nav_button.add_theme_color_override(icon_state, content_color)
+		nav_button.theme_type_variation = &"NavTabActive" if is_active else &"NavTab"
+		nav_button.custom_minimum_size.y = NAV_HEIGHT_OPEN if is_active else NAV_HEIGHT
 
 		var badge_text := _badge_text_for(tab_id)
 		var badge: Control = nav_button.get_node("Badge")
@@ -1110,6 +1144,8 @@ func _refresh_nav() -> void:
 
 ## What a nav tab's badge says ("" = no badge).
 func _badge_text_for(tab_id: String) -> String:
+	if tutorial and tutorial.is_tab_locked(tab_id):
+		return "Day %d" % tutorial.unlock_day(tab_id)
 	match tab_id:
 		"board":
 			return str(undecided_count()) if undecided_count() > 0 else ""

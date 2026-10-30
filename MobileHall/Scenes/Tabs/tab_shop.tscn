@@ -3,43 +3,17 @@
 [ext_resource type="Script" path="res://MobileHall/Scripts/tab_shop.gd" id="1_shop"]
 [ext_resource type="Texture2D" path="res://MobileHall/Art/shopkeeper_placeholder.svg" id="2_keeper"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="3_bar"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green.tres" id="4_green"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bubble"]
-content_margin_left = 18.0
-content_margin_top = 14.0
-content_margin_right = 18.0
-content_margin_bottom = 14.0
-bg_color = Color(1, 1, 1, 1)
-border_width_left = 5
-border_width_top = 5
-border_width_right = 5
-border_width_bottom = 5
-border_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-corner_radius_top_left = 24
-corner_radius_top_right = 24
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_nametag"]
-content_margin_left = 16.0
-content_margin_top = 6.0
-content_margin_right = 16.0
-content_margin_bottom = 6.0
-bg_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/awning.png" id="4_awning"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/coins.svg" id="5_coins"]
 
 [node name="TabShop" type="VBoxContainer"]
 theme_override_constants/separation = 0
 script = ExtResource("1_shop")
 
 [node name="Keeper" type="Control" parent="."]
-custom_minimum_size = Vector2(0, 480)
-layout_mode = 2
 clip_contents = true
+custom_minimum_size = Vector2(0, 440)
+layout_mode = 2
 
 [node name="Art" type="TextureRect" parent="Keeper"]
 layout_mode = 1
@@ -53,20 +27,32 @@ texture = ExtResource("2_keeper")
 expand_mode = 1
 stretch_mode = 6
 
+[node name="Awning" type="TextureRect" parent="Keeper"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 66.0
+grow_horizontal = 2
+mouse_filter = 2
+texture = ExtResource("4_awning")
+expand_mode = 1
+stretch_mode = 1
+
 [node name="Bubble" type="PanelContainer" parent="Keeper"]
 layout_mode = 0
-offset_left = 20.0
-offset_top = 20.0
-offset_right = 300.0
-offset_bottom = 60.0
+offset_left = 16.0
+offset_top = 84.0
+offset_right = 330.0
+offset_bottom = 124.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_bubble")
+theme_type_variation = &"SpeechBubble"
 
 [node name="BubbleText" type="Label" parent="Keeper/Bubble"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-theme_override_font_sizes/font_size = 23
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 28
+theme_override_constants/line_spacing = -6
 text = "Fresh stock every dawn. Touch it, you bought it."
 autowrap_mode = 3
 
@@ -75,19 +61,19 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -260.0
-offset_top = 24.0
-offset_right = -20.0
-offset_bottom = 64.0
+offset_left = -300.0
+offset_top = 50.0
+offset_right = -16.0
+offset_bottom = 150.0
 grow_horizontal = 0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_nametag")
+theme_type_variation = &"ShopSign"
 
 [node name="ShopName" type="Label" parent="Keeper/NameTag"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 21
+theme_type_variation = &"TitleLight"
+theme_override_font_sizes/font_size = 36
 text = "Grizzle's Goods"
 horizontal_alignment = 1
 
@@ -100,9 +86,9 @@ horizontal_scroll_mode = 0
 [node name="Margin" type="MarginContainer" parent="Scroll"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/margin_left = 18
+theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 18
+theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
 [node name="Goods" type="VBoxContainer" parent="Scroll/Margin"]
@@ -116,57 +102,69 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 21
-text = "TODAY'S GOODS"
+size_flags_vertical = 4
+theme_type_variation = &"CapsLight"
+theme_override_font_sizes/font_size = 20
+text = "Today's goods"
+uppercase = true
 
 [node name="RestockNote" type="Label" parent="Scroll/Margin/Goods/Head"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 21
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 24
 text = "New goods at dawn"
 
 [node name="Grid" type="GridContainer" parent="Scroll/Margin/Goods"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 14
-theme_override_constants/v_separation = 14
+theme_override_constants/v_separation = 16
 columns = 3
 
 [node name="BuyBar" type="PanelContainer" parent="."]
 layout_mode = 2
 theme_override_styles/panel = ExtResource("3_bar")
 
-[node name="Row" type="HBoxContainer" parent="BuyBar"]
+[node name="Banner" type="PanelContainer" parent="BuyBar"]
+layout_mode = 2
+theme_type_variation = &"TornPaper"
+
+[node name="Row" type="HBoxContainer" parent="BuyBar/Banner"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Text" type="VBoxContainer" parent="BuyBar/Row"]
+[node name="Text" type="VBoxContainer" parent="BuyBar/Banner/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_override_constants/separation = 0
 alignment = 1
 
-[node name="ItemName" type="Label" parent="BuyBar/Row/Text"]
+[node name="ItemName" type="Label" parent="BuyBar/Banner/Row/Text"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 34
 text = "Healing Tonic"
+text_overrun_behavior = 3
 
-[node name="ItemEffect" type="Label" parent="BuyBar/Row/Text"]
+[node name="ItemEffect" type="Label" parent="BuyBar/Banner/Row/Text"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 21
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
 text = "Heals one hero by one injury level, right now"
 autowrap_mode = 3
 
-[node name="BuyButton" type="Button" parent="BuyBar/Row"]
+[node name="BuyButton" type="Button" parent="BuyBar/Banner/Row"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 92)
+custom_minimum_size = Vector2(210, 84)
 layout_mode = 2
 size_flags_vertical = 4
 focus_mode = 0
-theme_override_font_sizes/font_size = 26
-theme_override_styles/normal = ExtResource("4_green")
+theme_type_variation = &"GoldButton"
+theme_override_font_sizes/font_size = 32
 text = "Buy · 80g"
+icon = ExtResource("5_coins")

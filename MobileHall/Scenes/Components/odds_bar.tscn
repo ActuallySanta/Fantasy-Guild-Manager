@@ -1,10 +1,20 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/odds_bar.gd" id="1_uxobj"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/odds_bar.gd" id="1_odds"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/odds_track.png" id="2_track"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/odds_fill.png" id="3_fill"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/odds_over.png" id="4_over"]
 
-[node name="OddsBar" type="Control" unique_id=1205212220]
+[node name="OddsBar" type="TextureProgressBar"]
 custom_minimum_size = Vector2(0, 30)
-layout_mode = 3
-anchors_preset = 0
 mouse_filter = 2
-script = ExtResource("1_uxobj")
+value = 50.0
+nine_patch_stretch = true
+stretch_margin_left = 6
+stretch_margin_top = 6
+stretch_margin_right = 6
+stretch_margin_bottom = 6
+texture_under = ExtResource("2_track")
+texture_over = ExtResource("4_over")
+texture_progress = ExtResource("3_fill")
+script = ExtResource("1_odds")

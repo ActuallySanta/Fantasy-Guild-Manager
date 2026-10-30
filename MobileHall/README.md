@@ -12,13 +12,19 @@ It is **UI only**: it runs on the existing systems (`CharacterContainer`, `Guild
 
 ## Look
 
-Generic primitives: flat boxes, Godot's default font, a dark header and nav, white cards.
-Colour only carries meaning: each stat has its own colour, green = good / sent,
-red = bad / denied, blue = info / to do, yellow = gold, and each quest type and building
-has a coloured tag (DUN, ESC, SCT, INT, BOSS / OFF, TRN, HSP, ARM, BRK). The only art is the
-project's own `Sprites/Character Icons` and `Sprites/UI Icons`. All colours are in
-`Scripts/hall_style.gd` (and the shared boxes in `Styles/`), so a real art pass can
-replace them later.
+A guild hall at night: dark wood behind everything, parchment cards, blackletter titles
+(Pirata One) over an old-style serif (Alegreya). Quests are scrolls, applicants are letters
+of introduction, buildings are plans on grid paper, and the night's results come back as
+letters with a Success / Failed stamp.
+Colour still carries meaning, now as ink: each stat has its own ink, green = good / sent,
+red = bad / denied / hurt, blue = odds / to do, gold = money, and each quest type has a
+coloured seal (DUN, ESC, SCT, INT, BOSS).
+
+All art is a swappable placeholder. **See `Art/README.md`** for every file, what it's used
+for and how to replace it. In short: images and fonts are in `Art/`, each surface is a
+StyleBox in `Styles/`, and `hall_theme.tres` holds the named looks scenes use
+(`theme_type_variation` = `TitleLabel`, `PaperCard`, `GoldButton`...). Scripts never build
+boxes in code; they only pick a look or tint white art with an ink colour.
 
 ## What changed, by feedback
 
@@ -31,31 +37,32 @@ replace them later.
 | Not sure what to do next (Ledger) | One **action bar** button above the nav, always the next step: *For Hire* → *Next Quest* → *End Day* |
 | Upgrades forgotten in every version | **Upgrades** tab badge when you can afford something, an Upgrades box on the Board's Today checklist, and the **End Day check** offers affordable upgrades before the day ends |
 | No way to get denied quests back (Ledger) | Denied quests stay on the Board. Open one and tap **Reconsider** |
-| No signal when new recruits arrive (Ledger) | **Guild** badge ("3 new") each morning until you open For Hire |
-| Hiring and questing blurred together (Deck) | Guild tab has two clearly separate halves: **Your Guild** / **For Hire** |
+| No signal when new recruits arrive (Ledger) | **Guild** badge ("3 new") each morning until you open Applicants |
+| Hiring and questing blurred together (Deck) | Guild tab has two clearly separate folder tabs: **Your Guild** / **Applicants** |
 | Tutorial skipped Home (Ledger) | Welcome card walks through Board, Guild, Upgrades and the big button, then lands on the Board |
 | Small buttons (Flow) | Main buttons are 88–96 px tall, nav tabs 100 px, list rows are tappable as a whole |
 | Too much scrolling / decorative art (Ledger) | No decorative art. The Board fits 5 quests without much scrolling. "Coming soon" buildings collapse into one line |
-| Quest results are walls of text (Flow) | **Day Report** shows result, gold, party, odds and who got hurt; the full story is behind *Read the story* |
+| Quest results are walls of text (Flow) | **Day Report** is one short letter per quest: a result stamp, who went and at what odds, who got hurt, one line per story beat with an icon, and a one-line sign-off |
 
 ## Layout
 
 ```
 ┌ header ─ Day · Bone Drake countdown · gold · standing · menu ┐
-│ content ─ Board | Guild | Upgrades  (or a screen over them) │
+│ content ─ Board | Guild | Upgrades | Shop  (or a screen over them) │
 │ action bar ─ "what to do next" + one big button             │
-└ nav ─ Board (undecided) · Guild (new recruits) · Upgrades (affordable) ┘
+└ nav ─ Board (undecided) · Members (new recruits) · Guild (affordable) · Shop ┘
 ```
 
 | Screen | What's on it |
 |---|---|
 | Board (tab) | Today checklist (Recruits / Quests / Upgrades, each tappable), then all quests. Rows show *Pick a party*, *Party picked*, *Sent* or *Denied* with odds and mini portraits |
 | Assign Party | Quest strip; quest card; party seats (tap to remove) with live odds; picker sorted best fit first. Adventurers already in another quest's party are hidden unless **Show busy** is on; shown, they say "Picked for / Sent on #N" and move over when tapped. Footer: Deny / Send Party, or Recall / Next Quest, or Board / Reconsider |
-| Guild (tab) | Your Guild (roster with health, today's task, all five stats) / For Hire (recruit cards with Hire). Bed count links to the Barracks |
-| Upgrades (tab) | Two halves. **Tonight**: the Training Yard card (heroes in a slot with a Str / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital card (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: wallet, affordable buildings first, level pips, now/next effect, cost or what's missing. Badge = upgrades you can afford |
+| Guild (tab, "Members" in the nav) | A folder with two tabs: Your Guild (roster with health, today's task, all five stats) / Applicants (a stack of letters of introduction; tap one peeking out to read it, Hire on the top one). Bed count links to the Barracks |
+| Upgrades (tab, "Guild" in the nav) | A folder with two tabs. **Tonight**: the Training Yard plan (heroes in a slot with a Pow / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital plan (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: the treasury ledger, a plan per building (affordable first) with level diamonds, now/next effect, cost or what's missing, and "coming soon" buildings as rolled-up scrolls. Badge = upgrades you can afford |
+| Shop (tab) | Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar where the action bar usually is. Groundwork only: nothing can be bought yet |
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
-| Day Report | Totals (succeeded, gold, injuries), one short card per quest, story on demand |
+| Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story |
 | Menu | How to play, last night's report, colorblind filter (tap to cycle Off / Red-weak / Green-weak / Blue-yellow, saved to `user://settings.cfg`), reset upgrades (debug) |
 
 ## Colorblind filter
@@ -68,7 +75,7 @@ It doesn't fake colourblindness. When it's Off the rect is hidden and costs noth
 
 ## Training Yard and Hospital
 
-Both live on the Upgrades tab's **Tonight** half (`Scenes/Rows/home_section.tscn`, one card each). The rules
+Both live on the Upgrades tab's **Tonight** half (`Scenes/Rows/home_section.tscn`, one building plan each). The rules
 live in `Globals/guild_upgrades.gd` (`run_night()`, called by End Day before the quests
 are played out), and the tuning numbers sit at the top of that file.
 
@@ -83,6 +90,12 @@ are played out), and the tuning numbers sit at the top of that file.
 - **Revive:** Hospital level 5 brings one fallen hero back per run, Gravely hurt and in a bed.
 - The Day Report's header has an "At home" line with who trained and who healed.
 
+Looks come from the theme, not from overrides: a label is `TitleLabel`, `CapsLabel`,
+`ItalicLabel` (or `TitleLight` / `ItalicLight` / `LabelLight` on wood), a panel is
+`PaperCard`, `PlanCard`, `TornPaper`... and a button is `GoldButton`, `WoodButton`,
+`PaperButton` or `SealButton`. Pick one in the inspector (*Theme > Type Variation*) rather
+than overriding colours or styles on the node, so a reskin reaches it.
+
 ## Things to watch in the playtest
 
 - Do players compare quests on the Board, or go straight to Next Quest?
@@ -94,13 +107,14 @@ are played out), and the tuning numbers sit at the top of that file.
 ## Files
 
 - `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, the shell (header, action bar, nav, toast)
-- `Scenes/Tabs/`: Board, Guild, Upgrades
+- `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
 - `Scenes/Overlays/`: End Day check, Day Report, Welcome, Menu
-- `Scenes/Rows/`: list rows (quest row, quest tab, party seat, picker row, roster / hire cards, upgrade card, Today box, plan row, upgrade suggestion, report entry, story line, Training / Hospital card, row and heading)
-- `Scenes/Components/`: chip, portrait, stat strip, odds bar
-- `Styles/` + `hall_theme.tres`: shared boxes and the base theme
-- `Scripts/hall_style.gd`: colours, stat / injury / odds tables, quest-type and building tags, icon table, text helpers, restyles
+- `Scenes/Rows/`: list rows (quest row, quest tab, party seat, picker row, roster / hire cards, applicant peek, upgrade card, Today note, plan row, upgrade suggestion, report entry, story line, Training / Hospital card, row and heading, shop tile)
+- `Scenes/Components/`: chip, portrait, stat strip, odds bar, divider, seal button, rolled-up scroll tag
+- `Art/`: every image, icon and font (placeholders; see `Art/README.md`)
+- `Styles/` + `hall_theme.tres`: one StyleBox per surface, and the theme with every named look
+- `Scripts/hall_style.gd`: ink colours, stat / injury / odds tables, quest-type and building tables, icon table, text helpers, restyles
 
 ### Editing
 

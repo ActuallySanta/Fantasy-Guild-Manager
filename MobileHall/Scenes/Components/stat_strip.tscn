@@ -2,46 +2,24 @@
 
 [ext_resource type="Script" path="res://MobileHall/Scripts/stat_strip.gd" id="1_mh62l"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="2_d5pfk"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/chip.tres" id="3_i0o57"]
-[ext_resource type="Script" path="res://MobileHall/Scripts/chip.gd" id="4_fcy4g"]
 
-[node name="StatStrip" type="HFlowContainer" unique_id=33119571]
+[node name="StatStrip" type="HFlowContainer"]
 mouse_filter = 2
-theme_override_constants/h_separation = 6
-theme_override_constants/v_separation = 6
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 2
 script = ExtResource("1_mh62l")
 
-[node name="Stat0" type="PanelContainer" parent="." unique_id=545259554 instance=ExtResource("2_d5pfk")]
+[node name="Stat0" parent="." instance=ExtResource("2_d5pfk")]
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("3_i0o57")
-script = ExtResource("4_fcy4g")
 
-[node name="Stat1" type="PanelContainer" parent="." unique_id=1127435320 instance=ExtResource("2_d5pfk")]
+[node name="Stat1" parent="." instance=ExtResource("2_d5pfk")]
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("3_i0o57")
-script = ExtResource("4_fcy4g")
 
-[node name="Stat2" type="PanelContainer" parent="." unique_id=825267710 instance=ExtResource("2_d5pfk")]
+[node name="Stat2" parent="." instance=ExtResource("2_d5pfk")]
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("3_i0o57")
-script = ExtResource("4_fcy4g")
 
-[node name="Stat3" type="PanelContainer" parent="." unique_id=1354379145 instance=ExtResource("2_d5pfk")]
+[node name="Stat3" parent="." instance=ExtResource("2_d5pfk")]
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("3_i0o57")
-script = ExtResource("4_fcy4g")
 
-[node name="Stat4" type="PanelContainer" parent="." unique_id=24411616 instance=ExtResource("2_d5pfk")]
+[node name="Stat4" parent="." instance=ExtResource("2_d5pfk")]
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("3_i0o57")
-script = ExtResource("4_fcy4g")

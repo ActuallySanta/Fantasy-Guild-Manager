@@ -118,7 +118,8 @@ func show_training_slot(main: HallMain, hero: GuildCharacter) -> void:
 	_show_stat_picker(stat)
 
 
-## One button per quest stat; the one being drilled is filled in.
+## One paper button per quest stat in that stat's ink; the one being drilled
+## has its paper tinted with the stat's colour and a check mark.
 func _show_stat_picker(selected_stat: int) -> void:
 	_stat_picker.visible = true
 	var buttons := _stat_picker.get_children()
@@ -127,12 +128,13 @@ func _show_stat_picker(selected_stat: int) -> void:
 		var stat: Dictionary = Style.STATS[stat_index]
 		var is_selected := stat_index == selected_stat
 		button.text = stat.short
-		var box := Style.flat_box(stat.bg if is_selected else Style.WHITE, 10, 4 if is_selected else 2, stat.color if is_selected else stat.bg)
-		for box_state in Style.BUTTON_BOX_STATES:
-			button.add_theme_stylebox_override(box_state, box)
-		button.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+		Style.style_button(button, "paper")
+		Style.tint_art(button, stat.bg if is_selected else Style.WHITE)
+		button.icon = Style.icon_texture("check") if is_selected else null
 		for font_state in Style.BUTTON_FONT_STATES:
 			button.add_theme_color_override(font_state, stat.color)
+		button.add_theme_color_override("icon_normal_color", stat.color)
+		button.add_theme_color_override("icon_pressed_color", stat.color)
 		for connection in button.pressed.get_connections():
 			button.pressed.disconnect(connection.callable)
 		button.pressed.connect(hall.train.bind(character, stat_index))

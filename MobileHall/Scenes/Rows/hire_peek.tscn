@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://MobileHall/Scripts/tap_panel.gd" id="1_tap"]
+
+[node name="HirePeek" type="PanelContainer"]
+custom_minimum_size = Vector2(0, 74)
+theme_type_variation = &"PaperCard"
+script = ExtResource("1_tap")
+
+[node name="Text" type="Label" parent="."]
+layout_mode = 2
+size_flags_vertical = 8
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 30
+text = "Bill · Knight"
+horizontal_alignment = 2

@@ -1,5 +1,7 @@
-## One quest in the Day Report, short by default: result, gold, who went, who
-## got hurt. "Read the story" opens the full story, one line per story beat.
+## One quest in the Day Report, written as a letter home: type seal, title,
+## who sent it and at what odds, a Success / Failed stamp, who got hurt or
+## died, the story one line per beat, and a closing line signed by whoever
+## came back.
 ## Scene: MobileHall/Scenes/Rows/report_entry.tscn
 extends PanelContainer
 
@@ -7,7 +9,7 @@ const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const BeatRowScene := preload("res://MobileHall/Scenes/Rows/beat_row.tscn")
 
 ## CreatedQuest.generateResults writes bright BBCode colours meant for a dark
-## screen; these swap them for darker ones that read on a light card.
+## screen; these swap them for inks that read on parchment.
 const STORY_RECOLORS := {
 	"[color=FFE700]": "[color=#7A5A12]", "[color=gold]": "[color=#7A5A12]",
 	"[color=green]": "[color=#2F6A22]",
@@ -15,11 +17,9 @@ const STORY_RECOLORS := {
 	# found equipment
 	"[color=4FC3F7]": "[color=#2F5F8A]",
 }
-
-## Icon for a story line; the first matching rule wins.
-##   test: "contains" | "starts_with", text: what to look for, icon: icon name
-## The special icon SUMMARY_ICON becomes a tick or cross from the quest's result.
-const SUMMARY_ICON := "SUMMARY"
+## Story lines the letter says in its own words instead (the closing line).
+const SKIPPED_LINE_STARTS := ["Summary", "However"]
+## Icon for a story line (matched on its plain text); the first matching rule wins.
 const BEAT_ICON_RULES := [
 	{"test": "contains", "text": "passed away", "icon": "injury"},
 	{"test": "contains", "text": "INJUR", "icon": "injury"},
@@ -30,25 +30,26 @@ const BEAT_ICON_RULES := [
 	{"test": "starts_with", "text": "Summary", "icon": SUMMARY_ICON},
 	{"test": "starts_with", "text": "However", "icon": "coins"},
 ]
-const BEAT_ICON_DEFAULT := "nav_quests"
-
-const CARD_PADDING := Vector4(18, 14, 18, 14)
+const BEAT_ICON_DEFAULT := "scroll"
 
 # ---- TEXT
 const TEXT_SUCCESS := "Success"
 const TEXT_FAILED := "Failed"
-const TEXT_GOLD := "+%d"
-const TEXT_PARTY := "%s · %d%% chance"
+const TEXT_FROM := "From %s · sent at %d%%"
 const TEXT_INJURED := "Hurt: %s"
-const TEXT_NO_INJURIES := "Everyone came back unhurt"
 const TEXT_DIED := "Died: %s"
 const TEXT_FOUND_ITEMS := "Found: %s"
 const BUTTON_OPEN_STORY := "Read the story"
 const BUTTON_HIDE_STORY := "Hide the story"
+const TEXT_WON := "It is done, master. The reward is ours: %d gold. — %s."
+const TEXT_LOST_GOLD := "Sorry, master. No reward this time, but %s brought back %d gold. — %s."
+const TEXT_LOST := "Sorry, master. No reward this time. — %s."
+const TEXT_NOBODY_CAME_BACK := "Nobody came back to write this letter."
 
 # ---- NODES
-# Summary
-@onready var _result_stamp = %Stamp           # chip.gd
+# Head
+@onready var _type_seal: PanelContainer = %TypeSeal
+@onready var _type_tag: Label = %TypeTag
 @onready var _title: Label = %Title
 @onready var _gold_chip = %GoldChip           # chip.gd
 @onready var _party_line: Label = %PartyLine
@@ -57,11 +58,19 @@ const BUTTON_HIDE_STORY := "Hide the story"
 @onready var _items_line: Label = %ItemsLine
 # Story
 @onready var _story_button: Button = %StoryButton
+@onready var _from_line: Label = %From
+@onready var _result_stamp: Control = %Stamp
+@onready var _stamp_text: Label = %StampText
+@onready var _injured_tag: Control = %HurtTag
+@onready var _injured_text: Label = %HurtText
+@onready var _died_tag: Control = %DiedTag
+@onready var _died_text: Label = %DiedText
+# Story and sign-off
 @onready var _beat_list: VBoxContainer = %Beats
+@onready var _closing_line: Label = %Closing
 
-## The raw story text, turned into beat rows the first time it's opened.
-var _story_text := ""
-var _succeeded := false
+## Matches BBCode tags, to test story lines on their plain text.
+var _bbcode_tags := RegEx.create_from_string("\\[[^\\]]*\\]")
 
 
 ## result = one quest result from hall_main._run_quest.
@@ -89,10 +98,9 @@ func _show_summary(result: Dictionary) -> void:
 	else:
 		_result_stamp.set_chip(TEXT_FAILED, Style.RED, Style.WHITE, "x")
 	_title.text = result.quest.questTitle
-	_gold_chip.set_chip(TEXT_GOLD % result.gold, Style.GOLD_BG, Style.GOLD_TEXT, "coins")
-	_party_line.text = TEXT_PARTY % [Style.join_names(result.party), mini(int(result.chance), 100)]
+	_from_line.text = TEXT_FROM % [Style.join_names(result.party), mini(int(result.chance), 100)]
 
-	var injured: Array = result.get("injured", [])
+	# the stamp is white art inked green or red (a death turns it red even on a success)
 	var died: Array = result.get("died", [])
 	if injured.is_empty():
 		_injured_line.text = TEXT_NO_INJURIES
@@ -117,40 +125,48 @@ func _show_summary(result: Dictionary) -> void:
 	Style.set_font_color(_items_line, Style.BLUE_TEXT)
 
 
-# ---- story
+	var injured: Array = result.get("injured", [])
+	_injured_tag.visible = not injured.is_empty()
+	_injured_text.text = TEXT_INJURED % Style.join_names(injured, ", ")
+	_died_tag.visible = not died.is_empty()
+	_died_text.text = TEXT_DIED % Style.join_names(died, ", ")
 
-func _toggle_story() -> void:
-	if _beat_list.get_child_count() == 0:
-		_build_story_beats()
-	_beat_list.visible = not _beat_list.visible
-	_story_button.text = BUTTON_HIDE_STORY if _beat_list.visible else BUTTON_OPEN_STORY
+	_build_story_beats(result.story)
+	_closing_line.text = _closing_text(result)
 
 
-## One beat row per non-empty line of the story.
-func _build_story_beats() -> void:
-	var story := _story_text
+## One beat row per story line (summary lines are left to the sign-off).
+func _build_story_beats(story: String) -> void:
 	for bright_tag in STORY_RECOLORS:
 		story = story.replace(bright_tag, STORY_RECOLORS[bright_tag])
-
 	for line in story.split("\n"):
 		var beat_text := line.strip_edges()
-		if beat_text == "":
+		var plain_text := _bbcode_tags.sub(beat_text, "", true).strip_edges()
+		if plain_text == "" or SKIPPED_LINE_STARTS.any(func(start): return plain_text.begins_with(start)):
 			continue
-		var icon_name := _icon_for_beat(beat_text)
-		var icon_tint := Color.WHITE
-		if icon_name == SUMMARY_ICON:
-			icon_name = "check" if _succeeded else "x"
-			icon_tint = Style.GREEN_TEXT if _succeeded else Style.RED
-		Style.add_row(_beat_list, BeatRowScene).setup(icon_name, icon_tint, beat_text)
+		Style.add_row(_beat_list, BeatRowScene).setup(_icon_for_beat(plain_text), Style.TEXT_SOFT, beat_text)
 
 
-func _icon_for_beat(beat_text: String) -> String:
+func _icon_for_beat(plain_text: String) -> String:
 	for rule in BEAT_ICON_RULES:
-		var is_match: bool
-		if rule.test == "starts_with":
-			is_match = beat_text.begins_with(rule.text)
-		else:
-			is_match = beat_text.contains(rule.text)
-		if is_match:
+		if plain_text.contains(rule.text):
 			return rule.icon
 	return BEAT_ICON_DEFAULT
+
+
+## "Sorry, master. ... — M." signed with the initials of whoever came back.
+func _closing_text(result: Dictionary) -> String:
+	var died: Array = result.get("died", [])
+	var survivors: Array = result.party.filter(func(character): return not died.has(character))
+	if survivors.is_empty():
+		return TEXT_NOBODY_CAME_BACK
+	var initials := PackedStringArray()
+	for character in survivors:
+		initials.append(character.name.left(1))
+	var signature := " & ".join(initials)
+	if result.succeeded:
+		return TEXT_WON % [result.gold, signature]
+	if result.gold > 0:
+		var speaker := "I" if survivors.size() == 1 else "we"
+		return TEXT_LOST_GOLD % [speaker, result.gold, signature]
+	return TEXT_LOST % signature

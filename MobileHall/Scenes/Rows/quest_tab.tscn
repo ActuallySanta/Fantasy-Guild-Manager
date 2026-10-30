@@ -1,37 +1,52 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://MobileHall/Scripts/quest_tab.gd" id="1_ebsm4"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/quest_band.tres" id="2_band"]
 
-[node name="QuestTab" type="Button" unique_id=2073796152]
-custom_minimum_size = Vector2(0, 84)
+[node name="QuestTab" type="VBoxContainer"]
 size_flags_horizontal = 3
-focus_mode = 0
+theme_override_constants/separation = 2
 script = ExtResource("1_ebsm4")
 
-[node name="Col" type="VBoxContainer" parent="." unique_id=176148314]
-layout_mode = 0
+[node name="Tab" type="Button" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 54)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"QuestTab"
+
+[node name="Band" type="Panel" parent="Tab"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_left = 0.26
+anchor_right = 0.74
+anchor_bottom = 1.0
+offset_top = 5.0
+offset_bottom = -5.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("2_band")
+
+[node name="Mark" type="Label" parent="Tab"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-mouse_filter = 2
-theme_override_constants/separation = 0
-alignment = 1
-
-[node name="Top" type="HBoxContainer" parent="Col" unique_id=881181668]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 4
-alignment = 1
-
-[node name="Tag" type="Label" parent="Col/Top" unique_id=1757764141]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 17
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-text = "DUN"
-
-[node name="Mark" type="Label" parent="Col" unique_id=456161643]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_font_sizes/font_size = 26
+grow_horizontal = 2
+grow_vertical = 2
+theme_type_variation = &"TitleLight"
+theme_override_font_sizes/font_size = 28
 text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Tag" type="Label" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CapsLight"
+theme_override_font_sizes/font_size = 17
+text = "SCT"
 horizontal_alignment = 1

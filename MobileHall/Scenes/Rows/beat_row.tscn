@@ -1,26 +1,27 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/beat_row.gd" id="1_4r0pi"]
-[ext_resource type="Texture2D" path="res://Sprites/UI Icons/book-solid-full.svg" id="2_w33w8"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/beat_row.gd" id="1_beat"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/scroll.svg" id="2_icon"]
 
-[node name="BeatRow" type="HBoxContainer" unique_id=567519157]
-theme_override_constants/separation = 10
-script = ExtResource("1_4r0pi")
+[node name="BeatRow" type="HBoxContainer"]
+theme_override_constants/separation = 14
+script = ExtResource("1_beat")
 
-[node name="Icon" type="TextureRect" parent="." unique_id=442251322]
+[node name="Icon" type="TextureRect" parent="."]
+modulate = Color(0.4196, 0.3647, 0.3098, 1)
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
 size_flags_vertical = 0
 mouse_filter = 2
-texture = ExtResource("2_w33w8")
+texture = ExtResource("2_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Text" type="RichTextLabel" parent="." unique_id=518006058]
+[node name="Text" type="RichTextLabel" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 bbcode_enabled = true
-text = "[b]The Party[/b] found a chest."
+text = "[b]Maria[/b] traveled to [b]Mistwater Marsh[/b] to map out the area."
 fit_content = true
 scroll_active = false

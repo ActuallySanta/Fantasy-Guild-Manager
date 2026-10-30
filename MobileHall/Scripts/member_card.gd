@@ -1,5 +1,5 @@
-## One adventurer in the Guild tab's roster: portrait, health, what they're
-## doing today, and all five stats. Tap for details.
+## One adventurer in the Guild tab's roster (a parchment card): portrait,
+## health, what they're doing today, and all five stats. Tap for details.
 ## Scene: MobileHall/Scenes/Rows/member_card.tscn
 extends "res://MobileHall/Scripts/tap_panel.gd"
 
@@ -32,21 +32,20 @@ func setup(hall: HallMain, character: GuildCharacter) -> void:
 	_health_chip.set_health(character)
 	_stats.show_stats(character)
 	_show_task(hall, character)
-	Style.style_panel(self, Style.CARD_BG, Style.BORDER, 2, 16)
 
 
-## Today's task chip: free, picked for a quest (blue), sent on one (green),
-## training a stat (that stat's colours), in a Hospital bed (orange), or the
-## day they died (hidden if that wasn't recorded; the Dead chip says enough).
+## Today's task in ink: free, picked for a quest (blue), sent on one (green),
+## training a stat (that stat's ink, in a pill), in a Hospital bed (orange), or
+## the day they died (hidden if that wasn't recorded; the Dead chip says enough).
 func _show_task(hall: HallMain, character: GuildCharacter) -> void:
 	var quest_index := hall.quest_index_of(character)
 	if Style.is_dead(character):
 		var dead_look: Dictionary = Style.INJURY_LOOKS[GuildCharacter.InjuryLevel.DEAD]
-		_task_chip.set_chip(TEXT_DIED_ON % character.died_on_day, dead_look.bg, dead_look.text, "", true)
+		_task_chip.set_chip(TEXT_DIED_ON % character.died_on_day, dead_look.bg, dead_look.text, "skull", true)
 		_task_chip.visible = character.died_on_day >= 0
 	elif quest_index < 0 and GuildUpgrades.is_patient(character):
 		var bed_look: Dictionary = Style.INJURY_LOOKS[2]
-		_task_chip.set_chip(TEXT_IN_BED, bed_look.bg, bed_look.text)
+		_task_chip.set_chip(TEXT_IN_BED, bed_look.bg, bed_look.text, "bed")
 	elif quest_index < 0 and GuildUpgrades.is_training(character):
 		var stat: Dictionary = Style.STATS[GuildUpgrades.get_training_stat(character)]
 		_task_chip.set_chip(TEXT_TRAINING % stat.short, stat.bg, stat.color, "", true)

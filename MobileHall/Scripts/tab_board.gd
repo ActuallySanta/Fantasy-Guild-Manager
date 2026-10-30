@@ -1,6 +1,6 @@
-## Board tab: the home screen. A three-box "Today" checklist (recruits,
-## quests, upgrades), then every quest of the day in one list so they can be
-## compared at a glance. Tap a quest to pick its party.
+## Board tab: the home screen. Three pinned "Today" notes (recruits,
+## quests decided, upgrades), then every quest of the day as a scroll in one
+## list so they can be compared at a glance. Tap a quest to pick its party.
 ## Scene: MobileHall/Scenes/Tabs/tab_board.tscn
 extends ScrollContainer
 
@@ -9,22 +9,22 @@ const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 const QuestRowScene := preload("res://MobileHall/Scenes/Rows/quest_row.tscn")
 
 # ---- TEXT
-# Today checklist box titles
+# Today note titles
 const TODAY_RECRUITS := "Recruits"
-const TODAY_QUESTS := "Quests"
+const TODAY_QUESTS := "Decided"
 const TODAY_UPGRADES := "Upgrades"
-# Today checklist box values
+# Today note values
 const RECRUITS_NEW := "%d new"
-const RECRUITS_FULL := "Beds full"
-const RECRUITS_IN_GUILD := "%d / %d in guild"
-const QUESTS_DECIDED := "%d / %d decided"
+const RECRUITS_FULL := "beds full"
+const RECRUITS_IN_GUILD := "%d / %d hired"
+const QUESTS_DECIDED := "%d / %d"
 const UPGRADES_READY := "%d ready"
-const UPGRADES_NONE := "None ready"
+const UPGRADES_NONE := "none yet"
 # Quest list
 const HEADING := "Today's Quests"
 const HEADING_MILESTONE := "The Bone Drake"
-const HINT := "Tap a quest to pick its party. Picks are kept until you send them."
-const HINT_ALL_DECIDED := "Every quest is decided. Tap one to change your mind."
+const HINT := "unroll one to staff it"
+const HINT_ALL_DECIDED := "all decided · tap to change"
 
 # ---- NODES
 @onready var _today_recruits = %TodayRecruits     # today_item.gd
@@ -42,7 +42,7 @@ func setup(main: HallMain) -> void:
 	hall = main
 	_today_recruits.pressed.connect(func(): hall.open_tab("guild", HallMain.GUILD_SECTION_HIRE))
 	_today_quests.pressed.connect(_on_today_quests_pressed)
-	_today_upgrades.pressed.connect(func(): hall.open_tab("upgrades"))
+	_today_upgrades.pressed.connect(func(): hall.open_tab("upgrades", HallMain.UPGRADES_SECTION_BUILD))
 
 
 func scroll_to_top() -> void:
@@ -56,7 +56,7 @@ func refresh() -> void:
 
 # ---- Today checklist
 
-## Each box is "todo" (blue) when it wants a visit, "done" (green) or "idle" (plain).
+## Each note is "todo" (dark ink) when it wants a visit, "done" (green) or "idle" (faded).
 func _show_today_checklist() -> void:
 	_show_recruits_box()
 	_show_quests_box()
@@ -88,7 +88,7 @@ func _show_upgrades_box() -> void:
 	_today_upgrades.set_item(TODAY_UPGRADES, value, "nav_upgrades", look)
 
 
-## The Quests box jumps to the next undecided quest (does nothing once all are decided).
+## The Decided note jumps to the next undecided quest (does nothing once all are decided).
 func _on_today_quests_pressed() -> void:
 	if hall.undecided_count() > 0:
 		hall.do_next_step()

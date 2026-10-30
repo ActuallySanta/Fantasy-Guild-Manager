@@ -1,6 +1,7 @@
-## One adventurer in Assign Party's picker: portrait, health, the four quest
-## stats (favored one outlined), how much they'd add to the odds, and which
-## quest they're already on. Tap to add / remove; "i" opens their details.
+## One adventurer in Assign Party's picker: portrait, the four quest stats
+## (favored one in a pill), health, how much they'd add to the odds, and which
+## quest (or training) they're already on. Tap to pin / unpin; "i" opens
+## their details.
 ## Scene: MobileHall/Scenes/Rows/pick_row.tscn
 extends "res://MobileHall/Scripts/tap_panel.gd"
 
@@ -18,27 +19,27 @@ const TEXT_PICKED_FOR := "Picked for %s"
 const TEXT_SENT_ON := "Sent on %s"
 const TEXT_QUEST_NAME := "#%d %s"
 const TEXT_TRAINING := "Training %s"
-# Right-hand box
+# Right-hand column
 const TEXT_ADDS := "+%d%%"
 const TEXT_ADDS_SUB := "to odds"
-const TEXT_IN_PARTY := "Added"
-const TEXT_IN_PARTY_SUB := "in party"
+const TEXT_IN_PARTY := "Pinned"
+const TEXT_IN_PARTY_SUB := "tap to unpin"
 const TEXT_CANT_GO := "-"
-const TEXT_CANT_GO_SUB := "Can't go"
-const TEXT_IN_BED_SUB := "In a bed"
-const TEXT_TRAINING_SUB := "Training"
+const TEXT_CANT_GO_SUB := "can't go"
+const TEXT_IN_BED_SUB := "in a bed"
+const TEXT_TRAINING_SUB := "training"
 
 # ---- NODES
 # Who they are
 @onready var _portrait = %Portrait            # portrait.gd
 @onready var _name: Label = %Name
 @onready var _role: Label = %Role
-@onready var _health_chip = %HealthChip       # chip.gd
+@onready var _health_chip = %Health           # chip.gd
 @onready var _stats = %Stats                  # stat_strip.gd
 @onready var _info_button: Button = %InfoButton
 # Where they already are
 @onready var _elsewhere_label: Label = %Where
-# Right-hand box
+# Right-hand column
 @onready var _adds_value: Label = %AddValue
 @onready var _adds_sub: Label = %AddSub
 
@@ -55,7 +56,8 @@ func setup(hall: HallMain, entry: Dictionary, character: GuildCharacter) -> void
 	_show_pick_state(hall, entry, character)
 
 
-## "Picked for #2 Escort..." when they're in another quest's party.
+## "Picked for #2 Escort..." when they're in another quest's party,
+## "Training Power" when they're in the Training Yard.
 func _show_elsewhere(hall: HallMain, entry: Dictionary, character: GuildCharacter) -> void:
 	var other_index := hall.quest_index_of(character)
 	var other_entry: Dictionary = hall.quest_entries[other_index] if other_index >= 0 else {}
@@ -73,14 +75,14 @@ func _show_elsewhere(hall: HallMain, entry: Dictionary, character: GuildCharacte
 	Style.set_font_color(_elsewhere_label, Style.GREEN_TEXT if is_sent else Style.BLUE_TEXT)
 
 
-## Right-hand box and row colours: in this party (green), can't go (faded),
-## or how much they'd add to the odds.
+## Right-hand column and paper tint: pinned to this party (green paper),
+## can't go (faded), or how much they'd add to the odds.
 func _show_pick_state(hall: HallMain, entry: Dictionary, character: GuildCharacter) -> void:
 	if entry.party.has(character):
 		_adds_value.text = TEXT_IN_PARTY
 		_adds_sub.text = TEXT_IN_PARTY_SUB
 		Style.set_font_color(_adds_value, Style.GREEN_TEXT)
-		Style.style_panel(self, Style.SENT_CARD_BG, Style.GREEN, 4, 16)
+		Style.style_panel(self, Style.SENT_CARD_BG)
 	elif not hall.can_go_on_quests(character):
 		_adds_value.text = TEXT_CANT_GO
 		if Style.is_dead(character):
@@ -90,11 +92,10 @@ func _show_pick_state(hall: HallMain, entry: Dictionary, character: GuildCharact
 		else:
 			_adds_sub.text = TEXT_TRAINING_SUB
 		Style.set_font_color(_adds_value, Style.TEXT_SOFT)
-		Style.style_panel(self, Style.DENIED_CARD_BG, Style.BORDER, 2, 16)
+		Style.style_panel(self, Style.DENIED_CARD_BG)
 		modulate = Color(1, 1, 1, CANT_GO_OPACITY)
 	else:
 		var chance_added := hall.chance_added_by(entry, character)
 		_adds_value.text = TEXT_ADDS % mini(chance_added, 100)
 		_adds_sub.text = TEXT_ADDS_SUB
 		Style.set_font_color(_adds_value, Style.odds_look(chance_added).text_color)
-		Style.style_panel(self, Style.CARD_BG, Style.BORDER, 2, 16)
