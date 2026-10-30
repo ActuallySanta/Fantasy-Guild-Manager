@@ -50,8 +50,13 @@ const ENABLED := true
 const TUTORIAL_DAYS := [1, 3, 5]
 const UNLOCK_DAY := {"upgrades": 3, "shop": 5}
 
+## Draw order: above the hall's overlays (z 10: Day Report, End Day sheet,
+## toast) and the raised art inside tabs (applicant letters, scroll rollers),
+## so the grey-out, ring and Pip always sit on top of what they point at.
+const TUTORIAL_Z_INDEX := 20
+## The spotlight ring and the arrow are white art (Styles/stamp.tres, Art/Icons)
+## tinted this gold.
 const RING_COLOR := Color("#F6B93B")
-const INK := Color("#2A1A10")
 const HOLE_PAD := 10.0
 const BUBBLE_MARGIN := 16.0
 ## Gap kept between Pip's bubble and the spotlight.
@@ -74,13 +79,22 @@ void fragment() {
 }
 """
 
-# ---- coloured words (match Style.STATS)
-const POW := "[color=#A3262A]Power[/color]"
-const DEF := "[color=#2F5F8A]Defense[/color]"
-const WIS := "[color=#5B3F8C]Wisdom[/color]"
-const SLZ := "[color=#3E6B35]Sleaziness[/color]"
-const PLK := "[color=#94500F]Pluck[/color]"
-const GOLD := "[color=#7A5A12]gold[/color]"
+# ---- coloured words (the stat inks in Style.STATS, and Style.GOLD_TEXT)
+const POW := "[color=#8B2E2A]Power[/color]"
+const DEF := "[color=#2F4A66]Defense[/color]"
+const WIS := "[color=#5B4A7A]Wisdom[/color]"
+const SLZ := "[color=#3D5A2A]Sleaziness[/color]"
+const PLK := "[color=#7A4A1E]Pluck[/color]"
+const GOLD := "[color=#6B5A1E]gold[/color]"
+
+# ---- art reused from MobileHall/Art (swap the files to restyle the coach)
+## Pip sits in the same round portrait frame as the heroes on the Board.
+const PORTRAIT_MASK := preload("res://MobileHall/Art/Textures/portrait_round_mask.png")
+const PORTRAIT_FRAME := preload("res://MobileHall/Art/Textures/portrait_round_frame.png")
+## The pointer is the pixel arrow icon (it points left; it's turned to point up / down).
+const ARROW_ICON := preload("res://MobileHall/Art/Icons/arrow_left.svg")
+## Ground behind Pip inside the frame (a parchment tint).
+const PIP_GROUND := Color("#E9DEC4")
 
 ## The main hall script (untyped: hall_main preloads this file).
 var hall: Control
@@ -118,7 +132,8 @@ var _cover: Control
 var _ring: Panel
 var _pointer: Pointer
 var _bubble: PanelContainer
-var _face: PipFace
+## Pip's framed portrait (tap it to move Pip or open the chip).
+var _face: Control
 var _counter: Label
 var _text: RichTextLabel
 var _do_label: Label
@@ -133,6 +148,7 @@ func setup(main: Control) -> void:
 	hall = main
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	z_index = TUTORIAL_Z_INDEX
 	_build()
 	visible = false
 	set_process(false)
@@ -483,24 +499,24 @@ func _build() -> void:
 	_cover.gui_input.connect(_on_blocked_input)
 	add_child(_cover)
 
+	# the spotlight ring: the stamp's double border (white art) inked gold
 	_ring = Panel.new()
 	_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var ring_box := StyleBoxFlat.new()
-	ring_box.draw_center = false
-	ring_box.set_border_width_all(6)
-	ring_box.border_color = RING_COLOR
-	ring_box.set_corner_radius_all(18)
-	_ring.add_theme_stylebox_override("panel", ring_box)
+	_ring.add_theme_stylebox_override("panel", load("res://MobileHall/Styles/stamp.tres"))
+	Style.tint_art(_ring, RING_COLOR)
 	add_child(_ring)
 
 	_pointer = Pointer.new()
 	_pointer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_pointer.custom_minimum_size = Vector2(84, 70)
+	_pointer.custom_minimum_size = Vector2(72, 72)
+	_pointer.arrow = ARROW_ICON
+	_pointer.tint = RING_COLOR
 	add_child(_pointer)
 
+	# Pip's bubble is a parchment card, like every other card in the hall
 	_bubble = PanelContainer.new()
 	_bubble.mouse_filter = Control.MOUSE_FILTER_STOP
-	Style.style_panel(_bubble, Style.CARD_BG, INK, 4, 22, Vector4(16, 14, 16, 14))
+	Style.set_look(_bubble, &"PaperCard")
 	add_child(_bubble)
 
 	var row := HBoxContainer.new()
@@ -511,18 +527,15 @@ func _build() -> void:
 	face_col.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	face_col.add_theme_constant_override("separation", 2)
 	row.add_child(face_col)
-	_face = PipFace.new()
-	_face.custom_minimum_size = Vector2(84, 84)
-	_face.mouse_filter = Control.MOUSE_FILTER_STOP
-	_face.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	_face = _build_portrait()
 	_face.gui_input.connect(_on_face_input)
 	face_col.add_child(_face)
 	_hint = Label.new()
+	_hint.theme_type_variation = &"ItalicLabel"
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_hint.custom_minimum_size.x = 84
-	_hint.add_theme_font_size_override("font_size", 15)
-	_hint.add_theme_color_override("font_color", Style.TEXT_SOFT)
+	_hint.add_theme_font_size_override("font_size", 16)
 	face_col.add_child(_hint)
 
 	var col := VBoxContainer.new()
@@ -534,13 +547,15 @@ func _build() -> void:
 	col.add_child(head)
 	var name_label := Label.new()
 	name_label.text = "Pip · Guild Clerk"
+	name_label.theme_type_variation = &"TitleLabel"
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_label.add_theme_font_size_override("font_size", 24)
-	name_label.add_theme_color_override("font_color", Style.TEXT_MAIN)
+	name_label.add_theme_font_size_override("font_size", 32)
 	head.add_child(name_label)
 	_counter = Label.new()
-	_counter.add_theme_font_size_override("font_size", 19)
-	_counter.add_theme_color_override("font_color", Style.TEXT_SOFT)
+	_counter.theme_type_variation = &"CapsLabel"
+	_counter.uppercase = true
+	_counter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_counter.add_theme_font_size_override("font_size", 17)
 	head.add_child(_counter)
 
 	_text = RichTextLabel.new()
@@ -559,60 +574,83 @@ func _build() -> void:
 	foot.add_theme_constant_override("separation", 10)
 	col.add_child(foot)
 	_do_label = Label.new()
+	_do_label.theme_type_variation = &"CapsLabel"
 	_do_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_do_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_do_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_do_label.add_theme_font_size_override("font_size", 22)
-	_do_label.add_theme_color_override("font_color", Style.BLUE_TEXT)
+	_do_label.add_theme_font_size_override("font_size", 19)
+	Style.set_font_color(_do_label, Style.BLUE_TEXT)
+	# the instruction takes all the room left of Skip / Next, so it doesn't wrap early
 	foot.add_child(_do_label)
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	foot.add_child(spacer)
 	_skip_button = Button.new()
 	_skip_button.text = "Skip tutorial"
 	_skip_button.flat = true
-	_skip_button.add_theme_font_size_override("font_size", 19)
+	_skip_button.add_theme_font_override("font", load("res://MobileHall/Art/Fonts/font_italic.tres"))
+	_skip_button.add_theme_font_size_override("font_size", 20)
 	_skip_button.add_theme_color_override("font_color", Style.TEXT_SOFT)
 	_skip_button.pressed.connect(skip_tutorial)
 	foot.add_child(_skip_button)
 	_next_button = Button.new()
 	_next_button.text = "Next"
-	Style.style_button(_next_button, "green", 26)
+	_next_button.custom_minimum_size = Vector2(120, 64)
+	Style.style_button(_next_button, "gold", 28)
 	_next_button.pressed.connect(_advance)
 	foot.add_child(_next_button)
 
 
-## Gold arrow with "TAP" on it, pointing at the spotlight.
+## Pip's portrait: the round portrait mask (parchment ground, clips Pip) and
+## the round portrait frame on top, the same art as the heroes' portraits.
+func _build_portrait() -> Control:
+	var holder := Control.new()
+	holder.custom_minimum_size = Vector2(84, 84)
+	holder.mouse_filter = Control.MOUSE_FILTER_STOP
+	holder.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	var mask := TextureRect.new()
+	mask.texture = PORTRAIT_MASK
+	mask.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	mask.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
+	mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mask.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	Style.tint_art(mask, PIP_GROUND)
+	holder.add_child(mask)
+	var pip := PipFace.new()
+	pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pip.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	mask.add_child(pip)
+	var frame := TextureRect.new()
+	frame.texture = PORTRAIT_FRAME
+	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	holder.add_child(frame)
+	return holder
+
+
+## The pixel arrow icon (it points left in the art), turned to point down or
+## up at the spotlight and tinted gold.
 class Pointer extends Control:
 	var points_down := true
+	## The arrow art and its tint (set by _build).
+	var arrow: Texture2D
+	var tint := Color.WHITE
 
 	func _draw() -> void:
-		var w := size.x
-		var h := size.y
-		var ink := Color("#2A1A10")
-		var gold := Color("#F6B93B")
-		var shaft_w := w * 0.42
-		var head_h := h * 0.45
-		var pts: PackedVector2Array
-		if points_down:
-			pts = PackedVector2Array([Vector2((w - shaft_w) / 2, 0), Vector2((w + shaft_w) / 2, 0), Vector2((w + shaft_w) / 2, h - head_h), Vector2(w, h - head_h), Vector2(w / 2, h), Vector2(0, h - head_h), Vector2((w - shaft_w) / 2, h - head_h)])
-		else:
-			pts = PackedVector2Array([Vector2((w - shaft_w) / 2, h), Vector2((w + shaft_w) / 2, h), Vector2((w + shaft_w) / 2, head_h), Vector2(w, head_h), Vector2(w / 2, 0), Vector2(0, head_h), Vector2((w - shaft_w) / 2, head_h)])
-		draw_colored_polygon(pts, gold)
-		var outline := pts.duplicate()
-		outline.append(pts[0])
-		draw_polyline(outline, ink, 4.0)
+		if arrow == null:
+			return
+		# rotate about the centre: left -> down is -90 degrees, left -> up is +90
+		var angle := -PI / 2.0 if points_down else PI / 2.0
+		draw_set_transform(size / 2.0, angle, Vector2.ONE)
+		draw_texture_rect(arrow, Rect2(-size / 2.0, size), false, tint)
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
-## Pip: a goblin clerk with round glasses, drawn with shapes (no art asset).
+## Pip: a goblin clerk with round glasses, drawn with shapes (no art asset yet;
+## the round portrait mask and frame around it are the project's art).
 class PipFace extends Control:
 	func _draw() -> void:
 		var s := size.x / 50.0
 		var ink := Color("#2A1A10")
 		var skin := Color("#7BC47F")
-		var bg := StyleBoxFlat.new()
-		bg.bg_color = Color("#FCE6B0")
-		bg.set_corner_radius_all(int(10 * s))
-		draw_style_box(bg, Rect2(Vector2.ZERO, size))
 		var body := StyleBoxFlat.new()
 		body.bg_color = Color("#9B72CF")
 		body.set_border_width_all(int(2.5 * s))
@@ -633,12 +671,6 @@ class PipFace extends Control:
 			draw_arc(lens, 4.2 * s, 0, TAU, 24, ink, 2 * s)
 			draw_circle(lens, 1.5 * s, ink)
 		draw_arc(Vector2(25, 32.5) * s, 3 * s, 0.3, PI - 0.3, 12, ink, 2 * s)
-		var border := StyleBoxFlat.new()
-		border.draw_center = false
-		border.set_border_width_all(int(3 * s))
-		border.border_color = ink
-		border.set_corner_radius_all(int(10 * s))
-		draw_style_box(border, Rect2(Vector2.ZERO, size))
 
 # ============================================================ FINDING TARGETS
 
@@ -753,14 +785,15 @@ func _day_one() -> Array:
 			"do": "Tap Members", "text": "A guild is only as good as its adventurers. Open [b]Members[/b]."},
 		{"target": func(): return _u(_tab("guild"), "SegHire"), "on": "tab", "when": func(d): return d.guild == "hire",
 			"skip": func(): return hall.guild_section == "hire",
-			"do": "Tap For Hire", "text": "Nobody works here yet. Open [b]For Hire[/b] to see today's recruits."},
+			"do": "Tap Applicants", "text": "Nobody works here yet. Open [b]Applicants[/b] to see today's recruits."},
 		{"target": func(): return _row(_tab("guild"), "hire_card.gd"),
 			"text": "Each recruit has a role and four stats: %s, %s, %s and %s. Every quest favours one of them." % [POW, DEF, WIS, SLZ]},
 		{"target": func(): return _row(_tab("guild"), "hire_card.gd", "HireButton"), "on": "hire",
 			"do": "Tap Hire", "deny": ["DetailsButton"], "text": "Hiring is free for your first two days. Hire this one."},
-		{"target": func(): return _u(_tab("guild"), "List"), "on": "hire", "tap": true,
+		# the applicants are a stack of letters (%Stack): the next one is on top now
+		{"target": func(): return _row(_tab("guild"), "hire_card.gd", "HireButton"), "on": "hire",
 			"skip": func(): return not hall.can_hire_anyone(),
-			"do": "Tap Hire on another recruit", "deny": ["DetailsButton"], "text": "Hire one more. Two heroes means better odds, and a backup when someone gets hurt."},
+			"do": "Tap Hire on the next letter", "deny": ["DetailsButton"], "text": "Hire one more. Two heroes means better odds, and a backup when someone gets hurt."},
 		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
 			"do": "Tap Your Guild", "text": "Now meet your people. Open [b]Your Guild[/b]."},
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"), "on": "character",
@@ -786,7 +819,7 @@ func _day_one() -> Array:
 		{"target": func(): return _u(_screen("assign"), "LeftButton"),
 			"text": "[b]Deny[/b] turns a quest down. It costs a little standing, and you can Reconsider later the same day. This one's worth taking."},
 		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "send",
-			"do": "Tap Send Party", "text": "Send the party. They head out tonight."},
+			"do": "Tap Seal & send", "text": "Seal the orders and send the party. They head out tonight."},
 		{"target": func(): return hall.get_node("%ActionButton"), "on": "end_check",
 			"do": "Tap End Day", "text": "Every quest is decided. This bar always shows your next step. Tap [b]End Day[/b]."},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
@@ -813,7 +846,7 @@ func _day_three() -> Array:
 			"text": "Each building has five levels. Upgrades cost %s and need enough standing. A card shows what you have now and what the next level adds." % GOLD},
 		{"target": func(): return _row(_tab("upgrades"), "upgrade_card.gd", "UpgradeButton", func(b): return _is_enabled(b)), "on": "upgrade",
 			"skip": func(): return hall.affordable_buildings().is_empty(),
-			"do": "Tap Upgrade", "text": "You can afford this one. Upgrade it."},
+			"do": "Tap Build", "text": "You can afford this one. Build it."},
 		{"target": func(): return _u(_tab("upgrades"), "Wallet"),
 			"skip": func(): return _seen.get("upgrade", false),
 			"text": "Not enough yet. When you can afford an upgrade, a number shows up on the Guild tab."},
@@ -850,7 +883,7 @@ func _day_five() -> Array:
 			"text": "Fresh stock every morning. Whatever you don't buy today is gone tomorrow."},
 		{"target": func(): return _u(_tab("shop"), "Grid"), "tap": true,
 			"skip": func(): return not _any_affordable(),
-			"do": "Tap items to compare, then Next", "text": "Every item is role-locked: its tag says which role can use it. Tap items to compare them, and pick one for a role you have."},
+			"do": "Tap items to compare, then Next", "text": "Every item is role-locked. Tap a tag and the bar below says what it does and which role can use it. Pick one for a role you have."},
 		{"target": func(): return _u(_tab("shop"), "BuyButton"), "on": "buy",
 			"skip": func(): return not _any_affordable(),
 			"do": "Tap Buy", "text": "The bar shows the picked item and what it does. Buy it."},
