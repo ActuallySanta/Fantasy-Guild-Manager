@@ -75,11 +75,12 @@ mouse_filter = 2
 theme_override_styles/panel = ExtResource("6_rfumr")
 script = ExtResource("7_8ji1b")
 
-[node name="Stats" type="HBoxContainer" parent="Row/Info" unique_id=33119571 instance=ExtResource("8_e6c2h")]
+[node name="Stats" type="HFlowContainer" parent="Row/Info" unique_id=33119571 instance=ExtResource("8_e6c2h")]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 6
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
 script = ExtResource("9_j63h7")
 
 [node name="Where" type="Label" parent="Row/Info" unique_id=1482574073]

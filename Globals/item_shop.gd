@@ -4,11 +4,11 @@
 ##     (GameState.day_started). Bought items go to ItemContainer.owned_items.
 ##   - Buying pays from the GuildUpgrades wallet.
 ##   - Equipping is role-locked (item.role must match the hero's role) and
-##     capped by character.max_items. It goes through ItemContainer, then adds
-##     the item's stat to character.stats, the same way the Armory bonus is
-##     applied, because quests read character.stats (temp_stats aren't used by
-##     quests yet). What was added is stored on the item as metadata, so
-##     unequipping takes off exactly that amount.
+##     capped by character.max_items. It goes through ItemContainer, then the
+##     hero's temp_stats are rebuilt (character.reset_temp_stats(), which adds
+##     pluck and add_passive_item_stats()). Gear never touches character.stats,
+##     so pluck (10% of the base stats) doesn't stack on top of gear. What each
+##     item gives is stored on it as metadata for the UI (get_item_bonus).
 ## The MobileHall UI calls these through hall_main.gd (buy_item / equip_item /
 ## unequip_item), which shows the toasts.
 extends Node
@@ -128,10 +128,14 @@ func equip(item: StandardItem, character: GuildCharacter) -> EquipResult:
 	if result != EquipResult.OK:
 		return result
 	# moving it off another hero takes their bonus away first
-	if item.curr_user != null:
-		_remove_bonus(item, item.curr_user)
+	var previous_user: GuildCharacter = item.curr_user
+	if previous_user != null:
+		_remove_bonus(item)
 	ItemContainer.give_item_to_character(item, character)
-	_apply_bonus(item, character)
+	_apply_bonus(item)
+	if previous_user != null:
+		previous_user.reset_temp_stats()
+	character.reset_temp_stats()
 	gear_changed.emit()
 	return result
 
@@ -140,12 +144,13 @@ func unequip(item: StandardItem) -> void:
 	var user: GuildCharacter = item.curr_user
 	if user == null:
 		return
-	_remove_bonus(item, user)
+	_remove_bonus(item)
 	ItemContainer.remove_item_from_character(item, user)
+	user.reset_temp_stats()
 	gear_changed.emit()
 
 
-## How much of a hero's stat comes from their gear.
+## How much of a hero's stat comes from their gear (it lives in temp_stats).
 func get_item_bonus(character: GuildCharacter, stat: int) -> int:
 	var total := 0
 	for item in character.equipped_items:
@@ -155,17 +160,15 @@ func get_item_bonus(character: GuildCharacter, stat: int) -> int:
 	return total
 
 
-func _apply_bonus(item: StandardItem, character: GuildCharacter) -> void:
+## Records what the item gives so the UI can show it. The stat itself is added
+## by the wearer's reset_temp_stats() -> add_passive_item_stats().
+func _apply_bonus(item: StandardItem) -> void:
 	if not (item is PassiveItem):
 		return
 	var passive := item as PassiveItem
-	character.stats[passive.affected_stat] += passive.stat_amount
 	item.set_meta(APPLIED_META, Vector2i(passive.affected_stat, passive.stat_amount))
 
 
-func _remove_bonus(item: StandardItem, character: GuildCharacter) -> void:
-	if not item.has_meta(APPLIED_META):
-		return
-	var applied: Vector2i = item.get_meta(APPLIED_META)
-	character.stats[applied.x as GuildCharacter.StatType] -= applied.y
-	item.remove_meta(APPLIED_META)
+func _remove_bonus(item: StandardItem) -> void:
+	if item.has_meta(APPLIED_META):
+		item.remove_meta(APPLIED_META)

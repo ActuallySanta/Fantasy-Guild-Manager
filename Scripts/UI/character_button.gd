@@ -26,7 +26,7 @@ static func get_display_name(c) -> String:
 	return str(c.get("title"))
 
 static func get_icon(c) -> Texture2D:
-	return ExternalContentContainer.get_character_icon(c.role)
+	return c.icon
 
 # Runs when player taps this character
 func _on_pressed() -> void:

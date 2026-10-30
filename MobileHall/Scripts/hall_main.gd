@@ -53,6 +53,9 @@ const DayBarLogic := preload("res://Scripts/UI/day_bar.gd")
 var QUESTS_PER_DAY := 5
 ## The day QuestList swaps the board for the milestone (Bone Drake) quest.
 const MILESTONE_DAY := 10
+## Standing lost for releasing a living hero, plus one more per level of their
+## Pluck (letting a veteran go hurts more). Releasing the fallen is free.
+const RELEASE_BASE_STANDING_COST := 1
 ## Bottom tabs, left to right (ids match the Nav_<id> buttons and Tab nodes in the scene).
 const TAB_IDS := ["board", "guild", "upgrades", "shop"]
 ## The Shop tab (goods come from the ItemShop autoload).
@@ -115,6 +118,8 @@ const TOAST_PARTY_FULL := "Party is full. Tap someone in it to swap them out."
 const TOAST_DEAD := "%s can't go on quests anymore."
 const TOAST_HIRED := "%s joined the guild!"
 const TOAST_ROSTER_FULL := "No room. Upgrade the Barracks for more beds."
+const TOAST_RELEASED := "%s left the guild"
+const TOAST_RELEASED_COST := "%s left the guild (-%d standing)"
 const TOAST_UPGRADED := "%s upgraded to level %d!"
 const TOAST_RESET := "Upgrades reset"
 const TOAST_NEW_DAY := "Day %d · %s · %s for hire"
@@ -126,6 +131,7 @@ const TOAST_TOO_HURT := "%s is too hurt to train. Try the Hospital (Guild > Toni
 const TOAST_ADMITTED := "%s is in a Hospital bed"
 const TOAST_DISCHARGED := "%s went home"
 const TOAST_REVIVED := "%s is back from the dead!"
+const TOAST_REVIVE_NO_BED := "No free bed for %s. Upgrade the Barracks first."
 const TOAST_IN_HOSPITAL := "%s is in the Hospital. Discharge them first."
 const TOAST_IN_TRAINING := "%s is training. Take them out of the Training Yard first."
 const TOAST_LEFT_QUEST := "%s left %s"
@@ -168,9 +174,14 @@ var active_screen := {}
 # ---- overlays
 
 ## The Day Report being shown, or {} when hidden:
-##   {day: int, results: Array (see _run_quest), starts_next_day: bool}
+##   {day: int, results: Array (see _run_quest), starts_next_day: bool,
+##    home: Dictionary (see GuildUpgrades.run_night), released: Array (see released_today)}
 ## starts_next_day is true right after End Day: closing it starts the next day.
 var shown_report := {}
+## Heroes released today, for the Day Report. Each entry is a Dictionary:
+##   {character: GuildCharacter, standing: int (standing it cost), fallen: bool}
+## Cleared when the next day starts.
+var released_today := []
 ## Last night's report, kept so the Menu can show it again.
 var previous_report := {}
 var is_end_check_open := false
@@ -250,6 +261,7 @@ func _ready() -> void:
 	GuildUpgrades.upgrades_changed.connect(queue_refresh)
 	GuildUpgrades.home_changed.connect(queue_refresh)
 	CharacterContainer.on_character_added.connect(queue_refresh)
+	CharacterContainer.on_character_removed.connect(queue_refresh)
 	CharacterContainer.on_hireables_refreshed.connect(queue_refresh)
 	ItemShop.stock_changed.connect(queue_refresh)
 	ItemShop.gear_changed.connect(queue_refresh)
@@ -344,9 +356,17 @@ func roster() -> Array:
 	return CharacterContainer.active_characters
 
 
-## True when every bed is taken (no more hiring).
+## True when every bed is taken by a living hero (no more hiring or reviving).
 func is_roster_full() -> bool:
-	return roster().size() >= CharacterContainer.max_characters
+	return not CharacterContainer.has_free_bed()
+
+
+## Standing it costs to release this hero: nothing for the fallen, otherwise
+## RELEASE_BASE_STANDING_COST plus their Pluck.
+func release_standing_cost(character: GuildCharacter) -> int:
+	if Style.is_dead(character):
+		return 0
+	return RELEASE_BASE_STANDING_COST + character.pluck
 
 
 ## True when there's at least one recruit and a free bed.
@@ -657,6 +677,26 @@ func hire(character: GuildCharacter) -> void:
 	queue_refresh()
 
 
+## Let a hero go for good (the Character screen's Release button, after its
+## confirm sheet). They leave any quest party first (a sent quest left empty
+## goes back to open), then CharacterContainer takes their gear off and frees
+## their training slot and Hospital bed. Living heroes cost standing.
+func release(character: GuildCharacter) -> void:
+	# read these before they leave: the cost depends on who they are right now
+	var standing_cost := release_standing_cost(character)
+	var is_fallen := Style.is_dead(character)
+	_leave_quest(character)
+	if not CharacterContainer.remove_character_from_guild(character):
+		return
+	if standing_cost > 0:
+		GameState.reduce_standing(standing_cost)
+		show_toast(TOAST_RELEASED_COST % [character.name, standing_cost])
+	else:
+		show_toast(TOAST_RELEASED % character.name)
+	released_today.append({"character": character, "standing": standing_cost, "fallen": is_fallen})
+	queue_refresh()
+
+
 func upgrade_building(building: int) -> void:
 	if GuildUpgrades.try_upgrade(building):
 		show_toast(TOAST_UPGRADED % [GuildUpgrades.get_building_name(building), GuildUpgrades.get_level(building)])
@@ -755,6 +795,8 @@ func discharge(character: GuildCharacter) -> void:
 func revive(character: GuildCharacter) -> void:
 	if GuildUpgrades.revive(character):
 		show_toast(TOAST_REVIVED % character.name)
+	elif is_roster_full():
+		show_toast(TOAST_REVIVE_NO_BED % character.name)
 	queue_refresh()
 
 
@@ -835,14 +877,16 @@ func end_day() -> void:
 	is_end_check_open = false
 	training_picker_open = false
 	active_screen = {}
-	shown_report = {"starts_next_day": true, "day": GameState.day, "results": results, "home": home}
+	shown_report = {"starts_next_day": true, "day": GameState.day, "results": results, "home": home,
+			"released": released_today.duplicate()}
 	queue_refresh()
 
 
 ## Play out one quest with DayBar's helpers and pay its gold and standing.
 ## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, injured, milestone}
-## (injured = the party members whose injury level went up on this quest)
+##   {quest, party, story, succeeded, chance, gold, standing, injured, died, milestone}
+## (injured = the party members whose injury level went up on this quest but
+## who survived; died = the party members who died on it)
 func _run_quest(entry: Dictionary) -> Dictionary:
 	var party: Array[GuildCharacter] = []
 	party.assign(entry.party)
@@ -868,9 +912,15 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		for character in party:
 			character.pluck += 1
 
+	# the dead are listed apart from the hurt, and remember where they fell
 	var injured := []
+	var died := []
 	for character in party:
-		if character.injury_level > injury_before[character]:
+		if Style.is_dead(character) and injury_before[character] < GuildCharacter.InjuryLevel.DEAD:
+			died.append(character)
+			character.died_on_day = GameState.day
+			character.died_on_quest = entry.quest.questTitle
+		elif character.injury_level > injury_before[character]:
 			injured.append(character)
 
 	return {
@@ -882,6 +932,7 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		"gold": gold_earned,
 		"standing": standing_earned,
 		"injured": injured,
+		"died": died,
 		"milestone": entry.milestone,
 	}
 
@@ -891,6 +942,8 @@ func start_new_day() -> void:
 	previous_report = shown_report.duplicate()
 	previous_report.starts_next_day = false
 	shown_report = {}
+	# today's releases are in the kept report now; tomorrow starts a fresh list
+	released_today.clear()
 	active_tab = "board"
 	active_screen = {}
 	GameState.start_new_day()

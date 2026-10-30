@@ -44,6 +44,7 @@ func _enter_tree() -> void:
 func _ready() -> void:
 	# autoloads are ready by now (they sit before the main scene in the tree)
 	CharacterContainer.active_characters.clear()
+	CharacterContainer.released_characters.clear()
 	for injury in member_injuries:
 		var character := GuildCharacter.new()
 		character.injury_level = clampi(injury, 0, GuildCharacter.InjuryLevel.GRAVELY_INJURED) as GuildCharacter.InjuryLevel

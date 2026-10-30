@@ -33,5 +33,5 @@ func show_character(character: GuildCharacter) -> void:
 	_frame.add_theme_stylebox_override("panel", frame_box)
 
 	# role art
-	_art.texture = ExternalContentContainer.get_character_icon(character.role)
+	_art.texture = character.icon
 	_art.modulate = DEAD_TINT if Style.is_dead(character) else Color.WHITE

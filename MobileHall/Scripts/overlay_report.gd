@@ -1,5 +1,6 @@
-## Day Report: the night's results, short. A totals line, then one card per
-## quest (result, gold, who went, who got hurt); the full story is behind
+## Day Report: the night's results, short. A totals line, a line for the night
+## at home, a line for anyone released that day, then one card per quest
+## (result, gold, who went, who got hurt); the full story is behind
 ## "Read the story" on each card.
 ## Scene: MobileHall/Scenes/Overlays/overlay_report.tscn
 extends Control
@@ -17,6 +18,9 @@ const TEXT_NOBODY_WENT := "Nobody went out. Quests are the only way to earn gold
 const TEXT_HOME := "At home: %s"
 const TEXT_TRAINED := "%s +%d %s"
 const TEXT_HEALED := "%s %s → %s"
+const TEXT_RELEASED := "Left the guild: %s"
+const TEXT_RELEASED_COST := "%s (-%d standing)"
+const TEXT_RELEASED_FALLEN := "%s (fallen)"
 const BUTTON_START_DAY := "Start Day %d"
 const BUTTON_CLOSE := "Close"
 
@@ -26,7 +30,9 @@ const BUTTON_CLOSE := "Close"
 @onready var _succeeded_chip = %WinsChip      # chip.gd
 @onready var _gold_chip = %GoldChip           # chip.gd
 @onready var _injured_chip = %HurtChip        # chip.gd
+@onready var _dead_chip = %DeadChip           # chip.gd
 @onready var _home_note: Label = %HomeNote
+@onready var _released_note: Label = %ReleasedNote
 # Quest cards
 @onready var _scroll: ScrollContainer = %Scroll
 @onready var _entry_list: VBoxContainer = %Entries
@@ -50,7 +56,8 @@ func refresh() -> void:
 	var is_same_report: bool = report.get("results") == _built_report.get("results") \
 			and report.get("starts_next_day") == _built_report.get("starts_next_day") \
 			and report.get("day") == _built_report.get("day") \
-			and report.get("home") == _built_report.get("home")
+			and report.get("home") == _built_report.get("home") \
+			and report.get("released") == _built_report.get("released")
 	if is_same_report:
 		return
 	_built_report = report
@@ -59,6 +66,7 @@ func refresh() -> void:
 	_title.text = TEXT_TITLE % report.day
 	_show_totals(results)
 	_show_home(report.get("home", {}))
+	_show_released(report.get("released", []))
 	_show_entries(results)
 
 	# after End Day the button starts the next day; from the Menu it just closes
@@ -67,16 +75,18 @@ func refresh() -> void:
 	Style.style_button(_action_button, "green" if starts_next_day else "paper", 32)
 
 
-## Chips: how many succeeded, total gold, how many got hurt.
+## Chips: how many succeeded, total gold, how many got hurt, how many died.
 func _show_totals(results: Array) -> void:
 	var total_gold := 0
 	var succeeded_count := 0
 	var injured_count := 0
+	var dead_count := 0
 	for result in results:
 		total_gold += int(result.gold)
 		if result.succeeded:
 			succeeded_count += 1
 		injured_count += result.get("injured", []).size()
+		dead_count += result.get("died", []).size()
 
 	_succeeded_chip.set_chip(TEXT_SUCCEEDED % [succeeded_count, results.size()], Style.GREEN_BG, Style.GREEN_TEXT, "check")
 	_succeeded_chip.visible = not results.is_empty()
@@ -85,6 +95,12 @@ func _show_totals(results: Array) -> void:
 		_injured_chip.set_chip(Style.count_text(injured_count, "hurt", "hurt"), Style.RED_BG, Style.RED, "injury")
 	else:
 		_injured_chip.set_chip(TEXT_NO_INJURIES, Style.GREEN_BG, Style.GREEN_TEXT, "heart")
+	# "No injuries" next to a death would read wrong, so it hides when someone died
+	_injured_chip.visible = injured_count > 0 or dead_count == 0
+
+	var dead_look: Dictionary = Style.INJURY_LOOKS[GuildCharacter.InjuryLevel.DEAD]
+	_dead_chip.set_chip(Style.count_text(dead_count, "death", "deaths"), dead_look.bg, dead_look.text, "injury")
+	_dead_chip.visible = dead_count > 0
 
 
 ## One line for the night at home: who trained, who healed (see GuildUpgrades.run_night).
@@ -98,6 +114,20 @@ func _show_home(home: Dictionary) -> void:
 		parts.append(TEXT_HEALED % [healed.character.name, from_label, to_label])
 	_home_note.text = TEXT_HOME % " · ".join(parts)
 	_home_note.visible = not parts.is_empty()
+
+
+## One line for heroes released today (see HallMain.released_today), with the
+## standing each one cost. Fallen heroes are marked instead, since they were free.
+func _show_released(released: Array) -> void:
+	var parts := PackedStringArray()
+	for release in released:
+		var hero_name: String = release.character.name
+		if release.fallen:
+			parts.append(TEXT_RELEASED_FALLEN % hero_name)
+		else:
+			parts.append(TEXT_RELEASED_COST % [hero_name, release.standing])
+	_released_note.text = TEXT_RELEASED % " · ".join(parts)
+	_released_note.visible = not parts.is_empty()
 
 
 ## One card per quest, or a note when nobody went out.

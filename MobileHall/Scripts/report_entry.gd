@@ -19,6 +19,7 @@ const STORY_RECOLORS := {
 ## The special icon SUMMARY_ICON becomes a tick or cross from the quest's result.
 const SUMMARY_ICON := "SUMMARY"
 const BEAT_ICON_RULES := [
+	{"test": "contains", "text": "passed away", "icon": "injury"},
 	{"test": "contains", "text": "INJUR", "icon": "injury"},
 	{"test": "contains", "text": "chest", "icon": "coins"},
 	{"test": "contains", "text": "without sustaining", "icon": "defense"},
@@ -36,6 +37,7 @@ const TEXT_GOLD := "+%d"
 const TEXT_PARTY := "%s · %d%% chance"
 const TEXT_INJURED := "Hurt: %s"
 const TEXT_NO_INJURIES := "Everyone came back unhurt"
+const TEXT_DIED := "Died: %s"
 const BUTTON_OPEN_STORY := "Read the story"
 const BUTTON_HIDE_STORY := "Hide the story"
 
@@ -46,6 +48,7 @@ const BUTTON_HIDE_STORY := "Hide the story"
 @onready var _gold_chip = %GoldChip           # chip.gd
 @onready var _party_line: Label = %PartyLine
 @onready var _injured_line: Label = %HurtLine
+@onready var _died_line: Label = %DiedLine
 # Story
 @onready var _story_button: Button = %StoryButton
 @onready var _beat_list: VBoxContainer = %Beats
@@ -66,11 +69,13 @@ func setup(result: Dictionary) -> void:
 	Style.style_button(_story_button, "paper", 22)
 	_beat_list.visible = false
 
-	var border_color := Style.GREEN if _succeeded else Style.RED
+	# a death turns the card red even when the quest succeeded
+	var anyone_died: bool = not result.get("died", []).is_empty()
+	var border_color := Style.GREEN if _succeeded and not anyone_died else Style.RED
 	Style.style_panel(self, Style.CARD_BG, border_color, 3, 16, CARD_PADDING)
 
 
-## Stamp, title, gold, who went (with their chance), who got hurt.
+## Stamp, title, gold, who went (with their chance), who got hurt, who died.
 func _show_summary(result: Dictionary) -> void:
 	if _succeeded:
 		_result_stamp.set_chip(TEXT_SUCCESS, Style.GREEN, Style.WHITE, "check")
@@ -81,12 +86,19 @@ func _show_summary(result: Dictionary) -> void:
 	_party_line.text = TEXT_PARTY % [Style.join_names(result.party), mini(int(result.chance), 100)]
 
 	var injured: Array = result.get("injured", [])
+	var died: Array = result.get("died", [])
 	if injured.is_empty():
 		_injured_line.text = TEXT_NO_INJURIES
 		Style.set_font_color(_injured_line, Style.GREEN_TEXT)
 	else:
 		_injured_line.text = TEXT_INJURED % Style.join_names(injured, ", ")
 		Style.set_font_color(_injured_line, Style.RED)
+	# "unhurt" would be wrong if someone died, so only the death line shows then
+	_injured_line.visible = not injured.is_empty() or died.is_empty()
+
+	_died_line.visible = not died.is_empty()
+	_died_line.text = TEXT_DIED % Style.join_names(died, ", ")
+	Style.set_font_color(_died_line, Style.RED)
 
 
 # ---- story

@@ -101,17 +101,21 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 	var statTotal = 0.0
 
 	for adventurer in _questingAdventurers:
-		statTotal += adventurer.stats[0] + adventurer.stats[1] + adventurer.stats[2] + adventurer.stats[3]
+		# Rebuild the temp stats first so the pluck bonus matches the current
+		# pluck level and base stats (both change after quests, training, gear...)
+		adventurer.reset_temp_stats()
+
+		statTotal += adventurer.get_quest_stat(0) + adventurer.get_quest_stat(1) + adventurer.get_quest_stat(2) + adventurer.get_quest_stat(3)
 		match favStat:
 			0:
-				statTotal += adventurer.stats[0]
+				statTotal += adventurer.get_quest_stat(0)
 				#regioncheck
 			1:
-				statTotal += adventurer.stats[1]
+				statTotal += adventurer.get_quest_stat(1)
 			2:
-				statTotal += adventurer.stats[2]
+				statTotal += adventurer.get_quest_stat(2)
 			3:
-				statTotal += adventurer.stats[3]
+				statTotal += adventurer.get_quest_stat(3)
 
 	return (snapped((statTotal / statHitNum), 0.01) * 100)
 
@@ -193,13 +197,9 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 				)
 			returnString = str(returnString, "[b]Summary[/b]: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=FFE700][b]", goldReward, " gold[/b][/color].\n")
 			questSummary = str(questSummary, "[b]Summary[/b]: The quest was SUCCESSFUL. Your guild gained ", goldReward, " gold.\n")
-			
-	if(dead_adventurers.size()>0):
-		for char in dead_adventurers:
-			questSummary = str(questSummary,"Unfortunately [b]",char.name,"[/b] succumbed to their injuries and passed away\n")
-			returnString = str(returnString,questSummary)
-			CharacterContainer.active_characters.erase(char)
-			
+
+	returnString = str(returnString, _deathLines())
+
 	#loop with size based on difficulty -> higher difficulty more loops 
 	#sends combat or search to its own methods
 
@@ -261,7 +261,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 					)
 				var died : bool = attackedAdventurer.injure_character()
 				
-				if(died):
+				if(died and not dead_adventurers.has(attackedAdventurer)):
 					dead_adventurers.append(attackedAdventurer)
 
 	else:
@@ -299,7 +299,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 		if(succComDet <=75):
 			var died : bool = attackedAdventurer.injure_character()
 
-			if(died):
+			if(died and not dead_adventurers.has(attackedAdventurer)):
 				dead_adventurers.append(attackedAdventurer)
 	return returnString
 
@@ -454,7 +454,19 @@ func generateMilestoneResults(_questingAdventurers: Array[GuildCharacter], _succ
 			returnString = str(returnString, "Summary: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=gold][b]", goldReward, " gold[/b][/color].\n")
 			questSummary = str(questSummary, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward, " gold.")
 
+	returnString = str(returnString, _deathLines())
+
 	return returnString
+
+
+#one line per adventurer who died on this quest, added to the summary too
+#(dead adventurers stay in the roster so the Hospital can revive them)
+func _deathLines() -> String:
+	var deathText = ""
+	for char in dead_adventurers:
+		deathText = str(deathText, "Unfortunately [b]", char.name, "[/b] succumbed to their injuries and passed away.\n")
+	questSummary = str(questSummary, deathText)
+	return deathText
 
 
 func generatePartyDuo() -> Array[GuildCharacter]:

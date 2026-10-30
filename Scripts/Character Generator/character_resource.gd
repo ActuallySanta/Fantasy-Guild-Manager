@@ -48,6 +48,10 @@ var role: CharacterRole
 var injury_level: InjuryLevel
 var injury_count: int
 
+## The day and quest this character died on (-1 / "" while alive).
+var died_on_day: int = -1
+var died_on_quest: String = ""
+
 var stat_deviation: int = 2
 
 var stats: Dictionary[StatType, int] = {
@@ -106,14 +110,20 @@ func _init() -> void:
 
 	title = name + " the " + str(CharacterRole.find_key(role))
 
-	if (GameState.day >= 5):
-		cost = 200
-	elif(GameState.day >= 3):
-		cost = 100
-	else:
-		cost = 0
-	
+	cost = recruit_cost_for_day(GameState.day)
+
+	add_pluck_temp_stats()
+
 	pass
+
+
+## What a new recruit costs to hire on a given day (free for the first two days).
+static func recruit_cost_for_day(day: int) -> int:
+	if (day >= 5):
+		return 200
+	elif (day >= 3):
+		return 100
+	return 0
 
 
 ## Generate the stats using normalized random number sampling
@@ -134,7 +144,7 @@ func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int)
 		var _proportion: float = _stat_weights[stat] / stat_sum
 		_stats[stat] = (_proportion * _total_points)
 
-	match(role):
+	match (role):
 		0:
 			_stats[1] += 3
 		1:
@@ -158,6 +168,10 @@ func generate_description() -> String:
 
 
 func injure_character() -> bool:
+	# already dead: nothing more can happen to them
+	if (injury_level >= InjuryLevel.DEAD):
+		return false
+
 	injury_count += 1
 	injury_level += 1
 
@@ -183,12 +197,36 @@ func reset_temp_stats():
 	for entry in temp_stats:
 		temp_stats[entry] = 0
 
+	##Since pluck and equipped gear are always applied, reapply them.
+	##Pluck is worked out from the base stats only, so it doesn't stack on gear
+	add_pluck_temp_stats()
+	add_passive_item_stats()
+
+
+##The stat value quests use: the base stat plus any temp stats (pluck, etc.)
+func get_quest_stat(_stat: StatType) -> int:
+	return stats[_stat] + temp_stats[_stat]
+
+
 ##Add all the stats from the equipped item slots
 func add_passive_item_stats():
 	for item in equipped_items:
 		if (item is PassiveItem):
 			var pass_item: PassiveItem = item as PassiveItem
 			increase_temp_stat(pass_item.affected_stat, pass_item.stat_amount)
+
+
+##Give a 10% increase in every stat for each level in pluck
+func add_pluck_temp_stats():
+	for stat in stats.keys():
+		increase_temp_stat(stat, get_pluck_stat_bonus(stat))
+	pass
+
+
+##How much a stat is raised by pluck: 10% of the base stat per level, rounded down,
+##but always at least +1 per level so low stats still get something
+func get_pluck_stat_bonus(_stat: StatType) -> int:
+	return maxi(pluck, int(stats[_stat] * pluck / 10.0))
 
 
 ##Attempt to add an item in, returns true if the item was added, false if it wasn't able to
