@@ -1,7 +1,7 @@
 ## One quest in the Day Report, written as a letter home: type seal, title,
 ## who sent it and at what odds, a Success / Failed stamp, who got hurt or
-## died, the story one line per beat, and a closing line signed by whoever
-## came back.
+## died, what equipment was found, the story one line per beat, and a closing
+## line signed by whoever came back.
 ## Scene: MobileHall/Scenes/Rows/report_entry.tscn
 extends PanelContainer
 
@@ -14,15 +14,19 @@ const STORY_RECOLORS := {
 	"[color=FFE700]": "[color=#6B5A1E]", "[color=gold]": "[color=#6B5A1E]",
 	"[color=green]": "[color=#3D5A2A]",
 	"[color=FD0000]": "[color=#8B2E2A]", "[color=red]": "[color=#8B2E2A]",
+	# equipment found while searching (CreatedQuest._find_equipment)
+	"[color=4FC3F7]": "[color=#2F4A66]",
 }
-## Story lines the letter says in its own words instead (the closing line).
-const SKIPPED_LINE_STARTS := ["Summary", "However"]
+## Story lines the letter says in its own words instead (the closing line, and
+## the Found tag for "Equipment found").
+const SKIPPED_LINE_STARTS := ["Summary", "However", "Equipment found"]
 ## Icon for a story line (matched on its plain text); the first matching rule wins.
 const BEAT_ICON_RULES := [
 	{"text": "succumbed", "icon": "skull"},
 	{"text": "passed away", "icon": "skull"},
 	{"text": "ATTACKED", "icon": "swords"},
 	{"text": "INJUR", "icon": "swords"},
+	{"text": "hidden cache", "icon": "chest"},
 	{"text": "chest", "icon": "chest"},
 	{"text": "lockbox", "icon": "chest"},
 	{"text": "wallet", "icon": "chest"},
@@ -37,6 +41,7 @@ const TEXT_FAILED := "Failed"
 const TEXT_FROM := "From %s · sent at %d%%"
 const TEXT_INJURED := "Hurt: %s"
 const TEXT_DIED := "Died: %s"
+const TEXT_FOUND := "Found: %s"
 const TEXT_WON := "It is done, master. The reward is ours: %d gold. — %s."
 const TEXT_LOST_GOLD := "Sorry, master. No reward this time, but %s brought back %d gold. — %s."
 const TEXT_LOST := "Sorry, master. No reward this time. — %s."
@@ -54,6 +59,8 @@ const TEXT_NOBODY_CAME_BACK := "Nobody came back to write this letter."
 @onready var _injured_text: Label = %HurtText
 @onready var _died_tag: Control = %DiedTag
 @onready var _died_text: Label = %DiedText
+@onready var _found_tag: Control = %FoundTag
+@onready var _found_text: Label = %FoundText
 # Story and sign-off
 @onready var _beat_list: VBoxContainer = %Beats
 @onready var _closing_line: Label = %Closing
@@ -82,6 +89,15 @@ func setup(result: Dictionary) -> void:
 	_injured_text.text = TEXT_INJURED % Style.join_names(injured, ", ")
 	_died_tag.visible = not died.is_empty()
 	_died_text.text = TEXT_DIED % Style.join_names(died, ", ")
+
+	# equipment found while searching; the guild keeps it even on a failed quest
+	# (results from before this feature have no "items" key, so default to none)
+	var found_items: Array = result.get("items", [])
+	var found_item_names := PackedStringArray()
+	for found_item in found_items:
+		found_item_names.append(found_item.name)
+	_found_tag.visible = not found_items.is_empty()
+	_found_text.text = TEXT_FOUND % ", ".join(found_item_names)
 
 	_build_story_beats(result.story)
 	_closing_line.text = _closing_text(result)

@@ -64,7 +64,9 @@ func end_day() -> void:
 		var succeeded := _did_succeed(story)
 		var gold_earned := _get_gold_earned(card.quest, succeeded)
 		GameState.add_gold(gold_earned)
-		
+		# equipment found while searching is kept even if the quest failed
+		ItemContainer.owned_items.append_array(card.quest.found_items)
+
 		results.append({
 			"quest": card.quest,
 			"party": party,

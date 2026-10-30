@@ -113,6 +113,25 @@ theme_override_font_sizes/font_size = 21
 text = "Died: Alex"
 uppercase = true
 
+[node name="FoundTag" type="PanelContainer" parent="Col/Tags"]
+unique_name_in_owner = true
+visible = false
+self_modulate = Color(0.1843, 0.2902, 0.4, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"InkBoxThick"
+
+[node name="FoundText" type="Label" parent="Col/Tags/FoundTag"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_colors/font_color = Color(0.1843, 0.2902, 0.4, 1)
+theme_override_font_sizes/font_size = 21
+text = "Found: Rare Dagger"
+autowrap_mode = 3
+uppercase = true
+
 [node name="Divider" parent="Col" instance=ExtResource("2_divider")]
 layout_mode = 2
 
