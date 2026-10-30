@@ -107,7 +107,7 @@ func _show_buy_bar() -> void:
 	_buy_button.visible = true
 	_buy_button.text = SOLD_BUTTON if is_sold else BUY_BUTTON % item.cost
 	_buy_button.disabled = not ItemShop.can_buy(_selected)
-	Style.style_button(_buy_button, "green", 26)
+	Style.style_button(_buy_button, "gold")
 
 
 func _pick(index: int) -> void:

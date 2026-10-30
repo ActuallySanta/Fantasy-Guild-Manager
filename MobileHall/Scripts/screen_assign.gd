@@ -2,12 +2,13 @@
 ## Scene: MobileHall/Scenes/Screens/screen_assign.tscn
 ##
 ## Top to bottom:
-##   strip   - back to the Board, then one tab per quest (state-coloured);
-##             switching keeps every quest's picks
-##   quest   - type, title, reward, party size, favored stat
-##   party   - the seats (tap to remove) and the live success chance
+##   strip   - back to the Board, then one little scroll per quest
+##             (state-coloured); switching keeps every quest's picks
+##   writ    - the quest as an unrolled scroll: type, title, reward, party
+##             size, favored stat, the pinned party (tap to remove) and the
+##             live success chance
 ##   picker  - every adventurer, best fit first, with stats and what they add
-##   footer  - Deny / Send (or Recall / Reconsider once decided)
+##   footer  - Deny / Seal & send (or Recall / Reconsider once decided)
 extends VBoxContainer
 
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
@@ -16,32 +17,32 @@ const QuestTabScene := preload("res://MobileHall/Scenes/Rows/quest_tab.tscn")
 const PartySlotScene := preload("res://MobileHall/Scenes/Rows/party_slot.tscn")
 const PickRowScene := preload("res://MobileHall/Scenes/Rows/pick_row.tscn")
 
-## Padding inside the quest card.
-const QUEST_CARD_PADDING := Vector4(20, 14, 20, 14)
-
 # ---- TEXT
-# Quest card
+# Quest writ
 const TEXT_TYPE := "%s · Rank %s"
 const TEXT_GOLD := "%d gold"
 const TEXT_PARTY_SIZE := "Up to %d"
 const TEXT_PARTY_SIZE_SOLO := "Solo"
 const TEXT_FAVORED := "Favors %s"
-const STATUS_OPEN := "Pick up to %s. Their stats add up to the chance."
-const STATUS_DRAFT := "Picks are kept if you look at another quest."
+const STATUS_OPEN := "Pin up to %s. Their stats add up to the chance."
+const STATUS_DRAFT := "Your picks stay pinned if you look at another quest."
 const STATUS_SENT := "Sent. Tap someone to change the party, or recall it."
 const STATUS_DENIED := "Denied. Reconsider to put it back on the board."
 # Party odds
 const TEXT_ODDS := "%d%%"
 const TEXT_ODDS_NONE := "--"
+const TEXT_ODDS_WORD := "Chance of success"
 # Picker
-const PICK_HEADING := "Your adventurers · best fit first"
-const PICK_HEADING_HIDDEN := "Free adventurers · %d busy hidden"
+const PICK_HEADING := "Your adventurers"
+const PICK_HINT := "best fit first"
+const PICK_HINT_HIDDEN := "best fit first · %d busy hidden"
 const BUTTON_SHOW_BUSY := "Show busy"
 const NO_ROSTER := "You have no adventurers yet."
 # Footer
 const BUTTON_DENY := "Deny"
-const BUTTON_SEND := "Send Party"
-const BUTTON_SEND_EMPTY := "Pick someone"
+const BUTTON_SEND := "Seal & send %s"
+const BUTTON_SEND_PARTY := "Seal & send party"
+const BUTTON_SEND_EMPTY := "Pin someone first"
 const BUTTON_RECALL := "Recall"
 const BUTTON_NEXT := "Next Quest"
 const BUTTON_BOARD := "Board"
@@ -52,8 +53,7 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _back_button: Button = %BackButton
 @onready var _quest_tabs: HBoxContainer = %QuestTabs
 @onready var _scroll: ScrollContainer = %Scroll
-# Quest card
-@onready var _quest_card: PanelContainer = %QuestCard
+# Quest writ
 @onready var _type_label: Label = %TypeLabel
 @onready var _title: Label = %Title
 @onready var _gold_chip = %GoldChip           # chip.gd
@@ -62,19 +62,21 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _status: Label = %Status
 # Party
 @onready var _party_box: Control = %PartyBox
-@onready var _party_seats: HBoxContainer = %Slots
+@onready var _party_seats: VBoxContainer = %Slots
 @onready var _odds_value: Label = %OddsValue
+@onready var _odds_circle: TextureRect = %Circle
 @onready var _odds_word: Label = %OddsWord
 @onready var _odds_bar = %OddsBar             # odds_bar.gd
 # Picker
 @onready var _pick_header: Control = %PickHeader
 @onready var _pick_heading: Label = %PickHeading
+@onready var _pick_hint: Label = %PickHint
 @onready var _show_busy_toggle: CheckButton = %BusyToggle
 @onready var _all_busy_label: Label = %AllBusy
 @onready var _pick_list: VBoxContainer = %PickList
 @onready var _no_roster_box: Control = %NoRoster
 @onready var _hire_button: Button = %HireButton
-# Footer
+# Footer (left = wood, right = the wax-sealed button)
 @onready var _left_button: Button = %LeftButton
 @onready var _right_button: Button = %RightButton
 
@@ -90,8 +92,7 @@ func setup(main: HallMain) -> void:
 	_right_button.pressed.connect(_on_right_button_pressed)
 	_show_busy_toggle.toggled.connect(hall.set_show_busy_adventurers)
 	_show_busy_toggle.text = BUTTON_SHOW_BUSY
-	Style.style_button(_back_button, "paper", 22)
-	Style.style_button(_hire_button, "blue", 26)
+	_back_button.text = BUTTON_BOARD
 
 
 func scroll_to_top() -> void:
@@ -120,57 +121,58 @@ func _show_quest_tabs() -> void:
 		Style.add_row(_quest_tabs, QuestTabScene).setup(hall, quest_index, is_current)
 
 
-# ---- quest card
+# ---- quest writ
 
 func _show_quest_card(entry: Dictionary) -> void:
 	var type_info := Style.quest_type_info(entry)
 	var quest: CreatedQuest = entry.quest
 	var size_limit: int = hall.party_size_limit(entry)
 
-	_type_label.text = TEXT_TYPE % [type_info.name, Style.rank_letter(quest)]
+	_type_label.text = TEXT_TYPE % [type_info.writ, Style.rank_letter(quest)]
 	Style.set_font_color(_type_label, type_info.color)
 	_title.text = quest.questTitle
 
 	# chips: reward, party size, favored stat
-	_gold_chip.set_chip(TEXT_GOLD % quest.goldReward, Style.GOLD_BG, Style.GOLD_TEXT, "coins")
+	_gold_chip.set_chip(TEXT_GOLD % quest.goldReward, Style.GOLD_BG, Style.TEXT_MAIN, "coins")
 	var size_text := TEXT_PARTY_SIZE_SOLO if size_limit == 1 else TEXT_PARTY_SIZE % size_limit
-	_party_size_chip.set_chip(size_text, Style.BLUE_BG, Style.BLUE_TEXT, "nav_characters")
+	_party_size_chip.set_chip(size_text, Style.BLUE_BG, Style.TEXT_MAIN, "person")
 	var favored_stat: Dictionary = Style.STATS[Style.favored_stat_index(quest)]
 	_favored_chip.set_chip(TEXT_FAVORED % favored_stat.name, favored_stat.bg, favored_stat.color, "", true)
 
-	# status line and card colour by state
+	# status line in the state's ink
 	match entry.state:
 		Style.QUEST_STATE_SENT:
 			_status.text = STATUS_SENT
-			Style.style_panel(_quest_card, Style.SENT_CARD_BG, Style.GREEN, 4, 18, QUEST_CARD_PADDING)
+			Style.set_font_color(_status, Style.GREEN_TEXT)
 		Style.QUEST_STATE_DENIED:
 			_status.text = STATUS_DENIED
-			Style.style_panel(_quest_card, Style.DENIED_CARD_BG, Style.RED, 4, 18, QUEST_CARD_PADDING)
+			Style.set_font_color(_status, Style.RED)
 		_:
 			if entry.party.is_empty():
 				_status.text = STATUS_OPEN % Style.count_text(size_limit, "adventurer", "adventurers")
 			else:
 				_status.text = STATUS_DRAFT
-			Style.style_panel(_quest_card, Style.CARD_BG, type_info.color, 4, 18, QUEST_CARD_PADDING)
+			Style.set_font_color(_status, Style.TEXT_SOFT)
 
 
 # ---- party
 
-## Seats (filled or empty) and the party's success chance. Hidden for denied quests.
+## Seats (pinned cards or empty) and the party's success chance, circled in
+## its ink. Hidden for denied quests.
 func _show_party(entry: Dictionary) -> void:
 	_party_box.visible = entry.state != Style.QUEST_STATE_DENIED
 
 	Style.clear_children(_party_seats)
 	for seat_index in hall.party_size_limit(entry):
 		var seated: GuildCharacter = entry.party[seat_index] if seat_index < entry.party.size() else null
-		Style.add_row(_party_seats, PartySlotScene).setup(hall, seated)
+		Style.add_row(_party_seats, PartySlotScene).setup(hall, entry, seated)
 
 	var chance: int = hall.success_chance(entry, entry.party)
 	var odds := Style.odds_look(chance)
 	_odds_value.text = TEXT_ODDS % mini(chance, 100) if chance >= 0 else TEXT_ODDS_NONE
-	_odds_word.text = odds.word
+	_odds_word.text = TEXT_ODDS_WORD if chance >= 0 else odds.word
 	Style.set_font_color(_odds_value, odds.text_color)
-	Style.set_font_color(_odds_word, odds.text_color)
+	Style.tint_art(_odds_circle, odds.text_color)
 	_odds_bar.set_chance(mini(chance, 100))
 
 
@@ -204,9 +206,9 @@ func _show_picker(entry: Dictionary) -> void:
 	# header, toggle and empty states
 	var can_pick: bool = entry.state != Style.QUEST_STATE_DENIED
 	var has_roster: bool = not shown_adventurers.is_empty() or hidden_busy_count > 0
-	_pick_heading.text = PICK_HEADING_HIDDEN % hidden_busy_count if hidden_busy_count > 0 else PICK_HEADING
+	_pick_heading.text = PICK_HEADING
+	_pick_hint.text = PICK_HINT_HIDDEN % hidden_busy_count if hidden_busy_count > 0 else PICK_HINT
 	_show_busy_toggle.set_pressed_no_signal(hall.show_busy_adventurers)
-	Style.style_button(_show_busy_toggle, "blue" if hall.show_busy_adventurers else "paper", 21)
 	_pick_header.visible = can_pick and has_roster
 	_pick_list.visible = can_pick
 	_all_busy_label.visible = can_pick and shown_adventurers.is_empty() and hidden_busy_count > 0
@@ -216,29 +218,30 @@ func _show_picker(entry: Dictionary) -> void:
 # ---- footer
 
 ## Left / right footer buttons depend on the quest's state:
-##   open   -> Deny | Send Party
+##   open   -> Deny | Seal & send <name>
 ##   sent   -> Recall | Next Quest (or Board when nothing's left to decide)
 ##   denied -> Board | Reconsider
+## The left button is always wood; the right one is the wax-sealed button.
 func _show_footer(entry: Dictionary) -> void:
 	_right_button.disabled = false
+	_left_button.icon = null
 	match entry.state:
 		Style.QUEST_STATE_SENT:
-			_set_footer_button(_left_button, BUTTON_RECALL, "paper", 28)
-			var right_text := BUTTON_NEXT if hall.undecided_count() > 0 else BUTTON_BOARD
-			_set_footer_button(_right_button, right_text, "blue", 30)
+			_left_button.text = BUTTON_RECALL
+			_right_button.text = BUTTON_NEXT if hall.undecided_count() > 0 else BUTTON_BOARD
 		Style.QUEST_STATE_DENIED:
-			_set_footer_button(_left_button, BUTTON_BOARD, "paper", 28)
-			_set_footer_button(_right_button, BUTTON_RECONSIDER, "blue", 30)
+			_left_button.text = BUTTON_BOARD
+			_right_button.text = BUTTON_RECONSIDER
 		_:
-			var has_party: bool = not entry.party.is_empty()
-			_set_footer_button(_left_button, BUTTON_DENY, "red", 28)
-			_set_footer_button(_right_button, BUTTON_SEND if has_party else BUTTON_SEND_EMPTY, "green", 30)
-			_right_button.disabled = not has_party
-
-
-func _set_footer_button(button: Button, text: String, kind: String, font_size: int) -> void:
-	button.text = text
-	Style.style_button(button, kind, font_size)
+			_left_button.text = BUTTON_DENY
+			_left_button.icon = Style.icon_texture("x")
+			if entry.party.is_empty():
+				_right_button.text = BUTTON_SEND_EMPTY
+			elif entry.party.size() == 1:
+				_right_button.text = BUTTON_SEND % entry.party[0].name
+			else:
+				_right_button.text = BUTTON_SEND_PARTY
+			_right_button.disabled = entry.party.is_empty()
 
 
 ## Recall (sent) / Board (denied) / Deny (open).
@@ -252,7 +255,7 @@ func _on_left_button_pressed() -> void:
 			hall.deny_quest()
 
 
-## Next Quest or Board (sent) / Reconsider (denied) / Send Party (open).
+## Next Quest or Board (sent) / Reconsider (denied) / Seal & send (open).
 func _on_right_button_pressed() -> void:
 	match hall.current_quest_entry().state:
 		Style.QUEST_STATE_SENT:

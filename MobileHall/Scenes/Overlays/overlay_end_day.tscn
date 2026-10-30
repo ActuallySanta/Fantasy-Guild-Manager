@@ -1,30 +1,11 @@
-[gd_scene format=3 uid="uid://b3yimxougfeoe"]
+[gd_scene format=3]
 
-[ext_resource type="Script" uid="uid://dfxrirpu3k7g1" path="res://MobileHall/Scripts/overlay_end_day.gd" id="1_3l375"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_end_day.gd" id="1_3l375"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/dim.tres" id="2_4xc3y"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/sheet.tres" id="3_k16o4"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green.tres" id="4_8mj16"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_green_down.tres" id="5_3sudb"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rvioo"]
-content_margin_left = 16.0
-content_margin_top = 12.0
-content_margin_right = 16.0
-content_margin_bottom = 12.0
-bg_color = Color(0.93333334, 0.9529412, 0.8627451, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.24705882, 0.47843137, 0.18039216, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
 
 [node name="OverlayEndDay" type="Control" unique_id=1202933692]
 layout_mode = 3
-anchors_preset = 15
+anchors_preset = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_3l375")
@@ -46,7 +27,7 @@ offset_top = -8.0
 offset_right = -8.0
 offset_bottom = -8.0
 grow_vertical = 0
-theme_override_styles/panel = ExtResource("3_k16o4")
+theme_type_variation = &"Sheet"
 
 [node name="Col" type="VBoxContainer" parent="Sheet" unique_id=1519062817]
 layout_mode = 2
@@ -55,14 +36,15 @@ theme_override_constants/separation = 12
 [node name="Title" type="Label" parent="Sheet/Col" unique_id=2123615656]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 36
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 46
 text = "End Day 1?"
 
 [node name="Sub" type="Label" parent="Sheet/Col" unique_id=875548344]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
 theme_override_font_sizes/font_size = 22
+theme_type_variation = &"ItalicLabel"
 text = "2 parties going out tonight"
 
 [node name="PlanList" type="VBoxContainer" parent="Sheet/Col" unique_id=1760786515]
@@ -74,15 +56,15 @@ theme_override_constants/separation = 10
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.6392157, 0.14901961, 0.16470589, 1)
 theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
 text = "Denied: ..."
 autowrap_mode = 3
 
 [node name="UpgradeBox" type="PanelContainer" parent="Sheet/Col" unique_id=403106631]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_rvioo")
+theme_type_variation = &"LedgerCard"
 
 [node name="Col" type="VBoxContainer" parent="Sheet/Col/UpgradeBox" unique_id=113201603]
 layout_mode = 2
@@ -92,8 +74,8 @@ theme_override_constants/separation = 10
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.18431373, 0.41568628, 0.13333334, 1)
 theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.2392, 0.3529, 0.1647, 1)
 text = "Before you go: you have 600 gold"
 autowrap_mode = 3
 
@@ -120,13 +102,5 @@ custom_minimum_size = Vector2(0, 92)
 layout_mode = 2
 size_flags_horizontal = 3
 focus_mode = 0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_pressed_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 32
-theme_override_styles/normal = ExtResource("4_8mj16")
-theme_override_styles/pressed = ExtResource("5_3sudb")
-theme_override_styles/hover = ExtResource("4_8mj16")
-theme_override_styles/hover_pressed = ExtResource("5_3sudb")
 text = "End Day"

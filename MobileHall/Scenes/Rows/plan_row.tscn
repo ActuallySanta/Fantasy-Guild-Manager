@@ -2,18 +2,6 @@
 
 [ext_resource type="Script" path="res://MobileHall/Scripts/plan_row.gd" id="1_qq40e"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_11yex"]
-content_margin_left = 4.0
-content_margin_top = 4.0
-content_margin_right = 4.0
-content_margin_bottom = 4.0
-bg_color = Color(0.18039216, 0.49019608, 0.19607843, 1)
-border_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-
 [node name="PlanRow" type="HBoxContainer" unique_id=1247588607]
 theme_override_constants/separation = 12
 script = ExtResource("1_qq40e")
@@ -24,13 +12,13 @@ custom_minimum_size = Vector2(52, 52)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_11yex")
+theme_type_variation = &"TypeSeal"
 
 [node name="Tag" type="Label" parent="TagBox" unique_id=1121001266]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"SealLabel"
 theme_override_font_sizes/font_size = 16
-theme_override_colors/font_color = Color(1, 1, 1, 1)
 text = "DUN"
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -52,7 +40,7 @@ text_overrun_behavior = 3
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_type_variation = &"ItalicLabel"
 text = "Alex & Gwen"
 
 [node name="Odds" type="Label" parent="." unique_id=4743860]

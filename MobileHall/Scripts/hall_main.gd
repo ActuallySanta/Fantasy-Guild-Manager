@@ -85,20 +85,22 @@ const SETTINGS_COLOR_FILTER := "color_filter"
 # ============================================================ TEXT
 
 # ---- header
-const HEADER_DAY := "Day %d"
-const HEADER_DRAKE := "Bone Drake in %d %s"
-const HEADER_DRAKE_TODAY := "The Bone Drake attacks today!"
+## The day number on the DAY tile.
+const HEADER_DAY := "%d"
+## The countdown note (BBCode); the days left are in red ink, and the whole
+## note turns red once DRAKE_WARNING_DAYS or fewer are left.
+const HEADER_DRAKE := "The Bone Drake wakes in [color=#%s]%d %s[/color]"
+const HEADER_DRAKE_TODAY := "The Bone Drake [color=#%s]attacks today![/color]"
 const HEADER_DRAKE_GONE := "The Bone Drake has come and gone"
-## Countdown colour in the last days (light red, readable on the dark header).
-const DRAKE_WARNING_COLOR := Color("#FF8A80")
 
 # ---- nav
-## Background of a nav tab that isn't open.
-const NAV_IDLE_BG := Color("#555A61")
+## Nav tab heights: the open tab stands a little taller than the others.
+const NAV_HEIGHT := 100
+const NAV_HEIGHT_OPEN := 114
 
 # ---- action bar
 const ACTION_HIRE := "Hire your first adventurer"
-const ACTION_HIRE_HINT := "You need someone to send on quests"
+const ACTION_HIRE_HINT := "You need someone to send on quests."
 const ACTION_HIRE_BUTTON := "For Hire"
 const ACTION_DECIDE := "%s to decide"
 const ACTION_DECIDE_HINT := "Next: %s"
@@ -211,7 +213,7 @@ var _toast_tween: Tween
 
 # ---- header
 @onready var _day_value: Label = %DayValue
-@onready var _drake_value: Label = %DrakeValue
+@onready var _drake_value: RichTextLabel = %DrakeValue
 @onready var _gold_value: Label = %GoldValue
 @onready var _standing_value: Label = %StandingValue
 @onready var _menu_button: Button = %MenuButton
@@ -1001,15 +1003,17 @@ func refresh() -> void:
 func _refresh_header() -> void:
 	_day_value.text = HEADER_DAY % GameState.day
 
+	# the days left are always in red ink; in the last days the whole note is
 	var days_left := days_until_drake()
+	var red_ink := Style.RED.to_html(false)
 	if days_left > 0:
-		_drake_value.text = HEADER_DRAKE % [days_left, Style.pick_plural(days_left, "day", "days")]
+		_drake_value.text = HEADER_DRAKE % [red_ink, days_left, Style.pick_plural(days_left, "day", "days")]
 	elif days_left == 0:
-		_drake_value.text = HEADER_DRAKE_TODAY
+		_drake_value.text = HEADER_DRAKE_TODAY % red_ink
 	else:
 		_drake_value.text = HEADER_DRAKE_GONE
 	var is_drake_close := days_left >= 0 and days_left <= DRAKE_WARNING_DAYS
-	Style.set_font_color(_drake_value, DRAKE_WARNING_COLOR if is_drake_close else Style.WHITE)
+	Style.set_font_color(_drake_value, Style.RED if is_drake_close else Style.TEXT_MAIN)
 
 	_gold_value.text = str(GameState.gold)
 	_standing_value.text = str(GameState.standing)
@@ -1053,42 +1057,36 @@ func _refresh_action_bar() -> void:
 	_action_bar.visible = active_screen.is_empty() and active_tab != TAB_SHOP
 
 	if roster().is_empty() and can_hire_anyone():
-		_set_action(ACTION_HIRE, ACTION_HIRE_HINT, ACTION_HIRE_BUTTON, "blue")
+		_set_action(ACTION_HIRE, ACTION_HIRE_HINT, ACTION_HIRE_BUTTON)
 	elif undecided_count() > 0:
 		var next_entry: Dictionary = quest_entries[next_undecided_index(0)]
 		var title := ACTION_DECIDE % Style.count_text(undecided_count(), "quest", "quests")
-		_set_action(title, ACTION_DECIDE_HINT % next_entry.quest.questTitle, ACTION_DECIDE_BUTTON, "blue")
+		_set_action(title, ACTION_DECIDE_HINT % next_entry.quest.questTitle, ACTION_DECIDE_BUTTON)
 	else:
 		var parties_going := sent_entries().size()
 		var hint := ACTION_END_HINT % Style.count_text(parties_going, "party", "parties") if parties_going > 0 else ACTION_END_HINT_NONE
-		_set_action(ACTION_END % GameState.day, hint, ACTION_END_BUTTON, "green")
+		_set_action(ACTION_END % GameState.day, hint, ACTION_END_BUTTON)
 
 
-func _set_action(title: String, hint: String, button_text: String, button_kind: String) -> void:
+## The torn banner's title, hint and gold button (its look is set in the scene).
+func _set_action(title: String, hint: String, button_text: String) -> void:
 	_action_title.text = title
 	_action_hint.text = hint
 	_action_button.text = button_text
-	Style.style_button(_action_button, button_kind, 30)
 
 # ---- nav
 
 
-## Bottom tabs: the open one is white; each has a badge when it needs a visit.
+## Bottom tabs: the open one is parchment (NavTabActive in hall_theme) and
+## stands taller, the rest dark wood (NavTab); each has a badge when it needs a visit.
 func _refresh_nav() -> void:
 	# Assign Party counts as part of the Board
 	var highlighted_tab := "board" if active_screen.get("kind", "") == SCREEN_ASSIGN else active_tab
 	for tab_id in TAB_IDS:
 		var nav_button := _nav_button(tab_id)
 		var is_active: bool = tab_id == highlighted_tab
-		var content_color := Style.TEXT_MAIN if is_active else Style.WHITE
-
-		var box := Style.flat_box(Style.WHITE if is_active else NAV_IDLE_BG, 10, 3 if is_active else 0, Style.BLUE_TEXT, Vector4(4, 8, 4, 8))
-		for box_state in Style.BUTTON_BOX_STATES:
-			nav_button.add_theme_stylebox_override(box_state, box)
-		for font_state in Style.BUTTON_FONT_STATES:
-			nav_button.add_theme_color_override(font_state, content_color)
-		for icon_state in ["icon_normal_color", "icon_hover_color", "icon_pressed_color"]:
-			nav_button.add_theme_color_override(icon_state, content_color)
+		nav_button.theme_type_variation = &"NavTabActive" if is_active else &"NavTab"
+		nav_button.custom_minimum_size.y = NAV_HEIGHT_OPEN if is_active else NAV_HEIGHT
 
 		var badge_text := _badge_text_for(tab_id)
 		var badge: Control = nav_button.get_node("Badge")

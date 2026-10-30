@@ -1,135 +1,148 @@
 [gd_scene format=3]
 
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/card.tres" id="1_8l0ns"]
-[ext_resource type="Script" path="res://MobileHall/Scripts/quest_row.gd" id="2_6d2g8"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_disbn"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/chip.tres" id="4_277ok"]
-[ext_resource type="Script" path="res://MobileHall/Scripts/chip.gd" id="5_2onvf"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/quest_row.gd" id="1_row"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/roller_v.png" id="2_roller"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_f4jbf"]
-content_margin_left = 4.0
-content_margin_top = 4.0
-content_margin_right = 4.0
-content_margin_bottom = 4.0
-bg_color = Color(0.18039216, 0.49019608, 0.19607843, 1)
-border_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+[node name="QuestRow" type="PanelContainer"]
+script = ExtResource("1_row")
 
-[node name="QuestRow" type="PanelContainer" unique_id=2143308763]
-mouse_filter = 1
-theme_override_styles/panel = ExtResource("1_8l0ns")
-script = ExtResource("2_6d2g8")
-
-[node name="Row" type="HBoxContainer" parent="." unique_id=1437177273]
+[node name="Row" type="HBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 12
+mouse_filter = 2
+theme_override_constants/separation = -4
 
-[node name="TypeTile" type="PanelContainer" parent="Row" unique_id=1122226933]
+[node name="RollerLeft" type="NinePatchRect" parent="Row"]
+z_index = 1
+custom_minimum_size = Vector2(34, 0)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_roller")
+patch_margin_top = 22
+patch_margin_bottom = 22
+
+[node name="BodyMargin" type="MarginContainer" parent="Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="Body" type="PanelContainer" parent="Row/BodyMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"ScrollBodyH"
+
+[node name="Content" type="HBoxContainer" parent="Row/BodyMargin/Body"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+
+[node name="TypeSeal" type="PanelContainer" parent="Row/BodyMargin/Body/Content"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(72, 72)
+custom_minimum_size = Vector2(76, 76)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_f4jbf")
+theme_type_variation = &"TypeSeal"
 
-[node name="TypeTag" type="Label" parent="Row/TypeTile" unique_id=457939101]
+[node name="TypeTag" type="Label" parent="Row/BodyMargin/Body/Content/TypeSeal"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_type_variation = &"SealLabel"
 theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-text = "DUN"
+text = "SCT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Info" type="VBoxContainer" parent="Row" unique_id=1478867998]
+[node name="Info" type="VBoxContainer" parent="Row/BodyMargin/Body/Content"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+mouse_filter = 2
+theme_override_constants/separation = 4
 alignment = 1
 
-[node name="Title" type="Label" parent="Row/Info" unique_id=94069125]
+[node name="Title" type="Label" parent="Row/BodyMargin/Body/Content/Info"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 26
-text = "Raid the Goblin Caves"
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 34
+theme_override_constants/line_spacing = -6
+text = "Explore Mistwater Marsh"
 autowrap_mode = 3
 max_lines_visible = 2
 
-[node name="Chips" type="HBoxContainer" parent="Row/Info" unique_id=1363281564]
+[node name="Chips" type="HBoxContainer" parent="Row/BodyMargin/Body/Content/Info"]
 layout_mode = 2
-theme_override_constants/separation = 6
+mouse_filter = 2
+theme_override_constants/separation = 12
 
-[node name="RankChip" type="PanelContainer" parent="Row/Info/Chips" unique_id=545259554 instance=ExtResource("3_disbn")]
+[node name="RankChip" parent="Row/BodyMargin/Body/Content/Info/Chips" instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("4_277ok")
-script = ExtResource("5_2onvf")
 
-[node name="GoldChip" type="PanelContainer" parent="Row/Info/Chips" unique_id=39298034 instance=ExtResource("3_disbn")]
+[node name="GoldChip" parent="Row/BodyMargin/Body/Content/Info/Chips" instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("4_277ok")
-script = ExtResource("5_2onvf")
 
-[node name="SlotsChip" type="PanelContainer" parent="Row/Info/Chips" unique_id=1861899064 instance=ExtResource("3_disbn")]
+[node name="SlotsChip" parent="Row/BodyMargin/Body/Content/Info/Chips" instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("4_277ok")
-script = ExtResource("5_2onvf")
 
-[node name="FavChip" type="PanelContainer" parent="Row/Info/Chips" unique_id=638373799 instance=ExtResource("3_disbn")]
+[node name="FavChip" parent="Row/BodyMargin/Body/Content/Info/Chips" instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("4_277ok")
-script = ExtResource("5_2onvf")
 
-[node name="StateCol" type="VBoxContainer" parent="Row" unique_id=340373423]
-custom_minimum_size = Vector2(132, 0)
+[node name="StateCol" type="VBoxContainer" parent="Row/BodyMargin/Body/Content"]
+custom_minimum_size = Vector2(104, 0)
 layout_mode = 2
-theme_override_constants/separation = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
 alignment = 1
 
-[node name="StateLabel" type="Label" parent="Row/StateCol" unique_id=811372001]
+[node name="StateLabel" type="Label" parent="Row/BodyMargin/Body/Content/StateCol"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 28
+theme_override_constants/line_spacing = -8
 text = "Pick a party"
 horizontal_alignment = 2
 autowrap_mode = 3
 
-[node name="OddsLabel" type="Label" parent="Row/StateCol" unique_id=1196930527]
+[node name="OddsLabel" type="Label" parent="Row/BodyMargin/Body/Content/StateCol"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 34
 text = "72%"
 horizontal_alignment = 2
 
-[node name="SubLabel" type="Label" parent="Row/StateCol" unique_id=727361091]
+[node name="SubLabel" type="Label" parent="Row/BodyMargin/Body/Content/StateCol"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
+theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 18
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-text = "Tap to reconsider"
+text = "tap to reconsider"
 horizontal_alignment = 2
 autowrap_mode = 3
 
-[node name="Party" type="HBoxContainer" parent="Row/StateCol" unique_id=1894826583]
+[node name="Party" type="HBoxContainer" parent="Row/BodyMargin/Body/Content/StateCol"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 4
+mouse_filter = 2
+theme_override_constants/separation = 2
 alignment = 2
+
+[node name="RollerRight" type="NinePatchRect" parent="Row"]
+z_index = 1
+custom_minimum_size = Vector2(34, 0)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_roller")
+patch_margin_top = 22
+patch_margin_bottom = 22

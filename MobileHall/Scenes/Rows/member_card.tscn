@@ -1,82 +1,74 @@
-[gd_scene format=3 uid="uid://cli05lmk7ngkk"]
+[gd_scene format=3]
 
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/card.tres" id="1_esahr"]
-[ext_resource type="Script" uid="uid://b35afd8f80g43" path="res://MobileHall/Scripts/member_card.gd" id="2_bgie1"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/portrait.tscn" id="3_unp1y"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="5_uv3qh"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/stat_strip.tscn" id="8_p2o7o"]
+[ext_resource type="Script" path="res://MobileHall/Scripts/member_card.gd" id="1_member"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/stat_strip.tscn" id="4_stats"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_5l50i"]
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
-bg_color = Color(0.7254902, 0.7882353, 0.8392157, 1)
-border_color = Color(0.13333334, 0.13333334, 0.13333334, 1)
-corner_radius_top_left = 40
-corner_radius_top_right = 40
-corner_radius_bottom_right = 40
-corner_radius_bottom_left = 40
+[node name="MemberCard" type="PanelContainer"]
+theme_type_variation = &"PaperCard"
+script = ExtResource("1_member")
 
-[node name="MemberCard" type="PanelContainer" unique_id=637764125]
-mouse_filter = 1
-theme_override_styles/panel = ExtResource("1_esahr")
-script = ExtResource("2_bgie1")
-
-[node name="Row" type="HBoxContainer" parent="." unique_id=184087389]
+[node name="Row" type="HBoxContainer" parent="."]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 14
 
-[node name="Portrait" parent="Row" unique_id=1225425876 instance=ExtResource("3_unp1y")]
+[node name="Portrait" parent="Row" instance=ExtResource("2_portrait")]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(92, 92)
+custom_minimum_size = Vector2(80, 98)
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_5l50i")
 
-[node name="Info" type="VBoxContainer" parent="Row" unique_id=1343003411]
+[node name="Info" type="VBoxContainer" parent="Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 6
+mouse_filter = 2
+theme_override_constants/separation = 4
 
-[node name="Top" type="HBoxContainer" parent="Row/Info" unique_id=1515651373]
+[node name="Top" type="HBoxContainer" parent="Row/Info"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 8
 
-[node name="Name" type="Label" parent="Row/Info/Top" unique_id=1749095421]
+[node name="Name" type="Label" parent="Row/Info/Top"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 28
-text = "Name"
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 38
+text = "Maria"
 
-[node name="Role" type="Label" parent="Row/Info/Top" unique_id=1524940529]
+[node name="Role" type="Label" parent="Row/Info/Top"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(20, 0)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 21
+size_flags_vertical = 4
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 23
 text = "the Knight"
 text_overrun_behavior = 3
 
-[node name="Mid" type="HBoxContainer" parent="Row/Info" unique_id=711555915]
+[node name="Mid" type="HBoxContainer" parent="Row/Info"]
 layout_mode = 2
-theme_override_constants/separation = 8
+mouse_filter = 2
+theme_override_constants/separation = 14
 
-[node name="HealthChip" parent="Row/Info/Mid" unique_id=545259554 instance=ExtResource("5_uv3qh")]
+[node name="HealthChip" parent="Row/Info/Mid" instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="TaskChip" parent="Row/Info/Mid" unique_id=213804447 instance=ExtResource("5_uv3qh")]
+[node name="TaskChip" parent="Row/Info/Mid" instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Stats" parent="Row/Info" unique_id=33119571 instance=ExtResource("8_p2o7o")]
+[node name="Stats" parent="Row/Info" instance=ExtResource("4_stats")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="Chevron" type="Label" parent="Row" unique_id=1837898830]
+[node name="Chevron" type="Label" parent="Row"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 30
-text = ">"
+theme_type_variation = &"TitleLabel"
+theme_override_colors/font_color = Color(0.4196, 0.3647, 0.3098, 1)
+theme_override_font_sizes/font_size = 44
+text = "›"

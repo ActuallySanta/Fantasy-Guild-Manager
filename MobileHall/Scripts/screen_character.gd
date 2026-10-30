@@ -41,8 +41,8 @@ const TEXT_ON_QUEST := "#%d %s (%s)"
 const TEXT_TRAINING := "Training %s tonight (+%d)"
 const TEXT_IN_BED := "In a Hospital bed · healthy in %s"
 const BUTTON_BACK := "Back"
-const BUTTON_HIRE := "Hire (free)"
-const BUTTON_HIRE_COST := "Hire (%d gold)"
+const BUTTON_HIRE := "Hire · free"
+const BUTTON_HIRE_COST := "Hire · %dg"
 const BUTTON_RELEASE := "Release"
 # Release confirm sheet
 const TEXT_RELEASE_TITLE := "Release %s?"
@@ -106,11 +106,11 @@ func setup(main: HallMain) -> void:
 	_release_cancel_button.text = BUTTON_CANCEL
 	_release_confirm_button.text = BUTTON_RELEASE_CONFIRM
 	_pluck_note.text = TEXT_PLUCK_NOTE
-	Style.style_button(_back_button, "paper", 28)
-	Style.style_button(_hire_button, "green", 30)
-	Style.style_button(_release_button, "red", 28)
-	Style.style_button(_release_cancel_button, "paper", 28)
-	Style.style_button(_release_confirm_button, "red", 30)
+	Style.style_button(_back_button, "wood")
+	Style.style_button(_hire_button, "gold")
+	Style.style_button(_release_button, "wood")
+	Style.style_button(_release_cancel_button, "paper")
+	Style.style_button(_release_confirm_button, "wood")
 
 
 func scroll_to_top() -> void:
@@ -181,7 +181,8 @@ func _show_task(character: GuildCharacter, is_recruit: bool) -> void:
 
 
 ## One line per stat: name and base value, then the Armory, gear and Pluck bonuses
-## as separate tags ("5 (+1 Armory) (+2 gear)"), in that stat's colours.
+## as separate tags ("5 (+1 Armory) (+2 gear)"), in that stat's ink inside an
+## outline inked the same colour.
 ## The StatLines node has one authored line per stat, each with Row/Name and Row/Value.
 func _show_stats(character: GuildCharacter) -> void:
 	for stat_index in Style.STAT_COUNT:
@@ -215,7 +216,7 @@ func _show_stats(character: GuildCharacter) -> void:
 			value_label.text += TEXT_PLUCK_BONUS % pluck_bonus
 		Style.set_font_color(name_label, stat.color)
 		Style.set_font_color(value_label, stat.color)
-		line.add_theme_stylebox_override("panel", Style.flat_box(stat.bg, 12))
+		Style.tint_art(line, stat.color)
 
 
 ## Worn items, empty slots, and (while picking) the owned items that fit.

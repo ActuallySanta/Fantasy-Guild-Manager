@@ -1,32 +1,28 @@
-## One building on the Upgrades tab: level pips, what it does now and next,
-## and the Upgrade button (or why you can't yet).
+## One building on the Upgrades tab, drawn as a plan on grid paper: its icon,
+## level diamonds, what it does now and next, and the Build button (or why you
+## can't yet).
 ## Scene: MobileHall/Scenes/Rows/upgrade_card.tscn
 extends PanelContainer
 
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 
-## Level pips: filled up to the current level.
-const PIP_FILLED := Color("#1E88E5")
-const PIP_EMPTY := Color("#E6E6E6")
-
 # ---- TEXT
 # Level and effect
 const TEXT_LEVEL := "Level %d / %d"
-const TEXT_NOW := "Now: %s"
-const TEXT_NEXT := "Next: %s"
-const TEXT_MAXED := "Fully upgraded"
+const TEXT_NOW := "Now · %s"
+const TEXT_NEXT := "Next · %s"
+const TEXT_MAXED := "Fully built"
 # Button and status
-const TEXT_BUTTON := "%d gold"
-const TEXT_BUTTON_MAX := "Max"
-const TEXT_NEED_GOLD := "Need %d more gold"
-const TEXT_NEED_STANDING := "Needs standing %d"
-const TEXT_READY := "Ready to build"
+const TEXT_BUTTON := "Build · %d"
+const TEXT_BUTTON_MAX := "Built"
+const TEXT_NEED_GOLD := "need %d more gold"
+const TEXT_NEED_STANDING := "needs standing %d"
+const TEXT_READY := "ready to build"
 
 # ---- NODES
 # Name and level
-@onready var _tag_box: PanelContainer = %TagBox
-@onready var _tag: Label = %Tag
+@onready var _icon: TextureRect = %Icon
 @onready var _name: Label = %Name
 @onready var _level: Label = %Level
 @onready var _pips: HBoxContainer = %Pips
@@ -48,19 +44,18 @@ func setup(hall: HallMain, building: int) -> void:
 	_show_status(building, is_maxed)
 
 
+## Icon, name, "Level 2 / 5" and one diamond per level (filled up to the level).
 func _show_name_and_level(building: int, level: int) -> void:
-	var tag_color: Color = GuildUpgrades.get_building_color(building).darkened(0.25)
-	Style.style_tag(_tag_box, _tag, Style.BUILDING_TAGS.get(building, "?"), tag_color)
+	_icon.texture = Style.icon_texture(Style.BUILDING_ICONS.get(building, ""))
 	_name.text = GuildUpgrades.get_building_name(building)
 	_level.text = TEXT_LEVEL % [level, GuildUpgrades.MAX_LEVEL]
-	# one pip per level, authored in the scene
+	# one diamond per level, authored in the scene
 	for pip_index in _pips.get_child_count():
-		var pip: Panel = _pips.get_child(pip_index)
-		var pip_color := PIP_FILLED if pip_index < level else PIP_EMPTY
-		pip.add_theme_stylebox_override("panel", Style.flat_box(pip_color, 6, 2, Style.TEXT_MAIN))
+		var pip: TextureRect = _pips.get_child(pip_index)
+		pip.texture = Style.icon_texture("diamond" if pip_index < level else "diamond_empty")
 
 
-## "Now: ..." and "Next: ..." (or "Fully upgraded").
+## "Now · ..." and "Next · ..." (or "Fully built").
 func _show_effects(building: int, level: int, is_maxed: bool) -> void:
 	_now.text = TEXT_NOW % GuildUpgrades.get_effect_text(building, level)
 	if is_maxed:
@@ -69,7 +64,7 @@ func _show_effects(building: int, level: int, is_maxed: bool) -> void:
 		_next.text = TEXT_NEXT % GuildUpgrades.get_effect_text(building, level + 1)
 
 
-## Button (cost or Max), the status line (ready / what's missing), and card colours.
+## Build button (cost or Built) and the status line (ready / what's missing).
 func _show_status(building: int, is_maxed: bool) -> void:
 	var status := GuildUpgrades.get_upgrade_status(building)
 	var is_ready := status == GuildUpgrades.UpgradeStatus.READY
@@ -79,7 +74,6 @@ func _show_status(building: int, is_maxed: bool) -> void:
 	else:
 		_upgrade_button.text = TEXT_BUTTON % GuildUpgrades.get_next_gold_cost(building)
 	_upgrade_button.disabled = not is_ready
-	Style.style_button(_upgrade_button, "green", 26)
 
 	match status:
 		GuildUpgrades.UpgradeStatus.READY:
@@ -93,9 +87,3 @@ func _show_status(building: int, is_maxed: bool) -> void:
 			Style.set_font_color(_status, Style.RED)
 		_:
 			_status.text = ""
-	_status.visible = _status.text != ""
-
-	if is_ready:
-		Style.style_panel(self, Style.SENT_CARD_BG, Style.GREEN, 4, 16)
-	else:
-		Style.style_panel(self, Style.CARD_BG, Style.BORDER, 2, 16)
