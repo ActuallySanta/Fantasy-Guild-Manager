@@ -1,6 +1,6 @@
 ## One item on the Shop tab's goods grid, drawn as a parchment price tag:
 ## a coloured seal with the item's short tag, its name and price.
-## A sold-out item is faded, stamped "Sold out" and can't be picked.
+## A sold item (bought today) is faded, stamped "Sold" and can't be picked.
 ## The picked one gets the gold-edged tag (GoodsTagSelected in hall_theme).
 ## Scene: MobileHall/Scenes/Rows/shop_tile.tscn
 extends Button

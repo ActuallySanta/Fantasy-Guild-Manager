@@ -32,6 +32,7 @@ const TEXT_NIGHTS_IN_BED := "Healthy in %s"
 const TEXT_NIGHTS_COMPARE := "Healthy in %s at home, %s in a bed"
 const TEXT_REVIVE_READY := "The Hospital can bring one hero back"
 const TEXT_REVIVE_LOCKED := "Revive unlocks at Hospital level %d"
+const TEXT_REVIVE_NO_BED := "No free bed. Upgrade the Barracks to revive"
 const TEXT_REVIVE_USED := "This run's revive is used up"
 const BUTTON_REMOVE := "Remove"
 const BUTTON_ADD := "Add"
@@ -186,9 +187,14 @@ func show_needs_care(main: HallMain, hero: GuildCharacter) -> void:
 func show_fallen(main: HallMain, hero: GuildCharacter) -> void:
 	_fill(main, hero)
 	_task_chip.visible = false
-	if GuildUpgrades.can_revive():
+	if GuildUpgrades.can_revive() and not hall.is_roster_full():
 		_set_note(TEXT_REVIVE_READY, Style.GREEN_TEXT)
 		_set_button(_main_button, BUTTON_REVIVE, "green", hall.revive.bind(character))
+	elif GuildUpgrades.can_revive():
+		# revive is ready, but every bed is taken by a living hero
+		_set_note(TEXT_REVIVE_NO_BED)
+		Style.style_panel(self, Style.DENIED_CARD_BG, Style.BORDER, 2, 16)
+		modulate = Color(1, 1, 1, FADED_OPACITY)
 	else:
 		var is_used := GuildUpgrades.get_level(GuildUpgrades.Building.HOSPITAL) >= GuildUpgrades.REVIVE_LEVEL
 		_set_note(TEXT_REVIVE_USED if is_used else TEXT_REVIVE_LOCKED % GuildUpgrades.REVIVE_LEVEL)

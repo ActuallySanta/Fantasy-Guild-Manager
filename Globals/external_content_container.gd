@@ -15,6 +15,7 @@ extends Node
 @export var monsters_2D_test_path: String = "res://External Content/Quest Stuff (Test)/2D Monster Test.txt" #test path for monstrs
 @export var quest_story_test_path: String = "res://External Content/Quest Stuff (Test)/Story Parts.txt" #test path
 @export var milestone_story_path: String = "res://External Content/Quest Stuff (Test)/Milestone Story Parts.txt"
+@export var boglands_location_path: String = "res://External Content/Quest Stuff (Test)/The Boglands (Locations).txt"
 
 #Character Names
 var male_character_names: Array[String]
@@ -59,12 +60,6 @@ var pronoun_personal_object: Array[String] = [
 ]
 
 #Replace these with the actual UID of the icon
-var character_icons: Dictionary[GuildCharacter.CharacterRole, Texture2D] = {
-	GuildCharacter.CharacterRole.KNIGHT: preload("uid://0nieya7vg7ir"),
-	GuildCharacter.CharacterRole.PRIEST: preload("uid://dwkwfcgs6qeya"),
-	GuildCharacter.CharacterRole.PATHFINDER: preload("uid://dqfofkh0uu3x3"),
-	GuildCharacter.CharacterRole.MAGE: preload("uid://bw0opsv6knijq"),
-}
 
 var knight_icons: Array[Texture2D] = [
 	preload("uid://0nieya7vg7ir"),
@@ -89,6 +84,11 @@ var mage_icons: Array[Texture2D] = [
 	preload("uid://bo8xpib0s758d"),
 	preload("uid://diosvf6ou13rx"),
 ]
+
+var knight_item_names: Array[String] = ["Sword", "Axe", "Claymore"]
+var pathfinder_item_names: Array[String] = ["Dagger", "Mask", "Disguise"]
+var mage_item_names: Array[String] = ["Staff", "Orb", "Pointy Hat"]
+var priest_item_names: Array[String] = ["Sigil", "Incense", "Idol"]
 
 
 # Called when the node enters the scene tree for the first time.
@@ -201,3 +201,17 @@ func replace_standins(_backstory: String, _char: GuildCharacter) -> String:
 	_backstory = _backstory.replace("[PRONOUN_PERS_OBJ]", pronoun_personal_object[_char.gender])
 
 	return _backstory
+
+
+func get_item_title(_role: GuildCharacter.CharacterRole) -> String:
+	match _role:
+		GuildCharacter.CharacterRole.KNIGHT:
+			return knight_item_names.pick_random()
+		GuildCharacter.CharacterRole.PRIEST:
+			return priest_item_names.pick_random()
+		GuildCharacter.CharacterRole.PATHFINDER:
+			return pathfinder_item_names.pick_random()
+		GuildCharacter.CharacterRole.MAGE:
+			return mage_item_names.pick_random()
+		_:
+			return ""

@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="4_8ylyv"]
 [ext_resource type="Script" path="res://MobileHall/Scripts/chip.gd" id="6_w82a0"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="7_ye445"]
+[ext_resource type="StyleBox" path="res://MobileHall/Styles/dim.tres" id="10_rdim1"]
 
 [node name="ScreenCharacter" type="VBoxContainer" unique_id=2004027154]
 theme_override_constants/separation = 0
@@ -120,7 +121,11 @@ theme_override_font_sizes/font_size = 26
 text = "Power"
 
 [node name="Value" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat0/Row" unique_id=706212762]
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+autowrap_mode = 3
 theme_override_font_sizes/font_size = 28
 text = "5"
 
@@ -139,7 +144,11 @@ theme_override_font_sizes/font_size = 26
 text = "Power"
 
 [node name="Value" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat1/Row" unique_id=950791820]
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+autowrap_mode = 3
 theme_override_font_sizes/font_size = 28
 text = "5"
 
@@ -158,7 +167,11 @@ theme_override_font_sizes/font_size = 26
 text = "Power"
 
 [node name="Value" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat2/Row" unique_id=855251439]
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+autowrap_mode = 3
 theme_override_font_sizes/font_size = 28
 text = "5"
 
@@ -177,7 +190,11 @@ theme_override_font_sizes/font_size = 26
 text = "Power"
 
 [node name="Value" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat3/Row" unique_id=100645640]
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+autowrap_mode = 3
 theme_override_font_sizes/font_size = 28
 text = "5"
 
@@ -196,16 +213,43 @@ theme_override_font_sizes/font_size = 26
 text = "Power"
 
 [node name="Value" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat4/Row" unique_id=1680068538]
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+autowrap_mode = 3
 theme_override_font_sizes/font_size = 28
 text = "5"
 
 [node name="PluckNote" type="Label" parent="Scroll/Margin/Paper/Col" unique_id=2111063860]
+custom_minimum_size = Vector2(40, 0)
+autowrap_mode = 3
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 19
 theme_type_variation = &"ItalicLabel"
-text = "Pluck isn't used by quests yet."
+text = "Pluck goes up by 1 for every quest this hero wins."
+
+[node name="GearHeading" type="Label" parent="Scroll/Margin/Paper/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 36
+text = "Gear"
+
+[node name="GearLines" type="VBoxContainer" parent="Scroll/Margin/Paper/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GearNote" type="Label" parent="Scroll/Margin/Paper/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 21
+text = "Buy gear in the Shop."
+autowrap_mode = 3
 
 [node name="StoryHeading" type="Label" parent="Scroll/Margin/Paper/Col" unique_id=670952099]
 layout_mode = 2
@@ -239,6 +283,15 @@ focus_mode = 0
 theme_override_font_sizes/font_size = 28
 text = "Back"
 
+[node name="ReleaseButton" type="Button" parent="Footer/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"WoodButton"
+text = "Release"
+
 [node name="HireButton" type="Button" parent="Footer/Row" unique_id=1178814079]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 92)
@@ -247,3 +300,76 @@ size_flags_horizontal = 3
 focus_mode = 0
 theme_override_font_sizes/font_size = 30
 text = "Hire (free)"
+
+[node name="ReleaseConfirm" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+top_level = true
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ReleaseDim" type="PanelContainer" parent="ReleaseConfirm"]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = ExtResource("10_rdim1")
+
+[node name="Sheet" type="PanelContainer" parent="ReleaseConfirm"]
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_vertical = 0
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="ReleaseConfirm/Sheet"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ReleaseTitle" type="Label" parent="ReleaseConfirm/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 46
+text = "Release Name?"
+autowrap_mode = 3
+
+[node name="ReleaseSub" type="Label" parent="ReleaseConfirm/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "They leave the guild for good."
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="ReleaseConfirm/Sheet/Col"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ReleaseCancelButton" type="Button" parent="ReleaseConfirm/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(210, 92)
+layout_mode = 2
+focus_mode = 0
+text = "Cancel"
+
+[node name="ReleaseConfirmButton" type="Button" parent="ReleaseConfirm/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"WoodButton"
+text = "Release"

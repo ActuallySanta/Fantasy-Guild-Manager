@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://MobileHall/Scripts/report_entry.gd" id="1_entry"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/divider.tscn" id="2_divider"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/skull.svg" id="3_skull"]
 
 [node name="ReportEntry" type="PanelContainer"]
 theme_type_variation = &"PaperCard"
@@ -61,20 +62,55 @@ custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="HurtTag" type="PanelContainer" parent="Col"]
+[node name="Tags" type="HBoxContainer" parent="Col"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HurtTag" type="PanelContainer" parent="Col/Tags"]
 unique_name_in_owner = true
 self_modulate = Color(0.5451, 0.1804, 0.1647, 1)
 layout_mode = 2
 size_flags_horizontal = 0
 theme_type_variation = &"InkBoxThick"
 
-[node name="HurtText" type="Label" parent="Col/HurtTag"]
+[node name="HurtText" type="Label" parent="Col/Tags/HurtTag"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"CapsLabel"
 theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
 theme_override_font_sizes/font_size = 21
 text = "Hurt: Maria"
+uppercase = true
+
+[node name="DiedTag" type="PanelContainer" parent="Col/Tags"]
+unique_name_in_owner = true
+visible = false
+self_modulate = Color(0.2902, 0.2314, 0.3098, 1)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"InkBoxThick"
+
+[node name="DiedRow" type="HBoxContainer" parent="Col/Tags/DiedTag"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Skull" type="TextureRect" parent="Col/Tags/DiedTag/DiedRow"]
+modulate = Color(0.2902, 0.2314, 0.3098, 1)
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("3_skull")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="DiedText" type="Label" parent="Col/Tags/DiedTag/DiedRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_colors/font_color = Color(0.2902, 0.2314, 0.3098, 1)
+theme_override_font_sizes/font_size = 21
+text = "Died: Alex"
 uppercase = true
 
 [node name="Divider" parent="Col" instance=ExtResource("2_divider")]

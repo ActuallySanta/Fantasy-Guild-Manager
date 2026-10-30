@@ -3,9 +3,10 @@
 [ext_resource type="Script" path="res://MobileHall/Scripts/stat_strip.gd" id="1_mh62l"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="2_d5pfk"]
 
-[node name="StatStrip" type="HBoxContainer"]
+[node name="StatStrip" type="HFlowContainer"]
 mouse_filter = 2
-theme_override_constants/separation = 12
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 2
 script = ExtResource("1_mh62l")
 
 [node name="Stat0" parent="." instance=ExtResource("2_d5pfk")]

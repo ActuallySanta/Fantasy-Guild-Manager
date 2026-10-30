@@ -6,5 +6,5 @@ class_name CharacterIconButton
 
 
 func _ready() -> void:
-	icon = ExternalContentContainer._get_character_icon(held_character.role)
+	icon = held_character.icon
 	text = held_character.title

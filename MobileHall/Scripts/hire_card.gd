@@ -1,6 +1,6 @@
 ## One applicant on the Guild tab, written as a letter of introduction: who they
 ## are, all five stats in boxes, the first line of their backstory, Details and
-## a wax-sealed Hire button.
+## a wax-sealed Hire button with their price.
 ## Scene: MobileHall/Scenes/Rows/hire_card.tscn
 extends PanelContainer
 
@@ -12,7 +12,10 @@ const FIRST_LETTER_NUMBER := 12
 
 # ---- TEXT
 const TEXT_NUMBER := "No. %s"
-const TEXT_HIRE := "Hire · free"
+## Hiring costs the recruit's price (GuildCharacter.cost), in gold; it's free
+## on the first days (cost 0).
+const TEXT_HIRE := "Hire · %dg"
+const TEXT_HIRE_FREE := "Hire · free"
 const TEXT_NO_BEDS := "No beds left"
 
 # ---- NODES
@@ -58,5 +61,10 @@ func setup(hall: HallMain, recruit: GuildCharacter, letter_index: int = 0) -> vo
 
 	# Hire is disabled when every bed is taken
 	var no_beds := hall.is_roster_full()
-	_hire_button.text = TEXT_NO_BEDS if no_beds else TEXT_HIRE
+	if no_beds:
+		_hire_button.text = TEXT_NO_BEDS
+	elif recruit.cost > 0:
+		_hire_button.text = TEXT_HIRE % recruit.cost
+	else:
+		_hire_button.text = TEXT_HIRE_FREE
 	_hire_button.disabled = no_beds

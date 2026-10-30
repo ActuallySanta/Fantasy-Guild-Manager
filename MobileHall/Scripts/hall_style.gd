@@ -147,6 +147,18 @@ const BUILDING_TAGS := {0: "OFF", 1: "TRN", 2: "HSP", 3: "ARM", 4: "BRK"}
 ## GuildUpgrades.Building -> icon (an ICON_FILES name) drawn on its plan.
 const BUILDING_ICONS := {0: "quill", 1: "target", 2: "cross", 3: "swords", 4: "bed"}
 
+# ---- items
+
+## StandardItem.Rarity name -> short tag and seal ink (shop tags, gear rows).
+const ITEM_RARITY_LOOKS := {
+	"COMMON": {"tag": "COM", "color": Color("#6B6358")},
+	"UNCOMMON": {"tag": "UNC", "color": Color("#4A6B35")},
+	"RARE": {"tag": "RAR", "color": Color("#2F4A66")},
+	"LEGENDARY": {"tag": "LEG", "color": Color("#5B4A7A")},
+	"MYTHIC": {"tag": "MYT", "color": Color("#9C7426")},
+	"NAMED": {"tag": "NAM", "color": Color("#8B2E2A")},
+}
+
 
 # ============================================================ TEXT HELPERS
 
@@ -232,9 +244,27 @@ static func role_name(character: GuildCharacter) -> String:
 	return str(GuildCharacter.CharacterRole.find_key(character.role)).capitalize()
 
 
-## A character's value for STATS[stat_index] (Pluck is stored separately).
+## A character's base value for STATS[stat_index] (Pluck is stored separately).
+## Doesn't include temp stats (gear, pluck bonus); see quest_stat_value.
 static func stat_value(character: GuildCharacter, stat_index: int) -> int:
 	return character.pluck if stat_index == PLUCK_INDEX else int(character.stats[stat_index])
+
+
+## The value quests use: base stat + temp stats (gear and pluck bonus).
+static func quest_stat_value(character: GuildCharacter, stat_index: int) -> int:
+	if stat_index == PLUCK_INDEX:
+		return character.pluck
+	character.reset_temp_stats()
+	return character.get_quest_stat(stat_index)
+
+
+## Everything added on top of a character's own stat: Armory + gear + Pluck bonus.
+## quest_stat_value - stat_bonus is the stat before any bonus.
+static func stat_bonus(character: GuildCharacter, stat_index: int) -> int:
+	if stat_index == PLUCK_INDEX:
+		return 0
+	var armory_bonus := GuildUpgrades.get_stat_bonus(character, stat_index)
+	return armory_bonus + quest_stat_value(character, stat_index) - stat_value(character, stat_index)
 
 
 ## The four quest stats added up (the applicant letter's "Stat total").
@@ -252,6 +282,38 @@ static func injury_look(character: GuildCharacter) -> Dictionary:
 
 static func is_dead(character: GuildCharacter) -> bool:
 	return character.injury_level >= GuildCharacter.InjuryLevel.DEAD
+
+# ---- items
+
+
+## {name, short, tag, color, effect} for a StandardItem, e.g.
+## name "Rare Sword", short "Sword", tag "RAR", effect "+16 Power · Knights only".
+static func item_look(item: StandardItem) -> Dictionary:
+	var rarity_name := str(StandardItem.Rarity.find_key(item.rarity))
+	var rarity_look: Dictionary = ITEM_RARITY_LOOKS.get(rarity_name, ITEM_RARITY_LOOKS.COMMON)
+	var full_name := item.name.capitalize()
+	var space := full_name.find(" ")
+	return {
+		"name": full_name,
+		"short": full_name.substr(space + 1) if space >= 0 else full_name,
+		"tag": rarity_look.tag,
+		"color": rarity_look.color,
+		"effect": item_effect(item),
+	}
+
+
+## "+16 Power · Knights only"
+static func item_effect(item: StandardItem) -> String:
+	var role_text := "%ss only" % item_role_name(item)
+	if item is PassiveItem:
+		var passive := item as PassiveItem
+		return "+%d %s · %s" % [passive.stat_amount, STATS[passive.affected_stat].name, role_text]
+	return role_text
+
+
+## The role that can use an item, as a word ("Knight").
+static func item_role_name(item: StandardItem) -> String:
+	return str(GuildCharacter.CharacterRole.find_key(item.role)).capitalize()
 
 # ---- buildings
 

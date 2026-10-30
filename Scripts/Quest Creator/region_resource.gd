@@ -4,10 +4,11 @@ class_name Region
 
 @export var dunegon_locations_test_path: String = "res://External Content/Quest Stuff (Test)/Dungeon Names (Locations).txt" #test path for locations
 @export var monsters_2D_test_path: String = "res://External Content/Quest Stuff (Test)/2D Monster Test.txt" #test path for monstrs
+@export var boglands_location_path: String = "res://External Content/Quest Stuff (Test)/The Boglands (Locations).txt"
 
 enum RegionType {
 	OG = 0,
-	noNamesWhatWeDoin = 1,
+	theBoglands = 1,
 }
 
 var dungeonNames: Array[String]:
@@ -30,10 +31,19 @@ var regionMonsters: Array[String]:
 
 func _init(regionNum := 0) -> void:
 	regionNumber = regionNum
-	dungeonNames = (MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 0))
-	escortLocations = (MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 1))
-	explorationAreas = (MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 2))
-	intelTargets = (MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 3))
+	
+	match(regionNum):
+		0:
+			dungeonNames = (MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 0))
+			escortLocations = (MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 1))
+			explorationAreas = (MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 2))
+			intelTargets = (MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, 3))
+		1:
+			dungeonNames = (MultiColumnLoader._load_info_from_file(boglands_location_path, 1, 0))
+			escortLocations = (MultiColumnLoader._load_info_from_file(boglands_location_path, 1, 1))
+			explorationAreas = (MultiColumnLoader._load_info_from_file(boglands_location_path, 1, 2))
+			intelTargets = (MultiColumnLoader._load_info_from_file(boglands_location_path, 1, 3))
+	
 	regionMonsters = MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, regionNum)
 
 func returnName(questType: int) -> String:

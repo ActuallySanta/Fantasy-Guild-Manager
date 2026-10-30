@@ -33,7 +33,7 @@ func _ready() -> void:
 	pluck_label.text = "Pluck: " + str(loaded_character.pluck)
 	character_description_label.text = loaded_character.description
 	character_injury_label.text = "Injury Level: " + str(GuildCharacter.InjuryLevel.find_key(loaded_character.injury_level))
-	character_icon.texture = ExternalContentContainer.get_character_icon(loaded_character.role)
+	character_icon.texture = loaded_character.icon
 	pass # Replace with function body.
 
 

@@ -178,7 +178,7 @@ func _show_party(entry: Dictionary) -> void:
 
 # ---- picker
 
-## Everyone, best fit for this quest first; dead adventurers last.
+## Every living adventurer, best fit for this quest first (the dead are left out).
 ## Adventurers in another quest's party (sent or picked) are left out unless
 ## "Show busy" is on; when shown they still say which quest they're on.
 func _show_picker(entry: Dictionary) -> void:
@@ -186,6 +186,8 @@ func _show_picker(entry: Dictionary) -> void:
 	var shown_adventurers: Array = []
 	var hidden_busy_count := 0
 	for character in hall.roster():
+		if Style.is_dead(character):
+			continue
 		var quest_index: int = hall.quest_index_of(character)
 		var is_busy_elsewhere: bool = quest_index >= 0 and hall.quest_entries[quest_index] != entry
 		if is_busy_elsewhere and not hall.show_busy_adventurers:
@@ -193,10 +195,8 @@ func _show_picker(entry: Dictionary) -> void:
 		else:
 			shown_adventurers.append(character)
 
-	# living before dead, then most chance added first
+	# most chance added first
 	shown_adventurers.sort_custom(func(first, second):
-		if Style.is_dead(first) != Style.is_dead(second):
-			return Style.is_dead(second)
 		return hall.chance_added_by(entry, first) > hall.chance_added_by(entry, second))
 
 	Style.clear_children(_pick_list)
@@ -205,7 +205,7 @@ func _show_picker(entry: Dictionary) -> void:
 
 	# header, toggle and empty states
 	var can_pick: bool = entry.state != Style.QUEST_STATE_DENIED
-	var has_roster: bool = not hall.roster().is_empty()
+	var has_roster: bool = not shown_adventurers.is_empty() or hidden_busy_count > 0
 	_pick_heading.text = PICK_HEADING
 	_pick_hint.text = PICK_HINT_HIDDEN % hidden_busy_count if hidden_busy_count > 0 else PICK_HINT
 	_show_busy_toggle.set_pressed_no_signal(hall.show_busy_adventurers)

@@ -22,6 +22,8 @@ CharacterContainer="*uid://2a60tdtp51bo"
 GuildUpgrades="*res://Globals/guild_upgrades.gd"
 GameState="*uid://bgm1h6mn7oiy0"
 QuestManager="*uid://blul1044ocxp2"
+ItemContainer="*uid://bqkjfqmo47xb6"
+ItemShop="*res://Globals/item_shop.gd"
 
 [display]
 

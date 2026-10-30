@@ -1,6 +1,7 @@
 ## One quest in the Day Report, written as a letter home: type seal, title,
-## who sent it and at what odds, a Success / Failed stamp, who got hurt, the
-## story one line per beat, and a closing line signed by the party.
+## who sent it and at what odds, a Success / Failed stamp, who got hurt or
+## died, the story one line per beat, and a closing line signed by whoever
+## came back.
 ## Scene: MobileHall/Scenes/Rows/report_entry.tscn
 extends PanelContainer
 
@@ -19,6 +20,7 @@ const SKIPPED_LINE_STARTS := ["Summary", "However"]
 ## Icon for a story line (matched on its plain text); the first matching rule wins.
 const BEAT_ICON_RULES := [
 	{"text": "succumbed", "icon": "skull"},
+	{"text": "passed away", "icon": "skull"},
 	{"text": "ATTACKED", "icon": "swords"},
 	{"text": "INJUR", "icon": "swords"},
 	{"text": "chest", "icon": "chest"},
@@ -34,9 +36,11 @@ const TEXT_SUCCESS := "Success"
 const TEXT_FAILED := "Failed"
 const TEXT_FROM := "From %s · sent at %d%%"
 const TEXT_INJURED := "Hurt: %s"
+const TEXT_DIED := "Died: %s"
 const TEXT_WON := "It is done, master. The reward is ours: %d gold. — %s."
 const TEXT_LOST_GOLD := "Sorry, master. No reward this time, but %s brought back %d gold. — %s."
 const TEXT_LOST := "Sorry, master. No reward this time. — %s."
+const TEXT_NOBODY_CAME_BACK := "Nobody came back to write this letter."
 
 # ---- NODES
 # Head
@@ -48,6 +52,8 @@ const TEXT_LOST := "Sorry, master. No reward this time. — %s."
 @onready var _stamp_text: Label = %StampText
 @onready var _injured_tag: Control = %HurtTag
 @onready var _injured_text: Label = %HurtText
+@onready var _died_tag: Control = %DiedTag
+@onready var _died_text: Label = %DiedText
 # Story and sign-off
 @onready var _beat_list: VBoxContainer = %Beats
 @onready var _closing_line: Label = %Closing
@@ -64,15 +70,18 @@ func setup(result: Dictionary) -> void:
 	_title.text = result.quest.questTitle
 	_from_line.text = TEXT_FROM % [Style.join_names(result.party), mini(int(result.chance), 100)]
 
-	# the stamp is white art inked green or red
+	# the stamp is white art inked green or red (a death turns it red even on a success)
+	var died: Array = result.get("died", [])
 	_stamp_text.text = TEXT_SUCCESS if succeeded else TEXT_FAILED
-	var stamp_ink := Style.GREEN_TEXT if succeeded else Style.RED
+	var stamp_ink := Style.GREEN_TEXT if succeeded and died.is_empty() else Style.RED
 	Style.tint_art(_result_stamp, stamp_ink)
 	Style.set_font_color(_stamp_text, stamp_ink)
 
 	var injured: Array = result.get("injured", [])
 	_injured_tag.visible = not injured.is_empty()
 	_injured_text.text = TEXT_INJURED % Style.join_names(injured, ", ")
+	_died_tag.visible = not died.is_empty()
+	_died_text.text = TEXT_DIED % Style.join_names(died, ", ")
 
 	_build_story_beats(result.story)
 	_closing_line.text = _closing_text(result)
@@ -97,15 +106,19 @@ func _icon_for_beat(plain_text: String) -> String:
 	return BEAT_ICON_DEFAULT
 
 
-## "Sorry, master. ... — M." signed with the party's initials.
+## "Sorry, master. ... — M." signed with the initials of whoever came back.
 func _closing_text(result: Dictionary) -> String:
+	var died: Array = result.get("died", [])
+	var survivors: Array = result.party.filter(func(character): return not died.has(character))
+	if survivors.is_empty():
+		return TEXT_NOBODY_CAME_BACK
 	var initials := PackedStringArray()
-	for character in result.party:
+	for character in survivors:
 		initials.append(character.name.left(1))
 	var signature := " & ".join(initials)
 	if result.succeeded:
 		return TEXT_WON % [result.gold, signature]
 	if result.gold > 0:
-		var speaker := "I" if result.party.size() == 1 else "we"
+		var speaker := "I" if survivors.size() == 1 else "we"
 		return TEXT_LOST_GOLD % [speaker, result.gold, signature]
 	return TEXT_LOST % signature

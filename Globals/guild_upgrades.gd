@@ -57,7 +57,7 @@ const UPGRADE_GOLD_COST := [0, 150, 300, 500, 800]
 const UPGRADE_STANDING_REQ := [0, 1, 2, 3, 4]
 
 # ---- Economy: the wallet a new run starts with, and the standing floor for recruits ----
-const STARTING_GOLD := 600
+const STARTING_GOLD := 0
 const STARTING_STANDING := 1
 const MINIMUM_STANDING := -10
 
@@ -349,7 +349,12 @@ func can_revive() -> bool:
 func revive(character: GuildCharacter) -> bool:
 	if not can_revive() or character.injury_level < GuildCharacter.InjuryLevel.DEAD:
 		return false
+	# the dead don't take a bed, so coming back needs a free one
+	if not CharacterContainer.has_free_bed():
+		return false
 	character.injury_level = GuildCharacter.InjuryLevel.GRAVELY_INJURED
+	character.died_on_day = -1
+	character.died_on_quest = ""
 	character.set_meta(RECOVERY_META, Vector2i(GuildCharacter.InjuryLevel.GRAVELY_INJURED, 0))
 	revives_used += 1
 	patients.append(character)
