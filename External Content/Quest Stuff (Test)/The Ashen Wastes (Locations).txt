@@ -1,6 +1,6 @@
-Blacksun Citadel||the Abandoned Acropolis|a possible Necromancer
-Tomb of Time||Cragfield Canyon|a Legendary Tome
-Lost Library||the Sun-Scorched Sands|a Merchant's Missing Cargo
-Obsidian Tower||Vulcan's Volcano|a Possible Volcanic Eruption
-Rustsunk Pyramid||the Lava Delta|
-||the Lake of Fire|
+Blacksun Citadel|Pearl of Syran|the Abandoned Acropolis|a possible Necromancer
+Tomb of Time|the Crawling Bazaar|Cragfield Canyon|a Legendary Tome
+Lost Library|the Dwarven Catacombs|the Sun-Scorched Sands|a Merchant's Missing Cargo
+Tower of Basalt|the Hearthworks|Vulcan's Volcano|a Possible Volcanic Eruption
+Rustsunk Pyramid|Golden Wells|the Lava Delta|
+Obsidian Caves|Sethek's Oasis|the Lake of Fire|

@@ -4,10 +4,10 @@ var thisQuest = CreatedQuest
 var acceptedQuests: Array[CreatedQuest]
 var acceptedQuestResults: Array[String]
 
-var newRegion: Region = Region.new(0)
+var theWindsweptMeadows: Region = Region.new(0)
 var theBoglands: Region = Region.new(1)
 
-var world_regions := [newRegion, theBoglands]
+var world_regions := [theWindsweptMeadows, theBoglands]
 var total_regions : int = 2
 
 var dayNum = 0;
@@ -39,10 +39,10 @@ func _ready() -> void:
 	print(questResults, "\n")
 	
 	for int in range(10):
-		print(newRegion.returnName(0))
-		print(newRegion.returnName(1))
-		print(newRegion.returnName(2))
-		print(newRegion.returnName(3))
+		print(theWindsweptMeadows.returnName(0))
+		print(theWindsweptMeadows.returnName(1))
+		print(theWindsweptMeadows.returnName(2))
+		print(theWindsweptMeadows.returnName(3))
 
 
 	pass
