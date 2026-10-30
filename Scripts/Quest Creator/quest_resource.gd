@@ -66,7 +66,7 @@ func _init(diff := 0, dayNum := 0) -> void:
 
 	difficulty = diff
 	maxAdventurers = randi_range(1, 2)
-	regionNum = randi_range(0, 1)
+	regionNum = randi_range(0, 2)
 	questNum = randi_range(0, 7)
 	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
 	location = QuestManager.world_regions[regionNum].returnName(type)

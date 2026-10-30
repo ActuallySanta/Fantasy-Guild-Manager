@@ -38,6 +38,7 @@ var regionMonsters: Array[String]:
 func _init(regionNum := 0) -> void:
 	regionNumber = regionNum
 	
+	print(regionNum)
 	match(regionNum):
 		0:
 			dungeonNames = (MultiColumnLoader._load_info_from_file(meadows_location_path, 1, 0))
@@ -49,6 +50,16 @@ func _init(regionNum := 0) -> void:
 			escortLocations = (MultiColumnLoader._load_info_from_file(boglands_location_path, 1, 1))
 			explorationAreas = (MultiColumnLoader._load_info_from_file(boglands_location_path, 1, 2))
 			intelTargets = (MultiColumnLoader._load_info_from_file(boglands_location_path, 1, 3))
+		2:
+			dungeonNames = (MultiColumnLoader._load_info_from_file(wastes_location_path, 1, 0))
+			escortLocations = (MultiColumnLoader._load_info_from_file(wastes_location_path, 1, 1))
+			explorationAreas = (MultiColumnLoader._load_info_from_file(wastes_location_path, 1, 2))
+			intelTargets = (MultiColumnLoader._load_info_from_file(wastes_location_path, 1, 3))
+		3:
+			dungeonNames = (MultiColumnLoader._load_info_from_file(mountains_location_path, 1, 0))
+			escortLocations = (MultiColumnLoader._load_info_from_file(mountains_location_path, 1, 1))
+			explorationAreas = (MultiColumnLoader._load_info_from_file(mountains_location_path, 1, 2))
+			intelTargets = (MultiColumnLoader._load_info_from_file(mountains_location_path, 1, 3))
 	
 	regionMonsters = MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, regionNum)
 
