@@ -63,7 +63,20 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
 | Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story |
+| Game Over | The guild ledger: days survived, a 2 x 3 grid (gold earned, quests won, heroes hired, fallen, final standing, Bone Drake), a roll call of every hero and their fate, and Found a New Guild |
 | Menu | How to play, last night's report, colorblind filter (tap to cycle Off / Red-weak / Green-weak / Blue-yellow, saved to `user://settings.cfg`), reset upgrades (debug) |
+
+## Game Over
+
+The run ends when the guild can never send anyone out again (`HallMain.is_run_over`):
+nobody is alive (patients in a Hospital bed count as alive), nobody in today's For Hire
+costs what you have, and no recruit ever will. That means standing is at or below
+`GuildUpgrades.MINIMUM_STANDING`, or tomorrow's recruit price is already more than your
+gold (prices never go down). Recruits are free on days 1-2, so it can't happen then. It's
+checked when a new day starts (after the Day Report), after a release, and when the
+scene loads. The ledger's numbers come from `HallMain.run_stats`, tallied as you play.
+**Found a New Guild** resets the autoloads to Day 1 and loads `hall_main.tscn` again.
+`Playtest/scenario_game_over.tscn` opens straight onto the ledger.
 
 ## Colorblind filter
 

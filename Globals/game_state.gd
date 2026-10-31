@@ -38,6 +38,12 @@ func start_new_day() -> void:
 	# Tell everything else the new day has begun.
 	day_started.emit(day)
 
+## Back to Day 1 for a new run (HallMain.start_new_run). Doesn't emit
+## day_started: the hall scene is reloaded right after and builds Day 1 itself.
+func reset() -> void:
+	day = 1
+
+
 func _refresh_temp_stats():
 	for entry in CharacterContainer.active_characters:
 		entry.reset_temp_stats()

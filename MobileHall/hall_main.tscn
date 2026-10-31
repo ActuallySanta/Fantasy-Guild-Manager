@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_menu.tscn" id="32_kg28u"]
 [ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_report.tscn" id="34_6fy20"]
 [ext_resource type="PackedScene" uid="uid://bgwxd653pjox8" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_game_over.tscn" id="37_gameover"]
 [ext_resource type="Shader" uid="uid://dkvytyy35gk2p" path="res://MobileHall/Styles/colorblind_filter.gdshader" id="39_cbf01"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cbf01"]
@@ -482,6 +483,15 @@ unique_name_in_owner = true
 visible = false
 z_index = 10
 layout_mode = 1
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OverlayGameOver" parent="." instance=ExtResource("37_gameover")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
 grow_horizontal = 2
 grow_vertical = 2
 
