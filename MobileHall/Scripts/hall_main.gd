@@ -82,6 +82,9 @@ const TOAST_SECONDS := 2.2
 const TOAST_FADE_SECONDS := 0.4
 ## The Bone Drake countdown turns red when this many days (or fewer) are left.
 const DRAKE_WARNING_DAYS := 2
+## The header's "last hero standing" strip counts standing within this many
+## points of GuildUpgrades.MINIMUM_STANDING as nearly too low for recruits.
+const DANGER_STANDING_MARGIN := 3
 ## Colorblind filter choices, in Menu order. Index = the shader's `mode`.
 const COLOR_FILTERS := ["Off", "Red-weak", "Green-weak", "Blue-yellow"]
 ## Where player settings are saved, and the section / key for the filter.
@@ -106,6 +109,11 @@ const HEADER_DAY := "%d"
 const HEADER_DRAKE := "The Bone Drake wakes in [color=#%s]%d %s[/color]"
 const HEADER_DRAKE_TODAY := "The Bone Drake [color=#%s]attacks today![/color]"
 const HEADER_DRAKE_GONE := "The Bone Drake has come and gone"
+## The warning strip under the header (see is_one_death_from_falling).
+## DANGER_GOLD when gold is the problem, DANGER_STANDING when standing is.
+const DANGER_TITLE := "Last hero standing"
+const DANGER_GOLD := "Recruits cost %d gold and you have %d. Lose %s and the guild falls."
+const DANGER_STANDING := "Standing is nearly too low for recruits. Lose %s and the guild falls."
 
 # ---- nav
 ## Nav tab heights: the open tab stands a little taller than the others.
@@ -256,6 +264,10 @@ var tutorial: Control
 @onready var _gold_value: Label = %GoldValue
 @onready var _standing_value: Label = %StandingValue
 @onready var _menu_button: Button = %MenuButton
+@onready var _danger_strip: PanelContainer = %DangerStrip
+@onready var _danger_icon: TextureRect = %DangerIcon
+@onready var _danger_title: Label = %DangerTitle
+@onready var _danger_text: Label = %DangerText
 
 # ---- content
 @onready var _tabs := {"board": %TabBoard, "guild": %TabGuild, "upgrades": %TabUpgrades, "shop": %TabShop}
@@ -440,14 +452,45 @@ func unseen_recruit_count() -> int:
 ## show up, or tomorrow's price is already more than the gold left, and the
 ## price never goes down). Never true on the free-recruit days.
 func is_run_over() -> bool:
-	if CharacterContainer.living_count() > 0:
+	if CharacterContainer.living_count() > 0 or _can_afford_a_recruit_today():
 		return false
-	for character in CharacterContainer.hireable_characters:
-		if character.cost <= GameState.gold:
-			return false
 	if GameState.standing <= GuildUpgrades.MINIMUM_STANDING:
 		return true
 	return GameState.gold < GuildCharacter.recruit_cost_for_day(GameState.day + 1)
+
+
+## True when one hero is left alive and losing them would (or nearly would)
+## end the run: nobody in today's For Hire is affordable, and either tomorrow's
+## recruit price is more than the gold left, or standing is within
+## DANGER_STANDING_MARGIN of the floor where recruits stop showing up.
+## Drives the header's warning strip. Never true on the free-recruit days.
+func is_one_death_from_falling() -> bool:
+	if CharacterContainer.living_count() != 1 or _can_afford_a_recruit_today():
+		return false
+	return _is_short_of_recruit_gold() or _is_standing_near_floor()
+
+
+## The one living member of the guild, or null if there isn't exactly one.
+func last_living_hero() -> GuildCharacter:
+	var living := roster().filter(func(character): return not Style.is_dead(character))
+	return living[0] if living.size() == 1 else null
+
+
+## Someone in today's For Hire costs no more than the gold in hand.
+func _can_afford_a_recruit_today() -> bool:
+	for character in CharacterContainer.hireable_characters:
+		if character.cost <= GameState.gold:
+			return true
+	return false
+
+
+## Tomorrow's recruit price is more than the gold in hand (prices never drop).
+func _is_short_of_recruit_gold() -> bool:
+	return GameState.gold < GuildCharacter.recruit_cost_for_day(GameState.day + 1)
+
+
+func _is_standing_near_floor() -> bool:
+	return GameState.standing <= GuildUpgrades.MINIMUM_STANDING + DANGER_STANDING_MARGIN
 
 
 ## Everything the Game Over ledger shows, read from the tallies and the roster:
@@ -1184,6 +1227,25 @@ func _refresh_header() -> void:
 
 	_gold_value.text = str(GameState.gold)
 	_standing_value.text = str(GameState.standing)
+	_refresh_danger_strip()
+
+
+## The red "last hero standing" strip under the header, only while the guild
+## is one death from falling (and not once the Game Over ledger is up).
+func _refresh_danger_strip() -> void:
+	var hero := last_living_hero()
+	_danger_strip.visible = run_over_stats.is_empty() and hero != null and is_one_death_from_falling()
+	if not _danger_strip.visible:
+		return
+	Style.style_panel(_danger_strip, Style.RED_BG)
+	_danger_icon.modulate = Style.RED
+	_danger_title.text = DANGER_TITLE
+	Style.set_font_color(_danger_title, Style.RED)
+	if _is_short_of_recruit_gold():
+		var price := GuildCharacter.recruit_cost_for_day(GameState.day + 1)
+		_danger_text.text = DANGER_GOLD % [price, GameState.gold, hero.name]
+	else:
+		_danger_text.text = DANGER_STANDING % hero.name
 
 # ---- content (tabs and screens)
 

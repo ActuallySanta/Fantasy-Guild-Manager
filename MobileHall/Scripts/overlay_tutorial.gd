@@ -3,7 +3,8 @@
 ## waits for the player to use it (or press Next on explain-only steps), so
 ## the player learns by doing instead of reading an intro screen.
 ##   Day 1 - hiring, a hero's page (stats, gear), reading a quest, picking a
-##           party, odds, Deny vs Send, End Day, the Day Report
+##           party, odds, Deny vs Send, End Day, the Day Report, how the
+##           guild can fall (HallMain.is_run_over)
 ##   Day 3 - the Guild tab: upgrading a building, the Training Yard, the
 ##           Hospital, and why posted heroes can't quest
 ##   Day 5 - the Shop: role-locked items, buying, equipping from a hero's page
@@ -760,7 +761,7 @@ func _day_one() -> Array:
 			"do": "Tap Hire", "deny": ["DetailsButton"], "text": "Hiring is free for your first two days. Hire this one."},
 		{"target": func(): return _u(_tab("guild"), "List"), "on": "hire", "tap": true,
 			"skip": func(): return not hall.can_hire_anyone(),
-			"do": "Tap Hire on another recruit", "deny": ["DetailsButton"], "text": "Hire one more. Two heroes means better odds, and a backup when someone gets hurt."},
+			"do": "Tap Hire on another recruit", "deny": ["DetailsButton"], "text": "Hire one more. Two heroes means better odds, and a backup if someone falls. A guild with nobody left is finished."},
 		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
 			"do": "Tap Your Guild", "text": "Now meet your people. Open [b]Your Guild[/b]."},
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"), "on": "character",
@@ -795,6 +796,8 @@ func _day_one() -> Array:
 			"text": "Morning! Each party tells you what happened out there."},
 		{"target": func(): return _report_totals(),
 			"text": "The tally: quests won, %s earned, and who came back hurt. Hurt heroes heal at home, or faster in the Hospital." % GOLD},
+		{"target": func(): return _report_totals(),
+			"text": "Heroes can [b]die[/b] out there. If everyone is gone and you can't afford a new recruit, the guild falls and the run is over. When you're down to your last hero, a red warning shows under the header."},
 		{"target": func(): return _u(hall.get_node("%OverlayReport"), "ActionButton"), "on": "new_day",
 			"do": "Tap the button to start Day 2", "text": "Start Day 2. New recruits and quests show up every morning."},
 		{"text": "Day 2 is yours: hire, plan, send, end the day. I'll be back on Day 3 to show you the guild's buildings."},

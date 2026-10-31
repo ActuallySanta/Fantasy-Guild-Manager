@@ -48,6 +48,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 
 ```
 ┌ header ─ Day · Bone Drake countdown · gold · standing · menu ┐
+│ warning strip ─ "Last hero standing" (only when one death from falling) │
 │ content ─ Board | Guild | Upgrades | Shop  (or a screen over them) │
 │ action bar ─ "what to do next" + one big button             │
 └ nav ─ Board (undecided) · Members (new recruits) · Guild (affordable) · Shop ┘
@@ -77,6 +78,12 @@ checked when a new day starts (after the Day Report), after a release, and when 
 scene loads. The ledger's numbers come from `HallMain.run_stats`, tallied as you play.
 **Found a New Guild** resets the autoloads to Day 1 and loads `hall_main.tscn` again.
 `Playtest/scenario_game_over.tscn` opens straight onto the ledger.
+
+A red **Last hero standing** strip shows under the header when the guild is one death
+from falling (`HallMain.is_one_death_from_falling`). That means one hero is alive, nobody
+in today's For Hire is affordable, and either tomorrow's recruit price is more than your
+gold or standing is within `DANGER_STANDING_MARGIN` of the floor. The Welcome card's
+"Don't run out of heroes" row and Pip's Day 1 Day Report step explain the rule.
 
 ## Colorblind filter
 
