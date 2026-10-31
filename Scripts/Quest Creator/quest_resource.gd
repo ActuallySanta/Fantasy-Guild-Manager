@@ -65,7 +65,10 @@ func _init(diff := 0, dayNum := 0) -> void:
 		return
 
 	difficulty = diff
-	maxAdventurers = randi_range(1, 3)
+	if (dayNum <= 5):
+		maxAdventurers = randi_range(1, 2)
+	else:
+		maxAdventurers = randi_range(1, 3)
 	regionNum = randi_range(0, 3)
 	questNum = randi_range(0, 7)
 	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
@@ -232,7 +235,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 		elif (26 <= succComDet && succComDet <= 50):
 				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
 				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
 					QuestManager.world_regions[regionNum].returnMonster(),
 					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
 					)
@@ -240,14 +243,14 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 				returnString = str(
 					"[b]The Party[/b] was ATTACKED by a group of ",
 					QuestManager.world_regions[regionNum].returnMonster(),
-					". They defeated them [color=green][b]without sustaining any injuries[/b][/color], and also obtained [EQUIP_NOT_IMPLEMENTED].\n"
+					"s. They defeated them [color=green][b]without sustaining any injuries[/b][/color], and also obtained [EQUIP_NOT_IMPLEMENTED].\n"
 					)
 		elif (76 <= succComDet && succComDet <= 90):
 				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
 				var extraGold = randi_range(11, 29)
 				goldReward += extraGold
 				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
 					QuestManager.world_regions[regionNum].returnMonster(),
 					", and defeated it, finding [color=FFE700][b] ", extraGold," gold [/b][/color]on its corpse.\n"
 					)
@@ -256,7 +259,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 				var extraGold = randi_range(11, 29)
 				goldReward += extraGold
 				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
 					QuestManager.world_regions[regionNum].returnMonster(), ", and defeated it, finding [color=FFE700][b] ", extraGold, 
 					" gold [/b][/color]on its corpse. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
 					)
