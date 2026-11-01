@@ -20,7 +20,7 @@ enum QuestType {
 }
 
 enum FavoredStat {
-	Attack = 0,
+	Power = 0,
 	Defense = 1,
 	Wisdom = 2,
 	Sleaze = 3,
@@ -82,7 +82,7 @@ func _init(diff := 0, dayNum := 0) -> void:
 
 	match type:
 		1:
-			favStat = FavoredStat.Attack
+			favStat = FavoredStat.Power
 			questTitle = str("Raid the ", location)
 		2:
 			favStat = FavoredStat.Defense
@@ -110,10 +110,19 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 		adventurer.reset_temp_stats()
 
 		statTotal += adventurer.get_quest_stat(0) + adventurer.get_quest_stat(1) + adventurer.get_quest_stat(2) + adventurer.get_quest_stat(3)
+		match regionNum:
+			0:
+				statTotal += adventurer.get_quest_stat(1)
+			1:
+				statTotal += adventurer.get_quest_stat(3)
+			2:
+				statTotal += adventurer.get_quest_stat(0)
+			3:
+				statTotal += adventurer.get_quest_stat(2)
+				
 		match favStat:
 			0:
 				statTotal += adventurer.get_quest_stat(0)
-				#regioncheck
 			1:
 				statTotal += adventurer.get_quest_stat(1)
 			2:
@@ -376,7 +385,7 @@ func _initMilestoneVars(dayNum: int):
 			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
 			location = ExternalContentContainer.get_Location_Name(1)
 			goldReward = 300 + (150 * difficulty)
-			favStat = FavoredStat.Attack
+			favStat = FavoredStat.Defense
 			questTitle = str("A Bone Drake is ATTACKING ", location, "! Save the town before it is DESTROYED!")
 
 	print("")
