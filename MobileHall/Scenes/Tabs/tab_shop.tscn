@@ -1,10 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://crrj07shkvbrv"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/tab_shop.gd" id="1_shop"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/shopkeeper_placeholder.svg" id="2_keeper"]
+[ext_resource type="Script" uid="uid://c8y7y1b72pyg1" path="res://MobileHall/Scripts/tab_shop.gd" id="1_shop"]
+[ext_resource type="Texture2D" uid="uid://dromsyxe0ytcx" path="res://MobileHall/Art/shopkeeper_placeholder.svg" id="2_keeper"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="3_bar"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/awning.png" id="4_awning"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/coins.svg" id="5_coins"]
+[ext_resource type="Texture2D" uid="uid://4x4uklt6lg6v" path="res://MobileHall/Art/Textures/awning.png" id="4_awning"]
+[ext_resource type="Texture2D" uid="uid://baflbvuj3ew0p" path="res://MobileHall/Art/Icons/coins.svg" id="5_coins"]
 
 [node name="TabShop" type="VBoxContainer"]
 theme_override_constants/separation = 0

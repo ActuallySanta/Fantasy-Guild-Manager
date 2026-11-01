@@ -1,75 +1,77 @@
 [gd_resource type="Theme" format=3 uid="uid://b8dl3ku854ddh"]
 
-[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_body.tres" id="f_body"]
-[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_bold.tres" id="f_bold"]
-[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_caps.tres" id="f_caps"]
-[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_italic.tres" id="f_italic"]
-[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_title.tres" id="f_title"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/empty.tres" id="s_empty"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_paper.tres" id="s_paper"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_paper_down.tres" id="s_paper_down"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_gold.tres" id="s_gold"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_gold_down.tres" id="s_gold_down"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_wood.tres" id="s_wood"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_wood_down.tres" id="s_wood_down"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_disabled.tres" id="s_disabled"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/nav_tile.tres" id="s_nav_tile"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/nav_tile_active.tres" id="s_nav_tile_active"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/folder_tab.tres" id="s_folder_tab"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/folder_tab_active.tres" id="s_folder_tab_active"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/quest_tab.tres" id="s_quest_tab"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/round_button.tres" id="s_round"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/round_button_down.tres" id="s_round_down"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/paper_card.tres" id="s_paper_card"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/paper_grid.tres" id="s_paper_grid"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/paper_ledger.tres" id="s_paper_ledger"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/paper_note.tres" id="s_paper_note"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/torn_paper.tres" id="s_torn"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/scroll_body_h.tres" id="s_scroll_h"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/scroll_body_v.tres" id="s_scroll_v"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/folder_body.tres" id="s_folder_body"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/sheet.tres" id="s_sheet"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/stamp.tres" id="s_stamp"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/ink_box.tres" id="s_ink_box"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/ink_box_thick.tres" id="s_ink_box_thick"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/pill.tres" id="s_pill"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/tag_label.tres" id="s_tag_label"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/type_seal.tres" id="s_type_seal"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/day_tile.tres" id="s_day_tile"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/badge.tres" id="s_badge"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/toast.tres" id="s_toast"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/header.tres" id="s_header"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/nav.tres" id="s_nav"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/scroll_grabber.tres" id="s_grabber"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/torn_note.tres" id="s_torn_note"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_seal.tres" id="s_seal"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_seal_down.tres" id="s_seal_down"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/btn_seal_disabled.tres" id="s_seal_disabled"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/box_on.png" id="t_box_on"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/box_off.png" id="t_box_off"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/speech_bubble.tres" id="s_speech_bubble"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/shop_sign.tres" id="s_shop_sign"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/goods_tag.tres" id="s_goods_tag"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/goods_tag_selected.tres" id="s_goods_tag_selected"]
+[ext_resource type="FontVariation" uid="uid://vhpgee40db2i" path="res://MobileHall/Art/Fonts/font_body.tres" id="f_body"]
+[ext_resource type="FontVariation" uid="uid://byfd5ncwh8y08" path="res://MobileHall/Art/Fonts/font_bold.tres" id="f_bold"]
+[ext_resource type="FontVariation" uid="uid://bl4h4wrmd1s0m" path="res://MobileHall/Art/Fonts/font_caps.tres" id="f_caps"]
+[ext_resource type="FontVariation" uid="uid://dvhjw1533s75" path="res://MobileHall/Art/Fonts/font_italic.tres" id="f_italic"]
+[ext_resource type="FontVariation" uid="uid://b7dyj081fpsg2" path="res://MobileHall/Art/Fonts/font_title.tres" id="f_title"]
+[ext_resource type="StyleBox" uid="uid://cqkfvxfksa8ca" path="res://MobileHall/Styles/badge.tres" id="s_badge"]
+[ext_resource type="StyleBox" uid="uid://chewgawwssvdk" path="res://MobileHall/Styles/day_tile.tres" id="s_day_tile"]
+[ext_resource type="StyleBox" uid="uid://f15s06qonplf" path="res://MobileHall/Styles/btn_disabled.tres" id="s_disabled"]
+[ext_resource type="StyleBox" uid="uid://p77lttnrpffa" path="res://MobileHall/Styles/empty.tres" id="s_empty"]
+[ext_resource type="StyleBox" uid="uid://bsar0lcyo6a0u" path="res://MobileHall/Styles/folder_body.tres" id="s_folder_body"]
+[ext_resource type="StyleBox" uid="uid://xhl40cdf7uii" path="res://MobileHall/Styles/folder_tab.tres" id="s_folder_tab"]
+[ext_resource type="StyleBox" uid="uid://3l2vqpjeif0q" path="res://MobileHall/Styles/folder_tab_active.tres" id="s_folder_tab_active"]
+[ext_resource type="StyleBox" uid="uid://pidbrxyy0uvf" path="res://MobileHall/Styles/btn_gold.tres" id="s_gold"]
+[ext_resource type="StyleBox" uid="uid://dpibpsh50j64p" path="res://MobileHall/Styles/btn_gold_down.tres" id="s_gold_down"]
+[ext_resource type="StyleBox" uid="uid://83qdo7e02ey3" path="res://MobileHall/Styles/goods_tag.tres" id="s_goods_tag"]
+[ext_resource type="StyleBox" uid="uid://c3pvymokpsrd0" path="res://MobileHall/Styles/goods_tag_selected.tres" id="s_goods_tag_selected"]
+[ext_resource type="StyleBox" uid="uid://dg7tksnauxqxp" path="res://MobileHall/Styles/scroll_grabber.tres" id="s_grabber"]
+[ext_resource type="StyleBox" uid="uid://c23nuitjkpknt" path="res://MobileHall/Styles/header.tres" id="s_header"]
+[ext_resource type="StyleBox" uid="uid://l4e4648hj2s1" path="res://MobileHall/Styles/ink_box.tres" id="s_ink_box"]
+[ext_resource type="StyleBox" uid="uid://dotwq7iyyf2ci" path="res://MobileHall/Styles/ink_box_thick.tres" id="s_ink_box_thick"]
+[ext_resource type="StyleBox" uid="uid://b8fd03xgajxvt" path="res://MobileHall/Styles/nav.tres" id="s_nav"]
+[ext_resource type="StyleBox" uid="uid://ccfrrv68u1aax" path="res://MobileHall/Styles/nav_tile.tres" id="s_nav_tile"]
+[ext_resource type="StyleBox" uid="uid://jsml66tbh37m" path="res://MobileHall/Styles/nav_tile_active.tres" id="s_nav_tile_active"]
+[ext_resource type="StyleBox" uid="uid://bei6c4rmoowm0" path="res://MobileHall/Styles/btn_paper.tres" id="s_paper"]
+[ext_resource type="StyleBox" uid="uid://bbfy65kp1vkyt" path="res://MobileHall/Styles/paper_card.tres" id="s_paper_card"]
+[ext_resource type="StyleBox" uid="uid://bkkatyygbqyi5" path="res://MobileHall/Styles/btn_paper_down.tres" id="s_paper_down"]
+[ext_resource type="StyleBox" uid="uid://bfqym5ymeq4c8" path="res://MobileHall/Styles/paper_grid.tres" id="s_paper_grid"]
+[ext_resource type="StyleBox" uid="uid://cpnay72r6q6yl" path="res://MobileHall/Styles/paper_ledger.tres" id="s_paper_ledger"]
+[ext_resource type="StyleBox" uid="uid://r03tfsw8ryx8" path="res://MobileHall/Styles/paper_note.tres" id="s_paper_note"]
+[ext_resource type="StyleBox" uid="uid://cels2rr0bev26" path="res://MobileHall/Styles/pill.tres" id="s_pill"]
+[ext_resource type="StyleBox" uid="uid://3qs47gdygdn4" path="res://MobileHall/Styles/quest_tab.tres" id="s_quest_tab"]
+[ext_resource type="StyleBox" uid="uid://bkwpvlemv5cu6" path="res://MobileHall/Styles/round_button.tres" id="s_round"]
+[ext_resource type="StyleBox" uid="uid://ctkoottjbkq4c" path="res://MobileHall/Styles/round_button_down.tres" id="s_round_down"]
+[ext_resource type="StyleBox" uid="uid://41mw3crl1e6b" path="res://MobileHall/Styles/scroll_body_h.tres" id="s_scroll_h"]
+[ext_resource type="StyleBox" uid="uid://cdpiymcry740b" path="res://MobileHall/Styles/scroll_body_v.tres" id="s_scroll_v"]
+[ext_resource type="StyleBox" uid="uid://cwt5j07yplovh" path="res://MobileHall/Styles/btn_seal.tres" id="s_seal"]
+[ext_resource type="StyleBox" uid="uid://dro8tgu01ihx" path="res://MobileHall/Styles/btn_seal_disabled.tres" id="s_seal_disabled"]
+[ext_resource type="StyleBox" uid="uid://cpstyibm7uhbc" path="res://MobileHall/Styles/btn_seal_down.tres" id="s_seal_down"]
+[ext_resource type="StyleBox" uid="uid://7gx8cbwkvvxf" path="res://MobileHall/Styles/sheet.tres" id="s_sheet"]
+[ext_resource type="StyleBox" uid="uid://bqs4sj7ic7tk" path="res://MobileHall/Styles/shop_sign.tres" id="s_shop_sign"]
+[ext_resource type="StyleBox" uid="uid://c37f34wt5oovr" path="res://MobileHall/Styles/speech_bubble.tres" id="s_speech_bubble"]
+[ext_resource type="StyleBox" uid="uid://cov6qnc1bx421" path="res://MobileHall/Styles/stamp.tres" id="s_stamp"]
+[ext_resource type="StyleBox" uid="uid://bmf5b30tflw3l" path="res://MobileHall/Styles/tag_label.tres" id="s_tag_label"]
+[ext_resource type="StyleBox" uid="uid://cjhgwq58641ut" path="res://MobileHall/Styles/toast.tres" id="s_toast"]
+[ext_resource type="StyleBox" uid="uid://mpa4iinug7wa" path="res://MobileHall/Styles/torn_paper.tres" id="s_torn"]
+[ext_resource type="StyleBox" uid="uid://n0egf4meh0b5" path="res://MobileHall/Styles/torn_note.tres" id="s_torn_note"]
+[ext_resource type="StyleBox" uid="uid://67oqxo77labb" path="res://MobileHall/Styles/type_seal.tres" id="s_type_seal"]
+[ext_resource type="StyleBox" uid="uid://r36iothecs6s" path="res://MobileHall/Styles/btn_wood.tres" id="s_wood"]
+[ext_resource type="StyleBox" uid="uid://b2whirhjur07n" path="res://MobileHall/Styles/btn_wood_down.tres" id="s_wood_down"]
+[ext_resource type="Texture2D" uid="uid://0sku3o62xc70" path="res://MobileHall/Art/Textures/box_off.png" id="t_box_off"]
+[ext_resource type="Texture2D" uid="uid://sgis68c4n8sr" path="res://MobileHall/Art/Textures/box_on.png" id="t_box_on"]
 
 [resource]
 default_font = ExtResource("f_body")
 default_font_size = 24
+Badge/base_type = &"PanelContainer"
+Badge/styles/panel = ExtResource("s_badge")
 Button/colors/font_color = Color(0.2039, 0.1608, 0.1255, 1)
 Button/colors/font_disabled_color = Color(0.3608, 0.3255, 0.2745, 1)
 Button/colors/font_focus_color = Color(0.2039, 0.1608, 0.1255, 1)
 Button/colors/font_hover_color = Color(0.2039, 0.1608, 0.1255, 1)
 Button/colors/font_hover_pressed_color = Color(0.2039, 0.1608, 0.1255, 1)
 Button/colors/font_pressed_color = Color(0.2039, 0.1608, 0.1255, 1)
-Button/colors/icon_normal_color = Color(0.2039, 0.1608, 0.1255, 1)
-Button/colors/icon_hover_color = Color(0.2039, 0.1608, 0.1255, 1)
-Button/colors/icon_pressed_color = Color(0.2039, 0.1608, 0.1255, 1)
-Button/colors/icon_hover_pressed_color = Color(0.2039, 0.1608, 0.1255, 1)
 Button/colors/icon_focus_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/icon_hover_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/icon_hover_pressed_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/icon_normal_color = Color(0.2039, 0.1608, 0.1255, 1)
+Button/colors/icon_pressed_color = Color(0.2039, 0.1608, 0.1255, 1)
 Button/constants/h_separation = 10
 Button/constants/icon_max_width = 30
-Button/fonts/font = ExtResource("f_bold")
 Button/font_sizes/font_size = 24
+Button/fonts/font = ExtResource("f_bold")
 Button/styles/disabled = ExtResource("s_disabled")
 Button/styles/focus = ExtResource("s_empty")
 Button/styles/hover = ExtResource("s_paper")
@@ -88,8 +90,8 @@ CheckButton/colors/font_color = Color(0.9294, 0.8902, 0.7961, 1)
 CheckButton/colors/font_hover_color = Color(0.9294, 0.8902, 0.7961, 1)
 CheckButton/colors/font_hover_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
 CheckButton/colors/font_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
-CheckButton/fonts/font = ExtResource("f_title")
 CheckButton/font_sizes/font_size = 26
+CheckButton/fonts/font = ExtResource("f_title")
 CheckButton/icons/checked = ExtResource("t_box_on")
 CheckButton/icons/unchecked = ExtResource("t_box_off")
 CheckButton/styles/focus = ExtResource("s_empty")
@@ -99,8 +101,6 @@ CheckButton/styles/normal = ExtResource("s_empty")
 CheckButton/styles/pressed = ExtResource("s_empty")
 DayTile/base_type = &"PanelContainer"
 DayTile/styles/panel = ExtResource("s_day_tile")
-Badge/base_type = &"PanelContainer"
-Badge/styles/panel = ExtResource("s_badge")
 FolderBody/base_type = &"PanelContainer"
 FolderBody/styles/panel = ExtResource("s_folder_body")
 FolderTab/base_type = &"Button"
@@ -108,8 +108,8 @@ FolderTab/colors/font_color = Color(0.9294, 0.8902, 0.7961, 1)
 FolderTab/colors/font_hover_color = Color(0.9294, 0.8902, 0.7961, 1)
 FolderTab/colors/font_hover_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
 FolderTab/colors/font_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
-FolderTab/fonts/font = ExtResource("f_bold")
 FolderTab/font_sizes/font_size = 26
+FolderTab/fonts/font = ExtResource("f_bold")
 FolderTab/styles/hover = ExtResource("s_folder_tab")
 FolderTab/styles/hover_pressed = ExtResource("s_folder_tab")
 FolderTab/styles/normal = ExtResource("s_folder_tab")
@@ -119,19 +119,32 @@ FolderTabActive/colors/font_color = Color(0.9686, 0.9412, 0.8784, 1)
 FolderTabActive/colors/font_hover_color = Color(0.9686, 0.9412, 0.8784, 1)
 FolderTabActive/colors/font_hover_pressed_color = Color(0.9686, 0.9412, 0.8784, 1)
 FolderTabActive/colors/font_pressed_color = Color(0.9686, 0.9412, 0.8784, 1)
-FolderTabActive/fonts/font = ExtResource("f_title")
 FolderTabActive/font_sizes/font_size = 30
+FolderTabActive/fonts/font = ExtResource("f_title")
 FolderTabActive/styles/hover = ExtResource("s_folder_tab_active")
 FolderTabActive/styles/hover_pressed = ExtResource("s_folder_tab_active")
 FolderTabActive/styles/normal = ExtResource("s_folder_tab_active")
 FolderTabActive/styles/pressed = ExtResource("s_folder_tab_active")
 GoldButton/base_type = &"Button"
-GoldButton/fonts/font = ExtResource("f_title")
 GoldButton/font_sizes/font_size = 30
+GoldButton/fonts/font = ExtResource("f_title")
 GoldButton/styles/hover = ExtResource("s_gold")
 GoldButton/styles/hover_pressed = ExtResource("s_gold_down")
 GoldButton/styles/normal = ExtResource("s_gold")
 GoldButton/styles/pressed = ExtResource("s_gold_down")
+GoodsTag/base_type = &"Button"
+GoodsTag/colors/font_disabled_color = Color(0.4196, 0.3647, 0.3098, 1)
+GoodsTag/styles/disabled = ExtResource("s_goods_tag")
+GoodsTag/styles/hover = ExtResource("s_goods_tag")
+GoodsTag/styles/hover_pressed = ExtResource("s_goods_tag")
+GoodsTag/styles/normal = ExtResource("s_goods_tag")
+GoodsTag/styles/pressed = ExtResource("s_goods_tag")
+GoodsTagSelected/base_type = &"Button"
+GoodsTagSelected/styles/disabled = ExtResource("s_goods_tag_selected")
+GoodsTagSelected/styles/hover = ExtResource("s_goods_tag_selected")
+GoodsTagSelected/styles/hover_pressed = ExtResource("s_goods_tag_selected")
+GoodsTagSelected/styles/normal = ExtResource("s_goods_tag_selected")
+GoodsTagSelected/styles/pressed = ExtResource("s_goods_tag_selected")
 Header/base_type = &"PanelContainer"
 Header/styles/panel = ExtResource("s_header")
 InkBox/base_type = &"PanelContainer"
@@ -211,19 +224,23 @@ ScrollBodyH/base_type = &"PanelContainer"
 ScrollBodyH/styles/panel = ExtResource("s_scroll_h")
 ScrollBodyV/base_type = &"PanelContainer"
 ScrollBodyV/styles/panel = ExtResource("s_scroll_v")
-SealLabel/base_type = &"Label"
-SealLabel/colors/font_color = Color(0.9294, 0.8902, 0.7961, 1)
-SealLabel/fonts/font = ExtResource("f_bold")
 SealButton/base_type = &"Button"
-SealButton/fonts/font = ExtResource("f_title")
 SealButton/font_sizes/font_size = 32
+SealButton/fonts/font = ExtResource("f_title")
 SealButton/styles/disabled = ExtResource("s_seal_disabled")
 SealButton/styles/hover = ExtResource("s_seal")
 SealButton/styles/hover_pressed = ExtResource("s_seal_down")
 SealButton/styles/normal = ExtResource("s_seal")
 SealButton/styles/pressed = ExtResource("s_seal_down")
+SealLabel/base_type = &"Label"
+SealLabel/colors/font_color = Color(0.9294, 0.8902, 0.7961, 1)
+SealLabel/fonts/font = ExtResource("f_bold")
 Sheet/base_type = &"PanelContainer"
 Sheet/styles/panel = ExtResource("s_sheet")
+ShopSign/base_type = &"PanelContainer"
+ShopSign/styles/panel = ExtResource("s_shop_sign")
+SpeechBubble/base_type = &"PanelContainer"
+SpeechBubble/styles/panel = ExtResource("s_speech_bubble")
 Stamp/base_type = &"PanelContainer"
 Stamp/styles/panel = ExtResource("s_stamp")
 TagLabel/base_type = &"PanelContainer"
@@ -260,26 +277,9 @@ WoodButton/colors/icon_hover_color = Color(0.9294, 0.8902, 0.7961, 1)
 WoodButton/colors/icon_hover_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
 WoodButton/colors/icon_normal_color = Color(0.9294, 0.8902, 0.7961, 1)
 WoodButton/colors/icon_pressed_color = Color(0.9294, 0.8902, 0.7961, 1)
-WoodButton/fonts/font = ExtResource("f_title")
 WoodButton/font_sizes/font_size = 30
+WoodButton/fonts/font = ExtResource("f_title")
 WoodButton/styles/hover = ExtResource("s_wood")
 WoodButton/styles/hover_pressed = ExtResource("s_wood_down")
 WoodButton/styles/normal = ExtResource("s_wood")
 WoodButton/styles/pressed = ExtResource("s_wood_down")
-GoodsTag/base_type = &"Button"
-GoodsTag/colors/font_disabled_color = Color(0.4196, 0.3647, 0.3098, 1)
-GoodsTag/styles/disabled = ExtResource("s_goods_tag")
-GoodsTag/styles/hover = ExtResource("s_goods_tag")
-GoodsTag/styles/hover_pressed = ExtResource("s_goods_tag")
-GoodsTag/styles/normal = ExtResource("s_goods_tag")
-GoodsTag/styles/pressed = ExtResource("s_goods_tag")
-GoodsTagSelected/base_type = &"Button"
-GoodsTagSelected/styles/disabled = ExtResource("s_goods_tag_selected")
-GoodsTagSelected/styles/hover = ExtResource("s_goods_tag_selected")
-GoodsTagSelected/styles/hover_pressed = ExtResource("s_goods_tag_selected")
-GoodsTagSelected/styles/normal = ExtResource("s_goods_tag_selected")
-GoodsTagSelected/styles/pressed = ExtResource("s_goods_tag_selected")
-ShopSign/base_type = &"PanelContainer"
-ShopSign/styles/panel = ExtResource("s_shop_sign")
-SpeechBubble/base_type = &"PanelContainer"
-SpeechBubble/styles/panel = ExtResource("s_speech_bubble")

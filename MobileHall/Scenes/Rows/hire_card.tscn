@@ -1,10 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cy6d8ep8exxlt"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/hire_card.gd" id="1_hire"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/dash.png" id="3_dash"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/ink_circle.png" id="4_circle"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/seal_button.tscn" id="5_seal"]
+[ext_resource type="Script" uid="uid://hqp723kox184" path="res://MobileHall/Scripts/hire_card.gd" id="1_hire"]
+[ext_resource type="PackedScene" uid="uid://h87tubvsjwc3" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
+[ext_resource type="Texture2D" uid="uid://bqjjx2xnallqq" path="res://MobileHall/Art/Textures/dash.png" id="3_dash"]
+[ext_resource type="Texture2D" uid="uid://3ayi3tkryivs" path="res://MobileHall/Art/Textures/ink_circle.png" id="4_circle"]
+[ext_resource type="PackedScene" uid="uid://j7s636wj68s6" path="res://MobileHall/Scenes/Components/seal_button.tscn" id="5_seal"]
 
 [node name="HireCard" type="PanelContainer"]
 theme_type_variation = &"PaperCard"

@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cp5084mci60mt"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/quest_tab.gd" id="1_ebsm4"]
+[ext_resource type="Script" uid="uid://spbdg15m6wf1" path="res://MobileHall/Scripts/quest_tab.gd" id="1_ebsm4"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/quest_band.tres" id="2_band"]
 
 [node name="QuestTab" type="VBoxContainer"]

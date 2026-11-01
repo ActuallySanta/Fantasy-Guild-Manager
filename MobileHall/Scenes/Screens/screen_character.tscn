@@ -1,10 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://chlxegiqwwtoa"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/screen_character.gd" id="1_edguq"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_vio58"]
-[ext_resource type="Script" path="res://MobileHall/Scripts/portrait.gd" id="3_yv2s2"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="4_8ylyv"]
-[ext_resource type="Script" path="res://MobileHall/Scripts/chip.gd" id="6_w82a0"]
+[ext_resource type="Script" uid="uid://cggvi7nt6b43a" path="res://MobileHall/Scripts/screen_character.gd" id="1_edguq"]
+[ext_resource type="PackedScene" uid="uid://h87tubvsjwc3" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_vio58"]
+[ext_resource type="Script" uid="uid://bpojheqlrxb24" path="res://MobileHall/Scripts/portrait.gd" id="3_yv2s2"]
+[ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://MobileHall/Scenes/Components/chip.tscn" id="4_8ylyv"]
+[ext_resource type="Script" uid="uid://bh1skn0yrphtr" path="res://MobileHall/Scripts/chip.gd" id="6_w82a0"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="7_ye445"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/dim.tres" id="10_rdim1"]
 

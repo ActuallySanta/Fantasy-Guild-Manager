@@ -1,15 +1,15 @@
 [gd_scene format=3 uid="uid://bt1iwlgoqgjw0"]
 
 [ext_resource type="Script" uid="uid://bftkb3j4ulonv" path="res://MobileHall/Scripts/screen_assign.gd" id="1_xf810"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/arrow_left.svg" id="2_back"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/roller_h.png" id="3_roller"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="4_chip"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/divider.tscn" id="5_divider"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/ink_circle.png" id="6_circle"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/odds_bar.tscn" id="7_kj605"]
+[ext_resource type="Texture2D" uid="uid://c2nc04lk4jmw3" path="res://MobileHall/Art/Icons/arrow_left.svg" id="2_back"]
+[ext_resource type="Texture2D" uid="uid://dmoxhfanh1kx5" path="res://MobileHall/Art/Textures/roller_h.png" id="3_roller"]
+[ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://MobileHall/Scenes/Components/chip.tscn" id="4_chip"]
+[ext_resource type="PackedScene" uid="uid://0ruw74gtfe6k" path="res://MobileHall/Scenes/Components/divider.tscn" id="5_divider"]
+[ext_resource type="Texture2D" uid="uid://3ayi3tkryivs" path="res://MobileHall/Art/Textures/ink_circle.png" id="6_circle"]
+[ext_resource type="PackedScene" uid="uid://b3neobxrym5mx" path="res://MobileHall/Scenes/Components/odds_bar.tscn" id="7_kj605"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="8_footer"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/x.svg" id="9_x"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/seal_button.tscn" id="10_seal"]
+[ext_resource type="Texture2D" uid="uid://ealg7qhxhkmi" path="res://MobileHall/Art/Icons/x.svg" id="9_x"]
+[ext_resource type="PackedScene" uid="uid://j7s636wj68s6" path="res://MobileHall/Scenes/Components/seal_button.tscn" id="10_seal"]
 
 [node name="ScreenAssign" type="VBoxContainer"]
 theme_override_constants/separation = 0

@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://4icacknba0fh"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_end_day.gd" id="1_3l375"]
+[ext_resource type="Script" uid="uid://dfxrirpu3k7g1" path="res://MobileHall/Scripts/overlay_end_day.gd" id="1_3l375"]
 [ext_resource type="StyleBox" path="res://MobileHall/Styles/dim.tres" id="2_4xc3y"]
 
 [node name="OverlayEndDay" type="Control" unique_id=1202933692]

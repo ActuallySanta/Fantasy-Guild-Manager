@@ -1,9 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cfnuyteanwwp5"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/pick_row.gd" id="1_pick"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/stat_strip.tscn" id="3_stats"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="4_chip"]
+[ext_resource type="Script" uid="uid://5081eamp440q" path="res://MobileHall/Scripts/pick_row.gd" id="1_pick"]
+[ext_resource type="PackedScene" uid="uid://h87tubvsjwc3" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
+[ext_resource type="PackedScene" uid="uid://eyqpbr188oi2" path="res://MobileHall/Scenes/Components/stat_strip.tscn" id="3_stats"]
+[ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://MobileHall/Scenes/Components/chip.tscn" id="4_chip"]
 
 [node name="PickRow" type="PanelContainer"]
 theme_type_variation = &"PaperCard"

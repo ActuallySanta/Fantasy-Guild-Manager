@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://c2ca1up8vmmc6"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/plan_row.gd" id="1_qq40e"]
+[ext_resource type="Script" uid="uid://dpvemrklcaafj" path="res://MobileHall/Scripts/plan_row.gd" id="1_qq40e"]
 
 [node name="PlanRow" type="HBoxContainer" unique_id=1247588607]
 theme_override_constants/separation = 12

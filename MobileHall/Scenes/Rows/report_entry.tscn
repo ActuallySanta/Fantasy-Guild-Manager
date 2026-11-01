@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://di7qjsfr530p5"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/report_entry.gd" id="1_entry"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/divider.tscn" id="2_divider"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/skull.svg" id="3_skull"]
+[ext_resource type="Script" uid="uid://gugxpsc75su" path="res://MobileHall/Scripts/report_entry.gd" id="1_entry"]
+[ext_resource type="PackedScene" uid="uid://0ruw74gtfe6k" path="res://MobileHall/Scenes/Components/divider.tscn" id="2_divider"]
+[ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.svg" id="3_skull"]
 
 [node name="ReportEntry" type="PanelContainer"]
 theme_type_variation = &"PaperCard"
