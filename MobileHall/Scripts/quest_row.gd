@@ -6,12 +6,18 @@ extends "res://MobileHall/Scripts/tap_panel.gd"
 
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
 const PortraitScene := preload("res://MobileHall/Scenes/Components/portrait.tscn")
 
 ## Size (pixels) of the little party portraits under the state.
 const MINI_PORTRAIT_SIZE := 40
 ## Denied quests fade back so the open ones stand out.
 const DENIED_OPACITY := 0.7
+## The SENT stamp inked on a sent quest's row: where its centre sits (fraction
+## of the row's size), text size, tilt (radians).
+const SENT_STAMP_AT := Vector2(0.56, 0.5)
+const SENT_STAMP_FONT_SIZE := 34
+const SENT_STAMP_TILT := -0.14
 
 # ---- TEXT
 # Quest facts (left)
@@ -22,6 +28,7 @@ const TEXT_PARTY_SIZE := "%d max"
 const TEXT_OPEN := "Pick a party"
 const TEXT_DRAFT := "Party picked"
 const TEXT_SENT := "Sent"
+const TEXT_SENT_STAMP := "SENT"
 const TEXT_DENIED := "Denied"
 const TEXT_DENIED_HINT := "tap to reconsider"
 const TEXT_ODDS := "%d%%"
@@ -48,6 +55,15 @@ func setup(hall: HallMain, quest_index: int) -> void:
 	_show_quest_facts(hall, entry)
 	_show_party(hall, entry)
 	_show_state(entry)
+	# sent quests have SENT inked on them (pressed on if it was just sent);
+	# a just-denied quest's state word stamps in
+	var is_just_decided: bool = hall.pending_fx.get("quest_stamp", -1) == quest_index
+	if entry.state == Style.QUEST_STATE_SENT:
+		Fx.stamp_onto(self, TEXT_SENT_STAMP, Style.GREEN_TEXT, SENT_STAMP_AT,
+				SENT_STAMP_FONT_SIZE, SENT_STAMP_TILT, is_just_decided)
+	elif is_just_decided:
+		Fx.stamp_in(_state_label, 2.0)
+		Fx.pop(self, 1.03, 0.12)
 
 
 ## Type seal, title, rank, reward, party size, favored stat.

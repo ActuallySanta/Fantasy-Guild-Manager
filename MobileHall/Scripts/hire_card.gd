@@ -41,7 +41,7 @@ func _ready() -> void:
 ## letter_index = place in today's applicants (for the letter number).
 func setup(hall: HallMain, recruit: GuildCharacter, letter_index: int = 0) -> void:
 	_details_button.pressed.connect(hall.open_character.bind(recruit))
-	_hire_button.pressed.connect(hall.hire.bind(recruit))
+	_hire_button.pressed.connect(_on_hire_pressed.bind(hall, recruit))
 
 	# who they are
 	_number.text = TEXT_NUMBER % Style.roman_numeral(FIRST_LETTER_NUMBER + GameState.day * 3 + letter_index)
@@ -68,3 +68,9 @@ func setup(hall: HallMain, recruit: GuildCharacter, letter_index: int = 0) -> vo
 	else:
 		_hire_button.text = TEXT_HIRE_FREE
 	_hire_button.disabled = no_beds
+
+
+## Hire, and if they joined, this letter flies off to the roster.
+func _on_hire_pressed(hall: HallMain, recruit: GuildCharacter) -> void:
+	if hall.hire(recruit):
+		hall.send_hired_letter(self)

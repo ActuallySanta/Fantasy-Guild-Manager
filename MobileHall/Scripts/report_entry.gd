@@ -7,6 +7,20 @@ extends PanelContainer
 
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const BeatRowScene := preload("res://MobileHall/Scenes/Rows/beat_row.tscn")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
+
+# ---- MOTION (the reveal, see reveal())
+## Seconds the letter takes to fade up, then before its stamp slams down.
+const REVEAL_LETTER_SECONDS := 0.25
+const REVEAL_STAMP_DELAY := 0.18
+## Seconds between each tag (Hurt, Died, Found) stamping in.
+const REVEAL_TAG_GAP := 0.14
+## A death holds the letter this long (seconds) and shakes it this hard (pixels).
+const REVEAL_DEATH_PAUSE := 0.45
+const REVEAL_DEATH_SHAKE := 9.0
+## Seconds between story lines; a long story squeezes them into REVEAL_BEATS_MAX.
+const REVEAL_BEAT_GAP := 0.06
+const REVEAL_BEATS_MAX := 0.7
 
 ## CreatedQuest.generateResults writes bright BBCode colours meant for a dark
 ## screen; these swap them for inks that read on parchment.
@@ -101,6 +115,39 @@ func setup(result: Dictionary) -> void:
 
 	_build_story_beats(result.story)
 	_closing_line.text = _closing_text(result)
+
+
+## Play this letter in, starting `delay` seconds from now: it fades up, the
+## Success / Failed stamp slams down, the Hurt / Died / Found tags stamp in
+## (a death holds and shakes the letter), then the story fills in line by
+## line and the sign-off appears.
+## Returns how long that takes (seconds), so the report can start the next letter.
+func reveal(delay: float) -> float:
+	if Fx.reduce_motion:
+		return 0.0
+	var at := delay
+	Fx.fade_in(self, at, REVEAL_LETTER_SECONDS)
+	at += REVEAL_STAMP_DELAY
+	Fx.stamp_in(_result_stamp, 2.4, at)
+	at += REVEAL_LETTER_SECONDS
+
+	for tag in [_injured_tag, _died_tag, _found_tag]:
+		if tag.visible:
+			Fx.stamp_in(tag, 1.6, at)
+			at += REVEAL_TAG_GAP
+	if _died_tag.visible:
+		Fx.shake(self, REVEAL_DEATH_SHAKE, at)
+		at += REVEAL_DEATH_PAUSE
+
+	var beats := _beat_list.get_children()
+	var beat_gap := REVEAL_BEAT_GAP
+	if not beats.is_empty():
+		beat_gap = minf(REVEAL_BEAT_GAP, REVEAL_BEATS_MAX / beats.size())
+	for beat in beats:
+		Fx.fade_in(beat, at)
+		at += beat_gap
+	Fx.fade_in(_closing_line, at)
+	return at - delay
 
 
 ## One beat row per story line (summary lines are left to the sign-off).

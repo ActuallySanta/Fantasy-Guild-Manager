@@ -7,6 +7,7 @@ extends "res://MobileHall/Scripts/tap_panel.gd"
 
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
 
 ## Adventurers who can't go fade back.
 const CANT_GO_OPACITY := 0.6
@@ -83,6 +84,9 @@ func _show_pick_state(hall: HallMain, entry: Dictionary, character: GuildCharact
 		_adds_sub.text = TEXT_IN_PARTY_SUB
 		Style.set_font_color(_adds_value, Style.GREEN_TEXT)
 		Style.style_panel(self, Style.SENT_CARD_BG)
+		# just pinned: "Pinned" stamps onto the row
+		if hall.pending_fx.get("seat_in") == character:
+			Fx.stamp_in(_adds_value, 1.6)
 	elif not hall.can_go_on_quests(character):
 		_adds_value.text = TEXT_CANT_GO
 		if Style.is_dead(character):

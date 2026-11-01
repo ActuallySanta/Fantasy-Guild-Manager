@@ -8,6 +8,18 @@ extends Control
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 const ReportEntryScene := preload("res://MobileHall/Scenes/Rows/report_entry.tscn")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
+
+# ---- MOTION (only for the report that opens after End Day)
+## Seconds before the reveal starts (the dusk wash is clearing).
+const REVEAL_START := 0.3
+## Seconds between the totals chips stamping in, and the gold total's count-up.
+const REVEAL_CHIP_GAP := 0.1
+const REVEAL_GOLD_SECONDS := 0.6
+## Letters overlap: the next one starts after this share of the last one.
+const REVEAL_LETTER_OVERLAP := 0.55
+## The button shows by this many seconds at the latest, however long the night was.
+const REVEAL_BUTTON_LATEST := 1.6
 
 ## Chip text size on the totals strip.
 const TOTALS_FONT_SIZE := 28
@@ -49,6 +61,8 @@ const BUTTON_CLOSE := "Close"
 var hall: HallMain
 ## The report currently built on screen (to skip rebuilding the same one).
 var _built_report: Dictionary = {}
+## The night's total gold (for the count-up on the totals strip).
+var _total_gold := 0
 
 
 func setup(main: HallMain) -> void:
@@ -83,6 +97,30 @@ func refresh() -> void:
 	# after End Day the button starts the next day; from the Menu it just closes
 	var starts_next_day: bool = report.get("starts_next_day", false)
 	_action_button.text = BUTTON_START_DAY % (GameState.day + 1) if starts_next_day else BUTTON_CLOSE
+	# the night plays out on the page the first time it's read
+	if starts_next_day:
+		_play_reveal()
+
+
+## The report as the night unfolds: the totals stamp in and the gold counts
+## up, the home / released notes fade in, then each letter plays in turn
+## (report_entry.reveal). The button is always there to skip ahead.
+func _play_reveal() -> void:
+	if Fx.reduce_motion:
+		return
+	var at := REVEAL_START
+	for chip in [_succeeded_chip, _gold_chip, _injured_chip, _dead_chip]:
+		if chip.visible:
+			Fx.stamp_in(chip, 1.6, at)
+			at += REVEAL_CHIP_GAP
+	Fx.count(_gold_chip.get_node("Row/Text"), 0, _total_gold, REVEAL_GOLD_SECONDS, TEXT_GOLD, REVEAL_START)
+	for note in [_home_note, _released_note]:
+		if note.visible:
+			Fx.fade_in(note, at)
+			at += REVEAL_CHIP_GAP
+	for entry in _entry_list.get_children():
+		at += entry.reveal(at) * REVEAL_LETTER_OVERLAP
+	Fx.appear(_action_button, 1.2, minf(at, REVEAL_BUTTON_LATEST))
 
 
 ## Inked boxes on the torn strip: how many succeeded, total gold, how many
@@ -102,6 +140,7 @@ func _show_totals(results: Array) -> void:
 	_succeeded_chip.set_box(TEXT_SUCCEEDED % [succeeded_count, results.size()], Style.BLUE_TEXT)
 	_succeeded_chip.visible = not results.is_empty()
 	_gold_chip.set_box(TEXT_GOLD % total_gold, Style.GOLD_TEXT)
+	_total_gold = total_gold
 	if injured_count > 0:
 		_injured_chip.set_box(Style.count_text(injured_count, "hurt", "hurt"), Style.RED)
 	else:
