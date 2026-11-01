@@ -26,10 +26,16 @@ extends Control
 ## Injury level for each adventurer in the guild, one entry per member
 ## (0 Healthy, 1 Sore, 2 Lightly Injured, 3 Gravely Injured).
 @export var member_injuries: Array[int] = [2, 3]
+## Dead heroes to add to the roster too (for the Game Over ledger's roll call).
+## Each one "fell" on the day before start_day at FALLEN_QUEST_NAME.
+@export var fallen_members: int = 0
 ## Show the Mobile Hall welcome card at the start.
 @export var show_welcome: bool = true
 ## Toast shown once the scenario loads ("" = none).
 @export var intro_toast: String = ""
+
+## Where the fallen_members died, as the roll call shows it.
+const FALLEN_QUEST_NAME := "a playtest skirmish"
 
 @onready var _hall: Control = $HallMain
 
@@ -50,6 +56,12 @@ func _ready() -> void:
 		character.injury_level = clampi(injury, 0, GuildCharacter.InjuryLevel.GRAVELY_INJURED) as GuildCharacter.InjuryLevel
 		character.injury_count = character.injury_level
 		CharacterContainer.active_characters.append(character)
+	for i in fallen_members:
+		var fallen := GuildCharacter.new()
+		fallen.injury_level = GuildCharacter.InjuryLevel.DEAD
+		fallen.died_on_day = maxi(start_day - 1, 1)
+		fallen.died_on_quest = FALLEN_QUEST_NAME
+		CharacterContainer.active_characters.append(fallen)
 
 	# re-roll For Hire with the new standing (empty at -10)
 	CharacterContainer.refresh_hireable_characters()

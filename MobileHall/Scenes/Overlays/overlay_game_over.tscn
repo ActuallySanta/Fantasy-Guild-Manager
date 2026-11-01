@@ -1,0 +1,173 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_game_over.gd" id="1_over"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/wood.png" id="2_wood"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/stat_tile.tscn" id="3_tile"]
+[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/connector.png" id="4_connector"]
+[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/divider.tscn" id="5_divider"]
+
+[node name="OverlayGameOver" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_over")
+
+[node name="Bg" type="TextureRect" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("2_wood")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Layout" type="VBoxContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 0
+
+[node name="HeadMargin" type="MarginContainer" parent="Layout"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 8
+
+[node name="Head" type="VBoxContainer" parent="Layout/HeadMargin"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Title" type="Label" parent="Layout/HeadMargin/Head"]
+layout_mode = 2
+theme_type_variation = &"TitleLight"
+theme_override_font_sizes/font_size = 62
+text = "The Guild Has Fallen"
+horizontal_alignment = 1
+
+[node name="Sub" type="Label" parent="Layout/HeadMargin/Head"]
+layout_mode = 2
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 28
+text = "No heroes left to send, and none to hire"
+horizontal_alignment = 1
+
+[node name="Scroll" type="ScrollContainer" parent="Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Layout/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_bottom = 20
+
+[node name="Ledger" type="PanelContainer" parent="Layout/Scroll/Margin"]
+layout_mode = 2
+theme_type_variation = &"LedgerCard"
+
+[node name="Col" type="VBoxContainer" parent="Layout/Scroll/Margin/Ledger"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="DaysRow" type="HBoxContainer" parent="Layout/Scroll/Margin/Ledger/Col"]
+layout_mode = 2
+alignment = 1
+
+[node name="DaysTile" parent="Layout/Scroll/Margin/Ledger/Col/DaysRow" instance=ExtResource("3_tile")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"InkBoxThick"
+
+[node name="Grid" type="GridContainer" parent="Layout/Scroll/Margin/Ledger/Col"]
+layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 3
+
+[node name="GoldTile" parent="Layout/Scroll/Margin/Ledger/Col/Grid" instance=ExtResource("3_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+rotation = -0.015
+
+[node name="QuestsTile" parent="Layout/Scroll/Margin/Ledger/Col/Grid" instance=ExtResource("3_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HiredTile" parent="Layout/Scroll/Margin/Ledger/Col/Grid" instance=ExtResource("3_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+rotation = 0.015
+
+[node name="FallenTile" parent="Layout/Scroll/Margin/Ledger/Col/Grid" instance=ExtResource("3_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+rotation = 0.01
+
+[node name="StandingTile" parent="Layout/Scroll/Margin/Ledger/Col/Grid" instance=ExtResource("3_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="DrakeTile" parent="Layout/Scroll/Margin/Ledger/Col/Grid" instance=ExtResource("3_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+rotation = -0.01
+
+[node name="Divider" parent="Layout/Scroll/Margin/Ledger/Col" instance=ExtResource("5_divider")]
+layout_mode = 2
+
+[node name="RollCallTitle" type="Label" parent="Layout/Scroll/Margin/Ledger/Col"]
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 26
+text = "Roll Call"
+uppercase = true
+
+[node name="RollCall" type="VBoxContainer" parent="Layout/Scroll/Margin/Ledger/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Empty" type="Label" parent="Layout/Scroll/Margin/Ledger/Col"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "No hero ever joined this guild."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Footer" type="MarginContainer" parent="Layout"]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 26
+
+[node name="Col" type="VBoxContainer" parent="Layout/Footer"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Connector" type="TextureRect" parent="Layout/Footer/Col"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_connector")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="NewRunButton" type="Button" parent="Layout/Footer/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"GoldButton"
+theme_override_font_sizes/font_size = 46
+text = "Found a New Guild"

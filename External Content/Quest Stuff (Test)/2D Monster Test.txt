@@ -1,6 +1,12 @@
-Ghost|Skeleton|Troll|AAAA
-Goblin|Specter|Titan|BBBB
-Ghoul|Shadow|Tiny Baby Zombie|CCCC
-Gorgon|Siren|Treant|DDDD
-Golem|Sprite|Trogladyte|EEEE
-Gremlin|Stray Cat|Tarantula|FFFF
+Anthousai Nymph|Beav'r|Naga|Porcelain Puppet
+Mischievous Slime|Wereboar|Umber Hulk|Crackling Gorgon
+Giant Eagle|Zombified Ogre|Salamander|Werepenguin
+Blighted Worms|Centaur|Parched Lich|Frostcloak
+Bandit|Banshee|Spined Imp|Thunderbird
+Skeleton Warrior|Necroghoul|Living Gargoyle|Flesh-Eating Yeti
+Shambling Mound|Kelpie|Igneous Drakeling|Discarded Construct
+Blightbloom|Marsh Troll|Black-Eyed Condor|Wendigo
+Orc|Giant Tarantula|Fire Snake|Cave Crawler
+Mantrap|Treant|Hell Hound|Kobold
+Goblin|Sprite|Gnoll|Crystal Gremlin
+Stray Cat|Swamp Siren|Apex Trogladyte|Powder Golem

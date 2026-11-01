@@ -4,41 +4,40 @@
 [ext_resource type="Texture2D" uid="uid://by4rny5fghqj" path="res://MobileHall/Art/Textures/roller_v.png" id="2_roller"]
 [ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
 
-[node name="QuestRow" type="PanelContainer"]
+[node name="QuestRow" type="PanelContainer" unique_id=1166598345]
 script = ExtResource("1_row")
 
-[node name="Row" type="HBoxContainer" parent="."]
+[node name="Row" type="HBoxContainer" parent="." unique_id=263599381]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = -4
 
-[node name="RollerLeft" type="NinePatchRect" parent="Row"]
+[node name="RollerLeft" type="NinePatchRect" parent="Row" unique_id=1412243554]
 z_index = 1
 custom_minimum_size = Vector2(34, 0)
 layout_mode = 2
-mouse_filter = 2
 texture = ExtResource("2_roller")
 patch_margin_top = 22
 patch_margin_bottom = 22
 
-[node name="BodyMargin" type="MarginContainer" parent="Row"]
+[node name="BodyMargin" type="MarginContainer" parent="Row" unique_id=1095335331]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="Body" type="PanelContainer" parent="Row/BodyMargin"]
+[node name="Body" type="PanelContainer" parent="Row/BodyMargin" unique_id=1920811871]
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"ScrollBodyH"
 
-[node name="Content" type="HBoxContainer" parent="Row/BodyMargin/Body"]
+[node name="Content" type="HBoxContainer" parent="Row/BodyMargin/Body" unique_id=1606069957]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 14
 
-[node name="TypeSeal" type="PanelContainer" parent="Row/BodyMargin/Body/Content"]
+[node name="TypeSeal" type="PanelContainer" parent="Row/BodyMargin/Body/Content" unique_id=160995385]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(76, 76)
 layout_mode = 2
@@ -46,7 +45,7 @@ size_flags_vertical = 4
 mouse_filter = 2
 theme_type_variation = &"TypeSeal"
 
-[node name="TypeTag" type="Label" parent="Row/BodyMargin/Body/Content/TypeSeal"]
+[node name="TypeTag" type="Label" parent="Row/BodyMargin/Body/Content/TypeSeal" unique_id=1129238189]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"SealLabel"
@@ -55,64 +54,64 @@ text = "SCT"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Info" type="VBoxContainer" parent="Row/BodyMargin/Body/Content"]
+[node name="Info" type="VBoxContainer" parent="Row/BodyMargin/Body/Content" unique_id=792652013]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 theme_override_constants/separation = 4
 alignment = 1
 
-[node name="Title" type="Label" parent="Row/BodyMargin/Body/Content/Info"]
+[node name="Title" type="Label" parent="Row/BodyMargin/Body/Content/Info" unique_id=1376892972]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"TitleLabel"
-theme_override_font_sizes/font_size = 34
 theme_override_constants/line_spacing = -6
+theme_override_font_sizes/font_size = 34
 text = "Explore Mistwater Marsh"
 autowrap_mode = 3
 max_lines_visible = 2
 
-[node name="Chips" type="HBoxContainer" parent="Row/BodyMargin/Body/Content/Info"]
+[node name="Chips" type="HBoxContainer" parent="Row/BodyMargin/Body/Content/Info" unique_id=57835270]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 12
 
-[node name="RankChip" parent="Row/BodyMargin/Body/Content/Info/Chips" instance=ExtResource("3_chip")]
+[node name="RankChip" parent="Row/BodyMargin/Body/Content/Info/Chips" unique_id=1055289194 instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="GoldChip" parent="Row/BodyMargin/Body/Content/Info/Chips" instance=ExtResource("3_chip")]
+[node name="GoldChip" parent="Row/BodyMargin/Body/Content/Info/Chips" unique_id=1572775574 instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="SlotsChip" parent="Row/BodyMargin/Body/Content/Info/Chips" instance=ExtResource("3_chip")]
+[node name="SlotsChip" parent="Row/BodyMargin/Body/Content/Info/Chips" unique_id=1873254163 instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="FavChip" parent="Row/BodyMargin/Body/Content/Info/Chips" instance=ExtResource("3_chip")]
+[node name="FavChip" parent="Row/BodyMargin/Body/Content/Info/Chips" unique_id=1742952413 instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="StateCol" type="VBoxContainer" parent="Row/BodyMargin/Body/Content"]
+[node name="StateCol" type="VBoxContainer" parent="Row/BodyMargin/Body/Content" unique_id=604254730]
 custom_minimum_size = Vector2(104, 0)
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 0
 alignment = 1
 
-[node name="StateLabel" type="Label" parent="Row/BodyMargin/Body/Content/StateCol"]
+[node name="StateLabel" type="Label" parent="Row/BodyMargin/Body/Content/StateCol" unique_id=22393443]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"TitleLabel"
-theme_override_font_sizes/font_size = 28
 theme_override_constants/line_spacing = -8
+theme_override_font_sizes/font_size = 28
 text = "Pick a party"
 horizontal_alignment = 2
 autowrap_mode = 3
 
-[node name="OddsLabel" type="Label" parent="Row/BodyMargin/Body/Content/StateCol"]
+[node name="OddsLabel" type="Label" parent="Row/BodyMargin/Body/Content/StateCol" unique_id=396846435]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"TitleLabel"
@@ -120,7 +119,7 @@ theme_override_font_sizes/font_size = 34
 text = "72%"
 horizontal_alignment = 2
 
-[node name="SubLabel" type="Label" parent="Row/BodyMargin/Body/Content/StateCol"]
+[node name="SubLabel" type="Label" parent="Row/BodyMargin/Body/Content/StateCol" unique_id=1710402794]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(40, 0)
@@ -131,18 +130,17 @@ text = "tap to reconsider"
 horizontal_alignment = 2
 autowrap_mode = 3
 
-[node name="Party" type="HBoxContainer" parent="Row/BodyMargin/Body/Content/StateCol"]
+[node name="Party" type="HBoxContainer" parent="Row/BodyMargin/Body/Content/StateCol" unique_id=275098860]
 unique_name_in_owner = true
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 2
 alignment = 2
 
-[node name="RollerRight" type="NinePatchRect" parent="Row"]
+[node name="RollerRight" type="NinePatchRect" parent="Row" unique_id=1545415025]
 z_index = 1
 custom_minimum_size = Vector2(34, 0)
 layout_mode = 2
-mouse_filter = 2
 texture = ExtResource("2_roller")
 patch_margin_top = 22
 patch_margin_bottom = 22
