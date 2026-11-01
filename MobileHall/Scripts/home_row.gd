@@ -12,6 +12,7 @@ extends PanelContainer
 
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
 
 ## Rows for heroes who can't do anything here fade back.
 const FADED_OPACITY := 0.6
@@ -72,6 +73,9 @@ func _fill(main: HallMain, hero: GuildCharacter) -> void:
 	_stat_picker.visible = false
 	modulate = Color.WHITE
 	Style.style_panel(self, Style.CARD_BG, Style.BORDER, 2, 16)
+	# just moved into a slot / bed (or out, or back from the dead): pop in its new spot
+	if hall.pending_fx.get("home_row") == hero:
+		Fx.appear(self, 0.9)
 
 
 ## "Free today", "Picked for #2" or "Sent on #2".

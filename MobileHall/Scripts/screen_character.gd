@@ -12,6 +12,13 @@ extends VBoxContainer
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 const GearRowScene := preload("res://MobileHall/Scenes/Rows/gear_row.tscn")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
+
+# ---- MOTION
+## Ink a stat line's number flashes when it changes (gear, training), and how
+## big the line grows.
+const STAT_CHANGE_INK := Color("#2F7A3A")
+const STAT_CHANGE_POP := 1.06
 
 # ---- TEXT
 const TEXT_ROLE := "the %s"
@@ -87,6 +94,10 @@ var hall: HallMain
 ## The Equip pick list is open (view state; closes when another hero is shown).
 var _is_picking_gear := false
 var _gear_character: GuildCharacter
+## Whose stats are drawn, and each stat line's text, to pop the lines that
+## change while the same hero is showing (null = not drawn yet).
+var _stats_character: GuildCharacter
+var _shown_stat_texts := {}
 ## The Release confirm sheet is open (view state; closes when another hero is shown).
 var _is_confirming_release := false
 var _release_character: GuildCharacter
@@ -185,6 +196,8 @@ func _show_task(character: GuildCharacter, is_recruit: bool) -> void:
 ## outline inked the same colour.
 ## The StatLines node has one authored line per stat, each with Row/Name and Row/Value.
 func _show_stats(character: GuildCharacter) -> void:
+	var is_same_hero := character == _stats_character
+	_stats_character = character
 	for stat_index in Style.STAT_COUNT:
 		var stat: Dictionary = Style.STATS[stat_index]
 		var line: PanelContainer = _stat_lines.get_child(stat_index)
@@ -218,6 +231,12 @@ func _show_stats(character: GuildCharacter) -> void:
 		Style.set_font_color(value_label, stat.color)
 		Style.tint_art(line, stat.color)
 
+		# a number that changed for the same hero (gear on / off) pops and flashes
+		if is_same_hero and _shown_stat_texts.get(stat_index, value_label.text) != value_label.text:
+			Fx.pop(line, STAT_CHANGE_POP)
+			Fx.flash_text(value_label, STAT_CHANGE_INK)
+		_shown_stat_texts[stat_index] = value_label.text
+
 
 ## Worn items, empty slots, and (while picking) the owned items that fit.
 func _show_gear(character: GuildCharacter, is_recruit: bool) -> void:
@@ -237,17 +256,23 @@ func _show_gear(character: GuildCharacter, is_recruit: bool) -> void:
 		_is_picking_gear = false
 
 	for item in character.equipped_items:
-		Style.add_row(_gear_lines, GearRowScene).setup(
-			Style.item_look(item), BUTTON_TAKE_OFF, "paper", hall.unequip_item.bind(item))
+		var worn_row: Control = Style.add_row(_gear_lines, GearRowScene)
+		worn_row.setup(Style.item_look(item), BUTTON_TAKE_OFF, "paper", hall.unequip_item.bind(item))
+		# just equipped: it slams into the slot
+		if hall.pending_fx.get("gear_in") == item:
+			Fx.stamp_in(worn_row, 1.25)
 
 	var free_slots := maxi(character.max_items - character.equipped_items.size(), 0)
 	for slot in free_slots:
 		var button_text := ""
 		if not is_dead and slot == 0:
 			button_text = BUTTON_CANCEL if _is_picking_gear else BUTTON_EQUIP
-		Style.add_row(_gear_lines, GearRowScene).setup_empty(
-			TEXT_EMPTY_SLOT, TEXT_EMPTY_HINT % role_name, button_text,
-			"paper" if _is_picking_gear else "blue", _toggle_gear_picker)
+		var empty_row: Control = Style.add_row(_gear_lines, GearRowScene)
+		empty_row.setup_empty(TEXT_EMPTY_SLOT, TEXT_EMPTY_HINT % role_name, button_text,
+				"paper" if _is_picking_gear else "blue", _toggle_gear_picker)
+		# just taken off: the freed slot fades back in
+		if slot == 0 and hall.pending_fx.get("gear_out", false):
+			Fx.fade_in(empty_row)
 	if free_slots == 0:
 		_is_picking_gear = false
 
