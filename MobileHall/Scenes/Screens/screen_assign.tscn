@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://0ruw74gtfe6k" path="res://MobileHall/Scenes/Components/divider.tscn" id="5_divider"]
 [ext_resource type="Texture2D" uid="uid://3ayi3tkryivs" path="res://MobileHall/Art/Textures/ink_circle.png" id="6_circle"]
 [ext_resource type="PackedScene" uid="uid://b3neobxrym5mx" path="res://MobileHall/Scenes/Components/odds_bar.tscn" id="7_kj605"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/action_bar.tres" id="8_footer"]
+[ext_resource type="StyleBox" uid="uid://1371ec6b7611" path="res://MobileHall/Styles/action_bar.tres" id="8_footer"]
 [ext_resource type="Texture2D" uid="uid://ealg7qhxhkmi" path="res://MobileHall/Art/Icons/x.svg" id="9_x"]
 [ext_resource type="PackedScene" uid="uid://j7s636wj68s6" path="res://MobileHall/Scenes/Components/seal_button.tscn" id="10_seal"]
 

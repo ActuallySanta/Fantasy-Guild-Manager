@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://farw7bcfj0fq"]
 
 [ext_resource type="Script" uid="uid://g02vne3w8yqq" path="res://MobileHall/Scripts/overlay_menu.gd" id="1_3yvdq"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/dim.tres" id="2_kkstj"]
+[ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_kkstj"]
 
 [node name="OverlayMenu" type="Control" unique_id=1444146504]
 layout_mode = 3
