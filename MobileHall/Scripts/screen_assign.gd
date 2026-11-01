@@ -16,6 +16,24 @@ const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 const QuestTabScene := preload("res://MobileHall/Scenes/Rows/quest_tab.tscn")
 const PartySlotScene := preload("res://MobileHall/Scenes/Rows/party_slot.tscn")
 const PickRowScene := preload("res://MobileHall/Scenes/Rows/pick_row.tscn")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
+
+# ---- MOTION
+## Seconds the odds number and bar take to move to a new chance.
+const ODDS_ROLL_SECONDS := 0.4
+## How big the odds circle grows when the chance changes.
+const ODDS_POP := 1.2
+## The "+12%" / "-12%" that floats off the tapped row: font size, inks.
+const ODDS_DELTA_FONT_SIZE := 32
+const ODDS_UP_INK := Color("#3D5A2A")
+const ODDS_DOWN_INK := Color("#8B2E2A")
+## How hard the quest shakes when it's denied (pixels).
+const DENY_SHAKE := 12.0
+## The SENT stamp inked on a sent quest: where its centre sits (fraction of the
+## quest card's size), text size, tilt (radians).
+const WRIT_STAMP_AT := Vector2(0.74, 0.2)
+const WRIT_STAMP_FONT_SIZE := 60
+const WRIT_STAMP_TILT := -0.16
 
 # ---- TEXT
 # Quest writ
@@ -28,8 +46,11 @@ const STATUS_OPEN := "Pin up to %s. Their stats add up to the chance."
 const STATUS_DRAFT := "Your picks stay pinned if you look at another quest."
 const STATUS_SENT := "Sent. Tap someone to change the party, or recall it."
 const STATUS_DENIED := "Denied. Reconsider to put it back on the board."
+const TEXT_STAMP_SENT := "SENT"
 # Party odds
 const TEXT_ODDS := "%d%%"
+const TEXT_ODDS_UP := "+%d%%"
+const TEXT_ODDS_DOWN := "%d%%"
 const TEXT_ODDS_NONE := "--"
 const TEXT_ODDS_WORD := "Chance of success"
 # Picker
@@ -60,6 +81,7 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _party_size_chip = %SlotsChip    # chip.gd
 @onready var _favored_chip = %FavChip         # chip.gd
 @onready var _status: Label = %Status
+@onready var _quest_card: PanelContainer = $Scroll/Margin/Col/Writ/WritMargin/QuestCard
 # Party
 @onready var _party_box: Control = %PartyBox
 @onready var _party_seats: VBoxContainer = %Slots
@@ -67,6 +89,7 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _odds_circle: TextureRect = %Circle
 @onready var _odds_word: Label = %OddsWord
 @onready var _odds_bar = %OddsBar             # odds_bar.gd
+@onready var _odds_stack: Control = %Circle.get_parent()
 # Picker
 @onready var _pick_header: Control = %PickHeader
 @onready var _pick_heading: Label = %PickHeading
@@ -82,6 +105,13 @@ const BUTTON_RECONSIDER := "Reconsider"
 
 ## The main hall script (state + actions), set in setup().
 var hall: HallMain
+## The quest and chance the odds were last drawn for (to animate a change on
+## the same quest; switching quests just snaps). -1 = not drawn yet.
+var _odds_quest_index := -1
+var _shown_chance := -1
+## The SENT ink on the quest card (null = none) and which quest it's for.
+var _writ_stamp: Control
+var _writ_stamp_quest := -1
 
 
 func setup(main: HallMain) -> void:
@@ -105,6 +135,7 @@ func refresh() -> void:
 		return
 	_show_quest_tabs()
 	_show_quest_card(entry)
+	_show_writ_stamp(entry)
 	_show_party(entry)
 	_show_picker(entry)
 	_show_footer(entry)
@@ -165,15 +196,77 @@ func _show_party(entry: Dictionary) -> void:
 	Style.clear_children(_party_seats)
 	for seat_index in hall.party_size_limit(entry):
 		var seated: GuildCharacter = entry.party[seat_index] if seat_index < entry.party.size() else null
-		Style.add_row(_party_seats, PartySlotScene).setup(hall, entry, seated)
+		var seat: Control = Style.add_row(_party_seats, PartySlotScene)
+		seat.setup(hall, entry, seated)
+		# the seat someone just left fades back to empty
+		if hall.pending_fx.get("seat_out", false) and seat_index == entry.party.size():
+			Fx.fade_in(seat)
 
 	var chance: int = hall.success_chance(entry, entry.party)
 	var odds := Style.odds_look(chance)
-	_odds_value.text = TEXT_ODDS % mini(chance, 100) if chance >= 0 else TEXT_ODDS_NONE
 	_odds_word.text = TEXT_ODDS_WORD if chance >= 0 else odds.word
 	Style.set_font_color(_odds_value, odds.text_color)
 	Style.tint_art(_odds_circle, odds.text_color)
-	_odds_bar.set_chance(mini(chance, 100))
+	_show_odds_change(chance)
+
+
+## The odds number and bar. On the same quest, a new chance rolls the number,
+## slides the bar, pops the circle, and floats "+12%" / "-12%" off the row the
+## player tapped. Switching quests (or the first draw) just snaps.
+func _show_odds_change(chance: int) -> void:
+	var shown := mini(chance, 100)
+	var quest_index: int = hall.active_screen.quest_index
+	var was_drawn := _odds_quest_index == quest_index
+	var old_chance := _shown_chance
+	_odds_quest_index = quest_index
+	_shown_chance = shown
+
+	if not was_drawn or old_chance == shown:
+		_odds_value.text = TEXT_ODDS % shown if shown >= 0 else TEXT_ODDS_NONE
+		_odds_bar.set_chance(shown)
+		return
+
+	_odds_bar.set_chance(shown, true)
+	Fx.pop(_odds_stack, ODDS_POP)
+	if shown < 0:
+		_odds_value.text = TEXT_ODDS_NONE
+	else:
+		Fx.count(_odds_value, maxi(old_chance, 0), shown, ODDS_ROLL_SECONDS, TEXT_ODDS)
+	var change := maxi(shown, 0) - maxi(old_chance, 0)
+	if change != 0:
+		var text := (TEXT_ODDS_UP if change > 0 else TEXT_ODDS_DOWN) % change
+		Fx.float_text(hall.fx_layer, hall.tap_point(), text,
+				ODDS_UP_INK if change > 0 else ODDS_DOWN_INK, ODDS_DELTA_FONT_SIZE)
+
+
+## A sent quest has SENT inked on it. Pressed on with the stamp animation
+## right after Send (hall.pending_fx.writ_stamp); just there when you look at
+## a quest sent earlier; lifted off when it's recalled.
+func _show_writ_stamp(entry: Dictionary) -> void:
+	var quest_index: int = hall.active_screen.quest_index
+	var is_sent: bool = entry.state == Style.QUEST_STATE_SENT
+	var is_just_sent: bool = hall.pending_fx.get("writ_stamp", false)
+	var has_right_stamp := is_instance_valid(_writ_stamp) and _writ_stamp_quest == quest_index
+	if is_instance_valid(_writ_stamp) and (not is_sent or not has_right_stamp or is_just_sent):
+		_writ_stamp.queue_free()
+		_writ_stamp = null
+	if is_sent and _writ_stamp == null:
+		_writ_stamp = Fx.stamp_onto(_quest_card, TEXT_STAMP_SENT, Style.GREEN_TEXT,
+				WRIT_STAMP_AT, WRIT_STAMP_FONT_SIZE, WRIT_STAMP_TILT, is_just_sent)
+		_writ_stamp_quest = quest_index
+
+
+## Where hall_main lands the DENIED stamp: the middle of the quest's
+## title area, kept inside the visible part of the scroll.
+func stamp_point() -> Vector2:
+	var visible_rect := _scroll.get_global_rect()
+	var point := _title.get_global_rect().get_center()
+	return point.clamp(visible_rect.position, visible_rect.end)
+
+
+## Deny: the quest writ shakes its head.
+func shake_writ() -> void:
+	Fx.shake($Scroll/Margin/Col/Writ, DENY_SHAKE)
 
 
 # ---- picker
