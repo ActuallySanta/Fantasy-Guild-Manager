@@ -300,7 +300,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 		
 		if(1 <= succComDet && succComDet <= 25):
 			returnString = str(
-			"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ", QuestManager.world_regions[regionNum].returnMonster(),
+			"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ", QuestManager.world_regions[regionNum].returnMonster(),
 			". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
 			)
 		elif (26 <= succComDet && succComDet <= 50):
@@ -310,7 +310,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 					)
 		elif (51 <= succComDet && succComDet <= 75):
 			returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ", QuestManager.world_regions[regionNum].returnMonster(),
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ", QuestManager.world_regions[regionNum].returnMonster(),
 					", and defeated it. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
 					)
 		elif (76 <= succComDet && succComDet <= 90):
@@ -321,7 +321,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 				)
 		elif (91 <= succComDet && succComDet <= 100):
 				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
 					QuestManager.world_regions[regionNum].returnMonster(),
 					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
 					)
