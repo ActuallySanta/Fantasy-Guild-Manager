@@ -62,6 +62,18 @@ func _add_returning_characters() -> void:
 		if randf() < RETURN_CHANCE:
 			released_character.cost = return_cost
 			hireable_characters.append(released_character)
+
+
+## Empties the roster, For Hire and the released list for a new run, then
+## rolls a fresh For Hire pool. Call after GameState.reset() so the pool is
+## sized for Day 1.
+func reset() -> void:
+	active_characters.clear()
+	hireable_characters.clear()
+	released_characters.clear()
+	refresh_hireable_characters()
+
+
 ## Living members of the guild. The dead stay on the roster (so they can be
 ## revived) but don't take up a bed.
 func living_count() -> int:

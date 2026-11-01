@@ -11,7 +11,8 @@
 ##                 whose Buy bar sits there)
 ##   nav         - Board / Members / Guild / Shop with badges, always visible
 ##                 (ids: board / guild / upgrades / shop)
-## Overlays over everything: End Day check, Day Report, Welcome, Menu.
+## Overlays over everything: End Day check, Day Report, Welcome, Menu, and
+## the Game Over ledger (when the guild is stuck with nobody left; see is_run_over).
 ## (The Training Yard and Hospital live on the Upgrades tab's Tonight half.)
 ## On top of all of it: the colorblind filter (set from the Menu, saved to disk).
 ##
@@ -46,7 +47,7 @@ extends Control
 ## Fired at the end of each player action, for the tutorial coach
 ## (overlay_tutorial.gd). event: tab, hire, character, close, assign, pick,
 ## send, deny, end_check, end_day, new_day, upgrade, training_picker, train,
-## admit, buy, equip.
+## admit, buy, equip, game_over.
 signal tutorial_event(event: String, data: Variant)
 
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
@@ -93,12 +94,21 @@ const TOAST_SECONDS := 2.2
 const TOAST_FADE_SECONDS := 0.4
 ## The Bone Drake countdown turns red when this many days (or fewer) are left.
 const DRAKE_WARNING_DAYS := 2
+## The header's "last hero standing" strip counts standing within this many
+## points of GuildUpgrades.MINIMUM_STANDING as nearly too low for recruits.
+const DANGER_STANDING_MARGIN := 3
 ## Colorblind filter choices, in Menu order. Index = the shader's `mode`.
 const COLOR_FILTERS := ["Off", "Red-weak", "Green-weak", "Blue-yellow"]
 ## Where player settings are saved, and the section / key for the filter.
 const SETTINGS_PATH := "user://settings.cfg"
 const SETTINGS_SECTION := "accessibility"
 const SETTINGS_COLOR_FILTER := "color_filter"
+## The scene a new run starts in (not a playtest scenario, so its preset isn't re-applied).
+const MAIN_SCENE_PATH := "res://MobileHall/hall_main.tscn"
+## run_stats.drake_result values (the Bone Drake milestone quest).
+const DRAKE_RESULT_NONE := ""
+const DRAKE_RESULT_SLAIN := "Slain"
+const DRAKE_RESULT_LOST := "Lost"
 ## Settings key for Reduced Motion (turns hall_fx.gd animations off).
 const SETTINGS_REDUCE_MOTION := "reduce_motion"
 
@@ -158,6 +168,11 @@ const HEADER_DAY := "%d"
 const HEADER_DRAKE := "The Bone Drake wakes in [color=#%s]%d %s[/color]"
 const HEADER_DRAKE_TODAY := "The Bone Drake [color=#%s]attacks today![/color]"
 const HEADER_DRAKE_GONE := "The Bone Drake has come and gone"
+## The warning strip under the header (see is_one_death_from_falling).
+## DANGER_GOLD when gold is the problem, DANGER_STANDING when standing is.
+const DANGER_TITLE := "Last hero standing"
+const DANGER_GOLD := "Recruits cost %d gold and you have %d. Lose %s and the guild falls."
+const DANGER_STANDING := "Standing is nearly too low for recruits. Lose %s and the guild falls."
 
 # ---- nav
 ## Nav tab heights: the open tab stands a little taller than the others.
@@ -263,6 +278,28 @@ var previous_report := {}
 var is_end_check_open := false
 var is_welcome_open := true
 var is_menu_open := false
+## The Game Over ledger's numbers, or {} while the run is still going.
+## Filled once by _check_run_over (see build_run_over_stats for the keys).
+var run_over_stats := {}
+
+# ---- the run so far
+
+## Tallies for the Game Over ledger. This script is reloaded for every new run,
+## so they start from zero each time:
+##   gold_earned:  gold paid out by quests (int)
+##   quests_sent:  parties that went out (int)
+##   quests_won:   of those, how many succeeded (int)
+##   heroes_hired: recruits hired from For Hire (int)
+##   drake_result: DRAKE_RESULT_NONE | _SLAIN | _LOST
+##   released:     every GuildCharacter let go this run (Array)
+var run_stats := {
+	"gold_earned": 0,
+	"quests_sent": 0,
+	"quests_won": 0,
+	"heroes_hired": 0,
+	"drake_result": DRAKE_RESULT_NONE,
+	"released": [],
+}
 
 # ---- player choices
 
@@ -331,6 +368,10 @@ var tutorial: Control
 @onready var _standing_box: Control = $Layout/Header/Row/StandingValueBox
 @onready var _standing_shield: TextureRect = $Layout/Header/Row/StandingValueBox/Shield
 @onready var _menu_button: Button = %MenuButton
+@onready var _danger_strip: PanelContainer = %DangerStrip
+@onready var _danger_icon: TextureRect = %DangerIcon
+@onready var _danger_title: Label = %DangerTitle
+@onready var _danger_text: Label = %DangerText
 
 # ---- content
 @onready var _tabs := {"board": %TabBoard, "guild": %TabGuild, "upgrades": %TabUpgrades, "shop": %TabShop}
@@ -347,6 +388,7 @@ var tutorial: Control
 @onready var _report_overlay: Control = %OverlayReport
 @onready var _welcome_overlay: Control = %OverlayWelcome
 @onready var _menu_overlay: Control = %OverlayMenu
+@onready var _game_over_overlay: Control = %OverlayGameOver
 
 # ---- toast
 @onready var _toast: PanelContainer = %Toast
@@ -398,6 +440,9 @@ func _ready() -> void:
 	_load_settings()
 	_generate_quests()
 	refresh()
+	# a playtest scenario can start already stuck. Deferred: the scenario
+	# builds its roster in its own _ready, which runs after this one
+	_check_run_over.call_deferred()
 
 
 func _on_day_started(_day: int) -> void:
@@ -508,6 +553,88 @@ func unseen_recruit_count() -> int:
 	if for_hire_last_seen_day == GameState.day or is_roster_full():
 		return 0
 	return CharacterContainer.hireable_characters.size()
+
+# ---- the run
+
+
+## True when the guild can never send anyone out again: nobody is alive
+## (patients in the Hospital count as alive), nobody in today's For Hire is
+## affordable, and no recruit ever will be (standing is too low for anyone to
+## show up, or tomorrow's price is already more than the gold left, and the
+## price never goes down). Never true on the free-recruit days.
+func is_run_over() -> bool:
+	if CharacterContainer.living_count() > 0 or _can_afford_a_recruit_today():
+		return false
+	if GameState.standing <= GuildUpgrades.MINIMUM_STANDING:
+		return true
+	return GameState.gold < GuildCharacter.recruit_cost_for_day(GameState.day + 1)
+
+
+## True when one hero is left alive and losing them would (or nearly would)
+## end the run: nobody in today's For Hire is affordable, and either tomorrow's
+## recruit price is more than the gold left, or standing is within
+## DANGER_STANDING_MARGIN of the floor where recruits stop showing up.
+## Drives the header's warning strip. Never true on the free-recruit days.
+func is_one_death_from_falling() -> bool:
+	if CharacterContainer.living_count() != 1 or _can_afford_a_recruit_today():
+		return false
+	return _is_short_of_recruit_gold() or _is_standing_near_floor()
+
+
+## The one living member of the guild, or null if there isn't exactly one.
+func last_living_hero() -> GuildCharacter:
+	var living := roster().filter(func(character): return not Style.is_dead(character))
+	return living[0] if living.size() == 1 else null
+
+
+## Someone in today's For Hire costs no more than the gold in hand.
+func _can_afford_a_recruit_today() -> bool:
+	for character in CharacterContainer.hireable_characters:
+		if character.cost <= GameState.gold:
+			return true
+	return false
+
+
+## Tomorrow's recruit price is more than the gold in hand (prices never drop).
+func _is_short_of_recruit_gold() -> bool:
+	return GameState.gold < GuildCharacter.recruit_cost_for_day(GameState.day + 1)
+
+
+func _is_standing_near_floor() -> bool:
+	return GameState.standing <= GuildUpgrades.MINIMUM_STANDING + DANGER_STANDING_MARGIN
+
+
+## Everything the Game Over ledger shows, read from the tallies and the roster:
+##   days, gold_earned, quests_sent, quests_won, heroes_hired, fallen (int),
+##   standing (int), drake_result (String),
+##   roll_call: Array of GuildCharacter, the fallen first (earliest death first),
+##              then the released, then anyone else still on the roster
+##   released:  Array of GuildCharacter (to tell the released apart in the roll call)
+func build_run_over_stats() -> Dictionary:
+	var released: Array = run_stats.released.duplicate()
+	var everyone: Array = roster().duplicate()
+	for character in released:
+		if not everyone.has(character):
+			everyone.append(character)
+
+	var fallen := everyone.filter(func(character): return Style.is_dead(character))
+	fallen.sort_custom(func(a, b): return a.died_on_day < b.died_on_day)
+	var let_go := released.filter(func(character): return not Style.is_dead(character))
+	var others := everyone.filter(func(character):
+		return not fallen.has(character) and not let_go.has(character))
+
+	return {
+		"days": GameState.day,
+		"gold_earned": run_stats.gold_earned,
+		"quests_sent": run_stats.quests_sent,
+		"quests_won": run_stats.quests_won,
+		"heroes_hired": run_stats.heroes_hired,
+		"fallen": fallen.size(),
+		"standing": GameState.standing,
+		"drake_result": run_stats.drake_result,
+		"roll_call": fallen + let_go + others,
+		"released": released,
+	}
 
 # ---- quests
 
@@ -850,6 +977,8 @@ func _go_to_next_undecided() -> void:
 func hire(character: GuildCharacter) -> bool:
 	if is_roster_full():
 		show_toast(TOAST_ROSTER_FULL)
+	elif CharacterContainer.add_character_to_guild(character):
+		run_stats.heroes_hired += 1
 		queue_refresh()
 		return false
 	var gold_before: int = GameState.gold
@@ -902,7 +1031,10 @@ func release(character: GuildCharacter) -> void:
 	else:
 		show_toast(TOAST_RELEASED % character.name)
 	released_today.append({"character": character, "standing": standing_cost, "fallen": is_fallen})
+	run_stats.released.append(character)
 	queue_refresh()
+	# releasing the last living hero can leave the guild stuck
+	_check_run_over()
 
 
 func upgrade_building(building: int) -> void:
@@ -1165,6 +1297,18 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 	GameState.add_gold(gold_earned)
 	GameState.add_standing(standing_earned)
 
+	# tallies for the Game Over ledger
+	run_stats.quests_sent += 1
+	run_stats.gold_earned += gold_earned
+	if succeeded:
+		run_stats.quests_won += 1
+	if entry.milestone:
+		run_stats.drake_result = DRAKE_RESULT_SLAIN if succeeded else DRAKE_RESULT_LOST
+
+	# Increase character pluck by one if the quest succeeded.
+	if succeeded:
+		for character in party:
+			character.pluck += 1
 	# equipment found while searching goes to the pack, even if the quest failed
 	var found_items: Array[StandardItem] = entry.quest.found_items.duplicate()
 	if not found_items.is_empty():
@@ -1222,6 +1366,37 @@ func start_new_day() -> void:
 	queue_refresh()
 	_land_earnings()
 	tutorial_event.emit("new_day", GameState.day)
+	# checked after the Day Report closes, so the player reads how the heroes fell first
+	_check_run_over()
+
+
+## If the guild is stuck (is_run_over), freeze the ledger's numbers and open
+## the Game Over overlay. Pip stops coaching: there's nothing left to teach.
+func _check_run_over() -> void:
+	if not run_over_stats.is_empty() or not is_run_over():
+		return
+	run_over_stats = build_run_over_stats()
+	is_end_check_open = false
+	is_menu_open = false
+	is_welcome_open = false
+	active_screen = {}
+	if tutorial and tutorial.is_running():
+		tutorial.skip_tutorial()
+	queue_refresh()
+	tutorial_event.emit("game_over", run_over_stats)
+
+
+## The Game Over ledger's "Found a New Guild" button: every autoload goes back
+## to a fresh Day 1, then the hall scene is loaded again (which resets this
+## script's state, the Welcome card and Pip).
+func start_new_run() -> void:
+	GameState.reset()
+	GuildUpgrades.reset()
+	ItemContainer.owned_items.clear()
+	ItemShop.restock()
+	# after GameState.reset, so For Hire is sized for Day 1
+	CharacterContainer.reset()
+	get_tree().change_scene_to_file(MAIN_SCENE_PATH)
 
 
 ## Dawn: release the counters held since End Day. Gains fly in from the middle
@@ -1278,6 +1453,10 @@ func queue_refresh() -> void:
 ## Redraw the whole shell and whatever tab / screen / overlay is showing.
 func refresh() -> void:
 	_is_refresh_queued = false
+	# start_new_run swaps this scene out; a refresh queued by its resets lands
+	# after that, on a hall that's no longer in the tree
+	if not is_inside_tree():
+		return
 	_refresh_header()
 	_refresh_content()
 	_refresh_action_bar()
@@ -1305,6 +1484,27 @@ func _refresh_header() -> void:
 	var is_drake_close := days_left >= 0 and days_left <= DRAKE_WARNING_DAYS
 	Style.set_font_color(_drake_value, Style.RED if is_drake_close else Style.TEXT_MAIN)
 
+	_gold_value.text = str(GameState.gold)
+	_standing_value.text = str(GameState.standing)
+	_refresh_danger_strip()
+
+
+## The red "last hero standing" strip under the header, only while the guild
+## is one death from falling (and not once the Game Over ledger is up).
+func _refresh_danger_strip() -> void:
+	var hero := last_living_hero()
+	_danger_strip.visible = run_over_stats.is_empty() and hero != null and is_one_death_from_falling()
+	if not _danger_strip.visible:
+		return
+	Style.style_panel(_danger_strip, Style.RED_BG)
+	_danger_icon.modulate = Style.RED
+	_danger_title.text = DANGER_TITLE
+	Style.set_font_color(_danger_title, Style.RED)
+	if _is_short_of_recruit_gold():
+		var price := GuildCharacter.recruit_cost_for_day(GameState.day + 1)
+		_danger_text.text = DANGER_GOLD % [price, GameState.gold, hero.name]
+	else:
+		_danger_text.text = DANGER_STANDING % hero.name
 	_update_counter("gold")
 	_update_counter("standing")
 
@@ -1438,10 +1638,12 @@ func _nav_button(tab_id: String) -> Button:
 # ---- overlays
 
 
-## The Day Report hides every other overlay while it's open.
+## The Game Over ledger hides every other overlay; the Day Report hides the rest.
 func _refresh_overlays() -> void:
-	var is_report_open := not shown_report.is_empty()
-	_report_overlay.visible = is_report_open
+	var is_game_over := not run_over_stats.is_empty()
+	_game_over_overlay.visible = is_game_over
+	var is_report_open := not shown_report.is_empty() or is_game_over
+	_report_overlay.visible = is_report_open and not is_game_over
 	_end_check_overlay.visible = not is_report_open and is_end_check_open
 	_menu_overlay.visible = not is_report_open and is_menu_open
 	_welcome_overlay.visible = not is_report_open and is_welcome_open
@@ -1451,7 +1653,7 @@ func _refresh_overlays() -> void:
 
 
 func _all_overlays() -> Array:
-	return [_report_overlay, _end_check_overlay, _menu_overlay, _welcome_overlay]
+	return [_report_overlay, _end_check_overlay, _menu_overlay, _welcome_overlay, _game_over_overlay]
 
 
 # ============================================================ TOAST
