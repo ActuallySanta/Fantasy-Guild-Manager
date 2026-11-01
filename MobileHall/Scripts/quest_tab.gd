@@ -6,6 +6,7 @@ extends VBoxContainer
 
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
 
 ## Band colour on the quest showing now.
 const CURRENT_BAND := Color("#F0E7D2")
@@ -41,3 +42,6 @@ func setup(hall: HallMain, quest_index: int, is_current: bool) -> void:
 	Style.tint_art(_band, CURRENT_BAND if is_current else band_color)
 	Style.set_font_color(_number, Style.TEXT_MAIN if is_current else Style.CREAM)
 	Style.set_font_color(_tag, Style.CREAM if is_current else Style.CREAM_SOFT)
+	# just sent / denied: SENT / NO stamps onto its little scroll
+	if hall.pending_fx.get("quest_stamp", -1) == quest_index:
+		Fx.stamp_in(_tag, 2.2)

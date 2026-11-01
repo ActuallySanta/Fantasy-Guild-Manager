@@ -6,6 +6,12 @@ extends PanelContainer
 
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
+
+# ---- MOTION
+## Seconds after Build before the new level diamond stamps in (lets the
+## building squash first).
+const NEW_PIP_DELAY := 0.15
 
 # ---- TEXT
 # Level and effect
@@ -42,6 +48,18 @@ func setup(hall: HallMain, building: int) -> void:
 	_show_name_and_level(building, level)
 	_show_effects(building, level, is_maxed)
 	_show_status(building, is_maxed)
+	if hall.pending_fx.get("upgraded", -1) == building:
+		_play_built(level)
+
+
+## Just built: the building squashes and stretches, the new level's diamond
+## stamps in, and "Level 3 / 5" pops.
+func _play_built(level: int) -> void:
+	Fx.squash(_icon.get_parent())
+	if level >= 1 and level <= _pips.get_child_count():
+		Fx.stamp_in(_pips.get_child(level - 1), 2.4, NEW_PIP_DELAY)
+	Fx.pop(_level, 1.25, NEW_PIP_DELAY)
+	Fx.pop(self, 1.03)
 
 
 ## Icon, name, "Level 2 / 5" and one diamond per level (filled up to the level).
