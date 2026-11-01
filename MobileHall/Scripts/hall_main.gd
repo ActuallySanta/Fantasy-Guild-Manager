@@ -101,7 +101,7 @@ const SETTINGS_PATH := "user://settings.cfg"
 const SETTINGS_SECTION := "accessibility"
 const SETTINGS_COLOR_FILTER := "color_filter"
 ## The scene a new run starts in (not a playtest scenario, so its preset isn't re-applied).
-const MAIN_SCENE_PATH := "res://MobileHall/hall_main.tscn"
+const MAIN_SCENE_PATH := "uid://dtw7iu2s1gibm"  # MobileHall/hall_main.tscn
 ## run_stats.drake_result values (the Bone Drake milestone quest).
 const DRAKE_RESULT_NONE := ""
 const DRAKE_RESULT_SLAIN := "Slain"
@@ -580,7 +580,7 @@ func is_one_death_from_falling() -> bool:
 
 ## The one living member of the guild, or null if there isn't exactly one.
 func last_living_hero() -> GuildCharacter:
-	var living := roster().filter(func(character): return not Style.is_dead(character))
+	var living := roster().filter(func(character): return not HallStyle.is_dead(character))
 	return living[0] if living.size() == 1 else null
 
 
@@ -614,9 +614,9 @@ func build_run_over_stats() -> Dictionary:
 		if not everyone.has(character):
 			everyone.append(character)
 
-	var fallen := everyone.filter(func(character): return Style.is_dead(character))
+	var fallen := everyone.filter(func(character): return HallStyle.is_dead(character))
 	fallen.sort_custom(func(a, b): return a.died_on_day < b.died_on_day)
-	var let_go := released.filter(func(character): return not Style.is_dead(character))
+	var let_go := released.filter(func(character): return not HallStyle.is_dead(character))
 	var others := everyone.filter(func(character):
 		return not fallen.has(character) and not let_go.has(character))
 
@@ -1493,10 +1493,10 @@ func _refresh_danger_strip() -> void:
 	_danger_strip.visible = run_over_stats.is_empty() and hero != null and is_one_death_from_falling()
 	if not _danger_strip.visible:
 		return
-	Style.style_panel(_danger_strip, Style.RED_BG)
-	_danger_icon.modulate = Style.RED
+	HallStyle.style_panel(_danger_strip, HallStyle.RED_BG)
+	_danger_icon.modulate = HallStyle.RED
 	_danger_title.text = DANGER_TITLE
-	Style.set_font_color(_danger_title, Style.RED)
+	HallStyle.set_font_color(_danger_title, HallStyle.RED)
 	if _is_short_of_recruit_gold():
 		var price := GuildCharacter.recruit_cost_for_day(GameState.day + 1)
 		_danger_text.text = DANGER_GOLD % [price, GameState.gold, hero.name]

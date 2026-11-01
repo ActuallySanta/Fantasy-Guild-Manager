@@ -23,8 +23,8 @@
 [ext_resource type="PackedScene" uid="uid://farw7bcfj0fq" path="res://MobileHall/Scenes/Overlays/overlay_menu.tscn" id="32_kg28u"]
 [ext_resource type="PackedScene" uid="uid://3cdpykowgja4" path="res://MobileHall/Scenes/Overlays/overlay_report.tscn" id="34_6fy20"]
 [ext_resource type="PackedScene" uid="uid://bgwxd653pjox8" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Overlays/overlay_game_over.tscn" id="37_gameover"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/skull.svg" id="38_skull"]
+[ext_resource type="PackedScene" uid="uid://cdmw3mrmuept3" path="res://MobileHall/Scenes/Overlays/overlay_game_over.tscn" id="37_gameover"]
+[ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.svg" id="38_skull"]
 [ext_resource type="Shader" uid="uid://dkvytyy35gk2p" path="res://MobileHall/Styles/colorblind_filter.gdshader" id="39_cbf01"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cbf01"]

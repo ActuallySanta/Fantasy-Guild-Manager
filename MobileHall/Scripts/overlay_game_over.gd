@@ -6,9 +6,7 @@
 ## Scene: MobileHall/Scenes/Overlays/overlay_game_over.tscn
 extends Control
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const RollCallRowScene := preload("res://MobileHall/Scenes/Rows/roll_call_row.tscn")
+const RollCallRowScene := preload("uid://bqn0i28l67um7")  # MobileHall/Scenes/Rows/roll_call_row.tscn
 
 ## Font size of the number on the big Days tile (the grid tiles keep the scene's).
 const DAYS_FONT_SIZE := 110
@@ -50,7 +48,7 @@ var _built_stats: Dictionary = {}
 func setup(main: HallMain) -> void:
 	hall = main
 	_new_run_button.pressed.connect(hall.start_new_run)
-	Style.style_button(_new_run_button, "gold", 46)
+	HallStyle.style_button(_new_run_button, "gold", 46)
 
 
 func refresh() -> void:
@@ -67,30 +65,30 @@ func refresh() -> void:
 func _show_tiles(stats: Dictionary) -> void:
 	var days: int = stats.days
 	var days_caption := TEXT_DAYS_CAPTION_ONE if days == 1 else TEXT_DAYS_CAPTION
-	_days_tile.setup(str(days), days_caption, Style.TEXT_MAIN, DAYS_FONT_SIZE)
+	_days_tile.setup(str(days), days_caption, HallStyle.TEXT_MAIN, DAYS_FONT_SIZE)
 
-	_gold_tile.setup(str(stats.gold_earned), TEXT_GOLD_CAPTION, Style.GOLD_TEXT)
-	_quests_tile.setup(TEXT_QUESTS % [stats.quests_won, stats.quests_sent], TEXT_QUESTS_CAPTION, Style.BLUE_TEXT)
-	_hired_tile.setup(str(stats.heroes_hired), TEXT_HIRED_CAPTION, Style.GREEN_TEXT)
-	var dead_ink: Color = Style.INJURY_LOOKS[GuildCharacter.InjuryLevel.DEAD].text
+	_gold_tile.setup(str(stats.gold_earned), TEXT_GOLD_CAPTION, HallStyle.GOLD_TEXT)
+	_quests_tile.setup(TEXT_QUESTS % [stats.quests_won, stats.quests_sent], TEXT_QUESTS_CAPTION, HallStyle.BLUE_TEXT)
+	_hired_tile.setup(str(stats.heroes_hired), TEXT_HIRED_CAPTION, HallStyle.GREEN_TEXT)
+	var dead_ink: Color = HallStyle.INJURY_LOOKS[GuildCharacter.InjuryLevel.DEAD].text
 	_fallen_tile.setup(str(stats.fallen), TEXT_FALLEN_CAPTION, dead_ink)
 	var standing: int = stats.standing
-	_standing_tile.setup(str(standing), TEXT_STANDING_CAPTION, Style.RED if standing < 0 else Style.TEXT_MAIN)
+	_standing_tile.setup(str(standing), TEXT_STANDING_CAPTION, HallStyle.RED if standing < 0 else HallStyle.TEXT_MAIN)
 
 	# the Drake tile: slain in green, lost in red, never fought in soft ink
 	var drake_result: String = stats.drake_result
 	if drake_result == HallMain.DRAKE_RESULT_SLAIN:
-		_drake_tile.setup(drake_result, TEXT_DRAKE_CAPTION, Style.GREEN_TEXT)
+		_drake_tile.setup(drake_result, TEXT_DRAKE_CAPTION, HallStyle.GREEN_TEXT)
 	elif drake_result == HallMain.DRAKE_RESULT_LOST:
-		_drake_tile.setup(drake_result, TEXT_DRAKE_CAPTION, Style.RED)
+		_drake_tile.setup(drake_result, TEXT_DRAKE_CAPTION, HallStyle.RED)
 	else:
-		_drake_tile.setup(TEXT_DRAKE_UNMET, TEXT_DRAKE_CAPTION, Style.TEXT_SOFT)
+		_drake_tile.setup(TEXT_DRAKE_UNMET, TEXT_DRAKE_CAPTION, HallStyle.TEXT_SOFT)
 
 
 ## One row per hero who was ever in the guild (already in roll-call order).
 func _show_roll_call(heroes: Array, released: Array) -> void:
-	Style.clear_children(_roll_call)
+	HallStyle.clear_children(_roll_call)
 	for character in heroes:
-		Style.add_row(_roll_call, RollCallRowScene).setup(character, released.has(character))
+		HallStyle.add_row(_roll_call, RollCallRowScene).setup(character, released.has(character))
 	_empty_label.text = TEXT_NOBODY
 	_empty_label.visible = heroes.is_empty()

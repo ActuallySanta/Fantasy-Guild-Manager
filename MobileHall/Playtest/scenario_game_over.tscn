@@ -1,6 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://1s4gb1s5mjv1"]
 
-[ext_resource type="Script" path="res://MobileHall/Playtest/playtest_scenario.gd" id="1_scn"]
+[ext_resource type="Script" uid="uid://cd15jv1qd0glg" path="res://MobileHall/Playtest/playtest_scenario.gd" id="1_scn"]
 [ext_resource type="PackedScene" uid="uid://dtw7iu2s1gibm" path="res://MobileHall/hall_main.tscn" id="2_hall"]
 
 [node name="ScenarioGameOver" type="Control"]
