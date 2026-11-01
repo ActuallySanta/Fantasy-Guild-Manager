@@ -12,6 +12,7 @@ const MemberCardScene := preload("res://MobileHall/Scenes/Rows/member_card.tscn"
 const HireCardScene := preload("res://MobileHall/Scenes/Rows/hire_card.tscn")
 const HirePeekScene := preload("res://MobileHall/Scenes/Rows/hire_peek.tscn")
 const HeadingScene := preload("res://MobileHall/Scenes/Rows/home_heading.tscn")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
 
 ## Cards of fallen heroes fade back, like faded rows elsewhere in the hall.
 const FALLEN_OPACITY := 0.6
@@ -19,6 +20,8 @@ const FALLEN_OPACITY := 0.6
 ## How many letters peek out under the top one, and their small tilts (degrees).
 const PEEK_COUNT := 2
 const PEEK_TILTS := [0.6, -0.5]
+## Where the next letter starts from after a hire (it slides up into place).
+const NEXT_LETTER_SLIDE := Vector2(0, 48)
 ## Folder tab heights: the open one stands taller and joins the folder.
 const FOLDER_TAB_HEIGHT := 72
 const FOLDER_TAB_HEIGHT_OPEN := 80
@@ -170,6 +173,9 @@ func _show_for_hire() -> void:
 	var top_card := Style.add_row(_letter_stack, HireCardScene)
 	top_card.z_index = PEEK_COUNT + 1
 	top_card.setup(hall, recruits[_top_letter], _top_letter)
+	# the last letter was just hired: the next one slides up off the stack
+	if hall.pending_fx.get("hire_next", false):
+		Fx.slide_in(top_card, NEXT_LETTER_SLIDE)
 
 	# the next applicants peek out underneath, each a little further back
 	for peek_index in mini(PEEK_COUNT, recruits.size() - 1):
@@ -185,3 +191,8 @@ func _show_for_hire() -> void:
 func _bring_to_top(recruit_index: int) -> void:
 	_top_letter = recruit_index
 	hall.queue_refresh()
+
+
+## The "Your Guild" folder tab, where hired letters fly to (hall_main.send_hired_letter).
+func roster_button() -> Control:
+	return _roster_section_button

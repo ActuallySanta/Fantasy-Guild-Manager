@@ -16,6 +16,7 @@ extends VBoxContainer
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 const ShopTileScene := preload("res://MobileHall/Scenes/Rows/shop_tile.tscn")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
 
 # ---- TEXT
 const SHOP_NAME := "Grizzle's Goods"
@@ -45,6 +46,8 @@ const TOO_POOR_HINT := " · Not enough gold"
 var hall: HallMain
 ## Index into ItemShop.stock of the picked item (-1 = none).
 var _selected := 0
+## True right after the player taps a tile, so that tile pops on this refresh.
+var _just_picked := false
 
 
 func setup(main: HallMain) -> void:
@@ -79,7 +82,15 @@ func _show_goods() -> void:
 			"price": item.cost,
 			"sold": ItemShop.is_sold(index),
 		}
-		Style.add_row(_grid, ShopTileScene).setup(good, index == _selected, _pick.bind(index))
+		var tile: Control = Style.add_row(_grid, ShopTileScene)
+		tile.setup(good, index == _selected, _pick.bind(index))
+		if hall.pending_fx.get("bought", -1) == index:
+			# just bought: the tile stamps down as sold and Grizzle perks up
+			Fx.stamp_in(tile, 1.4)
+			Fx.pop(_bubble_text.get_parent(), 1.08, 0.1)
+		elif _just_picked and index == _selected:
+			Fx.pop(tile, 1.08)
+	_just_picked = false
 
 
 func _show_restock_note() -> void:
@@ -112,6 +123,7 @@ func _show_buy_bar() -> void:
 
 func _pick(index: int) -> void:
 	_selected = index
+	_just_picked = true
 	refresh()
 
 

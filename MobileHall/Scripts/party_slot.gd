@@ -6,6 +6,7 @@ extends "res://MobileHall/Scripts/tap_panel.gd"
 
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
 
 ## Empty seats fade back.
 const EMPTY_SEAT_OPACITY := 0.55
@@ -33,6 +34,10 @@ func setup(hall: HallMain, entry: Dictionary, seated: GuildCharacter) -> void:
 		_hint.text = TEXT_ROLE % Style.role_name(seated)
 		_favored_chip.set_stat(seated, Style.favored_stat_index(entry.quest), true)
 		pressed.connect(hall.toggle_in_party.bind(seated))
+		# just pinned: their portrait slams into the seat
+		if hall.pending_fx.get("seat_in") == seated:
+			Fx.stamp_in(_portrait, 1.7)
+			Fx.pop(self, 1.05, 0.1)
 	else:
 		_name.text = TEXT_EMPTY
 		_hint.text = TEXT_EMPTY_HINT

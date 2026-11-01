@@ -53,6 +53,7 @@ signal tutorial_event(event: String, data: Variant)
 const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 const DayBarLogic := preload("res://Scripts/UI/day_bar.gd")
 const TutorialScript := preload("res://MobileHall/Scripts/overlay_tutorial.gd")
+const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
 
 
 # ============================================================ SETTINGS
@@ -64,6 +65,17 @@ const MILESTONE_DAY := 10
 ## Standing lost for releasing a living hero, plus one more per level of their
 ## Pluck (letting a veteran go hurts more). Releasing the fallen is free.
 const RELEASE_BASE_STANDING_COST := 1
+## Pluck each party member gains for winning a quest, by the odds the party
+## was sent at: the longer the odds, the more they grow from beating them.
+## Checked top to bottom: the first row whose `min` chance (percent) the odds
+## reach is used. The `min`s match Style.ODDS_BANDS, so the gain lines up with
+## the odds word on Assign Party (Strong odds / Fair odds / Risky / Long shot).
+const PLUCK_GAIN_BY_ODDS := [
+	{"min": 80, "gain": 1},
+	{"min": 60, "gain": 2},
+	{"min": 40, "gain": 3},
+	{"min": 0, "gain": 4},
+]
 ## Bottom tabs, left to right (ids match the Nav_<id> buttons and Tab nodes in the scene).
 const TAB_IDS := ["board", "guild", "upgrades", "shop"]
 ## The Shop tab (goods come from the ItemShop autoload).
@@ -97,6 +109,53 @@ const MAIN_SCENE_PATH := "res://MobileHall/hall_main.tscn"
 const DRAKE_RESULT_NONE := ""
 const DRAKE_RESULT_SLAIN := "Slain"
 const DRAKE_RESULT_LOST := "Lost"
+## Settings key for Reduced Motion (turns hall_fx.gd animations off).
+const SETTINGS_REDUCE_MOTION := "reduce_motion"
+
+# ---- motion (see MOTION below and hall_fx.gd)
+## Seconds the gold / standing numbers take to roll to a new value.
+const COUNTER_ROLL_SECONDS := 0.5
+## How big the counter grows when its number changes (1 = no pop).
+const COUNTER_POP := 1.22
+## Counter ink while it changes: a gain, a loss (light, to read on the wood header).
+const COUNTER_GAIN_INK := Color("#B5E08F")
+const COUNTER_LOSS_INK := Color("#FF9C8A")
+## Floating "+40" / "-2" under a counter: inks (dark, to read on paper and wood
+## with their light outline) and how far under the counter they start (pixels).
+const DELTA_GAIN_INK := Color("#3D5A2A")
+const DELTA_LOSS_INK := Color("#8B2E2A")
+const DELTA_OFFSET := Vector2(0, 58)
+## Coins / shields that fly between a counter and what you tapped: size (pixels),
+## flight time (seconds), and how many fly in when the night's earnings land.
+const FLY_ICON_SIZE := 44.0
+const FLY_SECONDS := 0.5
+const EARNINGS_COIN_COUNT := 5
+## Seconds between each of those coins leaving, and before the first one
+## leaves (so the dawn wash has started to clear).
+const EARNINGS_COIN_GAP := 0.07
+const EARNINGS_DELAY := 0.2
+## Seconds a SENT / DENIED stamp stays on the quest before the next one shows
+## (taps are blocked meanwhile).
+const STAMP_HOLD_SECONDS := 0.5
+## Seconds the hired letter takes to fly to the roster, and how long it sits
+## with its HIRED stamp before it goes.
+const HIRE_FLY_SECONDS := 0.45
+const HIRE_STAMP_HOLD_SECONDS := 0.5
+## The HIRED stamp on the letter: where its centre sits (fraction of the
+## letter's size), its text size, and its tilt (radians).
+const HIRE_STAMP_AT := Vector2(0.68, 0.32)
+const HIRE_STAMP_FONT_SIZE := 64
+const HIRE_STAMP_TILT := -0.2
+## End Day / new day: the dusk wash over the screen while the night plays out.
+const DUSK_INK := Color("#26304A")
+const DUSK_IN_SECONDS := 0.35
+const DUSK_OUT_SECONDS := 0.45
+## Each new tab or screen fades in this fast (seconds).
+const VIEW_FADE_SECONDS := 0.14
+## How big a nav badge grows when its count changes.
+const BADGE_POP := 1.4
+## Times the Bone Drake note pulses on a morning inside DRAKE_WARNING_DAYS.
+const DRAKE_PULSES := 3
 
 
 # ============================================================ TEXT
@@ -167,6 +226,13 @@ const TOAST_WRONG_ROLE := "Only %ss can use the %s."
 const TOAST_HANDS_FULL := "%s's hands are full. Take something off first."
 const TOAST_GEAR_DEAD := "%s can't use gear anymore."
 const TOAST_TAB_LOCKED := "Pip will open this on Day %d."
+
+# ---- stamps (SENT is inked on the quest itself, see screen_assign / quest_row)
+const STAMP_DENIED := "DENIED"
+const STAMP_HIRED := "HIRED"
+# ---- floating numbers under the counters
+const DELTA_GAIN := "+%d"
+const DELTA_LOSS := "%d"
 
 
 # ============================================================ STATE
@@ -244,6 +310,27 @@ var show_busy_adventurers := false
 var for_hire_last_seen_day := 0
 ## Colorblind filter: index into COLOR_FILTERS (0 = off). Saved in SETTINGS_PATH.
 var color_filter := 0
+## Reduced Motion: animations off (Fx.reduce_motion mirrors it). Saved in SETTINGS_PATH.
+var reduce_motion := false
+
+# ---- motion
+
+## One-shot hints from an action to the rows the next refresh rebuilds, so the
+## right row can animate ("this is the quest you just sent"). Cleared at the
+## end of every refresh. Keys:
+##   quest_stamp: int (quest index just sent / denied; its Board row and strip tab stamp in)
+##   writ_stamp: bool (the quest on Assign Party was just sent: SENT is pressed onto it)
+##   seat_in: GuildCharacter (just pinned to the party)
+##   seat_out: bool (someone was just unpinned; the emptied seat fades in)
+##   hire_next: bool (a letter was just hired; the next one slides up)
+##   upgraded: int (GuildUpgrades.Building just built)
+##   home_row: GuildCharacter (just moved in the Training Yard / Hospital)
+##   gear_in: StandardItem (just equipped) / gear_out: bool (just taken off)
+##   bought: int (ItemShop stock index just bought)
+var pending_fx := {}
+## Full-screen layer for motion that outlives a refresh (flying coins, floating
+## numbers, stamps, the dusk wash). Above the overlays, below Pip.
+var fx_layer: Control
 
 # ---- internal
 
@@ -252,6 +339,16 @@ var _is_refresh_queued := false
 ## Which tab / screen was showing at the last refresh (to know when to scroll to top).
 var _last_view_key := ""
 var _toast_tween: Tween
+## The gold / standing numbers on screen right now (-1 = not drawn yet), and
+## whether each is held still (it waits for flying coins, or for the night's
+## earnings to land at dawn).
+var _shown_counters := {"gold": -1, "standing": -1}
+var _held_counters := {"gold": false, "standing": false}
+## The day on the DAY tile (to flip it when it changes; -1 = not drawn yet).
+var _shown_day := -1
+## Last badge text per nav tab, and the last action-bar title (to pop on change).
+var _shown_badges := {}
+var _shown_action_title := ""
 ## Pip, the tutorial coach (built in _ready, sits on top of every overlay).
 var tutorial: Control
 
@@ -263,6 +360,13 @@ var tutorial: Control
 @onready var _drake_value: RichTextLabel = %DrakeValue
 @onready var _gold_value: Label = %GoldValue
 @onready var _standing_value: Label = %StandingValue
+# (header pieces that only move; no unique names in the scene)
+@onready var _day_tile: Control = $Layout/Header/Row/DayTile
+@onready var _drake_note: Control = $Layout/Header/Row/DrakeNote
+@onready var _gold_box: Control = $Layout/Header/Row/GoldValueBox
+@onready var _gold_coin: TextureRect = $Layout/Header/Row/GoldValueBox/Coin
+@onready var _standing_box: Control = $Layout/Header/Row/StandingValueBox
+@onready var _standing_shield: TextureRect = $Layout/Header/Row/StandingValueBox/Shield
 @onready var _menu_button: Button = %MenuButton
 @onready var _danger_strip: PanelContainer = %DangerStrip
 @onready var _danger_icon: TextureRect = %DangerIcon
@@ -319,6 +423,13 @@ func _ready() -> void:
 	CharacterContainer.on_hireables_refreshed.connect(queue_refresh)
 	ItemShop.stock_changed.connect(queue_refresh)
 	ItemShop.gear_changed.connect(queue_refresh)
+
+	# motion that outlives a refresh lives here, over the overlays and under Pip
+	fx_layer = Control.new()
+	fx_layer.name = "FxLayer"
+	fx_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(fx_layer)
+	fx_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 	# the tutorial coach goes on top of everything; on Day 1 it replaces the Welcome card
 	tutorial = TutorialScript.new()
@@ -579,6 +690,15 @@ func success_chance(entry: Dictionary, party: Array) -> int:
 	return int(entry.quest.calcSuccessChance(party))
 
 
+## Pluck each party member gains for winning a quest sent at `chance` percent
+## (see PLUCK_GAIN_BY_ODDS). A party with no chance yet (-1) counts as a long shot.
+func pluck_gain_for(chance: float) -> int:
+	for row in PLUCK_GAIN_BY_ODDS:
+		if chance >= row.min:
+			return row.gain
+	return PLUCK_GAIN_BY_ODDS[-1].gain
+
+
 ## How many points of success chance this character gives a quest on their own.
 func chance_added_by(entry: Dictionary, character: GuildCharacter) -> int:
 	return int(entry.quest.calcSuccessChance([character]))
@@ -721,6 +841,7 @@ func toggle_in_party(character: GuildCharacter) -> void:
 	# already in this party: take them out
 	if entry.party.has(character):
 		_remove_from_party(entry, character)
+		pending_fx.seat_out = true
 		queue_refresh()
 		return
 
@@ -751,6 +872,7 @@ func toggle_in_party(character: GuildCharacter) -> void:
 		show_toast(TOAST_MOVED % [character.name, previous_entry.quest.questTitle])
 
 	entry.party.append(character)
+	pending_fx.seat_in = character
 	queue_refresh()
 	tutorial_event.emit("pick", entry)
 
@@ -775,7 +897,8 @@ func send_party() -> void:
 		return
 	entry.state = Style.QUEST_STATE_SENT
 	show_toast(TOAST_SENT % entry.quest.questTitle)
-	_go_to_next_undecided()
+	pending_fx.writ_stamp = true
+	_hold_then_move_on()
 	tutorial_event.emit("send", entry)
 
 
@@ -786,9 +909,13 @@ func deny_quest() -> void:
 		return
 	entry.party.clear()
 	entry.state = Style.QUEST_STATE_DENIED
+	if entry.quest.difficulty > 0:
+		_pay_fx("standing")
 	GameState.reduce_standing(entry.quest.difficulty)
 	show_toast(TOAST_DENIED % entry.quest.questTitle)
-	_go_to_next_undecided()
+	_screens[SCREEN_ASSIGN].shake_writ()
+	Fx.stamp_mark(fx_layer, _screens[SCREEN_ASSIGN].stamp_point(), STAMP_DENIED, Style.RED, STAMP_HOLD_SECONDS)
+	_hold_then_move_on()
 	tutorial_event.emit("deny", entry)
 
 
@@ -812,7 +939,29 @@ func reconsider_quest() -> void:
 	queue_refresh()
 
 
-## After Send / Deny: show the next undecided quest, or close to the Board.
+## After Send / Deny: the quest shows its new state (Send presses SENT onto it,
+## Deny slams DENIED over it), taps wait STAMP_HOLD_SECONDS, then the next
+## undecided quest shows (or the Board) and that quest's row / strip tab stamps in.
+func _hold_then_move_on() -> void:
+	var decided_index: int = active_screen.quest_index
+	queue_refresh()
+	if Fx.reduce_motion:
+		_after_stamp(decided_index)
+		return
+	Fx.block_input(fx_layer, STAMP_HOLD_SECONDS)
+	get_tree().create_timer(STAMP_HOLD_SECONDS).timeout.connect(_after_stamp.bind(decided_index))
+
+
+func _after_stamp(decided_index: int) -> void:
+	pending_fx.quest_stamp = decided_index
+	# something else (Pip, End Day) may have closed Assign Party meanwhile
+	if active_screen.get("kind", "") != SCREEN_ASSIGN:
+		queue_refresh()
+		return
+	_go_to_next_undecided()
+
+
+## Show the next undecided quest, or close to the Board.
 func _go_to_next_undecided() -> void:
 	var next_index := next_undecided_index(active_screen.quest_index + 1)
 	if next_index < 0:
@@ -824,14 +973,44 @@ func _go_to_next_undecided() -> void:
 # ---- guild
 
 
-func hire(character: GuildCharacter) -> void:
+## Returns true when they joined (hire_card.gd then flies its letter to the roster).
+func hire(character: GuildCharacter) -> bool:
 	if is_roster_full():
 		show_toast(TOAST_ROSTER_FULL)
 	elif CharacterContainer.add_character_to_guild(character):
 		run_stats.heroes_hired += 1
+		queue_refresh()
+		return false
+	var gold_before: int = GameState.gold
+	var is_hired: bool = CharacterContainer.add_character_to_guild(character)
+	if is_hired:
+		if GameState.gold < gold_before:
+			_pay_fx("gold")
+		pending_fx.hire_next = true
 		show_toast(TOAST_HIRED % character.name)
 		tutorial_event.emit("hire", character)
 	queue_refresh()
+	return is_hired
+
+
+## The hired letter lifts off its stack, gets HIRED pressed onto it, sits a
+## moment, then flies into the "Your Guild" tab, which pops as it lands.
+## (The next letter slides up underneath meanwhile.)
+func send_hired_letter(card: Control) -> void:
+	if Fx.reduce_motion:
+		return
+	# off the stack first, so the refresh that's coming can't free it
+	Fx.detach(card, fx_layer)
+	Fx.stamp_onto(card, STAMP_HIRED, Style.GREEN_TEXT, HIRE_STAMP_AT, HIRE_STAMP_FONT_SIZE, HIRE_STAMP_TILT)
+	get_tree().create_timer(HIRE_STAMP_HOLD_SECONDS).timeout.connect(_fly_hired_letter.bind(card))
+
+
+func _fly_hired_letter(card: Control) -> void:
+	if not is_instance_valid(card):
+		return
+	var roster_button: Control = _tabs.guild.roster_button()
+	Fx.fly_away(card, fx_layer, roster_button.get_global_rect().get_center(), HIRE_FLY_SECONDS)
+	Fx.pop(roster_button, BADGE_POP, HIRE_FLY_SECONDS)
 
 
 ## Let a hero go for good (the Character screen's Release button, after its
@@ -846,6 +1025,7 @@ func release(character: GuildCharacter) -> void:
 	if not CharacterContainer.remove_character_from_guild(character):
 		return
 	if standing_cost > 0:
+		_pay_fx("standing")
 		GameState.reduce_standing(standing_cost)
 		show_toast(TOAST_RELEASED_COST % [character.name, standing_cost])
 	else:
@@ -859,6 +1039,8 @@ func release(character: GuildCharacter) -> void:
 
 func upgrade_building(building: int) -> void:
 	if GuildUpgrades.try_upgrade(building):
+		_pay_fx("gold")
+		pending_fx.upgraded = building
 		show_toast(TOAST_UPGRADED % [GuildUpgrades.get_building_name(building), GuildUpgrades.get_level(building)])
 		tutorial_event.emit("upgrade", building)
 	queue_refresh()
@@ -873,6 +1055,9 @@ func buy_item(index: int) -> void:
 	if item == null or ItemShop.is_sold(index):
 		return
 	if ItemShop.buy(index):
+		if item.cost > 0:
+			_pay_fx("gold")
+		pending_fx.bought = index
 		show_toast(TOAST_BOUGHT % Style.item_look(item).name)
 		tutorial_event.emit("buy", item)
 	else:
@@ -885,6 +1070,7 @@ func equip_item(item: StandardItem, character: GuildCharacter) -> void:
 	var item_name: String = Style.item_look(item).name
 	var result: int = ItemShop.equip(item, character)
 	if result == ItemShop.EquipResult.OK:
+		pending_fx.gear_in = item
 		show_toast(TOAST_EQUIPPED % [character.name, item_name])
 		tutorial_event.emit("equip", item)
 	elif result == ItemShop.EquipResult.WRONG_ROLE:
@@ -902,6 +1088,7 @@ func unequip_item(item: StandardItem) -> void:
 	if user == null:
 		return
 	ItemShop.unequip(item)
+	pending_fx.gear_out = true
 	show_toast(TOAST_UNEQUIPPED % [user.name, Style.item_look(item).name])
 	queue_refresh()
 
@@ -928,6 +1115,7 @@ func train(character: GuildCharacter, stat: int) -> void:
 		return
 	_leave_quest(character)
 	GuildUpgrades.set_training(character, stat)
+	pending_fx.home_row = character
 	if is_new:
 		show_toast(TOAST_TRAINING % [character.name, Style.STATS[stat].name])
 	# the pick list closes itself once every slot is taken
@@ -947,6 +1135,7 @@ func stop_training(character: GuildCharacter) -> void:
 func admit(character: GuildCharacter) -> void:
 	_leave_quest(character)
 	if GuildUpgrades.admit(character):
+		pending_fx.home_row = character
 		show_toast(TOAST_ADMITTED % character.name)
 		tutorial_event.emit("admit", character)
 	queue_refresh()
@@ -954,12 +1143,14 @@ func admit(character: GuildCharacter) -> void:
 
 func discharge(character: GuildCharacter) -> void:
 	GuildUpgrades.discharge(character)
+	pending_fx.home_row = character
 	show_toast(TOAST_DISCHARGED % character.name)
 	queue_refresh()
 
 
 func revive(character: GuildCharacter) -> void:
 	if GuildUpgrades.revive(character):
+		pending_fx.home_row = character
 		show_toast(TOAST_REVIVED % character.name)
 	elif is_roster_full():
 		show_toast(TOAST_REVIVE_NO_BED % character.name)
@@ -994,10 +1185,28 @@ func set_color_filter(filter_index: int) -> void:
 	queue_refresh()
 
 
+## Menu's Reduced Motion button: on <-> off.
+func toggle_reduce_motion() -> void:
+	set_reduce_motion(not reduce_motion)
+
+
+## Reduced Motion: hall_fx.gd skips every animation and lands things in place.
+func set_reduce_motion(is_on: bool) -> void:
+	reduce_motion = is_on
+	Fx.reduce_motion = is_on
+	var config := ConfigFile.new()
+	config.load(SETTINGS_PATH)
+	config.set_value(SETTINGS_SECTION, SETTINGS_REDUCE_MOTION, reduce_motion)
+	config.save(SETTINGS_PATH)
+	queue_refresh()
+
+
 func _load_settings() -> void:
 	var config := ConfigFile.new()
 	if config.load(SETTINGS_PATH) == OK:
 		color_filter = clampi(int(config.get_value(SETTINGS_SECTION, SETTINGS_COLOR_FILTER, 0)), 0, COLOR_FILTERS.size() - 1)
+		reduce_motion = bool(config.get_value(SETTINGS_SECTION, SETTINGS_REDUCE_MOTION, false))
+	Fx.reduce_motion = reduce_motion
 	_apply_color_filter()
 
 
@@ -1033,28 +1242,38 @@ func close_end_check() -> void:
 
 
 ## Mirrors DayBar.end_day: run every quest that has a party, pay out, show the report.
+## Dusk washes over the screen while the night plays out; the report shows
+## under it. The gold / standing counters hold still until dawn (start_new_day),
+## so the night's earnings land when the doors open.
 func end_day() -> void:
 	if undecided_count() > 0:
 		return
+	_held_counters.gold = true
+	_held_counters.standing = true
 	# training and healing happen first, so nobody heals the night they're hurt
 	var home := GuildUpgrades.run_night()
 	var results := []
 	for entry in sent_entries():
 		results.append(_run_quest(entry))
-	is_end_check_open = false
-	training_picker_open = false
-	active_screen = {}
-	shown_report = {"starts_next_day": true, "day": GameState.day, "results": results, "home": home,
+	var report := {"starts_next_day": true, "day": GameState.day, "results": results, "home": home,
 			"released": released_today.duplicate()}
-	queue_refresh()
-	tutorial_event.emit("end_day", results)
+	var show_report := func() -> void:
+		is_end_check_open = false
+		training_picker_open = false
+		active_screen = {}
+		shown_report = report
+		queue_refresh()
+		tutorial_event.emit("end_day", results)
+	Fx.curtain(fx_layer, DUSK_INK, show_report, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
 
 
 ## Play out one quest with DayBar's helpers and pay its gold and standing.
 ## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, injured, died, milestone}
+##   {quest, party, story, succeeded, chance, gold, standing, pluck, injured, died, items, milestone}
+## (pluck = what each party member gained, 0 on a failure)
 ## (injured = the party members whose injury level went up on this quest but
-## who survived; died = the party members who died on it)
+## who survived; died = the party members who died on it; items = the
+## equipment found while searching, already added to the pack)
 func _run_quest(entry: Dictionary) -> Dictionary:
 	var party: Array[GuildCharacter] = []
 	party.assign(entry.party)
@@ -1066,9 +1285,12 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 
 	# play it out
 	var chance: float = DayBarLogic._get_success_chance(entry.quest, party)
-	var story: String = entry.quest.generateResults(party, chance)
+	# only play the quest out once, or its loot and injuries would be rolled twice
+	var story: String
 	if(GameState.day == MILESTONE_DAY):
 		story = entry.quest.generateMilestoneResults(party, chance)
+	else:
+		story = entry.quest.generateResults(party, chance)
 	var succeeded: bool = DayBarLogic._did_succeed(story)
 	var gold_earned: int = DayBarLogic._get_gold_earned(entry.quest, succeeded)
 	var standing_earned: int = entry.quest.difficulty + 1 if succeeded else 0
@@ -1087,6 +1309,17 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 	if succeeded:
 		for character in party:
 			character.pluck += 1
+	# equipment found while searching goes to the pack, even if the quest failed
+	var found_items: Array[StandardItem] = entry.quest.found_items.duplicate()
+	if not found_items.is_empty():
+		ItemContainer.owned_items.append_array(found_items)
+		# refresh gear rows and unworn counts
+		ItemShop.gear_changed.emit()
+
+	# a win raises everyone's Pluck, more for winning against worse odds
+	var pluck_gained := pluck_gain_for(chance) if succeeded else 0
+	for character in party:
+		character.pluck += pluck_gained
 
 	# the dead are listed apart from the hurt, and remember where they fell
 	var injured := []
@@ -1107,8 +1340,10 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		"chance": chance,
 		"gold": gold_earned,
 		"standing": standing_earned,
+		"pluck": pluck_gained,
 		"injured": injured,
 		"died": died,
+		"items": found_items,
 		"milestone": entry.milestone,
 	}
 
@@ -1129,6 +1364,7 @@ func start_new_day() -> void:
 		var quests_text := Style.count_text(quest_entries.size(), "new quest", "new quests")
 		show_toast(TOAST_NEW_DAY % [GameState.day, quests_text, CharacterContainer.hireable_characters.size()])
 	queue_refresh()
+	_land_earnings()
 	tutorial_event.emit("new_day", GameState.day)
 	# checked after the Day Report closes, so the player reads how the heroes fell first
 	_check_run_over()
@@ -1163,10 +1399,31 @@ func start_new_run() -> void:
 	get_tree().change_scene_to_file(MAIN_SCENE_PATH)
 
 
-## The report's button: starts the next day after End Day, otherwise just closes.
+## Dawn: release the counters held since End Day. Gains fly in from the middle
+## of the screen as a few coins / shields and the counter rolls up as the last
+## one lands; anything else (a loss, no change) just rolls.
+func _land_earnings() -> void:
+	var start := fx_layer.get_global_rect().get_center()
+	for kind in ["gold", "standing"]:
+		var gained: int = _counter_value(kind) - int(_shown_counters[kind])
+		if gained <= 0 or Fx.reduce_motion or _shown_counters[kind] < 0:
+			_release_counter(kind)
+			continue
+		var target := _counter_art(kind).get_global_rect().get_center()
+		var coin_count := mini(EARNINGS_COIN_COUNT, gained)
+		for coin_index in coin_count:
+			var is_last := coin_index == coin_count - 1
+			var delay := EARNINGS_DELAY + coin_index * EARNINGS_COIN_GAP
+			var land := _release_counter.bind(kind) if is_last else Callable()
+			Fx.fly(fx_layer, _counter_art(kind).texture, start, target, FLY_ICON_SIZE, delay, FLY_SECONDS, land)
+
+
+## The report's button: starts the next day after End Day (under a dusk wash,
+## so the report, the new Board and the day flip don't all snap at once),
+## otherwise just closes.
 func close_report() -> void:
 	if shown_report.get("starts_next_day", false):
-		start_new_day()
+		Fx.curtain(fx_layer, DUSK_INK, start_new_day, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
 	else:
 		shown_report = {}
 		queue_refresh()
@@ -1205,13 +1462,15 @@ func refresh() -> void:
 	_refresh_action_bar()
 	_refresh_nav()
 	_refresh_overlays()
+	# every rebuilt row has read its hint by now
+	pending_fx.clear()
 
 # ---- header
 
 
 
 func _refresh_header() -> void:
-	_day_value.text = HEADER_DAY % GameState.day
+	_refresh_day_tile()
 
 	# the days left are always in red ink; in the last days the whole note is
 	var days_left := days_until_drake()
@@ -1246,6 +1505,26 @@ func _refresh_danger_strip() -> void:
 		_danger_text.text = DANGER_GOLD % [price, GameState.gold, hero.name]
 	else:
 		_danger_text.text = DANGER_STANDING % hero.name
+	_update_counter("gold")
+	_update_counter("standing")
+
+
+## DAY tile: a new day flips the tile over (the number changes edge-on, once
+## the dawn wash has cleared). A morning inside DRAKE_WARNING_DAYS also pulses
+## the Bone Drake note.
+func _refresh_day_tile() -> void:
+	var day: int = GameState.day
+	if _shown_day == day:
+		return
+	var is_first_draw := _shown_day < 0
+	_shown_day = day
+	if is_first_draw or Fx.reduce_motion:
+		_day_value.text = HEADER_DAY % day
+		return
+	Fx.flip(_day_tile, DUSK_OUT_SECONDS * 0.5, func() -> void: _day_value.text = HEADER_DAY % day)
+	var days_left := days_until_drake()
+	if days_left >= 0 and days_left <= DRAKE_WARNING_DAYS:
+		Fx.pulse(_drake_note, DRAKE_PULSES, 1.08, DUSK_OUT_SECONDS)
 
 # ---- content (tabs and screens)
 
@@ -1273,7 +1552,10 @@ func _refresh_content() -> void:
 	shown_view.refresh()
 
 	# back to the top only when the view changes, not on every tap
+	# (a new view fades in, so switching tabs reads as switching)
 	if view_key != _last_view_key:
+		if _last_view_key != "":
+			Fx.fade_in(shown_view, 0.0, VIEW_FADE_SECONDS)
 		_last_view_key = view_key
 		shown_view.scroll_to_top()
 
@@ -1298,10 +1580,16 @@ func _refresh_action_bar() -> void:
 
 
 ## The torn banner's title, hint and gold button (its look is set in the scene).
+## When the next step changes, its text fades in and the button pops.
 func _set_action(title: String, hint: String, button_text: String) -> void:
 	_action_title.text = title
 	_action_hint.text = hint
 	_action_button.text = button_text
+	if title != _shown_action_title:
+		if _shown_action_title != "" and _action_bar.visible:
+			Fx.fade_in(_action_title.get_parent(), 0.0, 0.25)
+			Fx.pop(_action_button, 1.1)
+		_shown_action_title = title
 
 # ---- nav
 
@@ -1321,6 +1609,10 @@ func _refresh_nav() -> void:
 		var badge: Control = nav_button.get_node("Badge")
 		badge.visible = badge_text != ""
 		badge.get_node("Text").text = badge_text
+		# a badge that appears or changes count pops
+		if _shown_badges.has(tab_id) and _shown_badges[tab_id] != badge_text and badge_text != "":
+			Fx.pop(badge, BADGE_POP)
+		_shown_badges[tab_id] = badge_text
 
 
 ## What a nav tab's badge says ("" = no badge).
@@ -1371,9 +1663,72 @@ func show_toast(message: String) -> void:
 	_toast_label.text = message
 	_toast.modulate.a = 1.0
 	_toast.visible = true
+	Fx.appear(_toast, 0.8, 0.0, 0.25)
 	if _toast_tween:
 		_toast_tween.kill()
 	_toast_tween = create_tween()
 	_toast_tween.tween_interval(TOAST_SECONDS)
 	_toast_tween.tween_property(_toast, "modulate:a", 0.0, TOAST_FADE_SECONDS)
 	_toast_tween.tween_callback(_toast.hide)
+
+
+# ============================================================ MOTION
+# Counters and coins. Everything else lives in the rows (pending_fx) and
+# hall_fx.gd.
+
+func _counter_value(kind: String) -> int:
+	return GameState.gold if kind == "gold" else GameState.standing
+
+
+func _counter_label(kind: String) -> Label:
+	return _gold_value if kind == "gold" else _standing_value
+
+
+## The counter's box (what pops) and its art (coin / shield, what flies).
+func _counter_box(kind: String) -> Control:
+	return _gold_box if kind == "gold" else _standing_box
+
+
+func _counter_art(kind: String) -> TextureRect:
+	return _gold_coin if kind == "gold" else _standing_shield
+
+
+## Draw a counter. When its number changed it rolls to the new value, pops,
+## flashes green (gain) or red (loss), and a "+40" / "-2" floats under it.
+## A held counter waits (see _held_counters).
+func _update_counter(kind: String) -> void:
+	var value := _counter_value(kind)
+	var old_value: int = _shown_counters[kind]
+	if _held_counters[kind] and old_value >= 0:
+		return
+	_shown_counters[kind] = value
+	var label := _counter_label(kind)
+	if old_value < 0 or old_value == value:
+		label.text = str(value)
+		return
+	var change := value - old_value
+	var is_gain := change > 0
+	Fx.count(label, old_value, value, COUNTER_ROLL_SECONDS)
+	Fx.pop(_counter_box(kind), COUNTER_POP)
+	Fx.flash_text(label, COUNTER_GAIN_INK if is_gain else COUNTER_LOSS_INK, COUNTER_ROLL_SECONDS + 0.3)
+	var delta_at := _counter_box(kind).get_global_rect().get_center() + DELTA_OFFSET
+	Fx.float_text(fx_layer, delta_at, (DELTA_GAIN if is_gain else DELTA_LOSS) % change,
+			DELTA_GAIN_INK if is_gain else DELTA_LOSS_INK)
+
+
+## Let a held counter catch up to the real value.
+func _release_counter(kind: String) -> void:
+	_held_counters[kind] = false
+	_update_counter(kind)
+
+
+## Gold or standing just paid for what the player tapped: a coin / shield
+## flies from the counter to the spot they tapped (the counter drops now).
+func _pay_fx(kind: String) -> void:
+	var art := _counter_art(kind)
+	Fx.fly(fx_layer, art.texture, art.get_global_rect().get_center(), tap_point(), FLY_ICON_SIZE, 0.0, FLY_SECONDS)
+
+
+## Where the player last pressed (global), for things that fly to / from their tap.
+func tap_point() -> Vector2:
+	return get_global_mouse_position()
