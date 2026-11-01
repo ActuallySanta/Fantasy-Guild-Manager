@@ -1,10 +1,10 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cdmw3mrmuept3"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_game_over.gd" id="1_over"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/wood.png" id="2_wood"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/stat_tile.tscn" id="3_tile"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/connector.png" id="4_connector"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/divider.tscn" id="5_divider"]
+[ext_resource type="Script" uid="uid://cwpscnknr0sye" path="res://MobileHall/Scripts/overlay_game_over.gd" id="1_over"]
+[ext_resource type="Texture2D" uid="uid://6sc4epkipif0" path="res://MobileHall/Art/Textures/wood.png" id="2_wood"]
+[ext_resource type="PackedScene" uid="uid://bakk5e3uhltne" path="res://MobileHall/Scenes/Components/stat_tile.tscn" id="3_tile"]
+[ext_resource type="Texture2D" uid="uid://bswbe5m6msbdj" path="res://MobileHall/Art/Textures/connector.png" id="4_connector"]
+[ext_resource type="PackedScene" uid="uid://0ruw74gtfe6k" path="res://MobileHall/Scenes/Components/divider.tscn" id="5_divider"]
 
 [node name="OverlayGameOver" type="Control"]
 layout_mode = 3
