@@ -206,6 +206,7 @@ func _show_party(entry: Dictionary) -> void:
 
 	var chance: int = hall.success_chance(entry, entry.party)
 	var odds := Style.odds_look(chance)
+	_odds_value.text = TEXT_ODDS % mini(chance, 100) if chance >= 0 else TEXT_ODDS_NONE
 	_odds_word.text = TEXT_PLUCK_ON_WIN % [odds.word, hall.pluck_gain_for(chance)] if chance >= 0 else odds.word
 	Style.set_font_color(_odds_value, odds.text_color)
 	Style.tint_art(_odds_circle, odds.text_color)
