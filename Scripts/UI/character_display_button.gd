@@ -1,7 +1,7 @@
 extends AnimatedButton
 class_name CharacterDisplayButton
 
-const CHARACTER_UI_CARD = preload("res://Scenes/Characters/character_ui_card.tscn")
+const CHARACTER_UI_CARD = preload("uid://dc26k5nacd1ik")  # Scenes/Characters/character_ui_card.tscn
 
 var held_character : GuildCharacter
 

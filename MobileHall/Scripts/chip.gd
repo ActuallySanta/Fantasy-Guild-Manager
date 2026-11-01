@@ -4,7 +4,6 @@
 ## Scene: MobileHall/Scenes/Components/chip.tscn
 extends PanelContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 
 # ---- NODES
 @onready var _icon: TextureRect = $Row/Icon
@@ -26,26 +25,26 @@ func set_box(text: String, text_color: Color, icon_name: String = "") -> void:
 
 func _set_ink(text: String, text_color: Color, icon_name: String, outline_look: StringName) -> void:
 	_label.text = text
-	Style.set_font_color(_label, text_color)
-	_icon.texture = Style.icon_texture(icon_name)
+	HallStyle.set_font_color(_label, text_color)
+	_icon.texture = HallStyle.icon_texture(icon_name)
 	_icon.visible = _icon.texture != null
 	_icon.modulate = text_color
 	theme_type_variation = outline_look
-	Style.tint_art(self, text_color)
+	HallStyle.tint_art(self, text_color)
 
 
 ## Health from a character's injury level ("Healthy" in green, "Hurt"...).
 func set_health(character: GuildCharacter) -> void:
-	var look := Style.injury_look(character)
+	var look := HallStyle.injury_look(character)
 	set_chip(look.label, look.bg, look.text)
 
 
 ## One stat as "Pow 6", or "Pow 5+3" when Armory, gear or Pluck add to it
 ## (quests use the sum). The favored stat gets a pill in its colour.
 func set_stat(character: GuildCharacter, stat_index: int, is_favored: bool = false) -> void:
-	var stat: Dictionary = Style.STATS[stat_index]
-	var bonus := Style.stat_bonus(character, stat_index)
-	var text := "%s %d" % [stat.short, Style.quest_stat_value(character, stat_index) - bonus]
+	var stat: Dictionary = HallStyle.STATS[stat_index]
+	var bonus := HallStyle.stat_bonus(character, stat_index)
+	var text := "%s %d" % [stat.short, HallStyle.quest_stat_value(character, stat_index) - bonus]
 	if bonus > 0:
 		text += "+%d" % bonus
-	set_chip(text, stat.bg, stat.color if is_favored else Style.TEXT_MAIN, "", is_favored)
+	set_chip(text, stat.bg, stat.color if is_favored else HallStyle.TEXT_MAIN, "", is_favored)

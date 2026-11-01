@@ -15,9 +15,9 @@
 ##
 ## Look: bouncy overshoot (TRANS_BACK), squash and stretch, stamps. No glows,
 ## no blurs (see the UI style guide).
+class_name HallFx
 extends RefCounted
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 
 ## Set from the Menu's Reduced Motion button (HallMain.set_reduce_motion).
 static var reduce_motion := false
