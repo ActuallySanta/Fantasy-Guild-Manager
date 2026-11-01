@@ -63,6 +63,17 @@ const MILESTONE_DAY := 10
 ## Standing lost for releasing a living hero, plus one more per level of their
 ## Pluck (letting a veteran go hurts more). Releasing the fallen is free.
 const RELEASE_BASE_STANDING_COST := 1
+## Pluck each party member gains for winning a quest, by the odds the party
+## was sent at: the longer the odds, the more they grow from beating them.
+## Checked top to bottom: the first row whose `min` chance (percent) the odds
+## reach is used. The `min`s match Style.ODDS_BANDS, so the gain lines up with
+## the odds word on Assign Party (Strong odds / Fair odds / Risky / Long shot).
+const PLUCK_GAIN_BY_ODDS := [
+	{"min": 80, "gain": 1},
+	{"min": 60, "gain": 2},
+	{"min": 40, "gain": 3},
+	{"min": 0, "gain": 4},
+]
 ## Bottom tabs, left to right (ids match the Nav_<id> buttons and Tab nodes in the scene).
 const TAB_IDS := ["board", "guild", "upgrades", "shop"]
 ## The Shop tab (goods come from the ItemShop autoload).
@@ -450,6 +461,15 @@ func success_chance(entry: Dictionary, party: Array) -> int:
 	if party.is_empty():
 		return -1
 	return int(entry.quest.calcSuccessChance(party))
+
+
+## Pluck each party member gains for winning a quest sent at `chance` percent
+## (see PLUCK_GAIN_BY_ODDS). A party with no chance yet (-1) counts as a long shot.
+func pluck_gain_for(chance: float) -> int:
+	for row in PLUCK_GAIN_BY_ODDS:
+		if chance >= row.min:
+			return row.gain
+	return PLUCK_GAIN_BY_ODDS[-1].gain
 
 
 ## How many points of success chance this character gives a quest on their own.
@@ -921,7 +941,8 @@ func end_day() -> void:
 
 ## Play out one quest with DayBar's helpers and pay its gold and standing.
 ## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, injured, died, items, milestone}
+##   {quest, party, story, succeeded, chance, gold, standing, pluck, injured, died, items, milestone}
+## (pluck = what each party member gained, 0 on a failure)
 ## (injured = the party members whose injury level went up on this quest but
 ## who survived; died = the party members who died on it; items = the
 ## equipment found while searching, already added to the pack)
@@ -955,10 +976,10 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		# refresh gear rows and unworn counts
 		ItemShop.gear_changed.emit()
 
-	# Increase character pluck by one if the quest succeeded.
-	if succeeded:
-		for character in party:
-			character.pluck += 1
+	# a win raises everyone's Pluck, more for winning against worse odds
+	var pluck_gained := pluck_gain_for(chance) if succeeded else 0
+	for character in party:
+		character.pluck += pluck_gained
 
 	# the dead are listed apart from the hurt, and remember where they fell
 	var injured := []
@@ -979,6 +1000,7 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		"chance": chance,
 		"gold": gold_earned,
 		"standing": standing_earned,
+		"pluck": pluck_gained,
 		"injured": injured,
 		"died": died,
 		"items": found_items,

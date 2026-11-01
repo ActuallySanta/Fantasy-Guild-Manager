@@ -43,6 +43,7 @@ const TEXT_INJURED := "Hurt: %s"
 const TEXT_DIED := "Died: %s"
 const TEXT_FOUND := "Found: %s"
 const TEXT_WON := "It is done, master. The reward is ours: %d gold. — %s."
+const TEXT_WON_PLUCK := "It is done, master. The reward is ours: %d gold, and we're bolder for it (+%d Pluck). — %s."
 const TEXT_LOST_GOLD := "Sorry, master. No reward this time, but %s brought back %d gold. — %s."
 const TEXT_LOST := "Sorry, master. No reward this time. — %s."
 const TEXT_NOBODY_CAME_BACK := "Nobody came back to write this letter."
@@ -133,6 +134,10 @@ func _closing_text(result: Dictionary) -> String:
 		initials.append(character.name.left(1))
 	var signature := " & ".join(initials)
 	if result.succeeded:
+		# results from before Pluck scaled with the odds have no "pluck" key
+		var pluck_gained: int = result.get("pluck", 0)
+		if pluck_gained > 0:
+			return TEXT_WON_PLUCK % [result.gold, pluck_gained, signature]
 		return TEXT_WON % [result.gold, signature]
 	if result.gold > 0:
 		var speaker := "I" if survivors.size() == 1 else "we"

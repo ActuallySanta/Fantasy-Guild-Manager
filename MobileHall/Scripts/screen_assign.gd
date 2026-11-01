@@ -32,6 +32,8 @@ const STATUS_DENIED := "Denied. Reconsider to put it back on the board."
 const TEXT_ODDS := "%d%%"
 const TEXT_ODDS_NONE := "--"
 const TEXT_ODDS_WORD := "Chance of success"
+## Under the odds: what each hero's Pluck goes up by if the party wins.
+const TEXT_PLUCK_ON_WIN := "%s · win for +%d Pluck"
 # Picker
 const PICK_HEADING := "Your adventurers"
 const PICK_HINT := "best fit first"
@@ -170,7 +172,7 @@ func _show_party(entry: Dictionary) -> void:
 	var chance: int = hall.success_chance(entry, entry.party)
 	var odds := Style.odds_look(chance)
 	_odds_value.text = TEXT_ODDS % mini(chance, 100) if chance >= 0 else TEXT_ODDS_NONE
-	_odds_word.text = TEXT_ODDS_WORD if chance >= 0 else odds.word
+	_odds_word.text = TEXT_PLUCK_ON_WIN % [odds.word, hall.pluck_gain_for(chance)] if chance >= 0 else odds.word
 	Style.set_font_color(_odds_value, odds.text_color)
 	Style.tint_art(_odds_circle, odds.text_color)
 	_odds_bar.set_chance(mini(chance, 100))
