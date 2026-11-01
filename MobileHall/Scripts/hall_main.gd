@@ -42,6 +42,7 @@
 ##   SETTINGS · TEXT · STATE · NODES · SETUP · QUERIES ·
 ##   ACTIONS (navigation, overlays, quests, guild, end of day) ·
 ##   REFRESH (header, content, action bar, nav, overlays) · TOAST
+class_name HallMain
 extends Control
 
 ## Fired at the end of each player action, for the tutorial coach
@@ -50,10 +51,6 @@ extends Control
 ## admit, buy, equip, game_over.
 signal tutorial_event(event: String, data: Variant)
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const DayBarLogic := preload("res://Scripts/UI/day_bar.gd")
-const TutorialScript := preload("res://MobileHall/Scripts/overlay_tutorial.gd")
-const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
 
 
 # ============================================================ SETTINGS
@@ -68,7 +65,7 @@ const RELEASE_BASE_STANDING_COST := 1
 ## Pluck each party member gains for winning a quest, by the odds the party
 ## was sent at: the longer the odds, the more they grow from beating them.
 ## Checked top to bottom: the first row whose `min` chance (percent) the odds
-## reach is used. The `min`s match Style.ODDS_BANDS, so the gain lines up with
+## reach is used. The `min`s match HallStyle.ODDS_BANDS, so the gain lines up with
 ## the odds word on Assign Party (Strong odds / Fair odds / Risky / Long shot).
 const PLUCK_GAIN_BY_ODDS := [
 	{"min": 80, "gain": 1},
@@ -241,7 +238,7 @@ const DELTA_LOSS := "%d"
 
 ## Today's quests, in board order. Each entry is a Dictionary:
 ##   quest:     CreatedQuest
-##   state:     Style.QUEST_STATE_OPEN | QUEST_STATE_SENT | QUEST_STATE_DENIED
+##   state:     HallStyle.QUEST_STATE_OPEN | QUEST_STATE_SENT | QUEST_STATE_DENIED
 ##   party:     Array of GuildCharacter (a draft while the quest is open)
 ##   milestone: bool (true for the Bone Drake quest)
 var quest_entries: Array = []
@@ -310,7 +307,7 @@ var show_busy_adventurers := false
 var for_hire_last_seen_day := 0
 ## Colorblind filter: index into COLOR_FILTERS (0 = off). Saved in SETTINGS_PATH.
 var color_filter := 0
-## Reduced Motion: animations off (Fx.reduce_motion mirrors it). Saved in SETTINGS_PATH.
+## Reduced Motion: animations off (HallFx.reduce_motion mirrors it). Saved in SETTINGS_PATH.
 var reduce_motion := false
 
 # ---- motion
@@ -432,7 +429,7 @@ func _ready() -> void:
 	fx_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 	# the tutorial coach goes on top of everything; on Day 1 it replaces the Welcome card
-	tutorial = TutorialScript.new()
+	tutorial = OverlayTutorial.new()
 	tutorial.name = "OverlayTutorial"
 	add_child(tutorial)
 	tutorial.setup(self)
@@ -517,7 +514,7 @@ func rand_bell_curve(mean: float = 0.0, standard_deviation: float = 1.0) -> floa
 	return (standard_normal * standard_deviation) + mean
 
 func _new_entry(quest: CreatedQuest, is_milestone: bool) -> Dictionary:
-	return {"quest": quest, "state": Style.QUEST_STATE_OPEN, "party": [], "milestone": is_milestone}
+	return {"quest": quest, "state": HallStyle.QUEST_STATE_OPEN, "party": [], "milestone": is_milestone}
 
 
 # ============================================================ QUERIES
@@ -538,7 +535,7 @@ func is_roster_full() -> bool:
 ## Standing it costs to release this hero: nothing for the fallen, otherwise
 ## RELEASE_BASE_STANDING_COST plus their Pluck.
 func release_standing_cost(character: GuildCharacter) -> int:
-	if Style.is_dead(character):
+	if HallStyle.is_dead(character):
 		return 0
 	return RELEASE_BASE_STANDING_COST + character.pluck
 
@@ -641,7 +638,7 @@ func build_run_over_stats() -> Dictionary:
 
 ## Quests still needing Send or Deny. Same rule as QuestCard.is_outstanding.
 func undecided_count() -> int:
-	return quest_entries.filter(func(entry): return entry.state == Style.QUEST_STATE_OPEN).size()
+	return quest_entries.filter(func(entry): return entry.state == HallStyle.QUEST_STATE_OPEN).size()
 
 
 ## Quests that have been sent or denied.
@@ -651,11 +648,11 @@ func decided_count() -> int:
 
 ## Entries whose party goes out tonight.
 func sent_entries() -> Array:
-	return quest_entries.filter(func(entry): return entry.state == Style.QUEST_STATE_SENT)
+	return quest_entries.filter(func(entry): return entry.state == HallStyle.QUEST_STATE_SENT)
 
 
 func denied_entries() -> Array:
-	return quest_entries.filter(func(entry): return entry.state == Style.QUEST_STATE_DENIED)
+	return quest_entries.filter(func(entry): return entry.state == HallStyle.QUEST_STATE_DENIED)
 
 
 ## Index of the quest whose party (sent or draft) has this character, or -1.
@@ -668,7 +665,7 @@ func quest_index_of(character: GuildCharacter) -> int:
 
 ## False for anyone who can't be put in a party (dead, training, or in a Hospital bed).
 func can_go_on_quests(character: GuildCharacter) -> bool:
-	return not Style.is_dead(character) and not GuildUpgrades.is_patient(character) \
+	return not HallStyle.is_dead(character) and not GuildUpgrades.is_patient(character) \
 			and not GuildUpgrades.is_training(character)
 
 
@@ -715,7 +712,7 @@ func current_quest_entry() -> Dictionary:
 func next_undecided_index(start_index: int = 0) -> int:
 	for offset in quest_entries.size():
 		var quest_index := (start_index + offset) % quest_entries.size()
-		if quest_entries[quest_index].state == Style.QUEST_STATE_OPEN:
+		if quest_entries[quest_index].state == HallStyle.QUEST_STATE_OPEN:
 			return quest_index
 	return -1
 
@@ -724,7 +721,7 @@ func next_undecided_index(start_index: int = 0) -> int:
 
 ## Buildings that can be upgraded right now (enough gold and standing).
 func affordable_buildings() -> Array:
-	return Style.buildings_in_order().filter(func(building):
+	return HallStyle.buildings_in_order().filter(func(building):
 		return GuildUpgrades.get_upgrade_status(building) == GuildUpgrades.UpgradeStatus.READY)
 
 
@@ -835,7 +832,7 @@ func close_welcome() -> void:
 ## another quest's party (sent or draft) moves over, so nobody is in two.
 func toggle_in_party(character: GuildCharacter) -> void:
 	var entry := current_quest_entry()
-	if entry.is_empty() or entry.state == Style.QUEST_STATE_DENIED:
+	if entry.is_empty() or entry.state == HallStyle.QUEST_STATE_DENIED:
 		return
 
 	# already in this party: take them out
@@ -846,7 +843,7 @@ func toggle_in_party(character: GuildCharacter) -> void:
 		return
 
 	# can't be added
-	if Style.is_dead(character):
+	if HallStyle.is_dead(character):
 		show_toast(TOAST_DEAD % character.name)
 		return
 	if GuildUpgrades.is_patient(character):
@@ -880,8 +877,8 @@ func toggle_in_party(character: GuildCharacter) -> void:
 ## Take someone out of a party. A sent quest left with nobody goes back to open.
 func _remove_from_party(entry: Dictionary, character: GuildCharacter) -> void:
 	entry.party.erase(character)
-	if entry.party.is_empty() and entry.state == Style.QUEST_STATE_SENT:
-		entry.state = Style.QUEST_STATE_OPEN
+	if entry.party.is_empty() and entry.state == HallStyle.QUEST_STATE_SENT:
+		entry.state = HallStyle.QUEST_STATE_OPEN
 
 
 ## Assign Party's "Show busy" toggle.
@@ -895,7 +892,7 @@ func send_party() -> void:
 	var entry := current_quest_entry()
 	if entry.is_empty() or entry.party.is_empty():
 		return
-	entry.state = Style.QUEST_STATE_SENT
+	entry.state = HallStyle.QUEST_STATE_SENT
 	show_toast(TOAST_SENT % entry.quest.questTitle)
 	pending_fx.writ_stamp = true
 	_hold_then_move_on()
@@ -908,13 +905,13 @@ func deny_quest() -> void:
 	if entry.is_empty():
 		return
 	entry.party.clear()
-	entry.state = Style.QUEST_STATE_DENIED
+	entry.state = HallStyle.QUEST_STATE_DENIED
 	if entry.quest.difficulty > 0:
 		_pay_fx("standing")
 	GameState.reduce_standing(entry.quest.difficulty)
 	show_toast(TOAST_DENIED % entry.quest.questTitle)
 	_screens[SCREEN_ASSIGN].shake_writ()
-	Fx.stamp_mark(fx_layer, _screens[SCREEN_ASSIGN].stamp_point(), STAMP_DENIED, Style.RED, STAMP_HOLD_SECONDS)
+	HallFx.stamp_mark(fx_layer, _screens[SCREEN_ASSIGN].stamp_point(), STAMP_DENIED, HallStyle.RED, STAMP_HOLD_SECONDS)
 	_hold_then_move_on()
 	tutorial_event.emit("deny", entry)
 
@@ -924,7 +921,7 @@ func recall_party() -> void:
 	var entry := current_quest_entry()
 	if entry.is_empty():
 		return
-	entry.state = Style.QUEST_STATE_OPEN
+	entry.state = HallStyle.QUEST_STATE_OPEN
 	show_toast(TOAST_RECALLED)
 	queue_refresh()
 
@@ -934,7 +931,7 @@ func reconsider_quest() -> void:
 	var entry := current_quest_entry()
 	if entry.is_empty():
 		return
-	entry.state = Style.QUEST_STATE_OPEN
+	entry.state = HallStyle.QUEST_STATE_OPEN
 	show_toast(TOAST_RECONSIDER % entry.quest.questTitle)
 	queue_refresh()
 
@@ -945,10 +942,10 @@ func reconsider_quest() -> void:
 func _hold_then_move_on() -> void:
 	var decided_index: int = active_screen.quest_index
 	queue_refresh()
-	if Fx.reduce_motion:
+	if HallFx.reduce_motion:
 		_after_stamp(decided_index)
 		return
-	Fx.block_input(fx_layer, STAMP_HOLD_SECONDS)
+	HallFx.block_input(fx_layer, STAMP_HOLD_SECONDS)
 	get_tree().create_timer(STAMP_HOLD_SECONDS).timeout.connect(_after_stamp.bind(decided_index))
 
 
@@ -997,11 +994,11 @@ func hire(character: GuildCharacter) -> bool:
 ## moment, then flies into the "Your Guild" tab, which pops as it lands.
 ## (The next letter slides up underneath meanwhile.)
 func send_hired_letter(card: Control) -> void:
-	if Fx.reduce_motion:
+	if HallFx.reduce_motion:
 		return
 	# off the stack first, so the refresh that's coming can't free it
-	Fx.detach(card, fx_layer)
-	Fx.stamp_onto(card, STAMP_HIRED, Style.GREEN_TEXT, HIRE_STAMP_AT, HIRE_STAMP_FONT_SIZE, HIRE_STAMP_TILT)
+	HallFx.detach(card, fx_layer)
+	HallFx.stamp_onto(card, STAMP_HIRED, HallStyle.GREEN_TEXT, HIRE_STAMP_AT, HIRE_STAMP_FONT_SIZE, HIRE_STAMP_TILT)
 	get_tree().create_timer(HIRE_STAMP_HOLD_SECONDS).timeout.connect(_fly_hired_letter.bind(card))
 
 
@@ -1009,8 +1006,8 @@ func _fly_hired_letter(card: Control) -> void:
 	if not is_instance_valid(card):
 		return
 	var roster_button: Control = _tabs.guild.roster_button()
-	Fx.fly_away(card, fx_layer, roster_button.get_global_rect().get_center(), HIRE_FLY_SECONDS)
-	Fx.pop(roster_button, BADGE_POP, HIRE_FLY_SECONDS)
+	HallFx.fly_away(card, fx_layer, roster_button.get_global_rect().get_center(), HIRE_FLY_SECONDS)
+	HallFx.pop(roster_button, BADGE_POP, HIRE_FLY_SECONDS)
 
 
 ## Let a hero go for good (the Character screen's Release button, after its
@@ -1020,7 +1017,7 @@ func _fly_hired_letter(card: Control) -> void:
 func release(character: GuildCharacter) -> void:
 	# read these before they leave: the cost depends on who they are right now
 	var standing_cost := release_standing_cost(character)
-	var is_fallen := Style.is_dead(character)
+	var is_fallen := HallStyle.is_dead(character)
 	_leave_quest(character)
 	if not CharacterContainer.remove_character_from_guild(character):
 		return
@@ -1058,7 +1055,7 @@ func buy_item(index: int) -> void:
 		if item.cost > 0:
 			_pay_fx("gold")
 		pending_fx.bought = index
-		show_toast(TOAST_BOUGHT % Style.item_look(item).name)
+		show_toast(TOAST_BOUGHT % HallStyle.item_look(item).name)
 		tutorial_event.emit("buy", item)
 	else:
 		show_toast(TOAST_CANT_BUY)
@@ -1067,14 +1064,14 @@ func buy_item(index: int) -> void:
 
 ## Put an owned item on a hero (moves it off whoever had it).
 func equip_item(item: StandardItem, character: GuildCharacter) -> void:
-	var item_name: String = Style.item_look(item).name
+	var item_name: String = HallStyle.item_look(item).name
 	var result: int = ItemShop.equip(item, character)
 	if result == ItemShop.EquipResult.OK:
 		pending_fx.gear_in = item
 		show_toast(TOAST_EQUIPPED % [character.name, item_name])
 		tutorial_event.emit("equip", item)
 	elif result == ItemShop.EquipResult.WRONG_ROLE:
-		show_toast(TOAST_WRONG_ROLE % [Style.item_role_name(item), item_name])
+		show_toast(TOAST_WRONG_ROLE % [HallStyle.item_role_name(item), item_name])
 	elif result == ItemShop.EquipResult.SLOTS_FULL:
 		show_toast(TOAST_HANDS_FULL % character.name)
 	elif result == ItemShop.EquipResult.DEAD:
@@ -1089,7 +1086,7 @@ func unequip_item(item: StandardItem) -> void:
 		return
 	ItemShop.unequip(item)
 	pending_fx.gear_out = true
-	show_toast(TOAST_UNEQUIPPED % [user.name, Style.item_look(item).name])
+	show_toast(TOAST_UNEQUIPPED % [user.name, HallStyle.item_look(item).name])
 	queue_refresh()
 
 
@@ -1117,7 +1114,7 @@ func train(character: GuildCharacter, stat: int) -> void:
 	GuildUpgrades.set_training(character, stat)
 	pending_fx.home_row = character
 	if is_new:
-		show_toast(TOAST_TRAINING % [character.name, Style.STATS[stat].name])
+		show_toast(TOAST_TRAINING % [character.name, HallStyle.STATS[stat].name])
 	# the pick list closes itself once every slot is taken
 	if not GuildUpgrades.has_free_training_slot():
 		training_picker_open = false
@@ -1193,7 +1190,7 @@ func toggle_reduce_motion() -> void:
 ## Reduced Motion: hall_fx.gd skips every animation and lands things in place.
 func set_reduce_motion(is_on: bool) -> void:
 	reduce_motion = is_on
-	Fx.reduce_motion = is_on
+	HallFx.reduce_motion = is_on
 	var config := ConfigFile.new()
 	config.load(SETTINGS_PATH)
 	config.set_value(SETTINGS_SECTION, SETTINGS_REDUCE_MOTION, reduce_motion)
@@ -1206,7 +1203,7 @@ func _load_settings() -> void:
 	if config.load(SETTINGS_PATH) == OK:
 		color_filter = clampi(int(config.get_value(SETTINGS_SECTION, SETTINGS_COLOR_FILTER, 0)), 0, COLOR_FILTERS.size() - 1)
 		reduce_motion = bool(config.get_value(SETTINGS_SECTION, SETTINGS_REDUCE_MOTION, false))
-	Fx.reduce_motion = reduce_motion
+	HallFx.reduce_motion = reduce_motion
 	_apply_color_filter()
 
 
@@ -1264,7 +1261,7 @@ func end_day() -> void:
 		shown_report = report
 		queue_refresh()
 		tutorial_event.emit("end_day", results)
-	Fx.curtain(fx_layer, DUSK_INK, show_report, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
+	HallFx.curtain(fx_layer, DUSK_INK, show_report, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
 
 
 ## Play out one quest with DayBar's helpers and pay its gold and standing.
@@ -1284,15 +1281,15 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		injury_before[character] = character.injury_level
 
 	# play it out
-	var chance: float = DayBarLogic._get_success_chance(entry.quest, party)
+	var chance: float = DayBar._get_success_chance(entry.quest, party)
 	# only play the quest out once, or its loot and injuries would be rolled twice
 	var story: String
 	if(GameState.day == MILESTONE_DAY):
 		story = entry.quest.generateMilestoneResults(party, chance)
 	else:
 		story = entry.quest.generateResults(party, chance)
-	var succeeded: bool = DayBarLogic._did_succeed(story)
-	var gold_earned: int = DayBarLogic._get_gold_earned(entry.quest, succeeded)
+	var succeeded: bool = DayBar._did_succeed(story)
+	var gold_earned: int = DayBar._get_gold_earned(entry.quest, succeeded)
 	var standing_earned: int = entry.quest.difficulty + 1 if succeeded else 0
 	GameState.add_gold(gold_earned)
 	GameState.add_standing(standing_earned)
@@ -1325,7 +1322,7 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 	var injured := []
 	var died := []
 	for character in party:
-		if Style.is_dead(character) and injury_before[character] < GuildCharacter.InjuryLevel.DEAD:
+		if HallStyle.is_dead(character) and injury_before[character] < GuildCharacter.InjuryLevel.DEAD:
 			died.append(character)
 			character.died_on_day = GameState.day
 			character.died_on_quest = entry.quest.questTitle
@@ -1361,7 +1358,7 @@ func start_new_day() -> void:
 	if GameState.day == MILESTONE_DAY:
 		show_toast(TOAST_MILESTONE_DAY % GameState.day)
 	else:
-		var quests_text := Style.count_text(quest_entries.size(), "new quest", "new quests")
+		var quests_text := HallStyle.count_text(quest_entries.size(), "new quest", "new quests")
 		show_toast(TOAST_NEW_DAY % [GameState.day, quests_text, CharacterContainer.hireable_characters.size()])
 	queue_refresh()
 	_land_earnings()
@@ -1406,7 +1403,7 @@ func _land_earnings() -> void:
 	var start := fx_layer.get_global_rect().get_center()
 	for kind in ["gold", "standing"]:
 		var gained: int = _counter_value(kind) - int(_shown_counters[kind])
-		if gained <= 0 or Fx.reduce_motion or _shown_counters[kind] < 0:
+		if gained <= 0 or HallFx.reduce_motion or _shown_counters[kind] < 0:
 			_release_counter(kind)
 			continue
 		var target := _counter_art(kind).get_global_rect().get_center()
@@ -1415,7 +1412,7 @@ func _land_earnings() -> void:
 			var is_last := coin_index == coin_count - 1
 			var delay := EARNINGS_DELAY + coin_index * EARNINGS_COIN_GAP
 			var land := _release_counter.bind(kind) if is_last else Callable()
-			Fx.fly(fx_layer, _counter_art(kind).texture, start, target, FLY_ICON_SIZE, delay, FLY_SECONDS, land)
+			HallFx.fly(fx_layer, _counter_art(kind).texture, start, target, FLY_ICON_SIZE, delay, FLY_SECONDS, land)
 
 
 ## The report's button: starts the next day after End Day (under a dusk wash,
@@ -1423,7 +1420,7 @@ func _land_earnings() -> void:
 ## otherwise just closes.
 func close_report() -> void:
 	if shown_report.get("starts_next_day", false):
-		Fx.curtain(fx_layer, DUSK_INK, start_new_day, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
+		HallFx.curtain(fx_layer, DUSK_INK, start_new_day, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
 	else:
 		shown_report = {}
 		queue_refresh()
@@ -1474,15 +1471,15 @@ func _refresh_header() -> void:
 
 	# the days left are always in red ink; in the last days the whole note is
 	var days_left := days_until_drake()
-	var red_ink := Style.RED.to_html(false)
+	var red_ink := HallStyle.RED.to_html(false)
 	if days_left > 0:
-		_drake_value.text = HEADER_DRAKE % [red_ink, days_left, Style.pick_plural(days_left, "day", "days")]
+		_drake_value.text = HEADER_DRAKE % [red_ink, days_left, HallStyle.pick_plural(days_left, "day", "days")]
 	elif days_left == 0:
 		_drake_value.text = HEADER_DRAKE_TODAY % red_ink
 	else:
 		_drake_value.text = HEADER_DRAKE_GONE
 	var is_drake_close := days_left >= 0 and days_left <= DRAKE_WARNING_DAYS
-	Style.set_font_color(_drake_value, Style.RED if is_drake_close else Style.TEXT_MAIN)
+	HallStyle.set_font_color(_drake_value, HallStyle.RED if is_drake_close else HallStyle.TEXT_MAIN)
 
 	_gold_value.text = str(GameState.gold)
 	_standing_value.text = str(GameState.standing)
@@ -1518,13 +1515,13 @@ func _refresh_day_tile() -> void:
 		return
 	var is_first_draw := _shown_day < 0
 	_shown_day = day
-	if is_first_draw or Fx.reduce_motion:
+	if is_first_draw or HallFx.reduce_motion:
 		_day_value.text = HEADER_DAY % day
 		return
-	Fx.flip(_day_tile, DUSK_OUT_SECONDS * 0.5, func() -> void: _day_value.text = HEADER_DAY % day)
+	HallFx.flip(_day_tile, DUSK_OUT_SECONDS * 0.5, func() -> void: _day_value.text = HEADER_DAY % day)
 	var days_left := days_until_drake()
 	if days_left >= 0 and days_left <= DRAKE_WARNING_DAYS:
-		Fx.pulse(_drake_note, DRAKE_PULSES, 1.08, DUSK_OUT_SECONDS)
+		HallFx.pulse(_drake_note, DRAKE_PULSES, 1.08, DUSK_OUT_SECONDS)
 
 # ---- content (tabs and screens)
 
@@ -1555,7 +1552,7 @@ func _refresh_content() -> void:
 	# (a new view fades in, so switching tabs reads as switching)
 	if view_key != _last_view_key:
 		if _last_view_key != "":
-			Fx.fade_in(shown_view, 0.0, VIEW_FADE_SECONDS)
+			HallFx.fade_in(shown_view, 0.0, VIEW_FADE_SECONDS)
 		_last_view_key = view_key
 		shown_view.scroll_to_top()
 
@@ -1571,11 +1568,11 @@ func _refresh_action_bar() -> void:
 		_set_action(ACTION_HIRE, ACTION_HIRE_HINT, ACTION_HIRE_BUTTON)
 	elif undecided_count() > 0:
 		var next_entry: Dictionary = quest_entries[next_undecided_index(0)]
-		var title := ACTION_DECIDE % Style.count_text(undecided_count(), "quest", "quests")
+		var title := ACTION_DECIDE % HallStyle.count_text(undecided_count(), "quest", "quests")
 		_set_action(title, ACTION_DECIDE_HINT % next_entry.quest.questTitle, ACTION_DECIDE_BUTTON)
 	else:
 		var parties_going := sent_entries().size()
-		var hint := ACTION_END_HINT % Style.count_text(parties_going, "party", "parties") if parties_going > 0 else ACTION_END_HINT_NONE
+		var hint := ACTION_END_HINT % HallStyle.count_text(parties_going, "party", "parties") if parties_going > 0 else ACTION_END_HINT_NONE
 		_set_action(ACTION_END % GameState.day, hint, ACTION_END_BUTTON)
 
 
@@ -1587,8 +1584,8 @@ func _set_action(title: String, hint: String, button_text: String) -> void:
 	_action_button.text = button_text
 	if title != _shown_action_title:
 		if _shown_action_title != "" and _action_bar.visible:
-			Fx.fade_in(_action_title.get_parent(), 0.0, 0.25)
-			Fx.pop(_action_button, 1.1)
+			HallFx.fade_in(_action_title.get_parent(), 0.0, 0.25)
+			HallFx.pop(_action_button, 1.1)
 		_shown_action_title = title
 
 # ---- nav
@@ -1611,7 +1608,7 @@ func _refresh_nav() -> void:
 		badge.get_node("Text").text = badge_text
 		# a badge that appears or changes count pops
 		if _shown_badges.has(tab_id) and _shown_badges[tab_id] != badge_text and badge_text != "":
-			Fx.pop(badge, BADGE_POP)
+			HallFx.pop(badge, BADGE_POP)
 		_shown_badges[tab_id] = badge_text
 
 
@@ -1663,7 +1660,7 @@ func show_toast(message: String) -> void:
 	_toast_label.text = message
 	_toast.modulate.a = 1.0
 	_toast.visible = true
-	Fx.appear(_toast, 0.8, 0.0, 0.25)
+	HallFx.appear(_toast, 0.8, 0.0, 0.25)
 	if _toast_tween:
 		_toast_tween.kill()
 	_toast_tween = create_tween()
@@ -1708,11 +1705,11 @@ func _update_counter(kind: String) -> void:
 		return
 	var change := value - old_value
 	var is_gain := change > 0
-	Fx.count(label, old_value, value, COUNTER_ROLL_SECONDS)
-	Fx.pop(_counter_box(kind), COUNTER_POP)
-	Fx.flash_text(label, COUNTER_GAIN_INK if is_gain else COUNTER_LOSS_INK, COUNTER_ROLL_SECONDS + 0.3)
+	HallFx.count(label, old_value, value, COUNTER_ROLL_SECONDS)
+	HallFx.pop(_counter_box(kind), COUNTER_POP)
+	HallFx.flash_text(label, COUNTER_GAIN_INK if is_gain else COUNTER_LOSS_INK, COUNTER_ROLL_SECONDS + 0.3)
 	var delta_at := _counter_box(kind).get_global_rect().get_center() + DELTA_OFFSET
-	Fx.float_text(fx_layer, delta_at, (DELTA_GAIN if is_gain else DELTA_LOSS) % change,
+	HallFx.float_text(fx_layer, delta_at, (DELTA_GAIN if is_gain else DELTA_LOSS) % change,
 			DELTA_GAIN_INK if is_gain else DELTA_LOSS_INK)
 
 
@@ -1726,7 +1723,7 @@ func _release_counter(kind: String) -> void:
 ## flies from the counter to the spot they tapped (the counter drops now).
 func _pay_fx(kind: String) -> void:
 	var art := _counter_art(kind)
-	Fx.fly(fx_layer, art.texture, art.get_global_rect().get_center(), tap_point(), FLY_ICON_SIZE, 0.0, FLY_SECONDS)
+	HallFx.fly(fx_layer, art.texture, art.get_global_rect().get_center(), tap_point(), FLY_ICON_SIZE, 0.0, FLY_SECONDS)
 
 
 ## Where the player last pressed (global), for things that fly to / from their tap.

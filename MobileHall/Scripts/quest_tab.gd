@@ -4,9 +4,6 @@
 ## Scene: MobileHall/Scenes/Rows/quest_tab.tscn
 extends VBoxContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
 
 ## Band colour on the quest showing now.
 const CURRENT_BAND := Color("#F0E7D2")
@@ -29,19 +26,19 @@ func setup(hall: HallMain, quest_index: int, is_current: bool) -> void:
 	_number.text = TEXT_NUMBER % (quest_index + 1)
 
 	# tag text and band colour by state
-	var type_info := Style.quest_type_info(entry)
+	var type_info := HallStyle.quest_type_info(entry)
 	var band_color: Color = type_info.color
 	_tag.text = type_info.tag
 	match entry.state:
-		Style.QUEST_STATE_SENT:
+		HallStyle.QUEST_STATE_SENT:
 			_tag.text = TAG_SENT
-			band_color = Style.GREEN_TEXT
-		Style.QUEST_STATE_DENIED:
+			band_color = HallStyle.GREEN_TEXT
+		HallStyle.QUEST_STATE_DENIED:
 			_tag.text = TAG_DENIED
-			band_color = Style.RED
-	Style.tint_art(_band, CURRENT_BAND if is_current else band_color)
-	Style.set_font_color(_number, Style.TEXT_MAIN if is_current else Style.CREAM)
-	Style.set_font_color(_tag, Style.CREAM if is_current else Style.CREAM_SOFT)
+			band_color = HallStyle.RED
+	HallStyle.tint_art(_band, CURRENT_BAND if is_current else band_color)
+	HallStyle.set_font_color(_number, HallStyle.TEXT_MAIN if is_current else HallStyle.CREAM)
+	HallStyle.set_font_color(_tag, HallStyle.CREAM if is_current else HallStyle.CREAM_SOFT)
 	# just sent / denied: SENT / NO stamps onto its little scroll
 	if hall.pending_fx.get("quest_stamp", -1) == quest_index:
-		Fx.stamp_in(_tag, 2.2)
+		HallFx.stamp_in(_tag, 2.2)

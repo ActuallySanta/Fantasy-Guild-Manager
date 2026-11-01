@@ -10,10 +10,8 @@
 ## Scene: MobileHall/Scenes/Tabs/tab_upgrades.tscn
 extends VBoxContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const UpgradeCardScene := preload("res://MobileHall/Scenes/Rows/upgrade_card.tscn")
-const RolledTagScene := preload("res://MobileHall/Scenes/Components/rolled_tag.tscn")
+const UpgradeCardScene := preload("uid://bsodxki3j2b0o")  # MobileHall/Scenes/Rows/upgrade_card.tscn
+const RolledTagScene := preload("uid://dvyjbi6emukey")  # MobileHall/Scenes/Components/rolled_tag.tscn
 
 ## Folder tab heights: the open one stands taller and joins the folder.
 const FOLDER_TAB_HEIGHT := 72
@@ -104,28 +102,28 @@ func _show_wallet(affordable: Array) -> void:
 	_standing.text = STANDING % GameState.standing
 	if affordable.is_empty():
 		_wallet_hint.text = WALLET_HINT_NONE
-		Style.set_font_color(_wallet_hint, Style.TEXT_SOFT)
+		HallStyle.set_font_color(_wallet_hint, HallStyle.TEXT_SOFT)
 	else:
-		_wallet_hint.text = WALLET_HINT_AFFORDABLE % Style.count_text(affordable.size(), "upgrade", "upgrades")
-		Style.set_font_color(_wallet_hint, Style.GREEN_TEXT)
+		_wallet_hint.text = WALLET_HINT_AFFORDABLE % HallStyle.count_text(affordable.size(), "upgrade", "upgrades")
+		HallStyle.set_font_color(_wallet_hint, HallStyle.GREEN_TEXT)
 
 
 ## One plan per working building, affordable ones first.
 func _show_building_cards(affordable: Array) -> void:
-	Style.clear_children(_card_list)
-	var buildings: Array = Style.buildings_in_order().filter(func(building):
+	HallStyle.clear_children(_card_list)
+	var buildings: Array = HallStyle.buildings_in_order().filter(func(building):
 		return GuildUpgrades.is_implemented(building))
 	buildings.sort_custom(func(first, second):
 		return affordable.has(first) and not affordable.has(second))
 	for building in buildings:
-		Style.add_row(_card_list, UpgradeCardScene).setup(hall, building)
+		HallStyle.add_row(_card_list, UpgradeCardScene).setup(hall, building)
 
 
 ## A rolled-up scroll for each building that isn't implemented yet.
 func _show_coming_soon() -> void:
-	Style.clear_children(_coming_soon_row)
-	for building in Style.buildings_in_order():
+	HallStyle.clear_children(_coming_soon_row)
+	for building in HallStyle.buildings_in_order():
 		if not GuildUpgrades.is_implemented(building):
-			var rolled_tag := Style.add_row(_coming_soon_row, RolledTagScene)
+			var rolled_tag := HallStyle.add_row(_coming_soon_row, RolledTagScene)
 			rolled_tag.get_node("Center/Tag/Text").text = GuildUpgrades.get_building_name(building)
 	_coming_soon_box.visible = _coming_soon_row.get_child_count() > 0

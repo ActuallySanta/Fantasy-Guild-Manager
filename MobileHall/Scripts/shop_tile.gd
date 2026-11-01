@@ -5,7 +5,6 @@
 ## Scene: MobileHall/Scenes/Rows/shop_tile.tscn
 extends Button
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 
 ## Sold-out tags fade back.
 const SOLD_OPACITY := 0.7
@@ -36,10 +35,10 @@ func setup(good: Dictionary, is_selected: bool, on_pick: Callable) -> void:
 	_sold_stamp.visible = is_sold
 	disabled = is_sold
 	if is_sold:
-		Style.style_tag(_tag, _tag_text, SOLD_TAG, Style.LINE)
-		Style.set_font_color(_name, Style.TEXT_SOFT)
+		HallStyle.style_tag(_tag, _tag_text, SOLD_TAG, HallStyle.LINE)
+		HallStyle.set_font_color(_name, HallStyle.TEXT_SOFT)
 		modulate = Color(1, 1, 1, SOLD_OPACITY)
 	else:
-		Style.style_tag(_tag, _tag_text, good.tag, good.color)
+		HallStyle.style_tag(_tag, _tag_text, good.tag, good.color)
 		pressed.connect(on_pick)
 	theme_type_variation = &"GoodsTagSelected" if is_selected and not is_sold else &"GoodsTag"

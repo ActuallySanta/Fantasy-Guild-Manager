@@ -3,8 +3,6 @@
 ## Scene: MobileHall/Scenes/Overlays/overlay_menu.tscn
 extends Control
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 
 # ---- TEXT
 const BUTTON_HOW_TO_PLAY := "How to play"
@@ -51,8 +49,8 @@ func setup(main: HallMain) -> void:
 	_reset_button.text = BUTTON_RESET
 	_close_button.text = BUTTON_CLOSE
 	for button in [_how_to_play_button, _report_button, _color_button, _motion_button, _reset_button]:
-		Style.style_button(button, "paper", 28)
-	Style.style_button(_close_button, "wood", 28)
+		HallStyle.style_button(button, "paper", 28)
+	HallStyle.style_button(_close_button, "wood", 28)
 
 
 func refresh() -> void:

@@ -1,9 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://b3neobxrym5mx"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/odds_bar.gd" id="1_odds"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/odds_track.png" id="2_track"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/odds_fill.png" id="3_fill"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/odds_over.png" id="4_over"]
+[ext_resource type="Script" uid="uid://8p3fv07dc832" path="res://MobileHall/Scripts/odds_bar.gd" id="1_odds"]
+[ext_resource type="Texture2D" uid="uid://2lb855g0v3ps" path="res://MobileHall/Art/Textures/odds_track.png" id="2_track"]
+[ext_resource type="Texture2D" uid="uid://do6sqwogbgsa" path="res://MobileHall/Art/Textures/odds_fill.png" id="3_fill"]
+[ext_resource type="Texture2D" uid="uid://cseygbbflg1ao" path="res://MobileHall/Art/Textures/odds_over.png" id="4_over"]
 
 [node name="OddsBar" type="TextureProgressBar"]
 custom_minimum_size = Vector2(0, 30)

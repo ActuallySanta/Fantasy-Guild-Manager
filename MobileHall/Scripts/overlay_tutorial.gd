@@ -42,9 +42,9 @@
 ##
 ## Tab pacing: while the tutorial is on, Guild (id "upgrades") unlocks on
 ## Day 3 and Shop on Day 5. Skipping the tutorial lifts both locks.
+class_name OverlayTutorial
 extends Control
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 
 ## Off = no coach, no tab locks, and the old Welcome card shows instead.
 const ENABLED := true
@@ -80,7 +80,7 @@ void fragment() {
 }
 """
 
-# ---- coloured words (the stat inks in Style.STATS, and Style.GOLD_TEXT)
+# ---- coloured words (the stat inks in HallStyle.STATS, and HallStyle.GOLD_TEXT)
 const POW := "[color=#8B2E2A]Power[/color]"
 const DEF := "[color=#2F4A66]Defense[/color]"
 const WIS := "[color=#5B4A7A]Wisdom[/color]"
@@ -90,10 +90,10 @@ const GOLD := "[color=#6B5A1E]gold[/color]"
 
 # ---- art reused from MobileHall/Art (swap the files to restyle the coach)
 ## Pip sits in the same round portrait frame as the heroes on the Board.
-const PORTRAIT_MASK := preload("res://MobileHall/Art/Textures/portrait_round_mask.png")
-const PORTRAIT_FRAME := preload("res://MobileHall/Art/Textures/portrait_round_frame.png")
+const PORTRAIT_MASK := preload("uid://buv1wa6etd3u3")  # MobileHall/Art/Textures/portrait_round_mask.png
+const PORTRAIT_FRAME := preload("uid://cscfv0x0mk446")  # MobileHall/Art/Textures/portrait_round_frame.png
 ## The pointer is the pixel arrow icon (it points left; it's turned to point up / down).
-const ARROW_ICON := preload("res://MobileHall/Art/Icons/arrow_left.svg")
+const ARROW_ICON := preload("uid://c2nc04lk4jmw3")  # MobileHall/Art/Icons/arrow_left.svg
 ## Ground behind Pip inside the frame (a parchment tint).
 const PIP_GROUND := Color("#E9DEC4")
 
@@ -503,8 +503,8 @@ func _build() -> void:
 	# the spotlight ring: the stamp's double border (white art) inked gold
 	_ring = Panel.new()
 	_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_ring.add_theme_stylebox_override("panel", load("res://MobileHall/Styles/stamp.tres"))
-	Style.tint_art(_ring, RING_COLOR)
+	_ring.add_theme_stylebox_override("panel", load("uid://cov6qnc1bx421"))  # MobileHall/Styles/stamp.tres
+	HallStyle.tint_art(_ring, RING_COLOR)
 	add_child(_ring)
 
 	_pointer = Pointer.new()
@@ -517,7 +517,7 @@ func _build() -> void:
 	# Pip's bubble is a parchment card, like every other card in the hall
 	_bubble = PanelContainer.new()
 	_bubble.mouse_filter = Control.MOUSE_FILTER_STOP
-	Style.set_look(_bubble, &"PaperCard")
+	HallStyle.set_look(_bubble, &"PaperCard")
 	add_child(_bubble)
 
 	var row := HBoxContainer.new()
@@ -568,7 +568,7 @@ func _build() -> void:
 	_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_text.add_theme_font_size_override("normal_font_size", 25)
 	_text.add_theme_font_size_override("bold_font_size", 25)
-	_text.add_theme_color_override("default_color", Style.TEXT_MAIN)
+	_text.add_theme_color_override("default_color", HallStyle.TEXT_MAIN)
 	col.add_child(_text)
 
 	var foot := HBoxContainer.new()
@@ -580,21 +580,21 @@ func _build() -> void:
 	_do_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_do_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_do_label.add_theme_font_size_override("font_size", 19)
-	Style.set_font_color(_do_label, Style.BLUE_TEXT)
+	HallStyle.set_font_color(_do_label, HallStyle.BLUE_TEXT)
 	# the instruction takes all the room left of Skip / Next, so it doesn't wrap early
 	foot.add_child(_do_label)
 	_skip_button = Button.new()
 	_skip_button.text = "Skip tutorial"
 	_skip_button.flat = true
-	_skip_button.add_theme_font_override("font", load("res://MobileHall/Art/Fonts/font_italic.tres"))
+	_skip_button.add_theme_font_override("font", load("uid://dvhjw1533s75"))  # MobileHall/Art/Fonts/font_italic.tres
 	_skip_button.add_theme_font_size_override("font_size", 20)
-	_skip_button.add_theme_color_override("font_color", Style.TEXT_SOFT)
+	_skip_button.add_theme_color_override("font_color", HallStyle.TEXT_SOFT)
 	_skip_button.pressed.connect(skip_tutorial)
 	foot.add_child(_skip_button)
 	_next_button = Button.new()
 	_next_button.text = "Next"
 	_next_button.custom_minimum_size = Vector2(120, 64)
-	Style.style_button(_next_button, "gold", 28)
+	HallStyle.style_button(_next_button, "gold", 28)
 	_next_button.pressed.connect(_advance)
 	foot.add_child(_next_button)
 
@@ -612,7 +612,7 @@ func _build_portrait() -> Control:
 	mask.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
 	mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mask.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	Style.tint_art(mask, PIP_GROUND)
+	HallStyle.tint_art(mask, PIP_GROUND)
 	holder.add_child(mask)
 	var pip := PipFace.new()
 	pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -752,19 +752,19 @@ func _any_affordable() -> bool:
 
 
 func _bought_role() -> String:
-	return Style.item_role_name(_bought_item) if _bought_item != null else ""
+	return HallStyle.item_role_name(_bought_item) if _bought_item != null else ""
 
 
 func _bought_name() -> String:
-	return Style.item_look(_bought_item).name if _bought_item != null else "item"
+	return HallStyle.item_look(_bought_item).name if _bought_item != null else "item"
 
 
 func _fits_bought(character: Variant) -> bool:
-	return character is GuildCharacter and _bought_item != null and Style.role_name(character) == _bought_role()
+	return character is GuildCharacter and _bought_item != null and HallStyle.role_name(character) == _bought_role()
 
 
 func _someone_fits_bought() -> bool:
-	return hall.roster().any(func(character): return _fits_bought(character) and not Style.is_dead(character))
+	return hall.roster().any(func(character): return _fits_bought(character) and not HallStyle.is_dead(character))
 
 # ============================================================ THE SCRIPT
 

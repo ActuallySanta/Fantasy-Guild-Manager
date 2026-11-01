@@ -4,9 +4,7 @@
 ## Scene: MobileHall/Scenes/Tabs/tab_board.tscn
 extends ScrollContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const QuestRowScene := preload("res://MobileHall/Scenes/Rows/quest_row.tscn")
+const QuestRowScene := preload("uid://dxhtjf067jytf")  # MobileHall/Scenes/Rows/quest_row.tscn
 
 # ---- TEXT
 # Today note titles
@@ -100,6 +98,6 @@ func _show_quest_list() -> void:
 	var is_milestone_day: bool = not hall.quest_entries.is_empty() and hall.quest_entries[0].milestone
 	_heading.text = HEADING_MILESTONE if is_milestone_day else HEADING
 	_hint.text = HINT_ALL_DECIDED if hall.undecided_count() == 0 else HINT
-	Style.clear_children(_quest_list)
+	HallStyle.clear_children(_quest_list)
 	for quest_index in hall.quest_entries.size():
-		Style.add_row(_quest_list, QuestRowScene).setup(hall, quest_index)
+		HallStyle.add_row(_quest_list, QuestRowScene).setup(hall, quest_index)

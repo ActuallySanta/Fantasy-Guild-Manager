@@ -2,8 +2,6 @@
 ## Scene: MobileHall/Scenes/Rows/suggest_row.tscn
 extends HBoxContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 
 # ---- TEXT
 const TEXT_NAME := "%s · Level %d"
@@ -21,10 +19,10 @@ const TEXT_BUTTON := "%d gold"
 func setup(hall: HallMain, building: int) -> void:
 	var next_level := GuildUpgrades.get_level(building) + 1
 	var tag_color: Color = GuildUpgrades.get_building_color(building).darkened(0.25)
-	Style.style_tag(_tag_box, _tag, Style.BUILDING_TAGS.get(building, "?"), tag_color)
+	HallStyle.style_tag(_tag_box, _tag, HallStyle.BUILDING_TAGS.get(building, "?"), tag_color)
 	_name.text = TEXT_NAME % [GuildUpgrades.get_building_name(building), next_level]
 	_effect.text = GuildUpgrades.get_effect_text(building, next_level)
 
 	_buy_button.text = TEXT_BUTTON % GuildUpgrades.get_next_gold_cost(building)
-	Style.style_button(_buy_button, "green", 24)
+	HallStyle.style_button(_buy_button, "green", 24)
 	_buy_button.pressed.connect(hall.upgrade_building.bind(building))

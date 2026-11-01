@@ -1,9 +1,8 @@
 ## One pinned note in the Board's "Today" checklist (Recruits / Decided / Upgrades).
 ## Green ink when done, dark ink when it wants a visit, faded otherwise.
 ## Scene: MobileHall/Scenes/Rows/today_item.tscn
-extends "res://MobileHall/Scripts/tap_panel.gd"
+extends TapPanel
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 
 # ---- NODES
 @onready var _title: Label = %Title
@@ -17,8 +16,8 @@ func set_item(title: String, value: String, _icon_name: String, look: String) ->
 	_value.text = value
 	match look:
 		"done":
-			Style.set_font_color(_value, Style.GREEN_TEXT)
+			HallStyle.set_font_color(_value, HallStyle.GREEN_TEXT)
 		"todo":
-			Style.set_font_color(_value, Style.TEXT_MAIN)
+			HallStyle.set_font_color(_value, HallStyle.TEXT_MAIN)
 		_:
-			Style.set_font_color(_value, Style.TEXT_SOFT)
+			HallStyle.set_font_color(_value, HallStyle.TEXT_SOFT)

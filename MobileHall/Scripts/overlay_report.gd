@@ -5,10 +5,7 @@
 ## Scene: MobileHall/Scenes/Overlays/overlay_report.tscn
 extends Control
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const ReportEntryScene := preload("res://MobileHall/Scenes/Rows/report_entry.tscn")
-const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
+const ReportEntryScene := preload("uid://di7qjsfr530p5")  # MobileHall/Scenes/Rows/report_entry.tscn
 
 # ---- MOTION (only for the report that opens after End Day)
 ## Seconds before the reveal starts (the dusk wash is clearing).
@@ -88,7 +85,7 @@ func refresh() -> void:
 
 	var results: Array = report.results
 	_title.text = TEXT_TITLE % report.day
-	_letters_note.text = TEXT_LETTERS % Style.count_text(results.size(), "letter", "letters") if not results.is_empty() else TEXT_NO_LETTERS
+	_letters_note.text = TEXT_LETTERS % HallStyle.count_text(results.size(), "letter", "letters") if not results.is_empty() else TEXT_NO_LETTERS
 	_show_totals(results)
 	_show_home(report.get("home", {}))
 	_show_released(report.get("released", []))
@@ -106,21 +103,21 @@ func refresh() -> void:
 ## up, the home / released notes fade in, then each letter plays in turn
 ## (report_entry.reveal). The button is always there to skip ahead.
 func _play_reveal() -> void:
-	if Fx.reduce_motion:
+	if HallFx.reduce_motion:
 		return
 	var at := REVEAL_START
 	for chip in [_succeeded_chip, _gold_chip, _injured_chip, _dead_chip]:
 		if chip.visible:
-			Fx.stamp_in(chip, 1.6, at)
+			HallFx.stamp_in(chip, 1.6, at)
 			at += REVEAL_CHIP_GAP
-	Fx.count(_gold_chip.get_node("Row/Text"), 0, _total_gold, REVEAL_GOLD_SECONDS, TEXT_GOLD, REVEAL_START)
+	HallFx.count(_gold_chip.get_node("Row/Text"), 0, _total_gold, REVEAL_GOLD_SECONDS, TEXT_GOLD, REVEAL_START)
 	for note in [_home_note, _released_note]:
 		if note.visible:
-			Fx.fade_in(note, at)
+			HallFx.fade_in(note, at)
 			at += REVEAL_CHIP_GAP
 	for entry in _entry_list.get_children():
 		at += entry.reveal(at) * REVEAL_LETTER_OVERLAP
-	Fx.appear(_action_button, 1.2, minf(at, REVEAL_BUTTON_LATEST))
+	HallFx.appear(_action_button, 1.2, minf(at, REVEAL_BUTTON_LATEST))
 
 
 ## Inked boxes on the torn strip: how many succeeded, total gold, how many
@@ -137,19 +134,19 @@ func _show_totals(results: Array) -> void:
 		injured_count += result.get("injured", []).size()
 		dead_count += result.get("died", []).size()
 
-	_succeeded_chip.set_box(TEXT_SUCCEEDED % [succeeded_count, results.size()], Style.BLUE_TEXT)
+	_succeeded_chip.set_box(TEXT_SUCCEEDED % [succeeded_count, results.size()], HallStyle.BLUE_TEXT)
 	_succeeded_chip.visible = not results.is_empty()
-	_gold_chip.set_box(TEXT_GOLD % total_gold, Style.GOLD_TEXT)
+	_gold_chip.set_box(TEXT_GOLD % total_gold, HallStyle.GOLD_TEXT)
 	_total_gold = total_gold
 	if injured_count > 0:
-		_injured_chip.set_box(Style.count_text(injured_count, "hurt", "hurt"), Style.RED)
+		_injured_chip.set_box(HallStyle.count_text(injured_count, "hurt", "hurt"), HallStyle.RED)
 	else:
-		_injured_chip.set_box(TEXT_NO_INJURIES, Style.GREEN_TEXT)
+		_injured_chip.set_box(TEXT_NO_INJURIES, HallStyle.GREEN_TEXT)
 	# "nobody hurt" next to a death would read wrong, so it hides when someone died
 	_injured_chip.visible = injured_count > 0 or dead_count == 0
 
-	var dead_look: Dictionary = Style.INJURY_LOOKS[GuildCharacter.InjuryLevel.DEAD]
-	_dead_chip.set_box(Style.count_text(dead_count, "death", "deaths"), dead_look.text, "skull")
+	var dead_look: Dictionary = HallStyle.INJURY_LOOKS[GuildCharacter.InjuryLevel.DEAD]
+	_dead_chip.set_box(HallStyle.count_text(dead_count, "death", "deaths"), dead_look.text, "skull")
 	_dead_chip.visible = dead_count > 0
 
 
@@ -157,10 +154,10 @@ func _show_totals(results: Array) -> void:
 func _show_home(home: Dictionary) -> void:
 	var parts := PackedStringArray()
 	for trained in home.get("trained", []):
-		parts.append(TEXT_TRAINED % [trained.character.name, trained.gain, Style.STATS[trained.stat].short])
+		parts.append(TEXT_TRAINED % [trained.character.name, trained.gain, HallStyle.STATS[trained.stat].short])
 	for healed in home.get("healed", []):
-		var from_label: String = Style.INJURY_LOOKS[healed.from].label
-		var to_label: String = Style.INJURY_LOOKS[healed.to].label
+		var from_label: String = HallStyle.INJURY_LOOKS[healed.from].label
+		var to_label: String = HallStyle.INJURY_LOOKS[healed.to].label
 		parts.append(TEXT_HEALED % [healed.character.name, from_label, to_label])
 	_home_note.text = TEXT_HOME % " · ".join(parts)
 	_home_note.visible = not parts.is_empty()
@@ -182,9 +179,9 @@ func _show_released(released: Array) -> void:
 
 ## One letter per quest, or a note when nobody went out.
 func _show_entries(results: Array) -> void:
-	Style.clear_children(_entry_list)
+	HallStyle.clear_children(_entry_list)
 	for result in results:
-		Style.add_row(_entry_list, ReportEntryScene).setup(result)
+		HallStyle.add_row(_entry_list, ReportEntryScene).setup(result)
 	_empty_label.text = TEXT_NOBODY_WENT
 	_empty_label.visible = results.is_empty()
 	_scroll.scroll_vertical = 0

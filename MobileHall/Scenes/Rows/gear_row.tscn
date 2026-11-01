@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://5qr0450k1huj"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/gear_row.gd" id="1_gear"]
+[ext_resource type="Script" uid="uid://mxarx3uliw24" path="res://MobileHall/Scripts/gear_row.gd" id="1_gear"]
 
 [node name="GearRow" type="PanelContainer"]
 size_flags_horizontal = 3

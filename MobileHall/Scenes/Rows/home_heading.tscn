@@ -1,4 +1,4 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bve0dglxrk3x4"]
 
 [node name="HomeHeading" type="Label"]
 custom_minimum_size = Vector2(40, 0)

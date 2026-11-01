@@ -4,10 +4,8 @@
 ## Scene: MobileHall/Scenes/Rows/home_section.tscn
 extends PanelContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const HomeRowScene := preload("res://MobileHall/Scenes/Rows/home_row.tscn")
-const HeadingScene := preload("res://MobileHall/Scenes/Rows/home_heading.tscn")
+const HomeRowScene := preload("uid://br273xs77xnj3")  # MobileHall/Scenes/Rows/home_row.tscn
+const HeadingScene := preload("uid://bve0dglxrk3x4")  # MobileHall/Scenes/Rows/home_heading.tscn
 
 # ---- TEXT
 const TEXT_LEVEL := "Lv %d"
@@ -45,15 +43,15 @@ func setup(main: HallMain, section_building: int) -> void:
 	hall = main
 	building = section_building
 	var tag_color: Color = GuildUpgrades.get_building_color(building).darkened(0.25)
-	Style.style_tag(_tag_box, _tag, Style.BUILDING_TAGS.get(building, "?"), tag_color)
+	HallStyle.style_tag(_tag_box, _tag, HallStyle.BUILDING_TAGS.get(building, "?"), tag_color)
 	_name.text = GuildUpgrades.get_building_name(building)
 	_add_button.pressed.connect(hall.toggle_training_picker)
-	Style.style_panel(self, Style.CARD_BG, Style.BORDER, 2, 16)
+	HallStyle.style_panel(self, HallStyle.CARD_BG, HallStyle.BORDER, 2, 16)
 
 
 func refresh() -> void:
 	_level.text = TEXT_LEVEL % GuildUpgrades.get_level(building)
-	Style.clear_children(_list)
+	HallStyle.clear_children(_list)
 	if building == GuildUpgrades.Building.TRAINING_YARD:
 		_show_training()
 	else:
@@ -61,11 +59,11 @@ func refresh() -> void:
 
 
 func _add_heading(text: String) -> void:
-	Style.add_row(_list, HeadingScene).text = text
+	HallStyle.add_row(_list, HeadingScene).text = text
 
 
 func _add_row() -> Node:
-	return Style.add_row(_list, HomeRowScene)
+	return HallStyle.add_row(_list, HomeRowScene)
 
 # ---- Training Yard
 
@@ -74,8 +72,8 @@ func _show_training() -> void:
 	var slots := GuildUpgrades.get_training_slots()
 	var roster: Array = hall.roster()
 	var trainees := roster.filter(func(character): return GuildUpgrades.is_training(character))
-	_summary.text = TEXT_TRAINING_SUMMARY % [trainees.size(), slots, Style.pick_plural(slots, "slot", "slots"), GuildUpgrades.get_training_gain()]
-	Style.set_font_color(_summary, Style.BLUE_TEXT if GuildUpgrades.has_free_training_slot() else Style.TEXT_SOFT)
+	_summary.text = TEXT_TRAINING_SUMMARY % [trainees.size(), slots, HallStyle.pick_plural(slots, "slot", "slots"), GuildUpgrades.get_training_gain()]
+	HallStyle.set_font_color(_summary, HallStyle.BLUE_TEXT if GuildUpgrades.has_free_training_slot() else HallStyle.TEXT_SOFT)
 
 	for character in trainees:
 		_add_row().show_training_slot(hall, character)
@@ -85,7 +83,7 @@ func _show_training() -> void:
 		var can_train := roster.filter(func(character):
 			return not GuildUpgrades.is_training(character) and GuildUpgrades.can_train(character))
 		var cant_train := roster.filter(func(character):
-			return not GuildUpgrades.can_train(character) and not Style.is_dead(character))
+			return not GuildUpgrades.can_train(character) and not HallStyle.is_dead(character))
 		_add_heading(HEADING_PICK)
 		for character in can_train:
 			_add_row().show_can_train(hall, character)
@@ -101,11 +99,11 @@ func _show_training() -> void:
 	if not GuildUpgrades.has_free_training_slot():
 		_add_button.text = BUTTON_FULL
 		_add_button.disabled = true
-		Style.style_button(_add_button, "paper", 24)
+		HallStyle.style_button(_add_button, "paper", 24)
 	else:
 		_add_button.text = BUTTON_DONE_PICKING if is_picking else BUTTON_ADD
 		_add_button.disabled = false
-		Style.style_button(_add_button, "paper" if is_picking else "blue", 24)
+		HallStyle.style_button(_add_button, "paper" if is_picking else "blue", 24)
 
 # ---- Hospital
 
@@ -116,17 +114,17 @@ func _show_hospital() -> void:
 	var patients := roster.filter(func(character): return GuildUpgrades.is_patient(character))
 	var waiting := roster.filter(func(character):
 		return GuildUpgrades.needs_care(character) and not GuildUpgrades.is_patient(character))
-	var fallen := roster.filter(func(character): return Style.is_dead(character))
+	var fallen := roster.filter(func(character): return HallStyle.is_dead(character))
 
 	if not waiting.is_empty():
 		_summary.text = TEXT_HOSPITAL_WAITING % waiting.size()
-		Style.set_font_color(_summary, Style.RED)
+		HallStyle.set_font_color(_summary, HallStyle.RED)
 	elif not patients.is_empty():
 		_summary.text = TEXT_HOSPITAL_IN_BED % patients.size()
-		Style.set_font_color(_summary, Style.TEXT_SOFT)
+		HallStyle.set_font_color(_summary, HallStyle.TEXT_SOFT)
 	else:
 		_summary.text = TEXT_HOSPITAL_CALM
-		Style.set_font_color(_summary, Style.TEXT_SOFT)
+		HallStyle.set_font_color(_summary, HallStyle.TEXT_SOFT)
 
 	if not patients.is_empty():
 		_add_heading(HEADING_IN_BED)

@@ -1,6 +1,6 @@
-[gd_resource type="StyleBoxTexture" format=3]
+[gd_resource type="StyleBoxTexture" format=3 uid="uid://cov6qnc1bx421"]
 
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/stamp.png" id="1_tex"]
+[ext_resource type="Texture2D" uid="uid://qemem1kgmrlw" path="res://MobileHall/Art/Textures/stamp.png" id="1_tex"]
 
 [resource]
 content_margin_left = 20.0
@@ -12,5 +12,3 @@ texture_margin_left = 16.0
 texture_margin_top = 16.0
 texture_margin_right = 16.0
 texture_margin_bottom = 16.0
-axis_stretch_horizontal = 0
-axis_stretch_vertical = 0

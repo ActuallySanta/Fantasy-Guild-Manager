@@ -1,5 +1,8 @@
 extends Node
 
+# These stay res:// paths: plain-text data files have no UID (UIDs are only
+# for Godot resources), and FileAccess.open needs a real path. If you move a
+# file in External Content, update its path here.
 @export var character_m_names_file_path: String = "res://External Content/Character Names/Character Names - Male Names.csv"
 @export var character_f_names_file_path: String = "res://External Content/Character Names/Character Names - Female Names.csv"
 @export var character_a_names_file_path: String = "res://External Content/Character Names/Character Names - Androgynous Names.csv"

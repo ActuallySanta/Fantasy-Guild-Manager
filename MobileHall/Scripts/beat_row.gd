@@ -2,7 +2,6 @@
 ## Scene: MobileHall/Scenes/Rows/beat_row.tscn
 extends HBoxContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 
 # ---- NODES
 @onready var _icon: TextureRect = $Icon
@@ -12,6 +11,6 @@ const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 ## icon_name = a name from hall_style ICON_FILES; icon_tint = its ink;
 ## bbcode = the story line.
 func setup(icon_name: String, icon_tint: Color, bbcode: String) -> void:
-	_icon.texture = Style.icon_texture(icon_name)
+	_icon.texture = HallStyle.icon_texture(icon_name)
 	_icon.modulate = icon_tint
 	_text.text = bbcode

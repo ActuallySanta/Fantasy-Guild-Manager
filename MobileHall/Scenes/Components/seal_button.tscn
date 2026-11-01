@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://j7s636wj68s6"]
 
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/wax_seal.png" id="1_seal"]
+[ext_resource type="Texture2D" uid="uid://cmmy0d1mwkpum" path="res://MobileHall/Art/Textures/wax_seal.png" id="1_seal"]
 
 [node name="SealButton" type="Button"]
 custom_minimum_size = Vector2(0, 92)

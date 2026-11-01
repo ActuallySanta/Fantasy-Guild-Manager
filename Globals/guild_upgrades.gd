@@ -24,7 +24,7 @@ enum Building { OFFICE, TRAINING_YARD, HOSPITAL, ARMORY, BARRACKS }
 enum UpgradeStatus { READY, STANDING_TOO_LOW, NOT_ENOUGH_GOLD, MAX_LEVEL, NOT_IMPLEMENTED }
 
 const MAX_LEVEL := 5
-const UPGRADES_PAGE_PATH := "res://Scenes/UI/Upgrades/upgrades_page.tscn"
+const UPGRADES_PAGE_PATH := "uid://d28mfgqtx1wvr"  # Scenes/UI/Upgrades/upgrades_page.tscn
 const ARMORY_META := "armory_bonus_applied"
 const HOOKED_META := "guild_upgrades_hooked"
 const CHARACTER_PAGE_NAME := "Guild Character Page"
