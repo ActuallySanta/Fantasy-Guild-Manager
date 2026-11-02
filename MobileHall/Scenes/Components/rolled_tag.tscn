@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dvyjbi6emukey"]
 
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/rolled_scroll.png" id="1_roll"]
+[ext_resource type="Texture2D" uid="uid://bd3fnwn17o4f8" path="res://MobileHall/Art/Textures/rolled_scroll.png" id="1_roll"]
 
 [node name="RolledTag" type="TextureRect"]
 custom_minimum_size = Vector2(212, 70)

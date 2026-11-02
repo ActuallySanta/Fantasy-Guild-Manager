@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://np4ecx6rqalr"]
 
-[ext_resource type="Script" path="res://Scripts/Upgrades/upgrade_card.gd" id="1_7wruj"]
+[ext_resource type="Script" uid="uid://dnco8l4oj5b1j" path="res://Scripts/Upgrades/upgrade_card.gd" id="1_7wruj"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
 content_margin_left = 16.0

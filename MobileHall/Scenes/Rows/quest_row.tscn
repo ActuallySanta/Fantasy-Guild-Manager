@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c72y5lb5o2uaa" path="res://MobileHall/Scripts/quest_row.gd" id="1_row"]
 [ext_resource type="Texture2D" uid="uid://by4rny5fghqj" path="res://MobileHall/Art/Textures/roller_v.png" id="2_roller"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
+[ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
 
 [node name="QuestRow" type="PanelContainer" unique_id=1166598345]
 script = ExtResource("1_row")

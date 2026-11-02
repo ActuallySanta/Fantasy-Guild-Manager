@@ -1,7 +1,7 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://eyqpbr188oi2"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/stat_strip.gd" id="1_mh62l"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="2_d5pfk"]
+[ext_resource type="Script" uid="uid://dqbuwhwv7qeli" path="res://MobileHall/Scripts/stat_strip.gd" id="1_mh62l"]
+[ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://MobileHall/Scenes/Components/chip.tscn" id="2_d5pfk"]
 
 [node name="StatStrip" type="HFlowContainer"]
 mouse_filter = 2

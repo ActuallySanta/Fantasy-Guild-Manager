@@ -13,10 +13,7 @@
 ## Scene: MobileHall/Scenes/Tabs/tab_shop.tscn
 extends VBoxContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const ShopTileScene := preload("res://MobileHall/Scenes/Rows/shop_tile.tscn")
-const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
+const ShopTileScene := preload("uid://b25qy8uoil5du")  # MobileHall/Scenes/Rows/shop_tile.tscn
 
 # ---- TEXT
 const SHOP_NAME := "Grizzle's Goods"
@@ -71,10 +68,10 @@ func refresh() -> void:
 
 
 func _show_goods() -> void:
-	Style.clear_children(_grid)
+	HallStyle.clear_children(_grid)
 	for index in ItemShop.stock.size():
 		var item := ItemShop.get_item(index)
-		var look := Style.item_look(item)
+		var look := HallStyle.item_look(item)
 		var good := {
 			"name": look.short,
 			"tag": look.tag,
@@ -82,21 +79,21 @@ func _show_goods() -> void:
 			"price": item.cost,
 			"sold": ItemShop.is_sold(index),
 		}
-		var tile: Control = Style.add_row(_grid, ShopTileScene)
+		var tile: Control = HallStyle.add_row(_grid, ShopTileScene)
 		tile.setup(good, index == _selected, _pick.bind(index))
 		if hall.pending_fx.get("bought", -1) == index:
 			# just bought: the tile stamps down as sold and Grizzle perks up
-			Fx.stamp_in(tile, 1.4)
-			Fx.pop(_bubble_text.get_parent(), 1.08, 0.1)
+			HallFx.stamp_in(tile, 1.4)
+			HallFx.pop(_bubble_text.get_parent(), 1.08, 0.1)
 		elif _just_picked and index == _selected:
-			Fx.pop(tile, 1.08)
+			HallFx.pop(tile, 1.08)
 	_just_picked = false
 
 
 func _show_restock_note() -> void:
 	var unworn := ItemShop.unworn_count()
 	if unworn > 0:
-		_restock_note.text = RESTOCK_NOTE_PACK % Style.count_text(unworn, "item", "items")
+		_restock_note.text = RESTOCK_NOTE_PACK % HallStyle.count_text(unworn, "item", "items")
 	else:
 		_restock_note.text = RESTOCK_NOTE
 
@@ -109,7 +106,7 @@ func _show_buy_bar() -> void:
 		_item_effect.text = NOTHING_PICKED_HINT
 		_buy_button.visible = false
 		return
-	var look := Style.item_look(item)
+	var look := HallStyle.item_look(item)
 	var is_sold := ItemShop.is_sold(_selected)
 	_item_name.text = look.name
 	_item_effect.text = SOLD_HINT if is_sold else look.effect
@@ -118,7 +115,7 @@ func _show_buy_bar() -> void:
 	_buy_button.visible = true
 	_buy_button.text = SOLD_BUTTON if is_sold else BUY_BUTTON % item.cost
 	_buy_button.disabled = not ItemShop.can_buy(_selected)
-	Style.style_button(_buy_button, "gold")
+	HallStyle.style_button(_buy_button, "gold")
 
 
 func _pick(index: int) -> void:

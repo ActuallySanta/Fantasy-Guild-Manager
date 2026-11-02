@@ -1,7 +1,7 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://b5bqn48cqktg4"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/tab_board.gd" id="1_uvw3s"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Rows/today_item.tscn" id="2_otn60"]
+[ext_resource type="Script" uid="uid://bwii1eyxbqp10" path="res://MobileHall/Scripts/tab_board.gd" id="1_uvw3s"]
+[ext_resource type="PackedScene" uid="uid://edhkrbpcjf3j" path="res://MobileHall/Scenes/Rows/today_item.tscn" id="2_otn60"]
 
 [node name="TabBoard" type="ScrollContainer"]
 horizontal_scroll_mode = 0

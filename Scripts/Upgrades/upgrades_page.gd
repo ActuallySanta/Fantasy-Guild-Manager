@@ -3,7 +3,7 @@
 ## standing are shown in the home screen's top bar, not on this page.
 extends Control
 
-const UPGRADE_CARD := preload("res://Scenes/UI/Upgrades/upgrade_card.tscn")
+const UPGRADE_CARD := preload("uid://csn6fmeousk5o")  # Scenes/UI/Upgrades/upgrade_card.tscn
 
 @onready var card_list: VBoxContainer = %CardList
 @onready var debug_row: HBoxContainer = %DebugRow

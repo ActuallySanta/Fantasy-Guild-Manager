@@ -5,8 +5,6 @@
 ## Scene: MobileHall/Scenes/Components/odds_bar.tscn
 extends TextureProgressBar
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
 
 ## Seconds the fill takes to slide to a new chance (when animated).
 const SLIDE_SECONDS := 0.4
@@ -18,10 +16,10 @@ var _slide_tween: Tween
 ## animate = slide the fill there (Assign Party, when the party changes).
 func set_chance(chance: int, animate := false) -> void:
 	var target := clampf(chance, 0.0, 100.0) if chance >= 0 else 0.0
-	tint_progress = Style.odds_look(chance).bar_color
+	tint_progress = HallStyle.odds_look(chance).bar_color
 	if _slide_tween:
 		_slide_tween.kill()
-	if not animate or Fx.reduce_motion:
+	if not animate or HallFx.reduce_motion:
 		value = target
 		return
 	_slide_tween = create_tween()

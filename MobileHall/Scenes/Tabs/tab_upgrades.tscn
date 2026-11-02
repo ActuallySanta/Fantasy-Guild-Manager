@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dfn4ypcw71ayy"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/tab_upgrades.gd" id="1_2kjtj"]
-[ext_resource type="FontVariation" path="res://MobileHall/Art/Fonts/font_title.tres" id="2_title"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Rows/home_section.tscn" id="7_section"]
+[ext_resource type="Script" uid="uid://bkf4h5pvim5go" path="res://MobileHall/Scripts/tab_upgrades.gd" id="1_2kjtj"]
+[ext_resource type="FontVariation" uid="uid://b7dyj081fpsg2" path="res://MobileHall/Art/Fonts/font_title.tres" id="2_title"]
+[ext_resource type="PackedScene" uid="uid://62s1nweygpw7" path="res://MobileHall/Scenes/Rows/home_section.tscn" id="7_section"]
 
 [node name="TabUpgrades" type="VBoxContainer"]
 theme_override_constants/separation = 0

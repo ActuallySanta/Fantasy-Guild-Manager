@@ -5,9 +5,7 @@
 ## Scene: MobileHall/Scenes/Rows/report_entry.tscn
 extends PanelContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const BeatRowScene := preload("res://MobileHall/Scenes/Rows/beat_row.tscn")
-const Fx := preload("res://MobileHall/Scripts/hall_fx.gd")
+const BeatRowScene := preload("uid://nm3rjurnk3x2")  # MobileHall/Scenes/Rows/beat_row.tscn
 
 # ---- MOTION (the reveal, see reveal())
 ## Seconds the letter takes to fade up, then before its stamp slams down.
@@ -87,23 +85,23 @@ var _bbcode_tags := RegEx.create_from_string("\\[[^\\]]*\\]")
 ## result = one quest result from hall_main._run_quest.
 func setup(result: Dictionary) -> void:
 	var succeeded: bool = result.succeeded
-	var type_info := Style.quest_type_info(result)
-	Style.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
+	var type_info := HallStyle.quest_type_info(result)
+	HallStyle.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
 	_title.text = result.quest.questTitle
-	_from_line.text = TEXT_FROM % [Style.join_names(result.party), mini(int(result.chance), 100)]
+	_from_line.text = TEXT_FROM % [HallStyle.join_names(result.party), mini(int(result.chance), 100)]
 
 	# the stamp is white art inked green or red (a death turns it red even on a success)
 	var died: Array = result.get("died", [])
 	_stamp_text.text = TEXT_SUCCESS if succeeded else TEXT_FAILED
-	var stamp_ink := Style.GREEN_TEXT if succeeded and died.is_empty() else Style.RED
-	Style.tint_art(_result_stamp, stamp_ink)
-	Style.set_font_color(_stamp_text, stamp_ink)
+	var stamp_ink := HallStyle.GREEN_TEXT if succeeded and died.is_empty() else HallStyle.RED
+	HallStyle.tint_art(_result_stamp, stamp_ink)
+	HallStyle.set_font_color(_stamp_text, stamp_ink)
 
 	var injured: Array = result.get("injured", [])
 	_injured_tag.visible = not injured.is_empty()
-	_injured_text.text = TEXT_INJURED % Style.join_names(injured, ", ")
+	_injured_text.text = TEXT_INJURED % HallStyle.join_names(injured, ", ")
 	_died_tag.visible = not died.is_empty()
-	_died_text.text = TEXT_DIED % Style.join_names(died, ", ")
+	_died_text.text = TEXT_DIED % HallStyle.join_names(died, ", ")
 
 	# equipment found while searching; the guild keeps it even on a failed quest
 	# (results from before this feature have no "items" key, so default to none)
@@ -124,20 +122,20 @@ func setup(result: Dictionary) -> void:
 ## line and the sign-off appears.
 ## Returns how long that takes (seconds), so the report can start the next letter.
 func reveal(delay: float) -> float:
-	if Fx.reduce_motion:
+	if HallFx.reduce_motion:
 		return 0.0
 	var at := delay
-	Fx.fade_in(self, at, REVEAL_LETTER_SECONDS)
+	HallFx.fade_in(self, at, REVEAL_LETTER_SECONDS)
 	at += REVEAL_STAMP_DELAY
-	Fx.stamp_in(_result_stamp, 2.4, at)
+	HallFx.stamp_in(_result_stamp, 2.4, at)
 	at += REVEAL_LETTER_SECONDS
 
 	for tag in [_injured_tag, _died_tag, _found_tag]:
 		if tag.visible:
-			Fx.stamp_in(tag, 1.6, at)
+			HallFx.stamp_in(tag, 1.6, at)
 			at += REVEAL_TAG_GAP
 	if _died_tag.visible:
-		Fx.shake(self, REVEAL_DEATH_SHAKE, at)
+		HallFx.shake(self, REVEAL_DEATH_SHAKE, at)
 		at += REVEAL_DEATH_PAUSE
 
 	var beats := _beat_list.get_children()
@@ -145,9 +143,9 @@ func reveal(delay: float) -> float:
 	if not beats.is_empty():
 		beat_gap = minf(REVEAL_BEAT_GAP, REVEAL_BEATS_MAX / beats.size())
 	for beat in beats:
-		Fx.fade_in(beat, at)
+		HallFx.fade_in(beat, at)
 		at += beat_gap
-	Fx.fade_in(_closing_line, at)
+	HallFx.fade_in(_closing_line, at)
 	return at - delay
 
 
@@ -160,7 +158,7 @@ func _build_story_beats(story: String) -> void:
 		var plain_text := _bbcode_tags.sub(beat_text, "", true).strip_edges()
 		if plain_text == "" or SKIPPED_LINE_STARTS.any(func(start): return plain_text.begins_with(start)):
 			continue
-		Style.add_row(_beat_list, BeatRowScene).setup(_icon_for_beat(plain_text), Style.TEXT_SOFT, beat_text)
+		HallStyle.add_row(_beat_list, BeatRowScene).setup(_icon_for_beat(plain_text), HallStyle.TEXT_SOFT, beat_text)
 
 
 func _icon_for_beat(plain_text: String) -> String:

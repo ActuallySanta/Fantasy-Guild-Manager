@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-"Fantasy Guild Manager", a Godot **4.7** GDScript game (GL Compatibility, portrait 720x1280, phone-first). You run a guild: hire heroes, send parties on daily quests, buy gear and building upgrades. A Bone Drake milestone quest comes on day 10.
+"Fantasy Guild Manager", a Godot **4.7** GDScript game (GL Compatibility, portrait 720x1280, phone-first). You run a guild: hire heroes, send parties on daily quests, buy gear and building upgrades. A Bone Drake milestone quest comes on day 10, and the main story ends with a final battle on day 50 (a credits roll, then endless freeplay with an S++ rank; see `MobileHall/README.md`).
 
 ## Running and testing
 
@@ -46,7 +46,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 - All colors and tables live in `MobileHall/Scripts/hall_style.gd`. Story BBCode colors are bright, meant for dark backgrounds. `report_entry.gd` `STORY_RECOLORS` swaps them for colors that read on the light cards, so a new story color needs an entry there.
 - `MobileHall/README.md` covers the UI's design and rules (training, hospital, revive).
 
-The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still borrows its scoring helpers: it preloads `Scripts/UI/day_bar.gd` for `_get_success_chance`, `_did_succeed`, and `_get_gold_earned`. Changes to quest payout or results need to keep `day_bar.gd` working too.
+The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still borrows its scoring helpers: it uses `Scripts/UI/day_bar.gd` (`class_name DayBar`) for `_get_success_chance`, `_did_succeed`, and `_get_gold_earned`. Changes to quest payout or results need to keep `day_bar.gd` working too.
 
 ## Conventions
 
@@ -54,3 +54,9 @@ The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still b
   - `quest_resource.gd` has legacy camelCase (`goldReward`, `questNum`, `generateResults`). Reference those as they are; don't rename them, since UI code depends on them.
 - Comment new code thoroughly. Tunables get `##` doc comments with units, functions get doc comments covering their params and return value, and non-obvious logic gets `#` comments. This matches the style of the newer files (`item_shop.gd`, `guild_upgrades.gd`, MobileHall scripts).
 - Tuning numbers go in named, documented variables or constants at the top of the file that owns them, not inline.
+- File references should survive files being moved:
+  - Reach scripts through their `class_name` (`HallStyle`, `HallMain`, `HallFx`, `TapPanel`, `DayBar`, …), not `preload("res://….gd")`. Name them directly (`HallStyle.X`, `HallFx.X`): GDScript rejects `const Style := HallStyle` as "not a constant expression" here.
+  - Load scenes and assets by uid with the path in a trailing comment: `preload("uid://…")  # MobileHall/Scenes/Rows/quest_row.tscn`. Look up a file's uid in its header (`.tscn`/`.tres`), its `.import` file, or its `.gd.uid` file.
+  - Text data in `External Content/` (`.txt`, `.csv`) has no UID, so it stays on `res://` paths.
+  - Move files in the Godot FileSystem dock. If you move one outside the editor, move its `.uid` or `.import` file along with it, and commit the `.uid` files.
+  - Hand-written `.tscn`/`.tres` files need a `uid="uid://…"` in their header, and each `ext_resource` line needs a `uid=` as well as its `path=`. Saving the file in the editor fills these in.

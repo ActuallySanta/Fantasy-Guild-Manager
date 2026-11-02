@@ -1,9 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://dls1bjn8gt2fe"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/member_card.gd" id="1_member"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/stat_strip.tscn" id="4_stats"]
+[ext_resource type="Script" uid="uid://b35afd8f80g43" path="res://MobileHall/Scripts/member_card.gd" id="1_member"]
+[ext_resource type="PackedScene" uid="uid://h87tubvsjwc3" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
+[ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
+[ext_resource type="PackedScene" uid="uid://eyqpbr188oi2" path="res://MobileHall/Scenes/Components/stat_strip.tscn" id="4_stats"]
 
 [node name="MemberCard" type="PanelContainer"]
 theme_type_variation = &"PaperCard"

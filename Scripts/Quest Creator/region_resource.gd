@@ -2,6 +2,9 @@ extends Resource
 
 class_name Region
 
+# These stay res:// paths: plain-text data files have no UID (UIDs are only
+# for Godot resources), and FileAccess.open needs a real path. If you move a
+# file in External Content, update its path here.
 @export var dunegon_locations_test_path: String = "res://External Content/Quest Stuff (Test)/Dungeon Names (Locations).txt" #test path for locations
 @export var monsters_2D_test_path: String = "res://External Content/Quest Stuff (Test)/2D Monster Test.txt" #test path for monstrs
 

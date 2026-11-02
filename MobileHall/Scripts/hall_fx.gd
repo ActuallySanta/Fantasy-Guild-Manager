@@ -15,9 +15,9 @@
 ##
 ## Look: bouncy overshoot (TRANS_BACK), squash and stretch, stamps. No glows,
 ## no blurs (see the UI style guide).
+class_name HallFx
 extends RefCounted
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 
 ## Set from the Menu's Reduced Motion button (HallMain.set_reduce_motion).
 static var reduce_motion := false
@@ -36,6 +36,13 @@ const STAMP_IMPACT_SCALE := 0.9
 const STAMP_FALL_SECONDS := 0.16
 const STAMP_SETTLE_SECONDS := 0.22
 const STAMP_PAGE_DIP := 0.96
+## Hanging something on a nail (swing_in): the angle it starts swung out to
+## (radians), how many times it swings back across the middle before it
+## settles, the seconds that takes, and the seconds it takes to fade in.
+const SWING_START_ANGLE := 0.26
+const SWING_CROSSINGS := 3
+const SWING_SECONDS := 1.0
+const SWING_FADE_SECONDS := 0.12
 
 
 # ============================================================ BASICS
@@ -62,6 +69,17 @@ static func _tween(node: Node, key: StringName) -> Tween:
 
 static func _center_pivot(node: Control) -> void:
 	node.pivot_offset = node.size / 2.0
+
+
+## The alpha a node fades in to: its own alpha the first time it fades, then
+## remembered for the node's life. A fade that starts while another is still
+## running (tapping quickly between quests or tabs) would otherwise take the
+## half-faded alpha as where to stop, and the node would stay see-through.
+## (Every faded node here keeps one resting alpha: rows are rebuilt on refresh.)
+static func _resting_alpha(node: CanvasItem) -> float:
+	if not node.has_meta(&"fx_resting_alpha"):
+		node.set_meta(&"fx_resting_alpha", node.modulate.a)
+	return node.get_meta(&"fx_resting_alpha")
 
 
 # ============================================================ ON A NODE
@@ -100,7 +118,7 @@ static func pulse(node: Control, times := 3, peak := 1.12, delay := 0.0) -> void
 static func appear(node: Control, from_scale := 0.85, delay := 0.0, duration := 0.28) -> void:
 	if reduce_motion or not is_instance_valid(node):
 		return
-	var target_alpha := node.modulate.a
+	var target_alpha := _resting_alpha(node)
 	node.modulate.a = 0.0
 	if not await _wait_for_layout(node):
 		return
@@ -123,7 +141,7 @@ static func stamp_in(node: Control, from_scale := 1.8, delay := 0.0) -> void:
 static func fade_in(node: Control, delay := 0.0, duration := 0.22) -> void:
 	if reduce_motion or not is_instance_valid(node):
 		return
-	var target_alpha := node.modulate.a
+	var target_alpha := _resting_alpha(node)
 	node.modulate.a = 0.0
 	var tween := _tween(node, &"fx_alpha")
 	if delay > 0.0:
@@ -136,7 +154,7 @@ static func fade_in(node: Control, delay := 0.0, duration := 0.22) -> void:
 static func slide_in(node: Control, offset: Vector2, delay := 0.0, duration := 0.3) -> void:
 	if reduce_motion or not is_instance_valid(node):
 		return
-	var target_alpha := node.modulate.a
+	var target_alpha := _resting_alpha(node)
 	node.modulate.a = 0.0
 	if not await _wait_for_layout(node):
 		return
@@ -148,6 +166,30 @@ static func slide_in(node: Control, offset: Vector2, delay := 0.0, duration := 0
 	tween.tween_property(node, "modulate:a", target_alpha, duration * 0.5)
 	tween.parallel().tween_property(node, "position", resting, duration) \
 			.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+
+## Hang like a sign on a nail: it fades in swung out to one side, then swings
+## back and forth about the nail, each swing smaller, and settles straight.
+## The nail is at the top middle of the node, `nail_y` pixels down.
+## Hidden right away until its delay is up.
+static func swing_in(node: Control, nail_y := 0.0, delay := 0.0) -> void:
+	if reduce_motion or not is_instance_valid(node):
+		return
+	var target_alpha := _resting_alpha(node)
+	node.modulate.a = 0.0
+	if not await _wait_for_layout(node):
+		return
+	node.pivot_offset = Vector2(node.size.x / 2.0, nail_y)
+	node.rotation = SWING_START_ANGLE
+	var tween := _tween(node, &"fx_swing")
+	if delay > 0.0:
+		tween.tween_interval(delay)
+	tween.tween_property(node, "modulate:a", target_alpha, SWING_FADE_SECONDS)
+	# a damped pendulum: crosses the middle SWING_CROSSINGS times, dying away
+	var sway := func(progress: float) -> void:
+		node.rotation = SWING_START_ANGLE * pow(1.0 - progress, 2.0) * cos(progress * PI * SWING_CROSSINGS)
+	tween.parallel().tween_method(sway, 0.0, 1.0, SWING_SECONDS)
+	tween.tween_callback(func() -> void: node.rotation = 0.0)
 
 
 ## Side-to-side shake that settles (a refusal, a loss, a death).

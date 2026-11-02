@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://5khy5d8j40yo"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/chip.gd" id="1_chip"]
+[ext_resource type="Script" uid="uid://bh1skn0yrphtr" path="res://MobileHall/Scripts/chip.gd" id="1_chip"]
 
 [node name="Chip" type="PanelContainer"]
 size_flags_vertical = 4

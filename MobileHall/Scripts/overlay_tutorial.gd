@@ -3,10 +3,14 @@
 ## waits for the player to use it (or press Next on explain-only steps), so
 ## the player learns by doing instead of reading an intro screen.
 ##   Day 1 - hiring, a hero's page (stats, gear), reading a quest, picking a
-##           party, odds, Deny vs Send, End Day, the Day Report
+##           party, odds, Deny vs Send, End Day, the Day Report, how the
+##           guild can fall (HallMain.is_run_over)
 ##   Day 3 - the Guild tab: upgrading a building, the Training Yard, the
 ##           Hospital, and why posted heroes can't quest
 ##   Day 5 - the Shop: role-locked items, buying, equipping from a hero's page
+##   Freeplay - after the final battle is won (HallMain.start_freeplay): what
+##           changes now the story is over (endless days, climbing quests,
+##           the S++ rank). Runs even if the main tutorial was skipped.
 ##
 ## Built in code; hall_main._ready adds it on top of every overlay.
 ## UI only: it calls nothing but hall_main's own actions and queries.
@@ -23,7 +27,8 @@
 ## HOW IT WORKS
 ##   hall_main emits tutorial_event(event, data) from its actions:
 ##     tab, hire, character, close, assign, pick, send, deny, end_check,
-##     end_day, new_day, upgrade, training_picker, train, admit, buy, equip
+##     end_day, new_day, upgrade, training_picker, train, admit, buy, equip,
+##     freeplay
 ##   A step is a Dictionary:
 ##     text    String or Callable -> String (BBCode)
 ##     do      short instruction under the text ("Tap Members")
@@ -41,13 +46,16 @@
 ##
 ## Tab pacing: while the tutorial is on, Guild (id "upgrades") unlocks on
 ## Day 3 and Shop on Day 5. Skipping the tutorial lifts both locks.
+class_name OverlayTutorial
 extends Control
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 
 ## Off = no coach, no tab locks, and the old Welcome card shows instead.
 const ENABLED := true
 const TUTORIAL_DAYS := [1, 3, 5]
+## Script key for the freeplay walkthrough (not a day: it starts on the
+## "freeplay" event, whatever day that is).
+const FREEPLAY_SCRIPT := -1
 const UNLOCK_DAY := {"upgrades": 3, "shop": 5}
 
 ## Draw order: above the hall's overlays (z 10: Day Report, End Day sheet,
@@ -79,7 +87,7 @@ void fragment() {
 }
 """
 
-# ---- coloured words (the stat inks in Style.STATS, and Style.GOLD_TEXT)
+# ---- coloured words (the stat inks in HallStyle.STATS, and HallStyle.GOLD_TEXT)
 const POW := "[color=#8B2E2A]Power[/color]"
 const DEF := "[color=#2F4A66]Defense[/color]"
 const WIS := "[color=#5B4A7A]Wisdom[/color]"
@@ -89,10 +97,10 @@ const GOLD := "[color=#6B5A1E]gold[/color]"
 
 # ---- art reused from MobileHall/Art (swap the files to restyle the coach)
 ## Pip sits in the same round portrait frame as the heroes on the Board.
-const PORTRAIT_MASK := preload("res://MobileHall/Art/Textures/portrait_round_mask.png")
-const PORTRAIT_FRAME := preload("res://MobileHall/Art/Textures/portrait_round_frame.png")
+const PORTRAIT_MASK := preload("uid://buv1wa6etd3u3")  # MobileHall/Art/Textures/portrait_round_mask.png
+const PORTRAIT_FRAME := preload("uid://cscfv0x0mk446")  # MobileHall/Art/Textures/portrait_round_frame.png
 ## The pointer is the pixel arrow icon (it points left; it's turned to point up / down).
-const ARROW_ICON := preload("res://MobileHall/Art/Icons/arrow_left.svg")
+const ARROW_ICON := preload("uid://c2nc04lk4jmw3")  # MobileHall/Art/Icons/arrow_left.svg
 ## Ground behind Pip inside the frame (a parchment tint).
 const PIP_GROUND := Color("#E9DEC4")
 
@@ -100,10 +108,13 @@ const PIP_GROUND := Color("#E9DEC4")
 var hall: Control
 ## True once the player taps Skip tutorial (also lifts the tab locks).
 var is_skipped := false
-## Tutorial days already finished or skipped.
+## Tutorial scripts already finished or skipped (a day, or FREEPLAY_SCRIPT).
 var done := {}
 
+## The day shown on Pip's counter.
 var _day := 0
+## Which script is running: a day from TUTORIAL_DAYS, or FREEPLAY_SCRIPT.
+var _script := 0
 var _steps: Array = []
 var _index := -1
 ## Events seen during the current day's script (for skip checks).
@@ -174,9 +185,12 @@ func is_running() -> bool:
 
 # ============================================================ FLOW
 
-func start(day: int) -> void:
+## Run a script on `day` (the counter shows it). script = which steps to run;
+## by default the day's own (TUTORIAL_DAYS), or FREEPLAY_SCRIPT.
+func start(day: int, script: int = day) -> void:
 	_day = day
-	_steps = _steps_for(day)
+	_script = script
+	_steps = _steps_for(script)
 	_seen = {}
 	_index = -1
 	visible = true
@@ -200,7 +214,7 @@ func _advance() -> void:
 
 
 func _finish() -> void:
-	done[_day] = true
+	done[_script] = true
 	_index = -1
 	_steps = []
 	visible = false
@@ -223,6 +237,12 @@ func _on_event(event: String, data: Variant = null) -> void:
 		if is_running():
 			_finish()
 		start(int(data))
+		return
+	# freeplay explains a new mode, so it runs even after Skip tutorial
+	if event == "freeplay" and ENABLED and not done.get(FREEPLAY_SCRIPT, false):
+		if is_running():
+			_finish()
+		start(int(data), FREEPLAY_SCRIPT)
 		return
 	if not is_running():
 		return
@@ -502,8 +522,8 @@ func _build() -> void:
 	# the spotlight ring: the stamp's double border (white art) inked gold
 	_ring = Panel.new()
 	_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_ring.add_theme_stylebox_override("panel", load("res://MobileHall/Styles/stamp.tres"))
-	Style.tint_art(_ring, RING_COLOR)
+	_ring.add_theme_stylebox_override("panel", load("uid://cov6qnc1bx421"))  # MobileHall/Styles/stamp.tres
+	HallStyle.tint_art(_ring, RING_COLOR)
 	add_child(_ring)
 
 	_pointer = Pointer.new()
@@ -516,7 +536,7 @@ func _build() -> void:
 	# Pip's bubble is a parchment card, like every other card in the hall
 	_bubble = PanelContainer.new()
 	_bubble.mouse_filter = Control.MOUSE_FILTER_STOP
-	Style.set_look(_bubble, &"PaperCard")
+	HallStyle.set_look(_bubble, &"PaperCard")
 	add_child(_bubble)
 
 	var row := HBoxContainer.new()
@@ -567,7 +587,7 @@ func _build() -> void:
 	_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_text.add_theme_font_size_override("normal_font_size", 25)
 	_text.add_theme_font_size_override("bold_font_size", 25)
-	_text.add_theme_color_override("default_color", Style.TEXT_MAIN)
+	_text.add_theme_color_override("default_color", HallStyle.TEXT_MAIN)
 	col.add_child(_text)
 
 	var foot := HBoxContainer.new()
@@ -579,21 +599,21 @@ func _build() -> void:
 	_do_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_do_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_do_label.add_theme_font_size_override("font_size", 19)
-	Style.set_font_color(_do_label, Style.BLUE_TEXT)
+	HallStyle.set_font_color(_do_label, HallStyle.BLUE_TEXT)
 	# the instruction takes all the room left of Skip / Next, so it doesn't wrap early
 	foot.add_child(_do_label)
 	_skip_button = Button.new()
 	_skip_button.text = "Skip tutorial"
 	_skip_button.flat = true
-	_skip_button.add_theme_font_override("font", load("res://MobileHall/Art/Fonts/font_italic.tres"))
+	_skip_button.add_theme_font_override("font", load("uid://dvhjw1533s75"))  # MobileHall/Art/Fonts/font_italic.tres
 	_skip_button.add_theme_font_size_override("font_size", 20)
-	_skip_button.add_theme_color_override("font_color", Style.TEXT_SOFT)
+	_skip_button.add_theme_color_override("font_color", HallStyle.TEXT_SOFT)
 	_skip_button.pressed.connect(skip_tutorial)
 	foot.add_child(_skip_button)
 	_next_button = Button.new()
 	_next_button.text = "Next"
 	_next_button.custom_minimum_size = Vector2(120, 64)
-	Style.style_button(_next_button, "gold", 28)
+	HallStyle.style_button(_next_button, "gold", 28)
 	_next_button.pressed.connect(_advance)
 	foot.add_child(_next_button)
 
@@ -611,7 +631,7 @@ func _build_portrait() -> Control:
 	mask.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
 	mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mask.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	Style.tint_art(mask, PIP_GROUND)
+	HallStyle.tint_art(mask, PIP_GROUND)
 	holder.add_child(mask)
 	var pip := PipFace.new()
 	pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -751,30 +771,32 @@ func _any_affordable() -> bool:
 
 
 func _bought_role() -> String:
-	return Style.item_role_name(_bought_item) if _bought_item != null else ""
+	return HallStyle.item_role_name(_bought_item) if _bought_item != null else ""
 
 
 func _bought_name() -> String:
-	return Style.item_look(_bought_item).name if _bought_item != null else "item"
+	return HallStyle.item_look(_bought_item).name if _bought_item != null else "item"
 
 
 func _fits_bought(character: Variant) -> bool:
-	return character is GuildCharacter and _bought_item != null and Style.role_name(character) == _bought_role()
+	return character is GuildCharacter and _bought_item != null and HallStyle.role_name(character) == _bought_role()
 
 
 func _someone_fits_bought() -> bool:
-	return hall.roster().any(func(character): return _fits_bought(character) and not Style.is_dead(character))
+	return hall.roster().any(func(character): return _fits_bought(character) and not HallStyle.is_dead(character))
 
 # ============================================================ THE SCRIPT
 
-func _steps_for(day: int) -> Array:
-	match day:
+func _steps_for(script: int) -> Array:
+	match script:
 		1:
 			return _day_one()
 		3:
 			return _day_three()
 		5:
 			return _day_five()
+		FREEPLAY_SCRIPT:
+			return _freeplay()
 	return []
 
 
@@ -793,7 +815,7 @@ func _day_one() -> Array:
 		# the applicants are a stack of letters (%Stack): the next one is on top now
 		{"target": func(): return _row(_tab("guild"), "hire_card.gd", "HireButton"), "on": "hire",
 			"skip": func(): return not hall.can_hire_anyone(),
-			"do": "Tap Hire on the next letter", "deny": ["DetailsButton"], "text": "Hire one more. Two heroes means better odds, and a backup when someone gets hurt."},
+			"do": "Tap Hire on another recruit", "deny": ["DetailsButton"], "text": "Hire one more. Two heroes means better odds, and a backup if someone falls. A guild with nobody left is finished."},
 		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
 			"do": "Tap Your Guild", "text": "Now meet your people. Open [b]Your Guild[/b]."},
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"), "on": "character",
@@ -828,6 +850,8 @@ func _day_one() -> Array:
 			"text": "Morning! Each party tells you what happened out there."},
 		{"target": func(): return _report_totals(),
 			"text": "The tally: quests won, %s earned, and who came back hurt. Hurt heroes heal at home, or faster in the Hospital." % GOLD},
+		{"target": func(): return _report_totals(),
+			"text": "Heroes can [b]die[/b] out there. If everyone is gone and you can't afford a new recruit, the guild falls and the run is over. When you're down to your last hero, a red warning shows under the header."},
 		{"target": func(): return _u(hall.get_node("%OverlayReport"), "ActionButton"), "on": "new_day",
 			"do": "Tap the button to start Day 2", "text": "Start Day 2. New recruits and quests show up every morning."},
 		{"text": "Day 2 is yours: hire, plan, send, end the day. I'll be back on Day 3 to show you the guild's buildings."},
@@ -907,4 +931,15 @@ func _day_five() -> Array:
 			"skip": func(): return not _seen.get("equip", false),
 			"text": "The gear's bonus is added to their stats and counts on every quest."},
 		{"text": func(): return ("You bought gear nobody can use yet. Hire a %s and equip it from their page." % _bought_role()) if (_seen.get("buy", false) and not _someone_fits_bought()) else "That's everything I can teach. Keep your heroes alive, watch the Bone Drake countdown, and good luck, Guildmaster."},
+	]
+
+
+## After the final battle is won: what freeplay changes.
+func _freeplay() -> Array:
+	return [
+		{"text": "You did it, Guildmaster! The final battle is won and the story is told. But the guild's doors stay open: welcome to [b]freeplay[/b]."},
+		{"text": "From now on the days never end. Each new day, every quest asks a little more of your heroes, and pays a little more %s too." % GOLD},
+		{"target": func(): return _row(_tab("board"), "quest_row.gd", "RankChip"),
+			"text": "Quests can now go past S rank. Anything tougher than S is [b]S++[/b]. It's the hardest work there is, and the best paid."},
+		{"text": "One thing hasn't changed: if every hero falls and you can't hire more, the guild falls with them. See how long your legend lasts!"},
 	]

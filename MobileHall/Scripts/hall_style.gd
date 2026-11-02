@@ -1,7 +1,7 @@
 ## Shared look and helpers for the Mobile Hall UI.
 ##
-## Every other MobileHall script preloads this file as `Style` and calls its
-## static helpers (Style.style_button(...), Style.QUEST_STATE_SENT, ...).
+## Every other MobileHall script uses this file through its class_name and calls its
+## static helpers (HallStyle.style_button(...), HallStyle.QUEST_STATE_SENT, ...).
 ## Nothing here holds state except the icon texture cache.
 ##
 ## The look: a guild hall at night. Dark wood behind everything, parchment
@@ -23,6 +23,7 @@
 ## Sections:
 ##   QUEST STATES · PALETTE · DISPLAY TABLES · TEXT HELPERS · GAME LOOKUPS ·
 ##   ICONS · STYLE BOXES · RESTYLES · SCENE HELPERS
+class_name HallStyle
 extends RefCounted
 
 
@@ -72,6 +73,14 @@ const BLUE_BG := Color("#DDE5EC")
 ## The navy ink for names on letters and sign-offs.
 const NAVY := Color("#26304A")
 
+# ---- the end-of-story roll (overlay_credits.gd): ink on a dark backdrop
+const CREDITS_BG := Color("#1B140F")      ## victory: a warm, near-black hall
+const CREDITS_INK := Color("#F3E2B0")     ## victory: candlelit gold text
+const CREDITS_INK_SOFT := Color("#C9B68A")  ## victory: captions, roles
+const DEFEAT_BG := Color("#0E1218")       ## defeat: a cold, moonless night
+const DEFEAT_INK := Color("#C9D3E0")      ## defeat: pale, ashen text
+const DEFEAT_INK_SOFT := Color("#8794A6")   ## defeat: captions, roles
+
 
 # ============================================================ DISPLAY TABLES
 
@@ -79,6 +88,8 @@ const NAVY := Color("#26304A")
 
 ## Key used for the milestone (Bone Drake) quest; it isn't a CreatedQuest.QuestType.
 const MILESTONE_TYPE_ID := 5
+## Key used for the final battle (HallMain.FINAL_DAY); not a CreatedQuest.QuestType either.
+const FINAL_TYPE_ID := 6
 
 ## CreatedQuest.QuestType (plus MILESTONE_TYPE_ID) -> display name, writ name
 ## (the Assign Party scroll), seal colour, short tag.
@@ -88,6 +99,7 @@ const QUEST_TYPES := {
 	3: {"name": "Scout Terrain", "writ": "Writ of Scouting", "color": Color("#3F5A74"), "tag": "SCT"},
 	4: {"name": "Gather Intel", "writ": "Writ of Intelligence", "color": Color("#5B4A7A"), "tag": "INT"},
 	MILESTONE_TYPE_ID: {"name": "Milestone", "writ": "Writ of the Drake", "color": Color("#7D2A26"), "tag": "BOSS"},
+	FINAL_TYPE_ID: {"name": "Final Battle", "writ": "Writ of the Last Stand", "color": Color("#3A1F3D"), "tag": "FINAL"},
 }
 
 # ---- stats
@@ -217,8 +229,10 @@ static func roman_numeral(number: int) -> String:
 
 # ---- quests
 
-## Key into QUEST_TYPES for a quest entry (the milestone gets its own key).
+## Key into QUEST_TYPES for a quest entry (the milestone and the final battle get their own keys).
 static func quest_type_id(entry: Dictionary) -> int:
+	if entry.get("final", false):
+		return FINAL_TYPE_ID
 	return MILESTONE_TYPE_ID if entry.get("milestone", false) else int(entry.quest.type)
 
 
@@ -232,8 +246,10 @@ static func favored_stat_index(quest: CreatedQuest) -> int:
 	return clampi(int(quest.favStat), 0, STAT_COUNT - 1)
 
 
-## Rank letter for a quest ("F" ... "S").
+## Rank letter for a quest ("F" ... "S", or "S++" in freeplay).
 static func rank_letter(quest: CreatedQuest) -> String:
+	if quest.difficulty == CreatedQuest.QuestDifficulty.SPP:
+		return "S++"
 	return str(CreatedQuest.QuestDifficulty.find_key(quest.difficulty))
 
 # ---- characters
@@ -328,37 +344,36 @@ static func buildings_in_order() -> Array:
 
 # ============================================================ ICONS
 
-const ART_FOLDER := "res://MobileHall/Art/"
-
-## Icon names used by the screens -> file in ART_FOLDER. Line icons are white
-## so they can be tinted; swap any file for your own art (keep it white to
-## keep the tinting). Names not listed here have no icon, so it's hidden.
+## Icon names used by the screens -> the icon file's uid (path in the comment),
+## so the files can move without breaking. Line icons are white so they can be
+## tinted; swap any file for your own art (keep it white to keep the tinting).
+## Names not listed here have no icon, so it's hidden.
 const ICON_FILES := {
-	"coins": "Icons/coins.svg",
-	"person": "Icons/person.svg",
-	"bed": "Icons/bed.svg",
-	"swords": "Icons/swords.svg",
-	"chest": "Icons/chest.svg",
-	"scroll": "Icons/scroll.svg",
-	"x": "Icons/x.svg",
-	"back": "Icons/arrow_left.svg",
-	"check": "Icons/check.svg",
-	"diamond": "Icons/diamond.svg",
-	"diamond_empty": "Icons/diamond_empty.svg",
-	"target": "Icons/target.svg",
-	"cross": "Icons/cross.svg",
-	"quill": "Icons/quill.svg",
-	"skull": "Icons/skull.svg",
-	"heart": "Icons/heart.svg",
-	"stall": "Icons/stall.svg",
-	"nav_settings": "Icons/gear.svg",
-	"nav_quests": "Icons/scroll.svg",
-	"nav_characters": "Icons/person.svg",
-	"nav_upgrades": "Icons/hammer.svg",
-	"nav_shop": "Icons/stall.svg",
+	"coins": "uid://baflbvuj3ew0p",  # MobileHall/Art/Icons/coins.svg
+	"person": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.svg
+	"bed": "uid://ih4xtkgfq1o8",  # MobileHall/Art/Icons/bed.svg
+	"swords": "uid://ce33qlc0iebc7",  # MobileHall/Art/Icons/swords.svg
+	"chest": "uid://dcn1cfg46tkrb",  # MobileHall/Art/Icons/chest.svg
+	"scroll": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.svg
+	"x": "uid://ealg7qhxhkmi",  # MobileHall/Art/Icons/x.svg
+	"back": "uid://c2nc04lk4jmw3",  # MobileHall/Art/Icons/arrow_left.svg
+	"check": "uid://xecbrm0mx34l",  # MobileHall/Art/Icons/check.svg
+	"diamond": "uid://b2bcm5mk7g15t",  # MobileHall/Art/Icons/diamond.svg
+	"diamond_empty": "uid://dkis35yrvae8t",  # MobileHall/Art/Icons/diamond_empty.svg
+	"target": "uid://c328bo4vnwlwo",  # MobileHall/Art/Icons/target.svg
+	"cross": "uid://d1p0h336y6eev",  # MobileHall/Art/Icons/cross.svg
+	"quill": "uid://bbkg4p4knjkde",  # MobileHall/Art/Icons/quill.svg
+	"skull": "uid://dv4aeys4diph4",  # MobileHall/Art/Icons/skull.svg
+	"heart": "uid://dbq8w0d0gocej",  # MobileHall/Art/Icons/heart.svg
+	"stall": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.svg
+	"nav_settings": "uid://ysb0ogcuiwff",  # MobileHall/Art/Icons/gear.svg
+	"nav_quests": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.svg
+	"nav_characters": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.svg
+	"nav_upgrades": "uid://cjywbau63ujgi",  # MobileHall/Art/Icons/hammer.svg
+	"nav_shop": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.svg
 }
 
-## Loaded icon textures by path, so each file is only loaded once.
+## Loaded icon textures by uid, so each file is only loaded once.
 static var _icon_cache := {}
 
 
@@ -366,10 +381,10 @@ static var _icon_cache := {}
 static func icon_texture(icon_name: String) -> Texture2D:
 	if not ICON_FILES.has(icon_name):
 		return null
-	var path: String = ART_FOLDER + ICON_FILES[icon_name]
-	if not _icon_cache.has(path):
-		_icon_cache[path] = load(path)
-	return _icon_cache[path]
+	var uid: String = ICON_FILES[icon_name]
+	if not _icon_cache.has(uid):
+		_icon_cache[uid] = load(uid)
+	return _icon_cache[uid]
 
 
 # ============================================================ STYLE BOXES

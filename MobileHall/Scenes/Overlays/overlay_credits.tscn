@@ -1,0 +1,324 @@
+[gd_scene format=3 uid="uid://0a18grxohlrg"]
+
+[ext_resource type="Script" uid="uid://voku81v31gey" path="res://MobileHall/Scripts/overlay_credits.gd" id="1_credits"]
+[ext_resource type="PackedScene" uid="uid://bakk5e3uhltne" path="res://MobileHall/Scenes/Components/stat_tile.tscn" id="2_tile"]
+[ext_resource type="PackedScene" uid="uid://0ruw74gtfe6k" path="res://MobileHall/Scenes/Components/divider.tscn" id="3_divider"]
+[ext_resource type="Texture2D" uid="uid://bswbe5m6msbdj" path="res://MobileHall/Art/Textures/connector.png" id="4_connector"]
+
+[node name="OverlayCredits" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_credits")
+
+[node name="Bg" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.105882, 0.0784314, 0.0588235, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="Margin" type="MarginContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_right = 36
+
+[node name="Roll" type="VBoxContainer" parent="Scroll/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="TopSpace" type="Control" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 1000)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"TitleLight"
+theme_override_font_sizes/font_size = 66
+text = "The Final Battle"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Sub" type="Label" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 30
+text = "Day 50 · Victory"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="StoryGap" type="Control" parent="Scroll/Margin/Roll"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="StoryHeading" type="Label" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CapsLight"
+theme_override_font_sizes/font_size = 28
+text = "The Battle"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="Story" type="VBoxContainer" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 26
+
+[node name="PartyGap" type="Control" parent="Scroll/Margin/Roll"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PartyHeading" type="Label" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CapsLight"
+theme_override_font_sizes/font_size = 28
+text = "Who Stood at the End"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="Party" type="VBoxContainer" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LedgerGap" type="Control" parent="Scroll/Margin/Roll"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Ledger" type="PanelContainer" parent="Scroll/Margin/Roll"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"LedgerCard"
+
+[node name="Col" type="VBoxContainer" parent="Scroll/Margin/Roll/Ledger"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="StatsTitle" type="Label" parent="Scroll/Margin/Roll/Ledger/Col"]
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 26
+text = "Final Stats"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="DaysRow" type="HBoxContainer" parent="Scroll/Margin/Roll/Ledger/Col"]
+layout_mode = 2
+alignment = 1
+
+[node name="DaysTile" parent="Scroll/Margin/Roll/Ledger/Col/DaysRow" instance=ExtResource("2_tile")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(260, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"InkBoxThick"
+
+[node name="Grid" type="GridContainer" parent="Scroll/Margin/Roll/Ledger/Col"]
+layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 3
+
+[node name="GoldTile" parent="Scroll/Margin/Roll/Ledger/Col/Grid" instance=ExtResource("2_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+rotation = -0.015
+
+[node name="QuestsTile" parent="Scroll/Margin/Roll/Ledger/Col/Grid" instance=ExtResource("2_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HiredTile" parent="Scroll/Margin/Roll/Ledger/Col/Grid" instance=ExtResource("2_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+rotation = 0.015
+
+[node name="FallenTile" parent="Scroll/Margin/Roll/Ledger/Col/Grid" instance=ExtResource("2_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+rotation = 0.01
+
+[node name="StandingTile" parent="Scroll/Margin/Roll/Ledger/Col/Grid" instance=ExtResource("2_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SpentTile" parent="Scroll/Margin/Roll/Ledger/Col/Grid" instance=ExtResource("2_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+rotation = -0.01
+
+[node name="RecordsDivider" parent="Scroll/Margin/Roll/Ledger/Col" instance=ExtResource("3_divider")]
+layout_mode = 2
+
+[node name="RecordsTitle" type="Label" parent="Scroll/Margin/Roll/Ledger/Col"]
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 26
+text = "Run Records"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="RecordsGrid" type="GridContainer" parent="Scroll/Margin/Roll/Ledger/Col"]
+layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 14
+columns = 2
+
+[node name="ItemsTile" parent="Scroll/Margin/Roll/Ledger/Col/RecordsGrid" instance=ExtResource("2_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+rotation = 0.01
+
+[node name="ServiceTile" parent="Scroll/Margin/Roll/Ledger/Col/RecordsGrid" instance=ExtResource("2_tile")]
+unique_name_in_owner = true
+layout_mode = 2
+rotation = -0.01
+
+[node name="Buildings" type="VBoxContainer" parent="Scroll/Margin/Roll/Ledger/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="RollCallDivider" parent="Scroll/Margin/Roll/Ledger/Col" instance=ExtResource("3_divider")]
+layout_mode = 2
+
+[node name="RollCallTitle" type="Label" parent="Scroll/Margin/Roll/Ledger/Col"]
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 26
+text = "Roll Call"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="RollCall" type="VBoxContainer" parent="Scroll/Margin/Roll/Ledger/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Empty" type="Label" parent="Scroll/Margin/Roll/Ledger/Col"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "No hero ever joined this guild."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TeamGap" type="Control" parent="Scroll/Margin/Roll"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TeamHeading" type="Label" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TitleLight"
+theme_override_font_sizes/font_size = 48
+text = "Made By"
+horizontal_alignment = 1
+
+[node name="Team" type="VBoxContainer" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="EndGap" type="Control" parent="Scroll/Margin/Roll"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="End" type="Label" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"TitleLight"
+theme_override_font_sizes/font_size = 72
+text = "The End"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="EndSub" type="Label" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 28
+text = "...though the guild's doors stay open."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="BottomSpace" type="Control" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 520)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Footer" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -180.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 26
+
+[node name="Col" type="VBoxContainer" parent="Footer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+alignment = 2
+
+[node name="Connector" type="TextureRect" parent="Footer/Col"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_connector")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ActionButton" type="Button" parent="Footer/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"GoldButton"
+theme_override_font_sizes/font_size = 46
+text = "Begin Freeplay"
