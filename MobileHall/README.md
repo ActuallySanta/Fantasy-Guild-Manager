@@ -126,7 +126,9 @@ than overriding colours or styles on the node, so a reskin reaches it.
 
 ## Files
 
-- `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, the shell (header, action bar, nav, toast)
+- `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, refresh
+- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings (static functions, no state)
+- `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip), action bar, nav and toast
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
 - `Scenes/Overlays/`: End Day check, Day Report, Welcome, Menu
@@ -143,7 +145,8 @@ and scripts only fill in text, show/hide nodes and instance rows. Each script ha
 comment naming its scene, a **TEXT** section with every message as a constant, a **NODES**
 section of `@onready var _x = %X` (unique names in the scene), then `setup(main)` and
 `refresh()`. Game state and actions live only in `hall_main.gd` (SETTINGS at the top:
-quests per day, milestone day, toast time). Screens call its actions and never change
+milestone day, release cost, dusk timings). Quests per day and quest ranks are in
+`hall_rules.gd`, toast time in `hall_toast.gd`. Screens call its actions and never change
 game state themselves.
 
 ## Known issues (in the game systems, not changed here)

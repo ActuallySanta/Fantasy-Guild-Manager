@@ -684,7 +684,7 @@ func _screen(kind: String) -> Node:
 
 
 func _nav(tab_id: String) -> Control:
-	return hall._nav_button(tab_id)
+	return hall.nav_button(tab_id)
 
 
 ## A scene-unique node (%Name) inside `node`'s scene.
@@ -821,7 +821,7 @@ func _day_one() -> Array:
 			"text": "[b]Deny[/b] turns a quest down. It costs a little standing, and you can Reconsider later the same day. This one's worth taking."},
 		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "send",
 			"do": "Tap Seal & send", "text": "Seal the orders and send the party. They head out tonight."},
-		{"target": func(): return hall.get_node("%ActionButton"), "on": "end_check",
+		{"target": func(): return hall.action_button(), "on": "end_check",
 			"do": "Tap End Day", "text": "Every quest is decided. This bar always shows your next step. Tap [b]End Day[/b]."},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
 			"do": "Tap End Day", "text": "A last look at tonight's plan. End the day."},

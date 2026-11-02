@@ -29,10 +29,20 @@
 ##   - big buttons, little scrolling, short report -> everywhere / Day Report
 ##
 ## HOW THE PIECES TALK
-## This script owns the day's state and every game action. Each tab, screen
-## and overlay gets setup(self) once, keeps that reference as `hall`, reads the
-## QUERIES and calls the ACTIONS below, and never changes game state itself.
-## After any change this script calls refresh() on whatever is showing.
+## This script owns the day's state and every game action. Each tab, screen,
+## overlay and shell piece gets setup(self) once, keeps that reference as `hall`,
+## reads the QUERIES and calls the ACTIONS below, and never changes game state
+## itself. After any change this script calls refresh() on whatever is showing.
+##
+## WHERE THINGS LIVE (keep this script to state, actions and refresh; see CLAUDE.md)
+##   hall_rules.gd     HallRules       building the day's quests, playing one out
+##   hall_ledger.gd    HallLedger      is the run over, the Game Over numbers
+##   hall_settings.gd  HallSettings    accessibility settings on disk
+##   hall_header.gd    HallHeader      day, countdown, counters (and their motion), danger strip
+##   hall_action_bar.gd HallActionBar  the "what to do next" banner
+##   hall_nav.gd       HallNav         bottom tabs and their badges
+##   hall_toast.gd     HallToast       the fading message
+##   hall_style.gd / hall_fx.gd         colors and tables / animations
 ##
 ## UI only: every rule comes from the existing systems (CharacterContainer,
 ## GuildCharacter, CreatedQuest, GameState, GuildUpgrades, DayBar's scoring
@@ -41,7 +51,7 @@
 ## Sections:
 ##   SETTINGS · TEXT · STATE · NODES · SETUP · QUERIES ·
 ##   ACTIONS (navigation, overlays, quests, guild, end of day) ·
-##   REFRESH (header, content, action bar, nav, overlays) · TOAST
+##   REFRESH (content, overlays) · TOAST
 class_name HallMain
 extends Control
 
@@ -55,24 +65,11 @@ signal tutorial_event(event: String, data: Variant)
 
 # ============================================================ SETTINGS
 
-## Same as QuestList.quests_per_day.
-var QUESTS_PER_DAY := 5
 ## The day QuestList swaps the board for the milestone (Bone Drake) quest.
 const MILESTONE_DAY := 10
 ## Standing lost for releasing a living hero, plus one more per level of their
 ## Pluck (letting a veteran go hurts more). Releasing the fallen is free.
 const RELEASE_BASE_STANDING_COST := 1
-## Pluck each party member gains for winning a quest, by the odds the party
-## was sent at: the longer the odds, the more they grow from beating them.
-## Checked top to bottom: the first row whose `min` chance (percent) the odds
-## reach is used. The `min`s match HallStyle.ODDS_BANDS, so the gain lines up with
-## the odds word on Assign Party (Strong odds / Fair odds / Risky / Long shot).
-const PLUCK_GAIN_BY_ODDS := [
-	{"min": 80, "gain": 1},
-	{"min": 60, "gain": 2},
-	{"min": 40, "gain": 3},
-	{"min": 0, "gain": 4},
-]
 ## Bottom tabs, left to right (ids match the Nav_<id> buttons and Tab nodes in the scene).
 const TAB_IDS := ["board", "guild", "upgrades", "shop"]
 ## The Shop tab (goods come from the ItemShop autoload).
@@ -86,51 +83,13 @@ const GUILD_SECTION_HIRE := "hire"
 ## Halves of the Upgrades tab.
 const UPGRADES_SECTION_TONIGHT := "tonight"
 const UPGRADES_SECTION_BUILD := "build"
-## Seconds a toast stays fully visible, then how long it takes to fade.
-const TOAST_SECONDS := 2.2
-const TOAST_FADE_SECONDS := 0.4
-## The Bone Drake countdown turns red when this many days (or fewer) are left.
-const DRAKE_WARNING_DAYS := 2
-## The header's "last hero standing" strip counts standing within this many
-## points of GuildUpgrades.MINIMUM_STANDING as nearly too low for recruits.
-const DANGER_STANDING_MARGIN := 3
-## Colorblind filter choices, in Menu order. Index = the shader's `mode`.
-const COLOR_FILTERS := ["Off", "Red-weak", "Green-weak", "Blue-yellow"]
-## Where player settings are saved, and the section / key for the filter.
-const SETTINGS_PATH := "user://settings.cfg"
-const SETTINGS_SECTION := "accessibility"
-const SETTINGS_COLOR_FILTER := "color_filter"
 ## The scene a new run starts in (not a playtest scenario, so its preset isn't re-applied).
 const MAIN_SCENE_PATH := "uid://dtw7iu2s1gibm"  # MobileHall/hall_main.tscn
 ## run_stats.drake_result values (the Bone Drake milestone quest).
 const DRAKE_RESULT_NONE := ""
 const DRAKE_RESULT_SLAIN := "Slain"
 const DRAKE_RESULT_LOST := "Lost"
-## Settings key for Reduced Motion (turns hall_fx.gd animations off).
-const SETTINGS_REDUCE_MOTION := "reduce_motion"
-
-# ---- motion (see MOTION below and hall_fx.gd)
-## Seconds the gold / standing numbers take to roll to a new value.
-const COUNTER_ROLL_SECONDS := 0.5
-## How big the counter grows when its number changes (1 = no pop).
-const COUNTER_POP := 1.22
-## Counter ink while it changes: a gain, a loss (light, to read on the wood header).
-const COUNTER_GAIN_INK := Color("#B5E08F")
-const COUNTER_LOSS_INK := Color("#FF9C8A")
-## Floating "+40" / "-2" under a counter: inks (dark, to read on paper and wood
-## with their light outline) and how far under the counter they start (pixels).
-const DELTA_GAIN_INK := Color("#3D5A2A")
-const DELTA_LOSS_INK := Color("#8B2E2A")
-const DELTA_OFFSET := Vector2(0, 58)
-## Coins / shields that fly between a counter and what you tapped: size (pixels),
-## flight time (seconds), and how many fly in when the night's earnings land.
-const FLY_ICON_SIZE := 44.0
-const FLY_SECONDS := 0.5
-const EARNINGS_COIN_COUNT := 5
-## Seconds between each of those coins leaving, and before the first one
-## leaves (so the dawn wash has started to clear).
-const EARNINGS_COIN_GAP := 0.07
-const EARNINGS_DELAY := 0.2
+# ---- motion (see hall_fx.gd; the counters' motion is in hall_header.gd)
 ## Seconds a SENT / DENIED stamp stays on the quest before the next one shows
 ## (taps are blocked meanwhile).
 const STAMP_HOLD_SECONDS := 0.5
@@ -149,44 +108,9 @@ const DUSK_IN_SECONDS := 0.35
 const DUSK_OUT_SECONDS := 0.45
 ## Each new tab or screen fades in this fast (seconds).
 const VIEW_FADE_SECONDS := 0.14
-## How big a nav badge grows when its count changes.
-const BADGE_POP := 1.4
-## Times the Bone Drake note pulses on a morning inside DRAKE_WARNING_DAYS.
-const DRAKE_PULSES := 3
 
 
 # ============================================================ TEXT
-
-# ---- header
-## The day number on the DAY tile.
-const HEADER_DAY := "%d"
-## The countdown note (BBCode); the days left are in red ink, and the whole
-## note turns red once DRAKE_WARNING_DAYS or fewer are left.
-const HEADER_DRAKE := "The Bone Drake wakes in [color=#%s]%d %s[/color]"
-const HEADER_DRAKE_TODAY := "The Bone Drake [color=#%s]attacks today![/color]"
-const HEADER_DRAKE_GONE := "The Bone Drake has come and gone"
-## The warning strip under the header (see is_one_death_from_falling).
-## DANGER_GOLD when gold is the problem, DANGER_STANDING when standing is.
-const DANGER_TITLE := "Last hero standing"
-const DANGER_GOLD := "Recruits cost %d gold and you have %d. Lose %s and the guild falls."
-const DANGER_STANDING := "Standing is nearly too low for recruits. Lose %s and the guild falls."
-
-# ---- nav
-## Nav tab heights: the open tab stands a little taller than the others.
-const NAV_HEIGHT := 100
-const NAV_HEIGHT_OPEN := 114
-
-# ---- action bar
-const ACTION_HIRE := "Hire your first adventurer"
-const ACTION_HIRE_HINT := "You need someone to send on quests."
-const ACTION_HIRE_BUTTON := "For Hire"
-const ACTION_DECIDE := "%s to decide"
-const ACTION_DECIDE_HINT := "Next: %s"
-const ACTION_DECIDE_BUTTON := "Next Quest"
-const ACTION_END := "Ready to end Day %d"
-const ACTION_END_HINT := "%s going out tonight"
-const ACTION_END_HINT_NONE := "No parties going out tonight"
-const ACTION_END_BUTTON := "End Day"
 
 # ---- toasts
 const TOAST_SENT := "Party sent: %s"
@@ -227,9 +151,6 @@ const TOAST_TAB_LOCKED := "Pip will open this on Day %d."
 # ---- stamps (SENT is inked on the quest itself, see screen_assign / quest_row)
 const STAMP_DENIED := "DENIED"
 const STAMP_HIRED := "HIRED"
-# ---- floating numbers under the counters
-const DELTA_GAIN := "+%d"
-const DELTA_LOSS := "%d"
 
 
 # ============================================================ STATE
@@ -305,9 +226,9 @@ var run_stats := {
 var show_busy_adventurers := false
 ## The day the player last opened For Hire (the Guild badge clears then).
 var for_hire_last_seen_day := 0
-## Colorblind filter: index into COLOR_FILTERS (0 = off). Saved in SETTINGS_PATH.
+## Colorblind filter: index into HallSettings.COLOR_FILTERS (0 = off). Saved by HallSettings.
 var color_filter := 0
-## Reduced Motion: animations off (HallFx.reduce_motion mirrors it). Saved in SETTINGS_PATH.
+## Reduced Motion: animations off (HallFx.reduce_motion mirrors it). Saved by HallSettings.
 var reduce_motion := false
 
 # ---- motion
@@ -335,50 +256,21 @@ var fx_layer: Control
 var _is_refresh_queued := false
 ## Which tab / screen was showing at the last refresh (to know when to scroll to top).
 var _last_view_key := ""
-var _toast_tween: Tween
-## The gold / standing numbers on screen right now (-1 = not drawn yet), and
-## whether each is held still (it waits for flying coins, or for the night's
-## earnings to land at dawn).
-var _shown_counters := {"gold": -1, "standing": -1}
-var _held_counters := {"gold": false, "standing": false}
-## The day on the DAY tile (to flip it when it changes; -1 = not drawn yet).
-var _shown_day := -1
-## Last badge text per nav tab, and the last action-bar title (to pop on change).
-var _shown_badges := {}
-var _shown_action_title := ""
 ## Pip, the tutorial coach (built in _ready, sits on top of every overlay).
 var tutorial: Control
 
 
 # ============================================================ NODES
 
-# ---- header
-@onready var _day_value: Label = %DayValue
-@onready var _drake_value: RichTextLabel = %DrakeValue
-@onready var _gold_value: Label = %GoldValue
-@onready var _standing_value: Label = %StandingValue
-# (header pieces that only move; no unique names in the scene)
-@onready var _day_tile: Control = $Layout/Header/Row/DayTile
-@onready var _drake_note: Control = $Layout/Header/Row/DrakeNote
-@onready var _gold_box: Control = $Layout/Header/Row/GoldValueBox
-@onready var _gold_coin: TextureRect = $Layout/Header/Row/GoldValueBox/Coin
-@onready var _standing_box: Control = $Layout/Header/Row/StandingValueBox
-@onready var _standing_shield: TextureRect = $Layout/Header/Row/StandingValueBox/Shield
-@onready var _menu_button: Button = %MenuButton
-@onready var _danger_strip: PanelContainer = %DangerStrip
-@onready var _danger_icon: TextureRect = %DangerIcon
-@onready var _danger_title: Label = %DangerTitle
-@onready var _danger_text: Label = %DangerText
+# ---- shell (each is its own scene in MobileHall/Scenes/Shell/)
+@onready var _header: HallHeader = %Header
+@onready var _action_bar: HallActionBar = %ActionBar
+@onready var _nav: HallNav = %Nav
+@onready var _toast: HallToast = %Toast
 
 # ---- content
 @onready var _tabs := {"board": %TabBoard, "guild": %TabGuild, "upgrades": %TabUpgrades, "shop": %TabShop}
 @onready var _screens := {SCREEN_ASSIGN: %ScreenAssign, SCREEN_CHARACTER: %ScreenCharacter}
-
-# ---- action bar
-@onready var _action_bar: Control = %ActionBar
-@onready var _action_title: Label = %ActionTitle
-@onready var _action_hint: Label = %ActionHint
-@onready var _action_button: Button = %ActionButton
 
 # ---- overlays
 @onready var _end_check_overlay: Control = %OverlayEndDay
@@ -387,10 +279,6 @@ var tutorial: Control
 @onready var _menu_overlay: Control = %OverlayMenu
 @onready var _game_over_overlay: Control = %OverlayGameOver
 
-# ---- toast
-@onready var _toast: PanelContainer = %Toast
-@onready var _toast_label: Label = %ToastLabel
-
 # ---- colorblind filter
 @onready var _color_filter: ColorRect = %ColorFilter
 
@@ -398,17 +286,10 @@ var tutorial: Control
 # ============================================================ SETUP
 
 func _ready() -> void:
-	# buttons owned by the shell
-	for tab_id in TAB_IDS:
-		_nav_button(tab_id).pressed.connect(open_tab.bind(tab_id))
-	_menu_button.pressed.connect(open_menu)
-	_action_button.pressed.connect(do_next_step)
-
-	# every tab, screen and overlay gets a reference back to this script
-	var views: Array = _tabs.values() + _screens.values() + _all_overlays()
+	# every shell piece, tab, screen and overlay gets a reference back to this script
+	var views: Array = [_header, _action_bar, _nav] + _tabs.values() + _screens.values() + _all_overlays()
 	for view in views:
 		view.setup(self)
-	_toast.visible = false
 
 	# game systems -> redraw
 	GameState.day_started.connect(_on_day_started)
@@ -447,74 +328,9 @@ func _on_day_started(_day: int) -> void:
 	queue_refresh()
 
 
-## Fill quest_entries for today. Mirrors QuestList.populate / _generate_quests:
-## the milestone day has only the Bone Drake, every other day has QUESTS_PER_DAY.
+## Fill quest_entries for today (see HallRules.build_day_quests).
 func _generate_quests() -> void:
-	quest_entries.clear()
-	
-	if GameState.day == MILESTONE_DAY:
-		quest_entries.append(_new_entry(CreatedQuest.new(2, 10), true))
-		return
-		
-	if GameState.day == 1:
-		QUESTS_PER_DAY = 1
-	elif GameState.day <= 3:
-		QUESTS_PER_DAY = 2
-	elif GameState.day <= 5:
-		QUESTS_PER_DAY = 3
-	elif GameState.day <= 10:
-		QUESTS_PER_DAY = 4
-	else:
-		QUESTS_PER_DAY = 5
-		
-	var standingNum = 0
-	if(GuildUpgrades.standing <= 10):
-		standingNum = 0
-	elif(GuildUpgrades.standing <= 20):
-		standingNum = 1
-	elif(GuildUpgrades.standing <= 30):
-		standingNum = 2
-	elif(GuildUpgrades.standing <= 40):
-		standingNum = 3
-	elif(GuildUpgrades.standing <= 50):
-		standingNum = 4
-	else:
-		standingNum = 5
-
-	for quest_number in QUESTS_PER_DAY:
-		var currentNum = 0
-		currentNum += standingNum
-		currentNum += int(rand_bell_curve())
-		if(currentNum < 0):
-			currentNum = 0
-		elif(currentNum > 5):
-			currentNum = 5
-
-		if(currentNum - standingNum == 2):
-			currentNum -= 1
-		elif(currentNum - standingNum == -2):
-			currentNum += 1
-
-		if(GuildUpgrades.standing <= 5):
-			currentNum = 0
-
-		quest_entries.append(_new_entry(CreatedQuest.new(currentNum, 0), false))
-
-func rand_bell_curve(mean: float = 0.0, standard_deviation: float = 1.0) -> float:
-	var u1: float = randf()
-	var u2: float = randf()
-	
-	# Avoid log(0) which is undefined
-	if u1 == 0.0: u1 = 0.0001 
-	
-	# Box-Muller transform formula
-	var standard_normal: float = sqrt(-2.0 * log(u1)) * cos(2.0 * PI * u2)
-	
-	# Scale by standard deviation and shift by the mean
-	return (standard_normal * standard_deviation) + mean
-
-func _new_entry(quest: CreatedQuest, is_milestone: bool) -> Dictionary:
-	return {"quest": quest, "state": HallStyle.QUEST_STATE_OPEN, "party": [], "milestone": is_milestone}
+	quest_entries = HallRules.build_day_quests(GameState.day, GuildUpgrades.standing)
 
 
 # ============================================================ QUERIES
@@ -554,84 +370,25 @@ func unseen_recruit_count() -> int:
 # ---- the run
 
 
-## True when the guild can never send anyone out again: nobody is alive
-## (patients in the Hospital count as alive), nobody in today's For Hire is
-## affordable, and no recruit ever will be (standing is too low for anyone to
-## show up, or tomorrow's price is already more than the gold left, and the
-## price never goes down). Never true on the free-recruit days.
+## True when the guild can never send anyone out again (see HallLedger.is_run_over).
 func is_run_over() -> bool:
-	if CharacterContainer.living_count() > 0 or _can_afford_a_recruit_today():
-		return false
-	if GameState.standing <= GuildUpgrades.MINIMUM_STANDING:
-		return true
-	return GameState.gold < GuildCharacter.recruit_cost_for_day(GameState.day + 1)
+	return HallLedger.is_run_over()
 
 
 ## True when one hero is left alive and losing them would (or nearly would)
-## end the run: nobody in today's For Hire is affordable, and either tomorrow's
-## recruit price is more than the gold left, or standing is within
-## DANGER_STANDING_MARGIN of the floor where recruits stop showing up.
-## Drives the header's warning strip. Never true on the free-recruit days.
+## end the run (see HallLedger). Drives the header's warning strip.
 func is_one_death_from_falling() -> bool:
-	if CharacterContainer.living_count() != 1 or _can_afford_a_recruit_today():
-		return false
-	return _is_short_of_recruit_gold() or _is_standing_near_floor()
+	return HallLedger.is_one_death_from_falling()
 
 
 ## The one living member of the guild, or null if there isn't exactly one.
 func last_living_hero() -> GuildCharacter:
-	var living := roster().filter(func(character): return not HallStyle.is_dead(character))
-	return living[0] if living.size() == 1 else null
+	return HallLedger.last_living_hero(roster())
 
 
-## Someone in today's For Hire costs no more than the gold in hand.
-func _can_afford_a_recruit_today() -> bool:
-	for character in CharacterContainer.hireable_characters:
-		if character.cost <= GameState.gold:
-			return true
-	return false
-
-
-## Tomorrow's recruit price is more than the gold in hand (prices never drop).
-func _is_short_of_recruit_gold() -> bool:
-	return GameState.gold < GuildCharacter.recruit_cost_for_day(GameState.day + 1)
-
-
-func _is_standing_near_floor() -> bool:
-	return GameState.standing <= GuildUpgrades.MINIMUM_STANDING + DANGER_STANDING_MARGIN
-
-
-## Everything the Game Over ledger shows, read from the tallies and the roster:
-##   days, gold_earned, quests_sent, quests_won, heroes_hired, fallen (int),
-##   standing (int), drake_result (String),
-##   roll_call: Array of GuildCharacter, the fallen first (earliest death first),
-##              then the released, then anyone else still on the roster
-##   released:  Array of GuildCharacter (to tell the released apart in the roll call)
+## Everything the Game Over ledger shows (see HallLedger.build_run_over_stats for the keys).
 func build_run_over_stats() -> Dictionary:
-	var released: Array = run_stats.released.duplicate()
-	var everyone: Array = roster().duplicate()
-	for character in released:
-		if not everyone.has(character):
-			everyone.append(character)
-
-	var fallen := everyone.filter(func(character): return HallStyle.is_dead(character))
-	fallen.sort_custom(func(a, b): return a.died_on_day < b.died_on_day)
-	var let_go := released.filter(func(character): return not HallStyle.is_dead(character))
-	var others := everyone.filter(func(character):
-		return not fallen.has(character) and not let_go.has(character))
-
-	return {
-		"days": GameState.day,
-		"gold_earned": run_stats.gold_earned,
-		"quests_sent": run_stats.quests_sent,
-		"quests_won": run_stats.quests_won,
-		"heroes_hired": run_stats.heroes_hired,
-		"fallen": fallen.size(),
-		"standing": GameState.standing,
-		"drake_result": run_stats.drake_result,
-		"roll_call": fallen + let_go + others,
-		"released": released,
-	}
+	return HallLedger.build_run_over_stats(run_stats, roster())
 
 # ---- quests
 
@@ -688,12 +445,9 @@ func success_chance(entry: Dictionary, party: Array) -> int:
 
 
 ## Pluck each party member gains for winning a quest sent at `chance` percent
-## (see PLUCK_GAIN_BY_ODDS). A party with no chance yet (-1) counts as a long shot.
+## (see HallRules.pluck_gain_for).
 func pluck_gain_for(chance: float) -> int:
-	for row in PLUCK_GAIN_BY_ODDS:
-		if chance >= row.min:
-			return row.gain
-	return PLUCK_GAIN_BY_ODDS[-1].gain
+	return HallRules.pluck_gain_for(chance)
 
 
 ## How many points of success chance this character gives a quest on their own.
@@ -907,7 +661,7 @@ func deny_quest() -> void:
 	entry.party.clear()
 	entry.state = HallStyle.QUEST_STATE_DENIED
 	if entry.quest.difficulty > 0:
-		_pay_fx("standing")
+		_header.pay_fx("standing")
 	GameState.reduce_standing(entry.quest.difficulty)
 	show_toast(TOAST_DENIED % entry.quest.questTitle)
 	_screens[SCREEN_ASSIGN].shake_writ()
@@ -982,7 +736,7 @@ func hire(character: GuildCharacter) -> bool:
 	var is_hired: bool = CharacterContainer.add_character_to_guild(character)
 	if is_hired:
 		if GameState.gold < gold_before:
-			_pay_fx("gold")
+			_header.pay_fx("gold")
 		pending_fx.hire_next = true
 		show_toast(TOAST_HIRED % character.name)
 		tutorial_event.emit("hire", character)
@@ -1007,7 +761,7 @@ func _fly_hired_letter(card: Control) -> void:
 		return
 	var roster_button: Control = _tabs.guild.roster_button()
 	HallFx.fly_away(card, fx_layer, roster_button.get_global_rect().get_center(), HIRE_FLY_SECONDS)
-	HallFx.pop(roster_button, BADGE_POP, HIRE_FLY_SECONDS)
+	HallFx.pop(roster_button, HallNav.BADGE_POP, HIRE_FLY_SECONDS)
 
 
 ## Let a hero go for good (the Character screen's Release button, after its
@@ -1022,7 +776,7 @@ func release(character: GuildCharacter) -> void:
 	if not CharacterContainer.remove_character_from_guild(character):
 		return
 	if standing_cost > 0:
-		_pay_fx("standing")
+		_header.pay_fx("standing")
 		GameState.reduce_standing(standing_cost)
 		show_toast(TOAST_RELEASED_COST % [character.name, standing_cost])
 	else:
@@ -1036,7 +790,7 @@ func release(character: GuildCharacter) -> void:
 
 func upgrade_building(building: int) -> void:
 	if GuildUpgrades.try_upgrade(building):
-		_pay_fx("gold")
+		_header.pay_fx("gold")
 		pending_fx.upgraded = building
 		show_toast(TOAST_UPGRADED % [GuildUpgrades.get_building_name(building), GuildUpgrades.get_level(building)])
 		tutorial_event.emit("upgrade", building)
@@ -1053,7 +807,7 @@ func buy_item(index: int) -> void:
 		return
 	if ItemShop.buy(index):
 		if item.cost > 0:
-			_pay_fx("gold")
+			_header.pay_fx("gold")
 		pending_fx.bought = index
 		show_toast(TOAST_BOUGHT % HallStyle.item_look(item).name)
 		tutorial_event.emit("buy", item)
@@ -1169,16 +923,13 @@ func _leave_quest(character: GuildCharacter) -> void:
 
 ## Menu's colorblind button: Off -> Red-weak -> Green-weak -> Blue-yellow -> Off.
 func cycle_color_filter() -> void:
-	set_color_filter((color_filter + 1) % COLOR_FILTERS.size())
+	set_color_filter((color_filter + 1) % HallSettings.COLOR_FILTERS.size())
 
 
 func set_color_filter(filter_index: int) -> void:
-	color_filter = clampi(filter_index, 0, COLOR_FILTERS.size() - 1)
+	color_filter = HallSettings.clamp_color_filter(filter_index)
 	_apply_color_filter()
-	var config := ConfigFile.new()
-	config.load(SETTINGS_PATH)
-	config.set_value(SETTINGS_SECTION, SETTINGS_COLOR_FILTER, color_filter)
-	config.save(SETTINGS_PATH)
+	HallSettings.save_value(HallSettings.KEY_COLOR_FILTER, color_filter)
 	queue_refresh()
 
 
@@ -1191,18 +942,14 @@ func toggle_reduce_motion() -> void:
 func set_reduce_motion(is_on: bool) -> void:
 	reduce_motion = is_on
 	HallFx.reduce_motion = is_on
-	var config := ConfigFile.new()
-	config.load(SETTINGS_PATH)
-	config.set_value(SETTINGS_SECTION, SETTINGS_REDUCE_MOTION, reduce_motion)
-	config.save(SETTINGS_PATH)
+	HallSettings.save_value(HallSettings.KEY_REDUCE_MOTION, reduce_motion)
 	queue_refresh()
 
 
 func _load_settings() -> void:
-	var config := ConfigFile.new()
-	if config.load(SETTINGS_PATH) == OK:
-		color_filter = clampi(int(config.get_value(SETTINGS_SECTION, SETTINGS_COLOR_FILTER, 0)), 0, COLOR_FILTERS.size() - 1)
-		reduce_motion = bool(config.get_value(SETTINGS_SECTION, SETTINGS_REDUCE_MOTION, false))
+	var settings := HallSettings.load_settings()
+	color_filter = settings.color_filter
+	reduce_motion = settings.reduce_motion
 	HallFx.reduce_motion = reduce_motion
 	_apply_color_filter()
 
@@ -1245,8 +992,7 @@ func close_end_check() -> void:
 func end_day() -> void:
 	if undecided_count() > 0:
 		return
-	_held_counters.gold = true
-	_held_counters.standing = true
+	_header.hold_counters()
 	# training and healing happen first, so nobody heals the night they're hurt
 	var home := GuildUpgrades.run_night()
 	var results := []
@@ -1264,85 +1010,18 @@ func end_day() -> void:
 	HallFx.curtain(fx_layer, DUSK_INK, show_report, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
 
 
-## Play out one quest with DayBar's helpers and pay its gold and standing.
-## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, pluck, injured, died, items, milestone}
-## (pluck = what each party member gained, 0 on a failure)
-## (injured = the party members whose injury level went up on this quest but
-## who survived; died = the party members who died on it; items = the
-## equipment found while searching, already added to the pack)
+## Play out one quest (HallRules.play_quest pays its gold and standing) and
+## add it to the run's tallies. Returns the Day Report result (see HallRules.play_quest).
 func _run_quest(entry: Dictionary) -> Dictionary:
-	var party: Array[GuildCharacter] = []
-	party.assign(entry.party)
-
-	# remember health before, to see who got hurt
-	var injury_before := {}
-	for character in party:
-		injury_before[character] = character.injury_level
-
-	# play it out
-	var chance: float = DayBar._get_success_chance(entry.quest, party)
-	# only play the quest out once, or its loot and injuries would be rolled twice
-	var story: String
-	if(GameState.day == MILESTONE_DAY):
-		story = entry.quest.generateMilestoneResults(party, chance)
-	else:
-		story = entry.quest.generateResults(party, chance)
-	var succeeded: bool = DayBar._did_succeed(story)
-	var gold_earned: int = DayBar._get_gold_earned(entry.quest, succeeded)
-	var standing_earned: int = entry.quest.difficulty + 1 if succeeded else 0
-	GameState.add_gold(gold_earned)
-	GameState.add_standing(standing_earned)
-
+	var result := HallRules.play_quest(entry, GameState.day)
 	# tallies for the Game Over ledger
 	run_stats.quests_sent += 1
-	run_stats.gold_earned += gold_earned
-	if succeeded:
+	run_stats.gold_earned += result.gold
+	if result.succeeded:
 		run_stats.quests_won += 1
 	if entry.milestone:
-		run_stats.drake_result = DRAKE_RESULT_SLAIN if succeeded else DRAKE_RESULT_LOST
-
-	# Increase character pluck by one if the quest succeeded.
-	if succeeded:
-		for character in party:
-			character.pluck += 1
-	# equipment found while searching goes to the pack, even if the quest failed
-	var found_items: Array[StandardItem] = entry.quest.found_items.duplicate()
-	if not found_items.is_empty():
-		ItemContainer.owned_items.append_array(found_items)
-		# refresh gear rows and unworn counts
-		ItemShop.gear_changed.emit()
-
-	# a win raises everyone's Pluck, more for winning against worse odds
-	var pluck_gained := pluck_gain_for(chance) if succeeded else 0
-	for character in party:
-		character.pluck += pluck_gained
-
-	# the dead are listed apart from the hurt, and remember where they fell
-	var injured := []
-	var died := []
-	for character in party:
-		if HallStyle.is_dead(character) and injury_before[character] < GuildCharacter.InjuryLevel.DEAD:
-			died.append(character)
-			character.died_on_day = GameState.day
-			character.died_on_quest = entry.quest.questTitle
-		elif character.injury_level > injury_before[character]:
-			injured.append(character)
-
-	return {
-		"quest": entry.quest,
-		"party": entry.party.duplicate(),
-		"story": story,
-		"succeeded": succeeded,
-		"chance": chance,
-		"gold": gold_earned,
-		"standing": standing_earned,
-		"pluck": pluck_gained,
-		"injured": injured,
-		"died": died,
-		"items": found_items,
-		"milestone": entry.milestone,
-	}
+		run_stats.drake_result = DRAKE_RESULT_SLAIN if result.succeeded else DRAKE_RESULT_LOST
+	return result
 
 
 ## DaySummary's "New Day" button. Keeps tonight's report for the Menu and opens on the Board.
@@ -1361,7 +1040,7 @@ func start_new_day() -> void:
 		var quests_text := HallStyle.count_text(quest_entries.size(), "new quest", "new quests")
 		show_toast(TOAST_NEW_DAY % [GameState.day, quests_text, CharacterContainer.hireable_characters.size()])
 	queue_refresh()
-	_land_earnings()
+	_header.land_earnings()
 	tutorial_event.emit("new_day", GameState.day)
 	# checked after the Day Report closes, so the player reads how the heroes fell first
 	_check_run_over()
@@ -1394,25 +1073,6 @@ func start_new_run() -> void:
 	# after GameState.reset, so For Hire is sized for Day 1
 	CharacterContainer.reset()
 	get_tree().change_scene_to_file(MAIN_SCENE_PATH)
-
-
-## Dawn: release the counters held since End Day. Gains fly in from the middle
-## of the screen as a few coins / shields and the counter rolls up as the last
-## one lands; anything else (a loss, no change) just rolls.
-func _land_earnings() -> void:
-	var start := fx_layer.get_global_rect().get_center()
-	for kind in ["gold", "standing"]:
-		var gained: int = _counter_value(kind) - int(_shown_counters[kind])
-		if gained <= 0 or HallFx.reduce_motion or _shown_counters[kind] < 0:
-			_release_counter(kind)
-			continue
-		var target := _counter_art(kind).get_global_rect().get_center()
-		var coin_count := mini(EARNINGS_COIN_COUNT, gained)
-		for coin_index in coin_count:
-			var is_last := coin_index == coin_count - 1
-			var delay := EARNINGS_DELAY + coin_index * EARNINGS_COIN_GAP
-			var land := _release_counter.bind(kind) if is_last else Callable()
-			HallFx.fly(fx_layer, _counter_art(kind).texture, start, target, FLY_ICON_SIZE, delay, FLY_SECONDS, land)
 
 
 ## The report's button: starts the next day after End Day (under a dusk wash,
@@ -1454,74 +1114,13 @@ func refresh() -> void:
 	# after that, on a hall that's no longer in the tree
 	if not is_inside_tree():
 		return
-	_refresh_header()
+	_header.refresh()
 	_refresh_content()
-	_refresh_action_bar()
-	_refresh_nav()
+	_action_bar.refresh()
+	_nav.refresh()
 	_refresh_overlays()
 	# every rebuilt row has read its hint by now
 	pending_fx.clear()
-
-# ---- header
-
-
-
-func _refresh_header() -> void:
-	_refresh_day_tile()
-
-	# the days left are always in red ink; in the last days the whole note is
-	var days_left := days_until_drake()
-	var red_ink := HallStyle.RED.to_html(false)
-	if days_left > 0:
-		_drake_value.text = HEADER_DRAKE % [red_ink, days_left, HallStyle.pick_plural(days_left, "day", "days")]
-	elif days_left == 0:
-		_drake_value.text = HEADER_DRAKE_TODAY % red_ink
-	else:
-		_drake_value.text = HEADER_DRAKE_GONE
-	var is_drake_close := days_left >= 0 and days_left <= DRAKE_WARNING_DAYS
-	HallStyle.set_font_color(_drake_value, HallStyle.RED if is_drake_close else HallStyle.TEXT_MAIN)
-
-	_gold_value.text = str(GameState.gold)
-	_standing_value.text = str(GameState.standing)
-	_refresh_danger_strip()
-
-
-## The red "last hero standing" strip under the header, only while the guild
-## is one death from falling (and not once the Game Over ledger is up).
-func _refresh_danger_strip() -> void:
-	var hero := last_living_hero()
-	_danger_strip.visible = run_over_stats.is_empty() and hero != null and is_one_death_from_falling()
-	if not _danger_strip.visible:
-		return
-	HallStyle.style_panel(_danger_strip, HallStyle.RED_BG)
-	_danger_icon.modulate = HallStyle.RED
-	_danger_title.text = DANGER_TITLE
-	HallStyle.set_font_color(_danger_title, HallStyle.RED)
-	if _is_short_of_recruit_gold():
-		var price := GuildCharacter.recruit_cost_for_day(GameState.day + 1)
-		_danger_text.text = DANGER_GOLD % [price, GameState.gold, hero.name]
-	else:
-		_danger_text.text = DANGER_STANDING % hero.name
-	_update_counter("gold")
-	_update_counter("standing")
-
-
-## DAY tile: a new day flips the tile over (the number changes edge-on, once
-## the dawn wash has cleared). A morning inside DRAKE_WARNING_DAYS also pulses
-## the Bone Drake note.
-func _refresh_day_tile() -> void:
-	var day: int = GameState.day
-	if _shown_day == day:
-		return
-	var is_first_draw := _shown_day < 0
-	_shown_day = day
-	if is_first_draw or HallFx.reduce_motion:
-		_day_value.text = HEADER_DAY % day
-		return
-	HallFx.flip(_day_tile, DUSK_OUT_SECONDS * 0.5, func() -> void: _day_value.text = HEADER_DAY % day)
-	var days_left := days_until_drake()
-	if days_left >= 0 and days_left <= DRAKE_WARNING_DAYS:
-		HallFx.pulse(_drake_note, DRAKE_PULSES, 1.08, DUSK_OUT_SECONDS)
 
 # ---- content (tabs and screens)
 
@@ -1556,81 +1155,17 @@ func _refresh_content() -> void:
 		_last_view_key = view_key
 		shown_view.scroll_to_top()
 
-# ---- action bar
+# ---- shell pieces Pip points at (overlay_tutorial.gd)
 
 
-func _refresh_action_bar() -> void:
-	# screens put their own buttons in this spot (Deny / Send, Back / Hire),
-	# and so does the Shop tab (its Buy bar)
-	_action_bar.visible = active_screen.is_empty() and active_tab != TAB_SHOP
-
-	if roster().is_empty() and can_hire_anyone():
-		_set_action(ACTION_HIRE, ACTION_HIRE_HINT, ACTION_HIRE_BUTTON)
-	elif undecided_count() > 0:
-		var next_entry: Dictionary = quest_entries[next_undecided_index(0)]
-		var title := ACTION_DECIDE % HallStyle.count_text(undecided_count(), "quest", "quests")
-		_set_action(title, ACTION_DECIDE_HINT % next_entry.quest.questTitle, ACTION_DECIDE_BUTTON)
-	else:
-		var parties_going := sent_entries().size()
-		var hint := ACTION_END_HINT % HallStyle.count_text(parties_going, "party", "parties") if parties_going > 0 else ACTION_END_HINT_NONE
-		_set_action(ACTION_END % GameState.day, hint, ACTION_END_BUTTON)
+## The nav button for a tab id (one of TAB_IDS).
+func nav_button(tab_id: String) -> Button:
+	return _nav.button(tab_id)
 
 
-## The torn banner's title, hint and gold button (its look is set in the scene).
-## When the next step changes, its text fades in and the button pops.
-func _set_action(title: String, hint: String, button_text: String) -> void:
-	_action_title.text = title
-	_action_hint.text = hint
-	_action_button.text = button_text
-	if title != _shown_action_title:
-		if _shown_action_title != "" and _action_bar.visible:
-			HallFx.fade_in(_action_title.get_parent(), 0.0, 0.25)
-			HallFx.pop(_action_button, 1.1)
-		_shown_action_title = title
-
-# ---- nav
-
-
-## Bottom tabs: the open one is parchment (NavTabActive in hall_theme) and
-## stands taller, the rest dark wood (NavTab); each has a badge when it needs a visit.
-func _refresh_nav() -> void:
-	# Assign Party counts as part of the Board
-	var highlighted_tab := "board" if active_screen.get("kind", "") == SCREEN_ASSIGN else active_tab
-	for tab_id in TAB_IDS:
-		var nav_button := _nav_button(tab_id)
-		var is_active: bool = tab_id == highlighted_tab
-		nav_button.theme_type_variation = &"NavTabActive" if is_active else &"NavTab"
-		nav_button.custom_minimum_size.y = NAV_HEIGHT_OPEN if is_active else NAV_HEIGHT
-
-		var badge_text := _badge_text_for(tab_id)
-		var badge: Control = nav_button.get_node("Badge")
-		badge.visible = badge_text != ""
-		badge.get_node("Text").text = badge_text
-		# a badge that appears or changes count pops
-		if _shown_badges.has(tab_id) and _shown_badges[tab_id] != badge_text and badge_text != "":
-			HallFx.pop(badge, BADGE_POP)
-		_shown_badges[tab_id] = badge_text
-
-
-## What a nav tab's badge says ("" = no badge).
-func _badge_text_for(tab_id: String) -> String:
-	if tutorial and tutorial.is_tab_locked(tab_id):
-		return "Day %d" % tutorial.unlock_day(tab_id)
-	match tab_id:
-		"board":
-			return str(undecided_count()) if undecided_count() > 0 else ""
-		"guild":
-			if roster().is_empty() and can_hire_anyone():
-				return "!"
-			return "%d new" % unseen_recruit_count() if unseen_recruit_count() > 0 else ""
-		"upgrades":
-			var affordable_count := affordable_buildings().size()
-			return str(affordable_count) if affordable_count > 0 else ""
-	return ""
-
-
-func _nav_button(tab_id: String) -> Button:
-	return get_node("%%Nav_%s" % tab_id)
+## The action bar's big button.
+func action_button() -> Button:
+	return _action_bar.button()
 
 # ---- overlays
 
@@ -1655,76 +1190,14 @@ func _all_overlays() -> Array:
 
 # ============================================================ TOAST
 
-## Short message just above the action bar that fades out.
+## Short message just above the action bar that fades out (see hall_toast.gd).
 func show_toast(message: String) -> void:
-	_toast_label.text = message
-	_toast.modulate.a = 1.0
-	_toast.visible = true
-	HallFx.appear(_toast, 0.8, 0.0, 0.25)
-	if _toast_tween:
-		_toast_tween.kill()
-	_toast_tween = create_tween()
-	_toast_tween.tween_interval(TOAST_SECONDS)
-	_toast_tween.tween_property(_toast, "modulate:a", 0.0, TOAST_FADE_SECONDS)
-	_toast_tween.tween_callback(_toast.hide)
+	_toast.show_message(message)
 
 
 # ============================================================ MOTION
-# Counters and coins. Everything else lives in the rows (pending_fx) and
-# hall_fx.gd.
-
-func _counter_value(kind: String) -> int:
-	return GameState.gold if kind == "gold" else GameState.standing
-
-
-func _counter_label(kind: String) -> Label:
-	return _gold_value if kind == "gold" else _standing_value
-
-
-## The counter's box (what pops) and its art (coin / shield, what flies).
-func _counter_box(kind: String) -> Control:
-	return _gold_box if kind == "gold" else _standing_box
-
-
-func _counter_art(kind: String) -> TextureRect:
-	return _gold_coin if kind == "gold" else _standing_shield
-
-
-## Draw a counter. When its number changed it rolls to the new value, pops,
-## flashes green (gain) or red (loss), and a "+40" / "-2" floats under it.
-## A held counter waits (see _held_counters).
-func _update_counter(kind: String) -> void:
-	var value := _counter_value(kind)
-	var old_value: int = _shown_counters[kind]
-	if _held_counters[kind] and old_value >= 0:
-		return
-	_shown_counters[kind] = value
-	var label := _counter_label(kind)
-	if old_value < 0 or old_value == value:
-		label.text = str(value)
-		return
-	var change := value - old_value
-	var is_gain := change > 0
-	HallFx.count(label, old_value, value, COUNTER_ROLL_SECONDS)
-	HallFx.pop(_counter_box(kind), COUNTER_POP)
-	HallFx.flash_text(label, COUNTER_GAIN_INK if is_gain else COUNTER_LOSS_INK, COUNTER_ROLL_SECONDS + 0.3)
-	var delta_at := _counter_box(kind).get_global_rect().get_center() + DELTA_OFFSET
-	HallFx.float_text(fx_layer, delta_at, (DELTA_GAIN if is_gain else DELTA_LOSS) % change,
-			DELTA_GAIN_INK if is_gain else DELTA_LOSS_INK)
-
-
-## Let a held counter catch up to the real value.
-func _release_counter(kind: String) -> void:
-	_held_counters[kind] = false
-	_update_counter(kind)
-
-
-## Gold or standing just paid for what the player tapped: a coin / shield
-## flies from the counter to the spot they tapped (the counter drops now).
-func _pay_fx(kind: String) -> void:
-	var art := _counter_art(kind)
-	HallFx.fly(fx_layer, art.texture, art.get_global_rect().get_center(), tap_point(), FLY_ICON_SIZE, 0.0, FLY_SECONDS)
-
+# The counters' motion lives in hall_header.gd; rows animate from pending_fx;
+# everything else is hall_fx.gd.
 
 ## Where the player last pressed (global), for things that fly to / from their tap.
 func tap_point() -> Vector2:
