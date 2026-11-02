@@ -98,16 +98,32 @@ func _init(diff := 0, dayNum := 0) -> void:
 	match type:
 		1:
 			favStat = FavoredStat.Power
-			questTitle = str("Raid the ", location)
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Raid the ", location)
+				1:
+					questTitle = str("Storm the ", location)
 		2:
 			favStat = FavoredStat.Defense
-			questTitle = str("Escort someone to ", location)
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Protect a client on their journey to ", location)
+				1:
+					questTitle = str("Escort a client to ", location)
 		3:
 			favStat = FavoredStat.Wisdom
-			questTitle = str("Explore ", location)
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Survey ", location)
+				1:
+					questTitle = str("Explore ", location)
 		4:
 			favStat = FavoredStat.Sleaze
-			questTitle = str("Gather information on ", location)
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Scour for intel on ", location)
+				1:
+					questTitle = str("Gather information on ", location)
 
 	print("")
 	pass
