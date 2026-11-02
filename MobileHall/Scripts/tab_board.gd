@@ -18,6 +18,8 @@ const RECRUITS_IN_GUILD := "%d / %d hired"
 const QUESTS_DECIDED := "%d / %d"
 const UPGRADES_READY := "%d ready"
 const UPGRADES_NONE := "none yet"
+## While Pip still holds the Guild tab back (HallMain.is_tab_locked).
+const UPGRADES_LOCKED := "opens Day %d"
 # Quest list
 const HEADING := "Today's Quests"
 const HEADING_MILESTONE := "The Bone Drake"
@@ -81,6 +83,9 @@ func _show_quests_box() -> void:
 
 
 func _show_upgrades_box() -> void:
+	if hall.is_tab_locked("upgrades"):
+		_today_upgrades.set_item(TODAY_UPGRADES, UPGRADES_LOCKED % hall.tab_unlock_day("upgrades"), "nav_upgrades", "idle")
+		return
 	var affordable_count := hall.affordable_buildings().size()
 	var value := UPGRADES_READY % affordable_count if affordable_count > 0 else UPGRADES_NONE
 	var look := "todo" if affordable_count > 0 else "idle"

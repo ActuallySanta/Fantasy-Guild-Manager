@@ -8,8 +8,10 @@ extends Control
 const ReportEntryScene := preload("uid://di7qjsfr530p5")  # MobileHall/Scenes/Rows/report_entry.tscn
 
 # ---- MOTION (only for the report that opens after End Day)
-## Seconds before the reveal starts (the dusk wash is clearing).
-const REVEAL_START := 0.3
+## Seconds after the report opens (under the dusk wash's peak) before the
+## reveal starts. Short, so the night is already playing out as the dusk
+## clears (HallMain.DUSK_OUT_SECONDS) instead of showing a blank page first.
+const REVEAL_START := 0.1
 ## Seconds between the totals chips stamping in, and the gold total's count-up.
 const REVEAL_CHIP_GAP := 0.1
 const REVEAL_GOLD_SECONDS := 0.6

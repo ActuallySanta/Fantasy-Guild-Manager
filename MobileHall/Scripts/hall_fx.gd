@@ -64,6 +64,17 @@ static func _center_pivot(node: Control) -> void:
 	node.pivot_offset = node.size / 2.0
 
 
+## The alpha a node fades in to: its own alpha the first time it fades, then
+## remembered for the node's life. A fade that starts while another is still
+## running (tapping quickly between quests or tabs) would otherwise take the
+## half-faded alpha as where to stop, and the node would stay see-through.
+## (Every faded node here keeps one resting alpha: rows are rebuilt on refresh.)
+static func _resting_alpha(node: CanvasItem) -> float:
+	if not node.has_meta(&"fx_resting_alpha"):
+		node.set_meta(&"fx_resting_alpha", node.modulate.a)
+	return node.get_meta(&"fx_resting_alpha")
+
+
 # ============================================================ ON A NODE
 
 ## Quick grow-and-settle: "this just changed".
@@ -100,7 +111,7 @@ static func pulse(node: Control, times := 3, peak := 1.12, delay := 0.0) -> void
 static func appear(node: Control, from_scale := 0.85, delay := 0.0, duration := 0.28) -> void:
 	if reduce_motion or not is_instance_valid(node):
 		return
-	var target_alpha := node.modulate.a
+	var target_alpha := _resting_alpha(node)
 	node.modulate.a = 0.0
 	if not await _wait_for_layout(node):
 		return
@@ -123,7 +134,7 @@ static func stamp_in(node: Control, from_scale := 1.8, delay := 0.0) -> void:
 static func fade_in(node: Control, delay := 0.0, duration := 0.22) -> void:
 	if reduce_motion or not is_instance_valid(node):
 		return
-	var target_alpha := node.modulate.a
+	var target_alpha := _resting_alpha(node)
 	node.modulate.a = 0.0
 	var tween := _tween(node, &"fx_alpha")
 	if delay > 0.0:
@@ -136,7 +147,7 @@ static func fade_in(node: Control, delay := 0.0, duration := 0.22) -> void:
 static func slide_in(node: Control, offset: Vector2, delay := 0.0, duration := 0.3) -> void:
 	if reduce_motion or not is_instance_valid(node):
 		return
-	var target_alpha := node.modulate.a
+	var target_alpha := _resting_alpha(node)
 	node.modulate.a = 0.0
 	if not await _wait_for_layout(node):
 		return
