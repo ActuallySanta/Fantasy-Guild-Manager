@@ -144,10 +144,6 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 	GameState.add_gold(gold_earned)
 	GameState.add_standing(standing_earned)
 
-	# Increase character pluck by one if the quest succeeded.
-	if succeeded:
-		for character in party:
-			character.pluck += 1
 	# equipment found while searching goes to the pack, even if the quest failed
 	var found_items: Array[StandardItem] = entry.quest.found_items.duplicate()
 	if not found_items.is_empty():

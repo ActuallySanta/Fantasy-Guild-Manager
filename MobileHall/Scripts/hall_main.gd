@@ -728,13 +728,12 @@ func _go_to_next_undecided() -> void:
 func hire(character: GuildCharacter) -> bool:
 	if is_roster_full():
 		show_toast(TOAST_ROSTER_FULL)
-	elif CharacterContainer.add_character_to_guild(character):
-		run_stats.heroes_hired += 1
 		queue_refresh()
 		return false
 	var gold_before: int = GameState.gold
 	var is_hired: bool = CharacterContainer.add_character_to_guild(character)
 	if is_hired:
+		run_stats.heroes_hired += 1
 		if GameState.gold < gold_before:
 			_header.pay_fx("gold")
 		pending_fx.hire_next = true
