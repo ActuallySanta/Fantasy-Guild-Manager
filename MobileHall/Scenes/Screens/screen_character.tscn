@@ -228,7 +228,7 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 19
 theme_type_variation = &"ItalicLabel"
-text = "Pluck goes up by 1 for every quest this hero wins."
+text = "Pluck goes up every time this hero wins a quest (more for riskier odds)."
 
 [node name="GearHeading" type="Label" parent="Scroll/Margin/Paper/Col"]
 unique_name_in_owner = true

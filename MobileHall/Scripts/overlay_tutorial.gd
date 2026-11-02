@@ -739,6 +739,19 @@ func _pick_text() -> String:
 	return "Tap heroes to put them in the party. The number on each row is how much chance that hero adds."
 
 
+## The Assign Party odds step: risk vs. reward. Riskier quests pay more Pluck
+## on a win. The numbers and odds words come from HallRules.PLUCK_GAIN_BY_ODDS
+## and HallStyle.ODDS_BANDS, so the text follows the tuning.
+func _odds_text() -> String:
+	var safest: Dictionary = HallRules.PLUCK_GAIN_BY_ODDS[0]
+	var riskiest: Dictionary = HallRules.PLUCK_GAIN_BY_ODDS[-1]
+	var safest_word: String = HallStyle.odds_look(safest.min).word
+	var riskiest_word: String = HallStyle.odds_look(riskiest.min).word
+	return ("Your party and its success chance. Low odds mean failure and injuries, but beating them makes heroes bolder: "
+			+ "a win gives each hero +%d %s at %s, up to +%d for a %s. Play it safe or take the gamble.") \
+			% [safest.gain, PLK, safest_word, riskiest.gain, riskiest_word]
+
+
 func _anyone_can_train() -> bool:
 	return hall.roster().any(func(character):
 		return not GuildUpgrades.is_training(character) and GuildUpgrades.can_train(character))
@@ -800,7 +813,7 @@ func _day_one() -> Array:
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"), "on": "character",
 			"do": "Tap the hero card", "text": "Tap a hero to open their page."},
 		{"target": func(): return _u(_screen("character"), "StatLines"),
-			"text": "Their stats. Quests lean hardest on the favoured stat. %s goes up by one every time they finish a quest." % PLK},
+			"text": "Their stats. Quests lean hardest on the favoured stat. %s grows every time they win a quest, and each point of it boosts all their other stats." % PLK},
 		{"target": func(): return _u(_screen("character"), "GearLines"),
 			"text": "Gear slots. Items are role-locked, so only some gear fits each hero. The Shop opens on Day 5."},
 		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close",
@@ -816,7 +829,7 @@ func _day_one() -> Array:
 		{"target": func(): return _u(_screen("assign"), "PickList"), "on": "pick", "when": func(d): return _party_ready(d),
 			"do": "Tap a hero row to add them", "deny": ["InfoButton"], "text": func(): return _pick_text()},
 		{"target": func(): return _u(_screen("assign"), "PartyBox"),
-			"text": "Your party and its success chance. Low odds mean failure and injuries. Swap heroes in and out until it looks right."},
+			"text": _odds_text()},
 		{"target": func(): return _u(_screen("assign"), "LeftButton"),
 			"text": "[b]Deny[/b] turns a quest down. It costs a little standing, and you can Reconsider later the same day. This one's worth taking."},
 		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "send",
