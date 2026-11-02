@@ -73,6 +73,14 @@ const BLUE_BG := Color("#DDE5EC")
 ## The navy ink for names on letters and sign-offs.
 const NAVY := Color("#26304A")
 
+# ---- the end-of-story roll (overlay_credits.gd): ink on a dark backdrop
+const CREDITS_BG := Color("#1B140F")      ## victory: a warm, near-black hall
+const CREDITS_INK := Color("#F3E2B0")     ## victory: candlelit gold text
+const CREDITS_INK_SOFT := Color("#C9B68A")  ## victory: captions, roles
+const DEFEAT_BG := Color("#0E1218")       ## defeat: a cold, moonless night
+const DEFEAT_INK := Color("#C9D3E0")      ## defeat: pale, ashen text
+const DEFEAT_INK_SOFT := Color("#8794A6")   ## defeat: captions, roles
+
 
 # ============================================================ DISPLAY TABLES
 
@@ -80,6 +88,8 @@ const NAVY := Color("#26304A")
 
 ## Key used for the milestone (Bone Drake) quest; it isn't a CreatedQuest.QuestType.
 const MILESTONE_TYPE_ID := 5
+## Key used for the final battle (HallMain.FINAL_DAY); not a CreatedQuest.QuestType either.
+const FINAL_TYPE_ID := 6
 
 ## CreatedQuest.QuestType (plus MILESTONE_TYPE_ID) -> display name, writ name
 ## (the Assign Party scroll), seal colour, short tag.
@@ -89,6 +99,7 @@ const QUEST_TYPES := {
 	3: {"name": "Scout Terrain", "writ": "Writ of Scouting", "color": Color("#3F5A74"), "tag": "SCT"},
 	4: {"name": "Gather Intel", "writ": "Writ of Intelligence", "color": Color("#5B4A7A"), "tag": "INT"},
 	MILESTONE_TYPE_ID: {"name": "Milestone", "writ": "Writ of the Drake", "color": Color("#7D2A26"), "tag": "BOSS"},
+	FINAL_TYPE_ID: {"name": "Final Battle", "writ": "Writ of the Last Stand", "color": Color("#3A1F3D"), "tag": "FINAL"},
 }
 
 # ---- stats
@@ -218,8 +229,10 @@ static func roman_numeral(number: int) -> String:
 
 # ---- quests
 
-## Key into QUEST_TYPES for a quest entry (the milestone gets its own key).
+## Key into QUEST_TYPES for a quest entry (the milestone and the final battle get their own keys).
 static func quest_type_id(entry: Dictionary) -> int:
+	if entry.get("final", false):
+		return FINAL_TYPE_ID
 	return MILESTONE_TYPE_ID if entry.get("milestone", false) else int(entry.quest.type)
 
 
@@ -233,8 +246,10 @@ static func favored_stat_index(quest: CreatedQuest) -> int:
 	return clampi(int(quest.favStat), 0, STAT_COUNT - 1)
 
 
-## Rank letter for a quest ("F" ... "S").
+## Rank letter for a quest ("F" ... "S", or "S++" in freeplay).
 static func rank_letter(quest: CreatedQuest) -> String:
+	if quest.difficulty == CreatedQuest.QuestDifficulty.SPP:
+		return "S++"
 	return str(CreatedQuest.QuestDifficulty.find_key(quest.difficulty))
 
 # ---- characters

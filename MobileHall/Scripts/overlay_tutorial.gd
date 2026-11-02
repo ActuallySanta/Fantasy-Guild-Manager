@@ -8,6 +8,9 @@
 ##   Day 3 - the Guild tab: upgrading a building, the Training Yard, the
 ##           Hospital, and why posted heroes can't quest
 ##   Day 5 - the Shop: role-locked items, buying, equipping from a hero's page
+##   Freeplay - after the final battle is won (HallMain.start_freeplay): what
+##           changes now the story is over (endless days, climbing quests,
+##           the S++ rank). Runs even if the main tutorial was skipped.
 ##
 ## Built in code; hall_main._ready adds it on top of every overlay.
 ## UI only: it calls nothing but hall_main's own actions and queries.
@@ -24,7 +27,8 @@
 ## HOW IT WORKS
 ##   hall_main emits tutorial_event(event, data) from its actions:
 ##     tab, hire, character, close, assign, pick, send, deny, end_check,
-##     end_day, new_day, upgrade, training_picker, train, admit, buy, equip
+##     end_day, new_day, upgrade, training_picker, train, admit, buy, equip,
+##     freeplay
 ##   A step is a Dictionary:
 ##     text    String or Callable -> String (BBCode)
 ##     do      short instruction under the text ("Tap Members")
@@ -49,6 +53,9 @@ extends Control
 ## Off = no coach, no tab locks, and the old Welcome card shows instead.
 const ENABLED := true
 const TUTORIAL_DAYS := [1, 3, 5]
+## Script key for the freeplay walkthrough (not a day: it starts on the
+## "freeplay" event, whatever day that is).
+const FREEPLAY_SCRIPT := -1
 const UNLOCK_DAY := {"upgrades": 3, "shop": 5}
 
 ## Draw order: above the hall's overlays (z 10: Day Report, End Day sheet,
@@ -101,10 +108,13 @@ const PIP_GROUND := Color("#E9DEC4")
 var hall: Control
 ## True once the player taps Skip tutorial (also lifts the tab locks).
 var is_skipped := false
-## Tutorial days already finished or skipped.
+## Tutorial scripts already finished or skipped (a day, or FREEPLAY_SCRIPT).
 var done := {}
 
+## The day shown on Pip's counter.
 var _day := 0
+## Which script is running: a day from TUTORIAL_DAYS, or FREEPLAY_SCRIPT.
+var _script := 0
 var _steps: Array = []
 var _index := -1
 ## Events seen during the current day's script (for skip checks).
@@ -175,9 +185,12 @@ func is_running() -> bool:
 
 # ============================================================ FLOW
 
-func start(day: int) -> void:
+## Run a script on `day` (the counter shows it). script = which steps to run;
+## by default the day's own (TUTORIAL_DAYS), or FREEPLAY_SCRIPT.
+func start(day: int, script: int = day) -> void:
 	_day = day
-	_steps = _steps_for(day)
+	_script = script
+	_steps = _steps_for(script)
 	_seen = {}
 	_index = -1
 	visible = true
@@ -201,7 +214,7 @@ func _advance() -> void:
 
 
 func _finish() -> void:
-	done[_day] = true
+	done[_script] = true
 	_index = -1
 	_steps = []
 	visible = false
@@ -224,6 +237,12 @@ func _on_event(event: String, data: Variant = null) -> void:
 		if is_running():
 			_finish()
 		start(int(data))
+		return
+	# freeplay explains a new mode, so it runs even after Skip tutorial
+	if event == "freeplay" and ENABLED and not done.get(FREEPLAY_SCRIPT, false):
+		if is_running():
+			_finish()
+		start(int(data), FREEPLAY_SCRIPT)
 		return
 	if not is_running():
 		return
@@ -768,14 +787,16 @@ func _someone_fits_bought() -> bool:
 
 # ============================================================ THE SCRIPT
 
-func _steps_for(day: int) -> Array:
-	match day:
+func _steps_for(script: int) -> Array:
+	match script:
 		1:
 			return _day_one()
 		3:
 			return _day_three()
 		5:
 			return _day_five()
+		FREEPLAY_SCRIPT:
+			return _freeplay()
 	return []
 
 
@@ -910,4 +931,15 @@ func _day_five() -> Array:
 			"skip": func(): return not _seen.get("equip", false),
 			"text": "The gear's bonus is added to their stats and counts on every quest."},
 		{"text": func(): return ("You bought gear nobody can use yet. Hire a %s and equip it from their page." % _bought_role()) if (_seen.get("buy", false) and not _someone_fits_bought()) else "That's everything I can teach. Keep your heroes alive, watch the Bone Drake countdown, and good luck, Guildmaster."},
+	]
+
+
+## After the final battle is won: what freeplay changes.
+func _freeplay() -> Array:
+	return [
+		{"text": "You did it, Guildmaster! The final battle is won and the story is told. But the guild's doors stay open: welcome to [b]freeplay[/b]."},
+		{"text": "From now on the days never end. Each new day, every quest asks a little more of your heroes, and pays a little more %s too." % GOLD},
+		{"target": func(): return _row(_tab("board"), "quest_row.gd", "RankChip"),
+			"text": "Quests can now go past S rank. Anything tougher than S is [b]S++[/b]. It's the hardest work there is, and the best paid."},
+		{"text": "One thing hasn't changed: if every hero falls and you can't hire more, the guild falls with them. See how long your legend lasts!"},
 	]

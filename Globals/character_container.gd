@@ -107,6 +107,7 @@ func add_character_to_guild(_character: GuildCharacter) -> bool:
 		return false
 	
 	active_characters.append(_character)
+	_character.joined_on_day = GameState.day
 	hireable_characters.erase(_character) # char hired, so no longer for hire
 	released_characters.erase(_character) # a returning hero is back for good
 	print(_character.name + " HAS JOINED THE GUILD")

@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CreditsList" format=3 uid="uid://c72de0tnaska"]
+
+[ext_resource type="Script" uid="uid://u0fk0vqu3yrm" path="res://Scripts/Credits/credits_list.gd" id="1_list"]
+[ext_resource type="Script" uid="uid://saahbs2eqhid" path="res://Scripts/Credits/credit_entry.gd" id="2_entry"]
+
+[sub_resource type="Resource" id="Resource_lead"]
+script = ExtResource("2_entry")
+section = "Design & Programming"
+name = "Your Name"
+contribution = "Lead programmer, guild systems"
+
+[sub_resource type="Resource" id="Resource_writer"]
+script = ExtResource("2_entry")
+section = "Design & Programming"
+name = "Teammate Name"
+contribution = "Quest writing and story parts"
+
+[sub_resource type="Resource" id="Resource_thanks"]
+script = ExtResource("2_entry")
+section = "Special Thanks"
+name = "Our Playtesters"
+contribution = "For breaking everything, so we could fix it"
+
+[resource]
+script = ExtResource("1_list")
+entries = Array[ExtResource("2_entry")]([SubResource("Resource_lead"), SubResource("Resource_writer"), SubResource("Resource_thanks")])
