@@ -166,6 +166,10 @@ const DUSK_OUT_SECONDS := 0.45
 ## defeat screen shows, and clears this slowly.
 const DEFEAT_DUSK_IN_SECONDS := 1.2
 const DEFEAT_DUSK_OUT_SECONDS := 1.4
+## Draw order of the FX layer: above the overlays (z 10 in hall_main.tscn), so
+## the dusk wash covers the End Day sheet and the Day Report too, and below
+## Pip (OverlayTutorial.TUTORIAL_Z_INDEX).
+const FX_LAYER_Z_INDEX := 15
 ## Each new tab or screen fades in this fast (seconds).
 const VIEW_FADE_SECONDS := 0.14
 ## How big a nav badge grows when its count changes.
@@ -294,6 +298,10 @@ var released_today := []
 ## Last night's report, kept so the Menu can show it again.
 var previous_report := {}
 var is_end_check_open := false
+## True from End Day until the night's report (or the credits) shows. The
+## quests have already played out by then (gold, odds and injuries changed),
+## so the End Day sheet stays as the player left it while the dusk falls.
+var is_night_falling := false
 var is_welcome_open := true
 var is_menu_open := false
 ## The Game Over ledger's numbers, or {} while the run is still going.
@@ -463,6 +471,7 @@ func _ready() -> void:
 	fx_layer = Control.new()
 	fx_layer.name = "FxLayer"
 	fx_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fx_layer.z_index = FX_LAYER_Z_INDEX
 	add_child(fx_layer)
 	fx_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
@@ -844,8 +853,22 @@ func next_undecided_index(start_index: int = 0) -> int:
 # ---- upgrades and countdown
 
 
+## True while Pip holds a bottom tab back (see OverlayTutorial.UNLOCK_DAY).
+func is_tab_locked(tab_id: String) -> bool:
+	return tutorial != null and tutorial.is_tab_locked(tab_id)
+
+
+## The day a locked tab opens (see is_tab_locked).
+func tab_unlock_day(tab_id: String) -> int:
+	return tutorial.unlock_day(tab_id) if tutorial != null else 0
+
+
 ## Buildings that can be upgraded right now (enough gold and standing).
+## None while the Guild tab (id "upgrades") is still locked, so nothing
+## (the End Day sheet, the Board note, the badge) offers them early.
 func affordable_buildings() -> Array:
+	if is_tab_locked("upgrades"):
+		return []
 	return HallStyle.buildings_in_order().filter(func(building):
 		return GuildUpgrades.get_upgrade_status(building) == GuildUpgrades.UpgradeStatus.READY)
 
@@ -864,8 +887,8 @@ func days_until_drake() -> int:
 ## Switch bottom tab. Closes any screen; party drafts stay on their quests.
 ## `section` optionally picks the tab's half (GUILD_SECTION_* or UPGRADES_SECTION_*).
 func open_tab(tab_id: String, section: String = "") -> void:
-	if tutorial and tutorial.is_tab_locked(tab_id):
-		show_toast(TOAST_TAB_LOCKED % tutorial.unlock_day(tab_id))
+	if is_tab_locked(tab_id):
+		show_toast(TOAST_TAB_LOCKED % tab_unlock_day(tab_id))
 		return
 	active_tab = tab_id
 	if section != "" and tab_id == "guild":
@@ -1160,6 +1183,10 @@ func release(character: GuildCharacter) -> void:
 
 
 func upgrade_building(building: int) -> void:
+	# buildings open with the Guild tab
+	if is_tab_locked("upgrades"):
+		show_toast(TOAST_TAB_LOCKED % tab_unlock_day("upgrades"))
+		return
 	var gold_before: int = GameState.gold
 	if GuildUpgrades.try_upgrade(building):
 		_count_spent(gold_before)
@@ -1380,8 +1407,10 @@ func close_end_check() -> void:
 ## under it. The gold / standing counters hold still until dawn (start_new_day),
 ## so the night's earnings land when the doors open.
 func end_day() -> void:
-	if undecided_count() > 0:
+	# (a second tap while the dusk falls would play the night out twice)
+	if undecided_count() > 0 or is_night_falling:
 		return
+	is_night_falling = true
 	_held_counters.gold = true
 	_held_counters.standing = true
 	# training and healing happen first, so nobody heals the night they're hurt
@@ -1399,6 +1428,7 @@ func end_day() -> void:
 		return
 
 	var show_report := func() -> void:
+		is_night_falling = false
 		is_end_check_open = false
 		training_picker_open = false
 		active_screen = {}
@@ -1416,6 +1446,7 @@ func _show_final_credits(result: Dictionary, report: Dictionary) -> void:
 	var credits := build_credits(result)
 	final_battle_lost = not credits.won
 	var show_credits := func() -> void:
+		is_night_falling = false
 		is_end_check_open = false
 		is_menu_open = false
 		training_picker_open = false
@@ -1481,10 +1512,6 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		run_stats.final_result = FINAL_RESULT_WON if succeeded else FINAL_RESULT_LOST
 		run_stats.final_party = entry.party.duplicate()
 
-	# Increase character pluck by one if the quest succeeded.
-	if succeeded:
-		for character in party:
-			character.pluck += 1
 	# equipment found while searching goes to the pack, even if the quest failed
 	var found_items: Array[StandardItem] = entry.quest.found_items.duplicate()
 	run_stats.items_found += found_items.size()
@@ -1682,8 +1709,9 @@ func _refresh_header() -> void:
 	var is_drake_close := days_left >= 0 and days_left <= DRAKE_WARNING_DAYS
 	HallStyle.set_font_color(_drake_value, HallStyle.RED if is_drake_close else HallStyle.TEXT_MAIN)
 
-	_gold_value.text = str(GameState.gold)
-	_standing_value.text = str(GameState.standing)
+	# rolls to a new value, or waits while held (see _update_counter)
+	_update_counter("gold")
+	_update_counter("standing")
 	_refresh_danger_strip()
 
 
@@ -1703,8 +1731,6 @@ func _refresh_danger_strip() -> void:
 		_danger_text.text = DANGER_GOLD % [price, GameState.gold, hero.name]
 	else:
 		_danger_text.text = DANGER_STANDING % hero.name
-	_update_counter("gold")
-	_update_counter("standing")
 
 
 ## DAY tile: a new day flips the tile over (the number changes edge-on, once
@@ -1815,8 +1841,8 @@ func _refresh_nav() -> void:
 
 ## What a nav tab's badge says ("" = no badge).
 func _badge_text_for(tab_id: String) -> String:
-	if tutorial and tutorial.is_tab_locked(tab_id):
-		return "Day %d" % tutorial.unlock_day(tab_id)
+	if is_tab_locked(tab_id):
+		return "Day %d" % tab_unlock_day(tab_id)
 	match tab_id:
 		"board":
 			return str(undecided_count()) if undecided_count() > 0 else ""

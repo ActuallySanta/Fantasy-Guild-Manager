@@ -47,6 +47,10 @@ func setup(main: HallMain) -> void:
 
 
 func refresh() -> void:
+	# End Day was pressed and the night has already played out, so the sheet
+	# keeps tonight's plan as it was while the dusk falls over it
+	if hall.is_night_falling:
+		return
 	_title.text = TEXT_TITLE % GameState.day
 	_show_tonights_plan()
 	_show_upgrade_suggestions()

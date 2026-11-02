@@ -24,9 +24,9 @@
 [ext_resource type="PackedScene" uid="uid://3cdpykowgja4" path="res://MobileHall/Scenes/Overlays/overlay_report.tscn" id="34_6fy20"]
 [ext_resource type="PackedScene" uid="uid://bgwxd653pjox8" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
 [ext_resource type="PackedScene" uid="uid://cdmw3mrmuept3" path="res://MobileHall/Scenes/Overlays/overlay_game_over.tscn" id="37_gameover"]
-[ext_resource type="PackedScene" uid="uid://0a18grxohlrg" path="res://MobileHall/Scenes/Overlays/overlay_credits.tscn" id="40_credits"]
 [ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.svg" id="38_skull"]
 [ext_resource type="Shader" uid="uid://dkvytyy35gk2p" path="res://MobileHall/Styles/colorblind_filter.gdshader" id="39_cbf01"]
+[ext_resource type="PackedScene" uid="uid://0a18grxohlrg" path="res://MobileHall/Scenes/Overlays/overlay_credits.tscn" id="40_credits"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cbf01"]
 shader = ExtResource("39_cbf01")
@@ -184,19 +184,19 @@ icon = ExtResource("8_gear")
 icon_alignment = 1
 expand_icon = true
 
-[node name="DangerStrip" type="PanelContainer" parent="Layout"]
+[node name="DangerStrip" type="PanelContainer" parent="Layout" unique_id=2119897059]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"PaperCard"
 
-[node name="Row" type="HBoxContainer" parent="Layout/DangerStrip"]
+[node name="Row" type="HBoxContainer" parent="Layout/DangerStrip" unique_id=403299495]
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 14
 
-[node name="DangerIcon" type="TextureRect" parent="Layout/DangerStrip/Row"]
+[node name="DangerIcon" type="TextureRect" parent="Layout/DangerStrip/Row" unique_id=2040100687]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
@@ -206,13 +206,13 @@ texture = ExtResource("38_skull")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Text" type="VBoxContainer" parent="Layout/DangerStrip/Row"]
+[node name="Text" type="VBoxContainer" parent="Layout/DangerStrip/Row" unique_id=1925409984]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 theme_override_constants/separation = 0
 
-[node name="DangerTitle" type="Label" parent="Layout/DangerStrip/Row/Text"]
+[node name="DangerTitle" type="Label" parent="Layout/DangerStrip/Row/Text" unique_id=1008113032]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"CapsLabel"
@@ -220,7 +220,7 @@ theme_override_font_sizes/font_size = 24
 text = "Last hero standing"
 uppercase = true
 
-[node name="DangerText" type="Label" parent="Layout/DangerStrip/Row/Text"]
+[node name="DangerText" type="Label" parent="Layout/DangerStrip/Row/Text" unique_id=159644274]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
@@ -533,7 +533,7 @@ layout_mode = 1
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="OverlayGameOver" parent="." instance=ExtResource("37_gameover")]
+[node name="OverlayGameOver" parent="." unique_id=1468031301 instance=ExtResource("37_gameover")]
 unique_name_in_owner = true
 visible = false
 z_index = 10
@@ -542,14 +542,11 @@ anchors_preset = 15
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="OverlayCredits" parent="." instance=ExtResource("40_credits")]
+[node name="OverlayCredits" parent="." unique_id=289976827 instance=ExtResource("40_credits")]
 unique_name_in_owner = true
 visible = false
 z_index = 10
 layout_mode = 1
-anchors_preset = 15
-grow_horizontal = 2
-grow_vertical = 2
 
 [node name="ColorFilterLayer" type="CanvasLayer" parent="." unique_id=2131547255]
 layer = 100

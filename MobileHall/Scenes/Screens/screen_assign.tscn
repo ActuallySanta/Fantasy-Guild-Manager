@@ -194,11 +194,13 @@ vertical_alignment = 1
 
 [node name="OddsWord" type="Label" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox/Row/OddsCol"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"CapsLabel"
 theme_override_font_sizes/font_size = 19
 text = "Chance of success"
 horizontal_alignment = 1
+autowrap_mode = 3
 uppercase = true
 
 [node name="OddsBar" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox" instance=ExtResource("7_kj605")]
