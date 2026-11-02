@@ -21,6 +21,7 @@ const UPGRADES_NONE := "none yet"
 # Quest list
 const HEADING := "Today's Quests"
 const HEADING_MILESTONE := "The Bone Drake"
+const HEADING_FINAL := "The Final Battle"
 const HINT := "unroll one to staff it"
 const HINT_ALL_DECIDED := "all decided · tap to change"
 
@@ -96,7 +97,11 @@ func _on_today_quests_pressed() -> void:
 
 func _show_quest_list() -> void:
 	var is_milestone_day: bool = not hall.quest_entries.is_empty() and hall.quest_entries[0].milestone
-	_heading.text = HEADING_MILESTONE if is_milestone_day else HEADING
+	var is_final_day: bool = not hall.quest_entries.is_empty() and hall.quest_entries[0].get("final", false)
+	if is_final_day:
+		_heading.text = HEADING_FINAL
+	else:
+		_heading.text = HEADING_MILESTONE if is_milestone_day else HEADING
 	_hint.text = HINT_ALL_DECIDED if hall.undecided_count() == 0 else HINT
 	HallStyle.clear_children(_quest_list)
 	for quest_index in hall.quest_entries.size():
