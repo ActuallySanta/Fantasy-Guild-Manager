@@ -31,15 +31,14 @@ const SECTION_ROSTER := "Your Guild · %d/%d"
 const SECTION_HIRE := "Applicants"
 # Beds line
 const BEDS := "Beds %d of %d · Barracks Lv %d"
-const BEDS_FULL := "All %d beds are taken. Upgrade the Barracks for more."
+const BEDS_FULL := "All %d beds full"
 const BEDS_BUTTON := "Barracks"
 # Lists
-const EMPTY_ROSTER := "Nobody here yet. Hire someone from Applicants."
-const NO_LIVING := "Nobody left standing. Hire someone from Applicants."
+const EMPTY_ROSTER := "Nobody here yet."
+const NO_LIVING := "Nobody left standing."
 const HEADING_FALLEN := "Fallen · %d"
-const EMPTY_HIRE := "No applicants left today. New faces arrive every morning."
-const HIRE_NOTE := "Applicants join free for the first two days, then ask a fee. New ones arrive every morning."
-const LOW_STANDING := "Your guild is too unpopular, and has thus failed to attract new talent"
+const EMPTY_HIRE := "No applicants left. More tomorrow."
+const LOW_STANDING := "Standing too low to attract applicants."
 const PEEK := "%s · %s"
 
 # ---- NODES
@@ -53,7 +52,6 @@ const PEEK := "%s · %s"
 @onready var _barracks_button: Button = %BedsButton
 # Lists
 @onready var _scroll: ScrollContainer = %Scroll
-@onready var _note: Label = %Note
 @onready var _card_list: VBoxContainer = %List
 @onready var _letter_stack: VBoxContainer = %Stack
 @onready var _empty_label: Label = %Empty
@@ -127,7 +125,6 @@ func _show_beds() -> void:
 ## Living heroes first, then the fallen under their own heading (they don't
 ## take a bed, but stay here so the Hospital can revive them).
 func _show_roster() -> void:
-	_note.visible = false
 	var living := hall.roster().filter(func(character): return not HallStyle.is_dead(character))
 	var fallen := hall.roster().filter(func(character): return HallStyle.is_dead(character))
 
@@ -154,8 +151,6 @@ func _show_roster() -> void:
 ## Recruits only come while standing is above GuildUpgrades.MINIMUM_STANDING.
 ## They're a stack of letters: one on top, the next few peeking out under it.
 func _show_for_hire() -> void:
-	_note.visible = true
-	_note.text = HIRE_NOTE
 	var recruits: Array = CharacterContainer.hireable_characters
 	if GameState.standing <= GuildUpgrades.MINIMUM_STANDING:
 		_empty_label.text = LOW_STANDING

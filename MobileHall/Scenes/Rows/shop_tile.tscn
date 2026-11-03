@@ -95,7 +95,7 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_type_variation = &"ItalicLabel"
-theme_override_font_sizes/font_size = 21
+theme_override_font_sizes/font_size = 23
 text = "Back tomorrow"
 horizontal_alignment = 1
 

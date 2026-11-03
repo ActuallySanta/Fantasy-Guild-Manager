@@ -44,13 +44,6 @@ size_flags_horizontal = 3
 theme_override_constants/separation = -6
 alignment = 1
 
-[node name="Caps" type="Label" parent="Col/Top/Info"]
-layout_mode = 2
-theme_type_variation = &"CapsLabel"
-theme_override_font_sizes/font_size = 19
-text = "Plan of the"
-uppercase = true
-
 [node name="Name" type="Label" parent="Col/Top/Info"]
 unique_name_in_owner = true
 layout_mode = 2

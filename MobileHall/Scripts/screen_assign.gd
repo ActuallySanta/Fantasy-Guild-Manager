@@ -39,10 +39,6 @@ const TEXT_GOLD := "%d gold"
 const TEXT_PARTY_SIZE := "Up to %d"
 const TEXT_PARTY_SIZE_SOLO := "Solo"
 const TEXT_FAVORED := "Favors %s"
-const STATUS_OPEN := "Pin up to %s. Their stats add up to the chance."
-const STATUS_DRAFT := "Your picks stay pinned if you look at another quest."
-const STATUS_SENT := "Sent. Tap someone to change the party, or recall it."
-const STATUS_DENIED := "Denied. Reconsider to put it back on the board."
 const TEXT_STAMP_SENT := "SENT"
 # Party odds
 const TEXT_ODDS := "%d%%"
@@ -55,8 +51,8 @@ const TEXT_ODDS_WORD := "Chance of success"
 const TEXT_PLUCK_ON_WIN := "%s\nwin for +%d Pluck"
 # Picker
 const PICK_HEADING := "Your adventurers"
-const PICK_HINT := "best fit first"
-const PICK_HINT_HIDDEN := "best fit first · %d busy hidden"
+## Only shown when "Show busy" is off and someone is hidden.
+const PICK_HINT_HIDDEN := "%d busy hidden"
 const BUTTON_SHOW_BUSY := "Show busy"
 const NO_ROSTER := "You have no adventurers yet."
 # Footer
@@ -80,7 +76,6 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _gold_chip = %GoldChip           # chip.gd
 @onready var _party_size_chip = %SlotsChip    # chip.gd
 @onready var _favored_chip = %FavChip         # chip.gd
-@onready var _status: Label = %Status
 @onready var _quest_card: PanelContainer = $Scroll/Margin/Col/Writ/WritMargin/QuestCard
 # Party
 @onready var _party_box: Control = %PartyBox
@@ -173,21 +168,6 @@ func _show_quest_card(entry: Dictionary) -> void:
 	_party_size_chip.set_chip(size_text, HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "person")
 	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_stat_index(quest)]
 	_favored_chip.set_chip(TEXT_FAVORED % favored_stat.name, favored_stat.bg, favored_stat.color, "", true)
-
-	# status line in the state's ink
-	match entry.state:
-		HallStyle.QUEST_STATE_SENT:
-			_status.text = STATUS_SENT
-			HallStyle.set_font_color(_status, HallStyle.GREEN_TEXT)
-		HallStyle.QUEST_STATE_DENIED:
-			_status.text = STATUS_DENIED
-			HallStyle.set_font_color(_status, HallStyle.RED)
-		_:
-			if entry.party.is_empty():
-				_status.text = STATUS_OPEN % HallStyle.count_text(size_limit, "adventurer", "adventurers")
-			else:
-				_status.text = STATUS_DRAFT
-			HallStyle.set_font_color(_status, HallStyle.TEXT_SOFT)
 
 
 # ---- party
@@ -305,7 +285,8 @@ func _show_picker(entry: Dictionary) -> void:
 	var can_pick: bool = entry.state != HallStyle.QUEST_STATE_DENIED
 	var has_roster: bool = not shown_adventurers.is_empty() or hidden_busy_count > 0
 	_pick_heading.text = PICK_HEADING
-	_pick_hint.text = PICK_HINT_HIDDEN % hidden_busy_count if hidden_busy_count > 0 else PICK_HINT
+	_pick_hint.visible = hidden_busy_count > 0
+	_pick_hint.text = PICK_HINT_HIDDEN % hidden_busy_count
 	_show_busy_toggle.set_pressed_no_signal(hall.show_busy_adventurers)
 	_pick_header.visible = can_pick and has_roster
 	_pick_list.visible = can_pick

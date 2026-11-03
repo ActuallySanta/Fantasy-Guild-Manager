@@ -5,11 +5,7 @@
 extends PanelContainer
 
 
-## Letter numbers start here so the first applicants aren't "No. I".
-const FIRST_LETTER_NUMBER := 12
-
 # ---- TEXT
-const TEXT_NUMBER := "No. %s"
 ## Hiring costs the recruit's price (GuildCharacter.cost), in gold; it's free
 ## on the first days (cost 0).
 const TEXT_HIRE := "Hire · %dg"
@@ -17,7 +13,6 @@ const TEXT_HIRE_FREE := "Hire · free"
 const TEXT_NO_BEDS := "No beds left"
 
 # ---- NODES
-@onready var _number: Label = %Number
 @onready var _portrait = %Portrait            # portrait.gd
 @onready var _name: Label = %Name
 @onready var _role: Label = %Role
@@ -36,13 +31,13 @@ func _ready() -> void:
 		_stat_columns.add_child(template.duplicate())
 
 
-## letter_index = place in today's applicants (for the letter number).
-func setup(hall: HallMain, recruit: GuildCharacter, letter_index: int = 0) -> void:
+## letter_index = place in today's applicants (unused now that letters have no
+## number; kept so callers don't change).
+func setup(hall: HallMain, recruit: GuildCharacter, _letter_index: int = 0) -> void:
 	_details_button.pressed.connect(hall.open_character.bind(recruit))
 	_hire_button.pressed.connect(_on_hire_pressed.bind(hall, recruit))
 
 	# who they are
-	_number.text = TEXT_NUMBER % HallStyle.roman_numeral(FIRST_LETTER_NUMBER + GameState.day * 3 + letter_index)
 	_portrait.show_character(recruit)
 	_name.text = recruit.name
 	_role.text = HallStyle.role_name(recruit)

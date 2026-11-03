@@ -40,7 +40,7 @@ theme_override_constants/separation = 0
 
 [node name="Title" type="Label" parent="Layout/HeadMargin/Head"]
 layout_mode = 2
-theme_type_variation = &"TitleLight"
+theme_type_variation = &"HeadingLight"
 theme_override_font_sizes/font_size = 62
 text = "The Guild Has Fallen"
 horizontal_alignment = 1
