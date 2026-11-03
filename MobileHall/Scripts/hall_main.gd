@@ -218,6 +218,8 @@ var is_end_check_open := false
 ## so the End Day sheet stays as the player left it while the dusk falls.
 var is_night_falling := false
 var is_welcome_open := true
+## How to Play was opened from the Menu (topic list, Close keeps the tab).
+var is_welcome_from_menu := false
 var is_menu_open := false
 ## The Game Over ledger's numbers, or {} while the run is still going.
 ## Filled once by _check_run_over (see build_run_over_stats for the keys).
@@ -642,13 +644,19 @@ func close_menu() -> void:
 
 func open_welcome() -> void:
 	is_menu_open = false
+	is_welcome_from_menu = true
 	is_welcome_open = true
 	queue_refresh()
 
 
-## The welcome card leads to the Board; the action bar then says what's next.
+## The fresh-run welcome leads to the Board; the action bar then says what's
+## next. Opened from the Menu, closing just goes back to where you were.
 func close_welcome() -> void:
 	is_welcome_open = false
+	if is_welcome_from_menu:
+		is_welcome_from_menu = false
+		queue_refresh()
+		return
 	open_tab("board")
 
 # ---- quests
