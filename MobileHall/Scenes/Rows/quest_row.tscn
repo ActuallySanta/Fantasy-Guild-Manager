@@ -72,10 +72,11 @@ text = "Explore Mistwater Marsh"
 autowrap_mode = 3
 max_lines_visible = 2
 
-[node name="Chips" type="HBoxContainer" parent="Row/BodyMargin/Body/Content/Info" unique_id=57835270]
+[node name="Chips" type="HFlowContainer" parent="Row/BodyMargin/Body/Content/Info" unique_id=57835270]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 12
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 6
 
 [node name="RankChip" parent="Row/BodyMargin/Body/Content/Info/Chips" unique_id=1055289194 instance=ExtResource("3_chip")]
 unique_name_in_owner = true

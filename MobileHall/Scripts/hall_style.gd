@@ -322,6 +322,27 @@ static func item_look(item: StandardItem) -> Dictionary:
 	}
 
 
+## Reward chip text for a quest that pays in items, using the short rarity tags
+## so the chip fits a phone row. Full: "3 items · LEG, UNC, COM" (the quest
+## writ, which has a line to itself). Compact: "3 items · best LEG" (Board
+## rows: hard quests roll many items, and a chip wider than the row pushed the
+## whole Board off screen). CreatedQuest.get_reward_text() spells the
+## rarities out, for the old UI.
+static func item_reward_text(quest: CreatedQuest, compact: bool = false) -> String:
+	var tags := PackedStringArray()
+	# reward_items is sorted rarest first
+	for reward_item in quest.reward_items:
+		var rarity_name := str(StandardItem.Rarity.find_key(reward_item.rarity))
+		tags.append(ITEM_RARITY_LOOKS.get(rarity_name, ITEM_RARITY_LOOKS.COMMON).tag)
+	var count: int = tags.size()
+	var count_text := "%d %s" % [count, pick_plural(count, "item", "items")]
+	if count == 0:
+		return count_text
+	if compact and count > 1:
+		return "%s · best %s" % [count_text, tags[0]]
+	return "%s · %s" % [count_text, ", ".join(tags)]
+
+
 ## "+16 Power · Knights only"
 static func item_effect(item: StandardItem) -> String:
 	var role_text := "%ss only" % item_role_name(item)

@@ -69,7 +69,7 @@ func _show_quest_facts(hall: HallMain, entry: Dictionary) -> void:
 	_rank_chip.set_box(TEXT_RANK % HallStyle.rank_letter(entry.quest), HallStyle.TEXT_MAIN)
 	# item quests pay pre-rolled equipment instead of gold: show the count and rarities
 	if entry.quest.pays_in_items():
-		_gold_chip.set_chip(entry.quest.get_reward_text(), HallStyle.BLUE_BG, HallStyle.BLUE_TEXT, "chest")
+		_gold_chip.set_chip(HallStyle.item_reward_text(entry.quest, true), HallStyle.BLUE_BG, HallStyle.BLUE_TEXT, "chest")
 	else:
 		_gold_chip.set_chip(TEXT_GOLD % entry.quest.goldReward, HallStyle.GOLD_BG, HallStyle.TEXT_MAIN, "coins")
 	_party_size_chip.set_chip(TEXT_PARTY_SIZE % hall.party_size_limit(entry), HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "person")
