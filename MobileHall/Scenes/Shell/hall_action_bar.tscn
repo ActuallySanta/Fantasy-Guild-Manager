@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://vr8mj4s68ib4"]
+
+[ext_resource type="Script" uid="uid://bebuks6x2021m" path="res://MobileHall/Scripts/hall_action_bar.gd" id="1_script"]
+[ext_resource type="StyleBox" uid="uid://1371ec6b7611" path="res://MobileHall/Styles/action_bar.tres" id="20_7dlno"]
+
+[node name="ActionBar" type="PanelContainer" unique_id=1821092104]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("20_7dlno")
+script = ExtResource("1_script")
+
+[node name="Banner" type="PanelContainer" parent="." unique_id=1776180342]
+layout_mode = 2
+theme_type_variation = &"TornPaper"
+
+[node name="Row" type="HBoxContainer" parent="Banner" unique_id=1190508417]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Text" type="VBoxContainer" parent="Banner/Row" unique_id=1752233219]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ActionTitle" type="Label" parent="Banner/Row/Text" unique_id=173131381]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 34
+text = "5 quests to decide"
+text_overrun_behavior = 3
+
+[node name="ActionHint" type="Label" parent="Banner/Row/Text" unique_id=1665142370]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
+text = "Next: Raid the Goblin Caves"
+text_overrun_behavior = 3
+
+[node name="ActionButton" type="Button" parent="Banner/Row" unique_id=719911977]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 84)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_type_variation = &"GoldButton"
+theme_override_font_sizes/font_size = 34
+text = "Next Quest"

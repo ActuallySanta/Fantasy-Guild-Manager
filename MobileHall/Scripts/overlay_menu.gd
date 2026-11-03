@@ -57,7 +57,7 @@ func refresh() -> void:
 	# no report until the first day has ended
 	_report_button.disabled = hall.previous_report.is_empty()
 	_reset_button.visible = GuildUpgrades.SHOW_DEBUG_BUTTONS
-	_color_button.text = BUTTON_COLOR % hall.COLOR_FILTERS[hall.color_filter]
+	_color_button.text = BUTTON_COLOR % HallSettings.COLOR_FILTERS[hall.color_filter]
 	_motion_button.text = BUTTON_MOTION % (MOTION_ON if hall.reduce_motion else MOTION_OFF)
 
 

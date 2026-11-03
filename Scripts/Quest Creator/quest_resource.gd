@@ -139,7 +139,7 @@ func _init(diff := 0, dayNum := 0) -> void:
 
 ## Freeplay: makes this quest harder and better paid by the same factor.
 ## multiplier: 1.0 = unchanged, 1.5 = needs half again the stats and pays
-## half again the gold (see HallMain.FREEPLAY_SCALE_PER_DAY).
+## half again the gold (see HallRules.FREEPLAY_SCALE_PER_DAY).
 func apply_freeplay_scaling(multiplier: float) -> void:
 	requirement_multiplier = multiplier
 	goldReward = roundi(goldReward * multiplier)

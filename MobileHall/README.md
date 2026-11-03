@@ -90,7 +90,7 @@ gold or standing is within `DANGER_STANDING_MARGIN` of the floor. The Welcome ca
 
 `HallMain.FINAL_DAY` (50) has a single quest, the final battle (`entry.final`). It's a
 random S-rank quest for now. The `FINAL QUEST CONTENT` / `FINAL QUEST STORY` comments in
-`hall_main.gd` (`_generate_quests`, `_run_quest`) and `FINAL QUEST DEFEAT TEXT` in
+`hall_rules.gd` (`build_day_quests`, `play_quest`) and `FINAL QUEST DEFEAT TEXT` in
 `overlay_credits.gd` mark where the real quest goes.
 
 Ending Day 50 opens the credits roll (`Scenes/Overlays/overlay_credits.tscn`) instead of the
@@ -102,13 +102,13 @@ reached and stays, so the player can scroll back up.
 - **Won:** **Begin Freeplay** (`HallMain.start_freeplay`) sets `GameState.is_freeplay`
   and opens Day 51, and Pip explains freeplay (it runs even if the tutorial was skipped).
   From then on, quests can roll past S into **S++** (`CreatedQuest.QuestDifficulty.SPP`).
-  Every quest's stat requirement and gold also grow by `FREEPLAY_SCALE_PER_DAY` (2%) for
+  Every quest's stat requirement and gold also grow by `HallRules.FREEPLAY_SCALE_PER_DAY` (2%) for
   each day past 50, without a cap. Game Over still applies.
 - **Lost:** the run ends (`HallMain.final_battle_lost`). The defeat roll stands in for the
   Game Over ledger and ends on **Found a New Guild**.
 
 Run records (gold spent, items found, building levels, longest-serving hero) come from
-`HallMain.build_run_records`. `Playtest/scenario_final_battle.tscn` starts on Day 50.
+`HallLedger.build_run_records`. `Playtest/scenario_final_battle.tscn` starts on Day 50.
 
 ### Adding your team credits
 
@@ -165,7 +165,9 @@ than overriding colours or styles on the node, so a reskin reaches it.
 
 ## Files
 
-- `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, the shell (header, action bar, nav, toast)
+- `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, refresh
+- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings (static functions, no state)
+- `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip), action bar, nav and toast
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
 - `Scenes/Overlays/`: End Day check, Day Report, Welcome, Menu, Game Over, Final Battle credits
@@ -183,7 +185,8 @@ and scripts only fill in text, show/hide nodes and instance rows. Each script ha
 comment naming its scene, a **TEXT** section with every message as a constant, a **NODES**
 section of `@onready var _x = %X` (unique names in the scene), then `setup(main)` and
 `refresh()`. Game state and actions live only in `hall_main.gd` (SETTINGS at the top:
-quests per day, milestone day, toast time). Screens call its actions and never change
+milestone day, release cost, dusk timings). Quests per day and quest ranks are in
+`hall_rules.gd`, toast time in `hall_toast.gd`. Screens call its actions and never change
 game state themselves.
 
 ## Known issues (in the game systems, not changed here)
