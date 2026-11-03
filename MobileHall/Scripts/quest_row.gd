@@ -27,7 +27,6 @@ const TEXT_DRAFT := "Party picked"
 const TEXT_SENT := "Sent"
 const TEXT_SENT_STAMP := "SENT"
 const TEXT_DENIED := "Denied"
-const TEXT_DENIED_HINT := "tap to reconsider"
 const TEXT_ODDS := "%d%%"
 
 # ---- NODES
@@ -42,7 +41,6 @@ const TEXT_ODDS := "%d%%"
 # State (right)
 @onready var _state_label: Label = %StateLabel
 @onready var _odds_label: Label = %OddsLabel
-@onready var _sub_label: Label = %SubLabel
 @onready var _party_portraits: HBoxContainer = %Party
 
 
@@ -104,8 +102,6 @@ func _show_state(entry: Dictionary) -> void:
 		HallStyle.QUEST_STATE_DENIED:
 			_state_label.text = TEXT_DENIED
 			HallStyle.set_font_color(_state_label, HallStyle.RED)
-			_sub_label.visible = true
-			_sub_label.text = TEXT_DENIED_HINT
 			modulate = Color(1, 1, 1, DENIED_OPACITY)
 		_:
 			_state_label.text = TEXT_DRAFT if not entry.party.is_empty() else TEXT_OPEN

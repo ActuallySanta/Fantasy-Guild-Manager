@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bcpgb8nxlfyed" path="res://MobileHall/Scripts/hall_header.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.svg" id="38_skull"]
-[ext_resource type="FontVariation" uid="uid://b7dyj081fpsg2" path="res://MobileHall/Art/Fonts/font_title.tres" id="5_title"]
+[ext_resource type="FontVariation" uid="uid://byfd5ncwh8y08" path="res://MobileHall/Art/Fonts/font_bold.tres" id="5_title"]
 [ext_resource type="Texture2D" uid="uid://ckv2l6r1wpg1p" path="res://MobileHall/Art/Textures/coin.png" id="6_coin"]
 [ext_resource type="Texture2D" uid="uid://dq7yxvfputc03" path="res://MobileHall/Art/Textures/shield.png" id="7_shield"]
 [ext_resource type="Texture2D" uid="uid://ysb0ogcuiwff" path="res://MobileHall/Art/Icons/gear.svg" id="8_gear"]
@@ -34,7 +34,7 @@ alignment = 1
 [node name="DayCaps" type="Label" parent="Bar/Row/DayTile/Col" unique_id=1546552936]
 layout_mode = 2
 theme_type_variation = &"CapsLight"
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 22
 text = "Day"
 horizontal_alignment = 1
 uppercase = true
@@ -42,7 +42,7 @@ uppercase = true
 [node name="DayValue" type="Label" parent="Bar/Row/DayTile/Col" unique_id=1686422736]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"TitleLight"
+theme_type_variation = &"HeadingLight"
 theme_override_font_sizes/font_size = 58
 text = "1"
 horizontal_alignment = 1
@@ -64,7 +64,7 @@ theme_override_fonts/bold_font = ExtResource("5_title")
 theme_override_font_sizes/normal_font_size = 26
 theme_override_font_sizes/bold_font_size = 26
 bbcode_enabled = true
-text = "The Bone Drake wakes in [color=#8B2E2A]9 days[/color]"
+text = "Bone Drake in [color=#8B2E2A]9 days[/color]"
 fit_content = true
 scroll_active = false
 

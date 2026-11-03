@@ -119,17 +119,6 @@ theme_override_font_sizes/font_size = 34
 text = "72%"
 horizontal_alignment = 2
 
-[node name="SubLabel" type="Label" parent="Row/BodyMargin/Body/Content/StateCol" unique_id=1710402794]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-theme_type_variation = &"ItalicLabel"
-theme_override_font_sizes/font_size = 18
-text = "tap to reconsider"
-horizontal_alignment = 2
-autowrap_mode = 3
-
 [node name="Party" type="HBoxContainer" parent="Row/BodyMargin/Body/Content/StateCol" unique_id=275098860]
 unique_name_in_owner = true
 layout_mode = 2

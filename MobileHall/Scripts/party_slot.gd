@@ -11,7 +11,6 @@ const EMPTY_SEAT_OPACITY := 0.55
 # ---- TEXT
 const TEXT_ROLE := "the %s"
 const TEXT_EMPTY := "Empty seat"
-const TEXT_EMPTY_HINT := "pin someone below"
 
 # ---- NODES
 @onready var _portrait = %Portrait            # portrait.gd
@@ -37,6 +36,6 @@ func setup(hall: HallMain, entry: Dictionary, seated: GuildCharacter) -> void:
 			HallFx.pop(self, 1.05, 0.1)
 	else:
 		_name.text = TEXT_EMPTY
-		_hint.text = TEXT_EMPTY_HINT
+		_hint.visible = false
 		HallStyle.set_font_color(_name, HallStyle.TEXT_SOFT)
 		modulate = Color(1, 1, 1, EMPTY_SEAT_OPACITY)

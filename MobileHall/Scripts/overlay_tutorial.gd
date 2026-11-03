@@ -596,7 +596,7 @@ func _build() -> void:
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_hint.custom_minimum_size.x = 84
-	_hint.add_theme_font_size_override("font_size", 16)
+	_hint.add_theme_font_size_override("font_size", 19)
 	face_col.add_child(_hint)
 
 	var col := VBoxContainer.new()
@@ -616,7 +616,7 @@ func _build() -> void:
 	_counter.theme_type_variation = &"CapsLabel"
 	_counter.uppercase = true
 	_counter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_counter.add_theme_font_size_override("font_size", 17)
+	_counter.add_theme_font_size_override("font_size", 20)
 	head.add_child(_counter)
 
 	_text = RichTextLabel.new()
@@ -639,7 +639,7 @@ func _build() -> void:
 	_do_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_do_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_do_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_do_label.add_theme_font_size_override("font_size", 19)
+	_do_label.add_theme_font_size_override("font_size", 22)
 	HallStyle.set_font_color(_do_label, HallStyle.BLUE_TEXT)
 	# the instruction takes all the room left of Skip / Next, so it doesn't wrap early
 	foot.add_child(_do_label)
@@ -647,7 +647,7 @@ func _build() -> void:
 	_skip_button.text = "Skip tutorial"
 	_skip_button.flat = true
 	_skip_button.add_theme_font_override("font", load("uid://dvhjw1533s75"))  # MobileHall/Art/Fonts/font_italic.tres
-	_skip_button.add_theme_font_size_override("font_size", 20)
+	_skip_button.add_theme_font_size_override("font_size", 22)
 	_skip_button.add_theme_color_override("font_color", HallStyle.TEXT_SOFT)
 	_skip_button.pressed.connect(skip_tutorial)
 	foot.add_child(_skip_button)

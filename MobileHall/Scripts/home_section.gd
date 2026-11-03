@@ -18,8 +18,7 @@ const HEADING_CANT_TRAIN := "CAN'T TRAIN"
 const HEADING_IN_BED := "IN A BED"
 const HEADING_NEEDS_CARE := "NEEDS CARE"
 const HEADING_FALLEN := "FALLEN"
-const TEXT_EMPTY_TRAINING := "Nobody is training. Heroes in a slot get stronger each night."
-const TEXT_EMPTY_HOSPITAL := "Hurt heroes show up here after a quest."
+const TEXT_EMPTY_TRAINING := "Trainees gain a stat each night."
 const BUTTON_ADD := "+ Add a hero"
 const BUTTON_DONE_PICKING := "Done picking"
 const BUTTON_FULL := "All slots are full"
@@ -138,5 +137,5 @@ func _show_hospital() -> void:
 		_add_heading(HEADING_FALLEN)
 		for character in fallen:
 			_add_row().show_fallen(hall, character)
-	_empty_label.text = TEXT_EMPTY_HOSPITAL
-	_empty_label.visible = patients.is_empty() and waiting.is_empty() and fallen.is_empty()
+	# an empty Hospital needs no note: the summary already says "Nobody is hurt"
+	_empty_label.visible = false

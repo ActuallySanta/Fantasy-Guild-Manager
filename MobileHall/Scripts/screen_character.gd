@@ -26,18 +26,19 @@ const TEXT_GEAR_BONUS := " (+%d gear)"
 const TEXT_PLUCK_BONUS := " (+%d Pluck)"
 const TEXT_EMPTY_SLOT := "Empty slot"
 const TEXT_EMPTY_HINT := "%s gear only"
-const TEXT_GEAR_NOTE := "Holds %s. Buy gear in the Shop."
-const TEXT_PICK_NOTE := "Pick something for %s to wear."
-const TEXT_PICK_NONE := "No %s gear in your pack. Buy some in the Shop."
-const TEXT_GEAR_DEAD := "%s can't use gear anymore. Take it off for someone else."
+## Gear note: only shown when there's something to explain (nothing fits, or
+## the hero has fallen). The rows themselves say the rest.
+const TEXT_PICK_NONE := "No %s gear yet. Try the Shop."
+const TEXT_GEAR_DEAD := "%s can't use gear anymore."
 const TEXT_WORN_BY := " · on %s"
 const BUTTON_EQUIP := "Equip"
 const BUTTON_TAKE := "Take"
 const BUTTON_TAKE_OFF := "Take off"
 const BUTTON_CANCEL := "Cancel"
-const TEXT_PLUCK_NOTE := "Pluck goes up every time this hero wins a quest: +1 at Strong odds, +2 at Fair, +3 when Risky, +4 for a Long shot. Each level adds 10% of their base Power, Defense, Wisdom and Sleaziness (rounded down), but never less than +1 per level."
-const TEXT_RECRUIT := "Recruit · not hired yet"
-const TEXT_RETURNING := "Former member · wants back in"
+## The numbers follow HallRules.PLUCK_GAIN_BY_ODDS and GuildCharacter's Pluck bonus.
+const TEXT_PLUCK_NOTE := "Wins raise Pluck: +1 at Strong odds, up to +4 on a Long shot. Each level adds 10% to the other stats (at least +1)."
+const TEXT_RECRUIT := "Recruit"
+const TEXT_RETURNING := "Former member"
 const TEXT_FREE := "Free today"
 const TEXT_DIED_ON := "Died on Day %d · %s"
 const TEXT_FALLEN := "Fallen"
@@ -50,8 +51,8 @@ const BUTTON_HIRE_COST := "Hire · %dg"
 const BUTTON_RELEASE := "Release"
 # Release confirm sheet
 const TEXT_RELEASE_TITLE := "Release %s?"
-const TEXT_RELEASE_COST := "%s leaves the guild for good. Their gear goes back to your pack. Costs %d standing."
-const TEXT_RELEASE_FALLEN := "Say goodbye to %s. Their gear goes back to your pack."
+const TEXT_RELEASE_COST := "Gone for good. Gear returns to your pack. Costs %d standing."
+const TEXT_RELEASE_FALLEN := "Their gear returns to your pack."
 const TEXT_RELEASE_QUEST := " They'll leave %s."
 const BUTTON_RELEASE_CONFIRM := "Release"
 
@@ -285,14 +286,11 @@ func _show_gear(character: GuildCharacter, is_recruit: bool) -> void:
 		HallStyle.add_row(_gear_lines, GearRowScene).setup(
 			look, button_text, "green", _on_gear_picked.bind(item), true)
 
+	_gear_note.visible = is_dead or (_is_picking_gear and choices.is_empty())
 	if is_dead:
 		_gear_note.text = TEXT_GEAR_DEAD % character.name
-	elif _is_picking_gear and choices.is_empty():
-		_gear_note.text = TEXT_PICK_NONE % role_name
-	elif _is_picking_gear:
-		_gear_note.text = TEXT_PICK_NOTE % character.name
 	else:
-		_gear_note.text = TEXT_GEAR_NOTE % HallStyle.count_text(character.max_items, "item", "items")
+		_gear_note.text = TEXT_PICK_NONE % role_name
 
 
 func _toggle_gear_picker() -> void:
@@ -324,9 +322,9 @@ func _show_release_confirm(character: GuildCharacter, is_recruit: bool) -> void:
 	_release_title.text = TEXT_RELEASE_TITLE % character.name
 	var standing_cost := hall.release_standing_cost(character)
 	if standing_cost > 0:
-		_release_sub.text = TEXT_RELEASE_COST % [character.name, standing_cost]
+		_release_sub.text = TEXT_RELEASE_COST % standing_cost
 	else:
-		_release_sub.text = TEXT_RELEASE_FALLEN % character.name
+		_release_sub.text = TEXT_RELEASE_FALLEN
 	var quest_index := hall.quest_index_of(character)
 	if quest_index >= 0:
 		_release_sub.text += TEXT_RELEASE_QUEST % hall.quest_entries[quest_index].quest.questTitle

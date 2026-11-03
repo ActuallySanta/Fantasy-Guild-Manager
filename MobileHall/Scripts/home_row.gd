@@ -28,10 +28,10 @@ const TEXT_TOO_HURT := "Too hurt to train"
 const TEXT_IN_BED := "In a Hospital bed"
 const TEXT_NIGHTS_IN_BED := "Healthy in %s"
 const TEXT_NIGHTS_COMPARE := "Healthy in %s at home, %s in a bed"
-const TEXT_REVIVE_READY := "The Hospital can bring one hero back"
-const TEXT_REVIVE_LOCKED := "Revive unlocks at Hospital level %d"
-const TEXT_REVIVE_NO_BED := "No free bed. Upgrade the Barracks to revive"
-const TEXT_REVIVE_USED := "This run's revive is used up"
+const TEXT_REVIVE_READY := "One revive available"
+const TEXT_REVIVE_LOCKED := "Revive at Hospital Lv %d"
+const TEXT_REVIVE_NO_BED := "No free bed to revive into"
+const TEXT_REVIVE_USED := "Revive used up"
 const BUTTON_REMOVE := "Remove"
 const BUTTON_ADD := "Add"
 const BUTTON_MOVE := "Move here"
@@ -102,7 +102,7 @@ func _set_button(button: Button, text: String, kind: String, action: Callable) -
 	button.text = text
 	button.visible = true
 	button.disabled = false
-	HallStyle.style_button(button, kind, 22)
+	HallStyle.style_button(button, kind, 24)
 	for connection in button.pressed.get_connections():
 		button.pressed.disconnect(connection.callable)
 	button.pressed.connect(action)

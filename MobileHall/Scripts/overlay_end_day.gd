@@ -12,7 +12,7 @@ const TEXT_TITLE := "End Day %d?"
 const TEXT_SUBTITLE := "%s going out tonight"
 const TEXT_SUBTITLE_NONE := "Nobody is going out tonight"
 const TEXT_DENIED := "Denied: %s"
-const TEXT_UPGRADE_TITLE := "Before you go: you have %d gold"
+const TEXT_UPGRADE_TITLE := "Upgrade first? · %d gold"
 const BUTTON_BACK := "Not yet"
 const BUTTON_END := "End Day"
 
