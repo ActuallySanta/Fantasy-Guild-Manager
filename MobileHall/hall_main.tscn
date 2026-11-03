@@ -17,8 +17,8 @@
 [ext_resource type="PackedScene" uid="uid://cdmw3mrmuept3" path="res://MobileHall/Scenes/Overlays/overlay_game_over.tscn" id="37_gameover"]
 [ext_resource type="Shader" uid="uid://dkvytyy35gk2p" path="res://MobileHall/Styles/colorblind_filter.gdshader" id="39_cbf01"]
 [ext_resource type="PackedScene" uid="uid://0a18grxohlrg" path="res://MobileHall/Scenes/Overlays/overlay_credits.tscn" id="40_credits"]
-[ext_resource type="PackedScene" uid="uid://ctiyuxdww3u5j" path="res://MobileHall/Scenes/Shell/hall_header.tscn" id="50_header"]
 [ext_resource type="PackedScene" uid="uid://vr8mj4s68ib4" path="res://MobileHall/Scenes/Shell/hall_action_bar.tscn" id="50_action"]
+[ext_resource type="PackedScene" uid="uid://ctiyuxdww3u5j" path="res://MobileHall/Scenes/Shell/hall_header.tscn" id="50_header"]
 [ext_resource type="PackedScene" uid="uid://ca70e6ixyakqm" path="res://MobileHall/Scenes/Shell/hall_nav.tscn" id="50_nav"]
 [ext_resource type="PackedScene" uid="uid://7rh1kia6seff" path="res://MobileHall/Scenes/Shell/hall_toast.tscn" id="50_toast"]
 
@@ -58,7 +58,6 @@ theme_override_constants/separation = 0
 
 [node name="Header" parent="Layout" unique_id=1081086639 instance=ExtResource("50_header")]
 unique_name_in_owner = true
-layout_mode = 2
 
 [node name="Content" type="Control" parent="Layout" unique_id=325224631]
 clip_contents = true
@@ -108,15 +107,12 @@ anchor_bottom = 1.0
 
 [node name="ActionBar" parent="Layout" unique_id=1821092104 instance=ExtResource("50_action")]
 unique_name_in_owner = true
-layout_mode = 2
 
 [node name="Nav" parent="Layout" unique_id=1524568463 instance=ExtResource("50_nav")]
 unique_name_in_owner = true
-layout_mode = 2
 
 [node name="Toast" parent="." unique_id=2122765158 instance=ExtResource("50_toast")]
 unique_name_in_owner = true
-visible = false
 
 [node name="OverlayEndDay" parent="." unique_id=773934197 instance=ExtResource("30_cwf4i")]
 unique_name_in_owner = true
@@ -153,7 +149,7 @@ layout_mode = 1
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="OverlayGameOver" parent="." instance=ExtResource("37_gameover")]
+[node name="OverlayGameOver" parent="." unique_id=1593428695 instance=ExtResource("37_gameover")]
 unique_name_in_owner = true
 visible = false
 z_index = 10
