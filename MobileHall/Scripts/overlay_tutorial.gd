@@ -17,7 +17,7 @@
 ## UI only: it calls nothing but hall_main's own actions and queries.
 ##
 ## WHAT THE PLAYER SEES
-##   - everything outside the spotlight is greyed out (desaturated + dimmed)
+##   - everything outside the spotlight is dimmed (a dark wash)
 ##     and swallows taps; every button outside the spotlight is disabled
 ##   - a gold ring and a bouncing arrow on the one thing to tap
 ##   - Pip's bubble docks at the top or bottom, whichever is clear of the
@@ -61,7 +61,7 @@ const UNLOCK_DAY := {"upgrades": 3, "shop": 5}
 
 ## Draw order: above the hall's overlays (z 10: Day Report, End Day sheet,
 ## toast) and the raised art inside tabs (applicant letters, scroll rollers),
-## so the grey-out, ring and Pip always sit on top of what they point at.
+## so the dim, ring and Pip always sit on top of what they point at.
 const TUTORIAL_Z_INDEX := 20
 ## The spotlight ring and the arrow are white art (Styles/stamp.tres, Art/Icons)
 ## tinted this gold.
@@ -76,17 +76,10 @@ const MISSING_GRACE := 0.6
 ## since the hall rebuilds rows on every refresh.
 const LOCK_INTERVAL := 0.1
 
-## Grey-out for everything outside the spotlight.
-const GREY_SHADER := """
-shader_type canvas_item;
-uniform sampler2D screen_tex : hint_screen_texture, filter_linear_mipmap;
-uniform float darken = 0.35;
-void fragment() {
-	vec3 c = texture(screen_tex, SCREEN_UV).rgb;
-	float g = dot(c, vec3(0.299, 0.587, 0.114));
-	COLOR = vec4(vec3(g) * (1.0 - darken), 1.0);
-}
-"""
+## Dim laid over everything outside the spotlight: a plain translucent wash.
+## (Reading the screen back to grey it out rendered wrong on iPhone Safari:
+## ghost copies of Pip and cropped slices.) Alpha = how dark it gets, 0..1.
+const DIM_COLOR := Color(0.0, 0.0, 0.0, 0.55)
 
 # ---- coloured words (the stat inks in HallStyle.STATS, and HallStyle.GOLD_TEXT)
 const POW := "[color=#8B2E2A]Power[/color]"
@@ -331,7 +324,7 @@ func _is_live(step: Dictionary) -> bool:
 # ============================================================ BUTTON LOCKS
 
 ## Disable every button in the hall except the ones inside a live spotlight.
-## (Rows that are tap panels, not Buttons, are stopped by the grey blockers.)
+## (Rows that are tap panels, not Buttons, are stopped by the dim blockers.)
 func _apply_locks(step: Dictionary, target: Control) -> void:
 	var live_root: Control = target if (target != null and _is_live(step)) else null
 	var denied: Array = step.get("deny", [])
@@ -383,7 +376,7 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 	var is_lost: bool = step.get("target") != null and target == null and _missing_for > MISSING_GRACE
 	var show_next: bool = not waits or is_lost
 
-	# ---- the spotlight hole and the grey-out around it
+	# ---- the spotlight hole and the dim around it
 	var hole := Rect2()
 	if target != null:
 		var xf: Transform2D = get_global_transform().affine_inverse() * target.get_global_transform()
@@ -397,7 +390,7 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 		_set_rect(_blockers[0], Rect2(Vector2.ZERO, full))
 		for blocker_index in range(1, 4):
 			_set_rect(_blockers[blocker_index], Rect2())
-	# explain-only steps cover the hole too (no grey, just no taps)
+	# explain-only steps cover the hole too (no dim, just no taps)
 	_set_rect(_cover, hole if (hole.has_area() and not _is_live(step)) else Rect2())
 
 	_ring.visible = hole.has_area()
@@ -544,12 +537,9 @@ func _is_press(event: InputEvent) -> bool:
 # ============================================================ BUILD
 
 func _build() -> void:
-	var grey := ShaderMaterial.new()
-	grey.shader = Shader.new()
-	grey.shader.code = GREY_SHADER
 	for blocker_index in 4:
 		var blocker := ColorRect.new()
-		blocker.material = grey
+		blocker.color = DIM_COLOR
 		blocker.mouse_filter = Control.MOUSE_FILTER_STOP
 		blocker.gui_input.connect(_on_blocked_input)
 		add_child(blocker)
@@ -665,7 +655,8 @@ func _build() -> void:
 	foot.add_child(_next_button)
 
 
-## Pip's portrait: the round portrait mask (parchment ground, clips Pip) and
+## Pip's portrait: the round portrait mask (parchment ground; its shape clips
+## Pip through HallStyle.mask_to) and
 ## the round portrait frame on top, the same art as the heroes' portraits.
 func _build_portrait() -> Control:
 	var holder := Control.new()
@@ -675,7 +666,6 @@ func _build_portrait() -> Control:
 	var mask := TextureRect.new()
 	mask.texture = PORTRAIT_MASK
 	mask.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	mask.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
 	mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mask.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	HallStyle.tint_art(mask, PIP_GROUND)
@@ -684,6 +674,10 @@ func _build_portrait() -> Control:
 	pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pip.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mask.add_child(pip)
+	# clipped by the portrait mask shader, not clip_children (broken on iPhone
+	# Safari); Pip fills the mask, so the mask's rect is Pip's own rect
+	pip.resized.connect(func() -> void: HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(Vector2.ZERO, pip.size)))
+	HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(Vector2.ZERO, pip.size))
 	var frame := TextureRect.new()
 	frame.texture = PORTRAIT_FRAME
 	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
