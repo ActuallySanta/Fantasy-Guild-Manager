@@ -14,34 +14,6 @@ script = ExtResource("1_hire")
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Head" type="HBoxContainer" parent="Col"]
-layout_mode = 2
-
-[node name="Kind" type="Label" parent="Col/Head"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"CapsLabel"
-theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
-theme_override_font_sizes/font_size = 19
-text = "Letter of introduction"
-uppercase = true
-
-[node name="Number" type="Label" parent="Col/Head"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"CapsLabel"
-theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
-theme_override_font_sizes/font_size = 19
-text = "No. XIV"
-uppercase = true
-
-[node name="Rule" type="ColorRect" parent="Col"]
-custom_minimum_size = Vector2(0, 2)
-layout_mode = 2
-mouse_filter = 2
-color = Color(0.5451, 0.1804, 0.1647, 1)
-
 [node name="Top" type="HBoxContainer" parent="Col"]
 layout_mode = 2
 theme_override_constants/separation = 22
@@ -58,12 +30,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 alignment = 1
-
-[node name="NameCaps" type="Label" parent="Col/Top/Fields"]
-layout_mode = 2
-theme_type_variation = &"CapsLabel"
-text = "Name"
-uppercase = true
 
 [node name="Name" type="Label" parent="Col/Top/Fields"]
 unique_name_in_owner = true
@@ -86,12 +52,6 @@ stretch_mode = 1
 custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
 mouse_filter = 2
-
-[node name="RoleCaps" type="Label" parent="Col/Top/Fields"]
-layout_mode = 2
-theme_type_variation = &"CapsLabel"
-text = "Calling"
-uppercase = true
 
 [node name="Role" type="Label" parent="Col/Top/Fields"]
 unique_name_in_owner = true
@@ -183,12 +143,6 @@ theme_override_font_sizes/font_size = 32
 text = "19"
 horizontal_alignment = 1
 vertical_alignment = 1
-
-[node name="WhyCaps" type="Label" parent="Col"]
-layout_mode = 2
-theme_type_variation = &"CapsLabel"
-text = "Why join the guild?"
-uppercase = true
 
 [node name="Story" type="HBoxContainer" parent="Col"]
 layout_mode = 2

@@ -50,5 +50,5 @@ func _set_button(button_text: String, button_kind: String, on_press: Callable) -
 	if button_text == "":
 		return
 	_button.text = button_text
-	HallStyle.style_button(_button, button_kind, 22)
+	HallStyle.style_button(_button, button_kind, 24)
 	_button.pressed.connect(on_press)

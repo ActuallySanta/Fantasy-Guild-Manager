@@ -23,5 +23,5 @@ stretch_mode = 5
 
 [node name="Text" type="Label" parent="Row"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 24
 text = "Chip"

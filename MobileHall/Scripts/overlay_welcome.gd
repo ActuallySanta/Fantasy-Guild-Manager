@@ -209,7 +209,7 @@ func _build_row(icon: String, heading: String, body: String) -> HBoxContainer:
 	text.add_child(name_label)
 	var body_label := Label.new()
 	body_label.theme_type_variation = &"ItalicLabel"
-	body_label.add_theme_font_size_override("font_size", 21)
+	body_label.add_theme_font_size_override("font_size", 23)
 	body_label.custom_minimum_size.x = 40
 	body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body_label.text = body

@@ -47,7 +47,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"ItalicLabel"
-theme_override_font_sizes/font_size = 21
+theme_override_font_sizes/font_size = 23
 text = "+2 Power · Knights only"
 autowrap_mode = 3
 
