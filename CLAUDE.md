@@ -21,6 +21,8 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
   - Don't trust `--check-only --script`: it doesn't load autoloads, so every script reports false "Identifier not found: GameState/ExternalContentContainer/…" errors.
 - **Formatting:** the GDQuest GDScript formatter editor plugin (`addons/GDQuest_GDScript_formatter`) is enabled. It runs from inside the editor.
 - **Exports** (`export_presets.cfg`) write to `Builds/`, which is committed. Don't regenerate builds unless asked.
+  - Every preset has `include_filter="External Content/*.txt"`. The quest `.txt` files aren't resources, so without it they're left out of the export and quests break.
+- **Web build:** `.github/workflows/deploy-web.yml` exports the `Web` preset with headless Godot and deploys it to GitHub Pages on every push to `master` (or with "Run workflow" in the Actions tab). The URL is `https://www.santibenfer.com/Fantasy-Guild-Manager/`. The repo is `ActuallySanta/Fantasy-Guild-Manager`, and the account's Pages site uses a custom domain. It's a PWA, so "Add to Home Screen" on a phone installs it full-screen in portrait. `GODOT_VERSION` in the workflow has to match the editor. `Builds/Web/` (local web exports) is gitignored.
 
 ## Architecture
 
