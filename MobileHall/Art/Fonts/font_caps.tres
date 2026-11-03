@@ -1,10 +1,10 @@
-[gd_resource type="FontVariation" format=3]
+[gd_resource type="FontVariation" format=3 uid="uid://bl4h4wrmd1s0m"]
 
-[ext_resource type="FontFile" path="res://MobileHall/Art/Fonts/Alegreya-VariableFont_wght.ttf" id="1_base"]
-
+[ext_resource type="FontFile" uid="uid://4rcpert1cng6" path="res://MobileHall/Art/Fonts/Alegreya-VariableFont_wght.ttf" id="1_base"]
 
 [resource]
-
 base_font = ExtResource("1_base")
-variation_opentype = {2003265652: 800}
+variation_opentype = {
+2003265652: 800
+}
 spacing_glyph = 2

@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://bdmft4ngc6x70"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/suggest_row.gd" id="1_q0b3u"]
+[ext_resource type="Script" uid="uid://b1dtmiwfdxjtv" path="res://MobileHall/Scripts/suggest_row.gd" id="1_q0b3u"]
 
 [node name="SuggestRow" type="HBoxContainer" unique_id=1551691532]
 theme_override_constants/separation = 12

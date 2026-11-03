@@ -1,7 +1,7 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cp5084mci60mt"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/quest_tab.gd" id="1_ebsm4"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/quest_band.tres" id="2_band"]
+[ext_resource type="Script" uid="uid://spbdg15m6wf1" path="res://MobileHall/Scripts/quest_tab.gd" id="1_ebsm4"]
+[ext_resource type="StyleBox" uid="uid://cle0lydr2ylul" path="res://MobileHall/Styles/quest_band.tres" id="2_band"]
 
 [node name="QuestTab" type="VBoxContainer"]
 size_flags_horizontal = 3
@@ -19,10 +19,11 @@ theme_type_variation = &"QuestTab"
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
-anchor_left = 0.26
-anchor_right = 0.74
+anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 5.0
 offset_top = 5.0
+offset_right = -5.0
 offset_bottom = -5.0
 grow_horizontal = 2
 grow_vertical = 2

@@ -4,8 +4,6 @@
 ## Scene: MobileHall/Scenes/Rows/hire_card.tscn
 extends PanelContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 
 ## Letter numbers start here so the first applicants aren't "No. I".
 const FIRST_LETTER_NUMBER := 12
@@ -34,28 +32,28 @@ const TEXT_NO_BEDS := "No beds left"
 ## The scene has one stat column; copy it for the other four.
 func _ready() -> void:
 	var template := _stat_columns.get_child(0)
-	for copy_index in Style.STAT_COUNT - 1:
+	for copy_index in HallStyle.STAT_COUNT - 1:
 		_stat_columns.add_child(template.duplicate())
 
 
 ## letter_index = place in today's applicants (for the letter number).
 func setup(hall: HallMain, recruit: GuildCharacter, letter_index: int = 0) -> void:
 	_details_button.pressed.connect(hall.open_character.bind(recruit))
-	_hire_button.pressed.connect(hall.hire.bind(recruit))
+	_hire_button.pressed.connect(_on_hire_pressed.bind(hall, recruit))
 
 	# who they are
-	_number.text = TEXT_NUMBER % Style.roman_numeral(FIRST_LETTER_NUMBER + GameState.day * 3 + letter_index)
+	_number.text = TEXT_NUMBER % HallStyle.roman_numeral(FIRST_LETTER_NUMBER + GameState.day * 3 + letter_index)
 	_portrait.show_character(recruit)
 	_name.text = recruit.name
-	_role.text = Style.role_name(recruit)
-	for stat_index in Style.STAT_COUNT:
+	_role.text = HallStyle.role_name(recruit)
+	for stat_index in HallStyle.STAT_COUNT:
 		var column := _stat_columns.get_child(stat_index)
-		column.get_node("Caps").text = Style.STATS[stat_index].short
-		column.get_node("Box/Value").text = str(Style.stat_value(recruit, stat_index))
-	_total.text = str(Style.quest_stat_total(recruit))
+		column.get_node("Caps").text = HallStyle.STATS[stat_index].short
+		column.get_node("Box/Value").text = str(HallStyle.stat_value(recruit, stat_index))
+	_total.text = str(HallStyle.quest_stat_total(recruit))
 
 	# first line of the backstory, with a red drop cap
-	var story := Style.clean_backstory(recruit).get_slice("\n", 0)
+	var story := HallStyle.clean_backstory(recruit).get_slice("\n", 0)
 	_drop_cap.text = story.left(1)
 	_blurb.text = story.substr(1)
 
@@ -68,3 +66,9 @@ func setup(hall: HallMain, recruit: GuildCharacter, letter_index: int = 0) -> vo
 	else:
 		_hire_button.text = TEXT_HIRE_FREE
 	_hire_button.disabled = no_beds
+
+
+## Hire, and if they joined, this letter flies off to the roster.
+func _on_hire_pressed(hall: HallMain, recruit: GuildCharacter) -> void:
+	if hall.hire(recruit):
+		hall.send_hired_letter(self)

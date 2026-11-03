@@ -1,6 +1,6 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://3jfkcim0fo7x"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/tap_panel.gd" id="1_tap"]
+[ext_resource type="Script" uid="uid://bhmrwbo8o83n4" path="res://MobileHall/Scripts/tap_panel.gd" id="1_tap"]
 
 [node name="HirePeek" type="PanelContainer"]
 custom_minimum_size = Vector2(0, 74)

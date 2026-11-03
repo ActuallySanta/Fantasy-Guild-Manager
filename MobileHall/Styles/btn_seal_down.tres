@@ -1,6 +1,6 @@
-[gd_resource type="StyleBoxTexture" format=3]
+[gd_resource type="StyleBoxTexture" format=3 uid="uid://cpstyibm7uhbc"]
 
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/btn_paper_down.png" id="1_tex"]
+[ext_resource type="Texture2D" uid="uid://dr60fnjyq5lrw" path="res://MobileHall/Art/Textures/btn_paper_down.png" id="1_tex"]
 
 [resource]
 content_margin_left = 96.0

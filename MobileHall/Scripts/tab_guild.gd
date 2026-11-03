@@ -6,12 +6,10 @@
 ## Scene: MobileHall/Scenes/Tabs/tab_guild.tscn
 extends VBoxContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const MemberCardScene := preload("res://MobileHall/Scenes/Rows/member_card.tscn")
-const HireCardScene := preload("res://MobileHall/Scenes/Rows/hire_card.tscn")
-const HirePeekScene := preload("res://MobileHall/Scenes/Rows/hire_peek.tscn")
-const HeadingScene := preload("res://MobileHall/Scenes/Rows/home_heading.tscn")
+const MemberCardScene := preload("uid://dls1bjn8gt2fe")  # MobileHall/Scenes/Rows/member_card.tscn
+const HireCardScene := preload("uid://cy6d8ep8exxlt")  # MobileHall/Scenes/Rows/hire_card.tscn
+const HirePeekScene := preload("uid://3jfkcim0fo7x")  # MobileHall/Scenes/Rows/hire_peek.tscn
+const HeadingScene := preload("uid://bve0dglxrk3x4")  # MobileHall/Scenes/Rows/home_heading.tscn
 
 ## Cards of fallen heroes fade back, like faded rows elsewhere in the hall.
 const FALLEN_OPACITY := 0.6
@@ -19,6 +17,8 @@ const FALLEN_OPACITY := 0.6
 ## How many letters peek out under the top one, and their small tilts (degrees).
 const PEEK_COUNT := 2
 const PEEK_TILTS := [0.6, -0.5]
+## Where the next letter starts from after a hire (it slides up into place).
+const NEXT_LETTER_SLIDE := Vector2(0, 48)
 ## Folder tab heights: the open one stands taller and joins the folder.
 const FOLDER_TAB_HEIGHT := 72
 const FOLDER_TAB_HEIGHT_OPEN := 80
@@ -79,8 +79,8 @@ func scroll_to_top() -> void:
 func refresh() -> void:
 	_show_section_buttons()
 	_show_beds()
-	Style.clear_children(_card_list)
-	Style.clear_children(_letter_stack)
+	HallStyle.clear_children(_card_list)
+	HallStyle.clear_children(_letter_stack)
 	if _is_hire_section():
 		_show_for_hire()
 	else:
@@ -119,7 +119,7 @@ func _show_beds() -> void:
 	else:
 		var barracks_level := GuildUpgrades.get_level(GuildUpgrades.Building.BARRACKS)
 		_beds_label.text = BEDS % [beds_used, bed_count, barracks_level]
-	Style.set_font_color(_beds_label, BEDS_FULL_COLOR if is_full else Style.CREAM)
+	HallStyle.set_font_color(_beds_label, BEDS_FULL_COLOR if is_full else HallStyle.CREAM)
 
 
 # ---- lists
@@ -128,11 +128,11 @@ func _show_beds() -> void:
 ## take a bed, but stay here so the Hospital can revive them).
 func _show_roster() -> void:
 	_note.visible = false
-	var living := hall.roster().filter(func(character): return not Style.is_dead(character))
-	var fallen := hall.roster().filter(func(character): return Style.is_dead(character))
+	var living := hall.roster().filter(func(character): return not HallStyle.is_dead(character))
+	var fallen := hall.roster().filter(func(character): return HallStyle.is_dead(character))
 
 	for character in living:
-		Style.add_row(_card_list, MemberCardScene).setup(hall, character)
+		HallStyle.add_row(_card_list, MemberCardScene).setup(hall, character)
 	if living.is_empty() and not fallen.is_empty():
 		var no_living_note: Label = _empty_label.duplicate()
 		no_living_note.text = NO_LIVING
@@ -140,11 +140,11 @@ func _show_roster() -> void:
 		_card_list.add_child(no_living_note)
 
 	if not fallen.is_empty():
-		var heading: Label = Style.add_row(_card_list, HeadingScene)
+		var heading: Label = HallStyle.add_row(_card_list, HeadingScene)
 		heading.text = HEADING_FALLEN % fallen.size()
 		heading.theme_type_variation = &"CapsLight"
 		for character in fallen:
-			var card: Control = Style.add_row(_card_list, MemberCardScene)
+			var card: Control = HallStyle.add_row(_card_list, MemberCardScene)
 			card.setup(hall, character)
 			card.modulate = Color(1, 1, 1, FALLEN_OPACITY)
 	_empty_label.text = EMPTY_ROSTER
@@ -167,21 +167,29 @@ func _show_for_hire() -> void:
 		return
 
 	_top_letter = clampi(_top_letter, 0, recruits.size() - 1)
-	var top_card := Style.add_row(_letter_stack, HireCardScene)
+	var top_card := HallStyle.add_row(_letter_stack, HireCardScene)
 	top_card.z_index = PEEK_COUNT + 1
 	top_card.setup(hall, recruits[_top_letter], _top_letter)
+	# the last letter was just hired: the next one slides up off the stack
+	if hall.pending_fx.get("hire_next", false):
+		HallFx.slide_in(top_card, NEXT_LETTER_SLIDE)
 
 	# the next applicants peek out underneath, each a little further back
 	for peek_index in mini(PEEK_COUNT, recruits.size() - 1):
 		var recruit_index := (_top_letter + 1 + peek_index) % recruits.size()
 		var recruit: GuildCharacter = recruits[recruit_index]
-		var peek := Style.add_row(_letter_stack, HirePeekScene)
+		var peek := HallStyle.add_row(_letter_stack, HirePeekScene)
 		peek.z_index = PEEK_COUNT - peek_index
 		peek.rotation_degrees = PEEK_TILTS[peek_index]
-		peek.get_node("Text").text = PEEK % [recruit.name, Style.role_name(recruit)]
+		peek.get_node("Text").text = PEEK % [recruit.name, HallStyle.role_name(recruit)]
 		peek.pressed.connect(_bring_to_top.bind(recruit_index))
 
 
 func _bring_to_top(recruit_index: int) -> void:
 	_top_letter = recruit_index
 	hall.queue_refresh()
+
+
+## The "Your Guild" folder tab, where hired letters fly to (hall_main.send_hired_letter).
+func roster_button() -> Control:
+	return _roster_section_button

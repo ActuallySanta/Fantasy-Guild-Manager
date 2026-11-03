@@ -1,9 +1,9 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://3cdpykowgja4"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/overlay_report.gd" id="1_s0qxh"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/wood.png" id="2_wood"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/connector.png" id="4_connector"]
+[ext_resource type="Script" uid="uid://cpybvnpe5d7yb" path="res://MobileHall/Scripts/overlay_report.gd" id="1_s0qxh"]
+[ext_resource type="Texture2D" uid="uid://6sc4epkipif0" path="res://MobileHall/Art/Textures/wood.png" id="2_wood"]
+[ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
+[ext_resource type="Texture2D" uid="uid://bswbe5m6msbdj" path="res://MobileHall/Art/Textures/connector.png" id="4_connector"]
 
 [node name="OverlayReport" type="Control"]
 layout_mode = 3

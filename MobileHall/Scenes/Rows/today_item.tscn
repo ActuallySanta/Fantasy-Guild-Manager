@@ -1,7 +1,7 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://edhkrbpcjf3j"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/today_item.gd" id="1_today"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Textures/pin.png" id="2_pin"]
+[ext_resource type="Script" uid="uid://cvvg4rhgxtlc7" path="res://MobileHall/Scripts/today_item.gd" id="1_today"]
+[ext_resource type="Texture2D" uid="uid://djwbyqk4uhihw" path="res://MobileHall/Art/Textures/pin.png" id="2_pin"]
 
 [node name="TodayItem" type="PanelContainer"]
 size_flags_horizontal = 3

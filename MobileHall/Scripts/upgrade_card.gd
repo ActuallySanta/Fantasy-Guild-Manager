@@ -4,8 +4,11 @@
 ## Scene: MobileHall/Scenes/Rows/upgrade_card.tscn
 extends PanelContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
+
+# ---- MOTION
+## Seconds after Build before the new level diamond stamps in (lets the
+## building squash first).
+const NEW_PIP_DELAY := 0.15
 
 # ---- TEXT
 # Level and effect
@@ -42,17 +45,29 @@ func setup(hall: HallMain, building: int) -> void:
 	_show_name_and_level(building, level)
 	_show_effects(building, level, is_maxed)
 	_show_status(building, is_maxed)
+	if hall.pending_fx.get("upgraded", -1) == building:
+		_play_built(level)
+
+
+## Just built: the building squashes and stretches, the new level's diamond
+## stamps in, and "Level 3 / 5" pops.
+func _play_built(level: int) -> void:
+	HallFx.squash(_icon.get_parent())
+	if level >= 1 and level <= _pips.get_child_count():
+		HallFx.stamp_in(_pips.get_child(level - 1), 2.4, NEW_PIP_DELAY)
+	HallFx.pop(_level, 1.25, NEW_PIP_DELAY)
+	HallFx.pop(self, 1.03)
 
 
 ## Icon, name, "Level 2 / 5" and one diamond per level (filled up to the level).
 func _show_name_and_level(building: int, level: int) -> void:
-	_icon.texture = Style.icon_texture(Style.BUILDING_ICONS.get(building, ""))
+	_icon.texture = HallStyle.icon_texture(HallStyle.BUILDING_ICONS.get(building, ""))
 	_name.text = GuildUpgrades.get_building_name(building)
 	_level.text = TEXT_LEVEL % [level, GuildUpgrades.MAX_LEVEL]
 	# one diamond per level, authored in the scene
 	for pip_index in _pips.get_child_count():
 		var pip: TextureRect = _pips.get_child(pip_index)
-		pip.texture = Style.icon_texture("diamond" if pip_index < level else "diamond_empty")
+		pip.texture = HallStyle.icon_texture("diamond" if pip_index < level else "diamond_empty")
 
 
 ## "Now · ..." and "Next · ..." (or "Fully built").
@@ -78,12 +93,12 @@ func _show_status(building: int, is_maxed: bool) -> void:
 	match status:
 		GuildUpgrades.UpgradeStatus.READY:
 			_status.text = TEXT_READY
-			Style.set_font_color(_status, Style.GREEN_TEXT)
+			HallStyle.set_font_color(_status, HallStyle.GREEN_TEXT)
 		GuildUpgrades.UpgradeStatus.NOT_ENOUGH_GOLD:
 			_status.text = TEXT_NEED_GOLD % (GuildUpgrades.get_next_gold_cost(building) - GameState.gold)
-			Style.set_font_color(_status, Style.GOLD_TEXT)
+			HallStyle.set_font_color(_status, HallStyle.GOLD_TEXT)
 		GuildUpgrades.UpgradeStatus.STANDING_TOO_LOW:
 			_status.text = TEXT_NEED_STANDING % GuildUpgrades.get_next_standing_req(building)
-			Style.set_font_color(_status, Style.RED)
+			HallStyle.set_font_color(_status, HallStyle.RED)
 		_:
 			_status.text = ""

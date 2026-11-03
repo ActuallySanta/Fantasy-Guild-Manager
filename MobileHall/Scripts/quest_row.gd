@@ -2,16 +2,19 @@
 ## party size and favored stat on the left; its state (party picked, sent,
 ## denied) and odds on the right. Tap it to open Assign Party on that quest.
 ## Scene: MobileHall/Scenes/Rows/quest_row.tscn
-extends "res://MobileHall/Scripts/tap_panel.gd"
+extends TapPanel
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const PortraitScene := preload("res://MobileHall/Scenes/Components/portrait.tscn")
+const PortraitScene := preload("uid://h87tubvsjwc3")  # MobileHall/Scenes/Components/portrait.tscn
 
 ## Size (pixels) of the little party portraits under the state.
 const MINI_PORTRAIT_SIZE := 40
 ## Denied quests fade back so the open ones stand out.
 const DENIED_OPACITY := 0.7
+## The SENT stamp inked on a sent quest's row: where its centre sits (fraction
+## of the row's size), text size, tilt (radians).
+const SENT_STAMP_AT := Vector2(0.56, 0.5)
+const SENT_STAMP_FONT_SIZE := 34
+const SENT_STAMP_TILT := -0.14
 
 # ---- TEXT
 # Quest facts (left)
@@ -22,6 +25,7 @@ const TEXT_PARTY_SIZE := "%d max"
 const TEXT_OPEN := "Pick a party"
 const TEXT_DRAFT := "Party picked"
 const TEXT_SENT := "Sent"
+const TEXT_SENT_STAMP := "SENT"
 const TEXT_DENIED := "Denied"
 const TEXT_DENIED_HINT := "tap to reconsider"
 const TEXT_ODDS := "%d%%"
@@ -48,27 +52,36 @@ func setup(hall: HallMain, quest_index: int) -> void:
 	_show_quest_facts(hall, entry)
 	_show_party(hall, entry)
 	_show_state(entry)
+	# sent quests have SENT inked on them (pressed on if it was just sent);
+	# a just-denied quest's state word stamps in
+	var is_just_decided: bool = hall.pending_fx.get("quest_stamp", -1) == quest_index
+	if entry.state == HallStyle.QUEST_STATE_SENT:
+		HallFx.stamp_onto(self, TEXT_SENT_STAMP, HallStyle.GREEN_TEXT, SENT_STAMP_AT,
+				SENT_STAMP_FONT_SIZE, SENT_STAMP_TILT, is_just_decided)
+	elif is_just_decided:
+		HallFx.stamp_in(_state_label, 2.0)
+		HallFx.pop(self, 1.03, 0.12)
 
 
 ## Type seal, title, rank, reward, party size, favored stat.
 func _show_quest_facts(hall: HallMain, entry: Dictionary) -> void:
-	var type_info := Style.quest_type_info(entry)
-	Style.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
+	var type_info := HallStyle.quest_type_info(entry)
+	HallStyle.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
 	_title.text = entry.quest.questTitle
-	_rank_chip.set_box(TEXT_RANK % Style.rank_letter(entry.quest), Style.TEXT_MAIN)
+	_rank_chip.set_box(TEXT_RANK % HallStyle.rank_letter(entry.quest), HallStyle.TEXT_MAIN)
 	# item quests pay pre-rolled equipment instead of gold: show the count and rarities
 	if entry.quest.pays_in_items():
-		_gold_chip.set_chip(entry.quest.get_reward_text(), Style.BLUE_BG, Style.BLUE_TEXT, "chest")
+		_gold_chip.set_chip(entry.quest.get_reward_text(), HallStyle.BLUE_BG, HallStyle.BLUE_TEXT, "chest")
 	else:
-		_gold_chip.set_chip(TEXT_GOLD % entry.quest.goldReward, Style.GOLD_BG, Style.TEXT_MAIN, "coins")
-	_party_size_chip.set_chip(TEXT_PARTY_SIZE % hall.party_size_limit(entry), Style.BLUE_BG, Style.TEXT_MAIN, "person")
-	var favored_stat: Dictionary = Style.STATS[Style.favored_stat_index(entry.quest)]
+		_gold_chip.set_chip(TEXT_GOLD % entry.quest.goldReward, HallStyle.GOLD_BG, HallStyle.TEXT_MAIN, "coins")
+	_party_size_chip.set_chip(TEXT_PARTY_SIZE % hall.party_size_limit(entry), HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "person")
+	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_stat_index(entry.quest)]
 	_favored_chip.set_chip(favored_stat.short, favored_stat.bg, favored_stat.color, "", true)
 
 
 ## Mini portraits of the picked party and their success chance.
 func _show_party(hall: HallMain, entry: Dictionary) -> void:
-	Style.clear_children(_party_portraits)
+	HallStyle.clear_children(_party_portraits)
 	for character in entry.party:
 		var portrait := PortraitScene.instantiate()
 		portrait.circle = true
@@ -79,21 +92,21 @@ func _show_party(hall: HallMain, entry: Dictionary) -> void:
 	var chance: int = hall.success_chance(entry, entry.party)
 	_odds_label.visible = chance >= 0
 	_odds_label.text = TEXT_ODDS % mini(chance, 100)
-	Style.set_font_color(_odds_label, Style.odds_look(chance).text_color)
+	HallStyle.set_font_color(_odds_label, HallStyle.odds_look(chance).text_color)
 
 
 ## State word in its ink: green = sent, red = denied (and the row fades), blue = open.
 func _show_state(entry: Dictionary) -> void:
 	match entry.state:
-		Style.QUEST_STATE_SENT:
+		HallStyle.QUEST_STATE_SENT:
 			_state_label.text = TEXT_SENT
-			Style.set_font_color(_state_label, Style.GREEN_TEXT)
-		Style.QUEST_STATE_DENIED:
+			HallStyle.set_font_color(_state_label, HallStyle.GREEN_TEXT)
+		HallStyle.QUEST_STATE_DENIED:
 			_state_label.text = TEXT_DENIED
-			Style.set_font_color(_state_label, Style.RED)
+			HallStyle.set_font_color(_state_label, HallStyle.RED)
 			_sub_label.visible = true
 			_sub_label.text = TEXT_DENIED_HINT
 			modulate = Color(1, 1, 1, DENIED_OPACITY)
 		_:
 			_state_label.text = TEXT_DRAFT if not entry.party.is_empty() else TEXT_OPEN
-			Style.set_font_color(_state_label, Style.BLUE_TEXT)
+			HallStyle.set_font_color(_state_label, HallStyle.BLUE_TEXT)

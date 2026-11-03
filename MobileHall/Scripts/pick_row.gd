@@ -3,10 +3,8 @@
 ## quest (or training) they're already on. Tap to pin / unpin; "i" opens
 ## their details.
 ## Scene: MobileHall/Scenes/Rows/pick_row.tscn
-extends "res://MobileHall/Scripts/tap_panel.gd"
+extends TapPanel
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 
 ## Adventurers who can't go fade back.
 const CANT_GO_OPACITY := 0.6
@@ -49,9 +47,9 @@ func setup(hall: HallMain, entry: Dictionary, character: GuildCharacter) -> void
 	_info_button.pressed.connect(hall.open_character.bind(character))
 	_portrait.show_character(character)
 	_name.text = character.name
-	_role.text = TEXT_ROLE % Style.role_name(character)
+	_role.text = TEXT_ROLE % HallStyle.role_name(character)
 	_health_chip.set_health(character)
-	_stats.show_stats(character, Style.favored_stat_index(entry.quest), false)
+	_stats.show_stats(character, HallStyle.favored_stat_index(entry.quest), false)
 	_show_elsewhere(hall, entry, character)
 	_show_pick_state(hall, entry, character)
 
@@ -63,16 +61,16 @@ func _show_elsewhere(hall: HallMain, entry: Dictionary, character: GuildCharacte
 	var other_entry: Dictionary = hall.quest_entries[other_index] if other_index >= 0 else {}
 	if other_index < 0 and GuildUpgrades.is_training(character):
 		_elsewhere_label.visible = true
-		_elsewhere_label.text = TEXT_TRAINING % Style.STATS[GuildUpgrades.get_training_stat(character)].name
-		Style.set_font_color(_elsewhere_label, Style.BLUE_TEXT)
+		_elsewhere_label.text = TEXT_TRAINING % HallStyle.STATS[GuildUpgrades.get_training_stat(character)].name
+		HallStyle.set_font_color(_elsewhere_label, HallStyle.BLUE_TEXT)
 		return
 	_elsewhere_label.visible = other_index >= 0 and other_entry != entry
 	if not _elsewhere_label.visible:
 		return
-	var is_sent: bool = other_entry.state == Style.QUEST_STATE_SENT
+	var is_sent: bool = other_entry.state == HallStyle.QUEST_STATE_SENT
 	var quest_name := TEXT_QUEST_NAME % [other_index + 1, other_entry.quest.questTitle]
 	_elsewhere_label.text = (TEXT_SENT_ON if is_sent else TEXT_PICKED_FOR) % quest_name
-	Style.set_font_color(_elsewhere_label, Style.GREEN_TEXT if is_sent else Style.BLUE_TEXT)
+	HallStyle.set_font_color(_elsewhere_label, HallStyle.GREEN_TEXT if is_sent else HallStyle.BLUE_TEXT)
 
 
 ## Right-hand column and paper tint: pinned to this party (green paper),
@@ -81,21 +79,24 @@ func _show_pick_state(hall: HallMain, entry: Dictionary, character: GuildCharact
 	if entry.party.has(character):
 		_adds_value.text = TEXT_IN_PARTY
 		_adds_sub.text = TEXT_IN_PARTY_SUB
-		Style.set_font_color(_adds_value, Style.GREEN_TEXT)
-		Style.style_panel(self, Style.SENT_CARD_BG)
+		HallStyle.set_font_color(_adds_value, HallStyle.GREEN_TEXT)
+		HallStyle.style_panel(self, HallStyle.SENT_CARD_BG)
+		# just pinned: "Pinned" stamps onto the row
+		if hall.pending_fx.get("seat_in") == character:
+			HallFx.stamp_in(_adds_value, 1.6)
 	elif not hall.can_go_on_quests(character):
 		_adds_value.text = TEXT_CANT_GO
-		if Style.is_dead(character):
+		if HallStyle.is_dead(character):
 			_adds_sub.text = TEXT_CANT_GO_SUB
 		elif GuildUpgrades.is_patient(character):
 			_adds_sub.text = TEXT_IN_BED_SUB
 		else:
 			_adds_sub.text = TEXT_TRAINING_SUB
-		Style.set_font_color(_adds_value, Style.TEXT_SOFT)
-		Style.style_panel(self, Style.DENIED_CARD_BG)
+		HallStyle.set_font_color(_adds_value, HallStyle.TEXT_SOFT)
+		HallStyle.style_panel(self, HallStyle.DENIED_CARD_BG)
 		modulate = Color(1, 1, 1, CANT_GO_OPACITY)
 	else:
 		var chance_added := hall.chance_added_by(entry, character)
 		_adds_value.text = TEXT_ADDS % mini(chance_added, 100)
 		_adds_sub.text = TEXT_ADDS_SUB
-		Style.set_font_color(_adds_value, Style.odds_look(chance_added).text_color)
+		HallStyle.set_font_color(_adds_value, HallStyle.odds_look(chance_added).text_color)

@@ -9,6 +9,10 @@ enum QuestDifficulty {
 	B = 3,
 	A = 4,
 	S = 5,
+	## Freeplay only (after HallMain.FINAL_DAY): every quest that would roll
+	## above S lands here. Shown as "S++" (HallStyle.rank_letter); its
+	## requirement and pay keep climbing through requirement_multiplier.
+	SPP = 6,
 }
 
 enum QuestType {
@@ -20,7 +24,7 @@ enum QuestType {
 }
 
 enum FavoredStat {
-	Attack = 0,
+	Power = 0,
 	Defense = 1,
 	Wisdom = 2,
 	Sleaze = 3,
@@ -59,8 +63,12 @@ var questNum: int:
 
 var dead_adventurers : Array[GuildCharacter]
 
+## Freeplay scaling on the stat total this quest asks for (1.0 = none).
+## Set by apply_freeplay_scaling; calcSuccessChance multiplies statHitNum by it.
+var requirement_multiplier: float = 1.0
+
 ## Equipment the party found while searching on this quest. The guild keeps it
-## whether or not the quest succeeds (hall_main adds it to ItemContainer).
+## whether or not the quest succeeds (HallRules.play_quest adds it to ItemContainer).
 var found_items: Array[StandardItem]
 
 ## Chance (percent) that a successful search turns up equipment, before any
@@ -76,7 +84,7 @@ var equipment_max_chance: float = 50.0
 
 ## The equipment this quest pays instead of gold, rolled when the quest is made
 ## so the Board can show it. Empty for a normal gold quest. Only paid out when
-## the quest succeeds (hall_main / DayBar add it to ItemContainer).
+## the quest succeeds (HallRules.play_quest / DayBar add it to ItemContainer).
 var reward_items: Array[StandardItem]
 
 ## Chance (percent) on day 1 that a standard quest pays in items instead of gold.
@@ -96,7 +104,10 @@ func _init(diff := 0, dayNum := 0) -> void:
 		return
 
 	difficulty = diff
-	maxAdventurers = randi_range(1, 3)
+	if (dayNum <= 5):
+		maxAdventurers = randi_range(1, 2)
+	else:
+		maxAdventurers = randi_range(1, 3)
 	regionNum = randi_range(0, 3)
 	questNum = randi_range(0, 7)
 	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
@@ -108,34 +119,60 @@ func _init(diff := 0, dayNum := 0) -> void:
 	else:
 		goldReward = 150 + (175 * difficulty)
 
-	# Some quests pay in equipment instead: the items replace the base gold
-	# (search finds can still add bonus gold to goldReward later)
-	if (randf_range(0.0, 100.0) < _get_item_reward_chance()):
+	# Some standard quests (dayNum 0) pay in equipment instead: the items replace
+	# the base gold. The final battle (HallMain.FINAL_DAY) always pays gold, like
+	# the Bone Drake. (search finds can still add bonus gold to goldReward later)
+	if (dayNum == 0 and randf_range(0.0, 100.0) < _get_item_reward_chance()):
 		_roll_reward_items()
 		goldReward = 0
 
 	match type:
 		1:
-			favStat = FavoredStat.Attack
-			questTitle = str("Raid the ", location)
+			favStat = FavoredStat.Power
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Raid the ", location)
+				1:
+					questTitle = str("Storm the ", location)
 		2:
 			favStat = FavoredStat.Defense
-			questTitle = str("Escort someone to ", location)
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Protect a client on their journey to ", location)
+				1:
+					questTitle = str("Escort a client to ", location)
 		3:
 			favStat = FavoredStat.Wisdom
-			questTitle = str("Explore ", location)
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Survey ", location)
+				1:
+					questTitle = str("Explore ", location)
 		4:
 			favStat = FavoredStat.Sleaze
-			questTitle = str("Gather information on ", location)
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Scour for intel on ", location)
+				1:
+					questTitle = str("Gather information on ", location)
 
 	print("")
 	pass
+
+
+## Freeplay: makes this quest harder and better paid by the same factor.
+## multiplier: 1.0 = unchanged, 1.5 = needs half again the stats and pays
+## half again the gold (see HallRules.FREEPLAY_SCALE_PER_DAY).
+func apply_freeplay_scaling(multiplier: float) -> void:
+	requirement_multiplier = multiplier
+	goldReward = roundi(goldReward * multiplier)
 
 
 func calcSuccessChance(_questingAdventurers: Array) -> int:
 	var statHitNum = 60.0 + (20 * difficulty)
 	if (maxAdventurers == 1):
 		statHitNum = (statHitNum / 2)
+	statHitNum *= requirement_multiplier
 	var statTotal = 0.0
 
 	for adventurer in _questingAdventurers:
@@ -144,10 +181,19 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 		adventurer.reset_temp_stats()
 
 		statTotal += adventurer.get_quest_stat(0) + adventurer.get_quest_stat(1) + adventurer.get_quest_stat(2) + adventurer.get_quest_stat(3)
+		match regionNum:
+			0:
+				statTotal += adventurer.get_quest_stat(1)
+			1:
+				statTotal += adventurer.get_quest_stat(3)
+			2:
+				statTotal += adventurer.get_quest_stat(0)
+			3:
+				statTotal += adventurer.get_quest_stat(2)
+				
 		match favStat:
 			0:
 				statTotal += adventurer.get_quest_stat(0)
-				#regioncheck
 			1:
 				statTotal += adventurer.get_quest_stat(1)
 			2:
@@ -282,7 +328,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 		elif (26 <= succComDet && succComDet <= 50):
 				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
 				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
 					QuestManager.world_regions[regionNum].returnMonster(),
 					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
 					)
@@ -297,7 +343,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 				var extraGold = randi_range(11, 29)
 				goldReward += extraGold
 				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
 					QuestManager.world_regions[regionNum].returnMonster(),
 					", and defeated it, finding [color=FFE700][b] ", extraGold," gold [/b][/color]on its corpse.\n"
 					)
@@ -306,7 +352,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 				var extraGold = randi_range(11, 29)
 				goldReward += extraGold
 				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
 					QuestManager.world_regions[regionNum].returnMonster(), ", and defeated it, finding [color=FFE700][b] ", extraGold, 
 					" gold [/b][/color]on its corpse. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
 					)
@@ -321,7 +367,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 		
 		if(1 <= succComDet && succComDet <= 25):
 			returnString = str(
-			"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ", QuestManager.world_regions[regionNum].returnMonster(),
+			"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ", QuestManager.world_regions[regionNum].returnMonster(),
 			". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
 			)
 		elif (26 <= succComDet && succComDet <= 50):
@@ -331,7 +377,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 					)
 		elif (51 <= succComDet && succComDet <= 75):
 			returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ", QuestManager.world_regions[regionNum].returnMonster(),
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ", QuestManager.world_regions[regionNum].returnMonster(),
 					", and defeated it. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
 					)
 		elif (76 <= succComDet && succComDet <= 90):
@@ -342,7 +388,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 				)
 		elif (91 <= succComDet && succComDet <= 100):
 				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a ",
+					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
 					QuestManager.world_regions[regionNum].returnMonster(),
 					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
 					)
@@ -488,7 +534,7 @@ func get_reward_text() -> String:
 
 
 ## How likely (percent) a new standard quest is to pay in items, growing with
-## GameState.day (hall_main passes dayNum = 0 for normal quests, so the day is
+## GameState.day (HallRules passes dayNum = 0 for normal quests, so the day is
 ## read from GameState instead).
 ## Returns the chance, clamped to 0..item_reward_max_chance.
 func _get_item_reward_chance() -> float:
@@ -533,7 +579,7 @@ func _initMilestoneVars(dayNum: int):
 			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
 			location = ExternalContentContainer.get_Location_Name(1)
 			goldReward = 300 + (150 * difficulty)
-			favStat = FavoredStat.Attack
+			favStat = FavoredStat.Defense
 			questTitle = str("A Bone Drake is ATTACKING ", location, "! Save the town before it is DESTROYED!")
 
 	print("")

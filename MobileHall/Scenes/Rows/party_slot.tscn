@@ -1,8 +1,8 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://cisymsmond1"]
 
-[ext_resource type="Script" path="res://MobileHall/Scripts/party_slot.gd" id="1_slot"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
-[ext_resource type="PackedScene" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
+[ext_resource type="Script" uid="uid://crhjoks2ikx5j" path="res://MobileHall/Scripts/party_slot.gd" id="1_slot"]
+[ext_resource type="PackedScene" uid="uid://h87tubvsjwc3" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
+[ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
 
 [node name="PartySlot" type="PanelContainer"]
 custom_minimum_size = Vector2(0, 118)

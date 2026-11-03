@@ -1,6 +1,7 @@
 # Script for the end day button, when pressed, it finds every quest
 # that's ready to go out runs the quest system's generateResults() 
 # on each, and shows the Day Summary.
+class_name DayBar
 extends PanelContainer
  
 @export var quest_list: QuestList

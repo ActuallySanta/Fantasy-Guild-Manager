@@ -9,9 +9,13 @@
 ## Scene: MobileHall/Scenes/Screens/screen_character.tscn
 extends VBoxContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const GearRowScene := preload("res://MobileHall/Scenes/Rows/gear_row.tscn")
+const GearRowScene := preload("uid://5qr0450k1huj")  # MobileHall/Scenes/Rows/gear_row.tscn
+
+# ---- MOTION
+## Ink a stat line's number flashes when it changes (gear, training), and how
+## big the line grows.
+const STAT_CHANGE_INK := Color("#2F7A3A")
+const STAT_CHANGE_POP := 1.06
 
 # ---- TEXT
 const TEXT_ROLE := "the %s"
@@ -31,7 +35,7 @@ const BUTTON_EQUIP := "Equip"
 const BUTTON_TAKE := "Take"
 const BUTTON_TAKE_OFF := "Take off"
 const BUTTON_CANCEL := "Cancel"
-const TEXT_PLUCK_NOTE := "Pluck goes up by 1 for every quest this hero wins. Each level adds 10% of their base Power, Defense, Wisdom and Sleaziness (rounded down), but never less than +1 per level."
+const TEXT_PLUCK_NOTE := "Pluck goes up every time this hero wins a quest: +1 at Strong odds, +2 at Fair, +3 when Risky, +4 for a Long shot. Each level adds 10% of their base Power, Defense, Wisdom and Sleaziness (rounded down), but never less than +1 per level."
 const TEXT_RECRUIT := "Recruit · not hired yet"
 const TEXT_RETURNING := "Former member · wants back in"
 const TEXT_FREE := "Free today"
@@ -87,6 +91,10 @@ var hall: HallMain
 ## The Equip pick list is open (view state; closes when another hero is shown).
 var _is_picking_gear := false
 var _gear_character: GuildCharacter
+## Whose stats are drawn, and each stat line's text, to pop the lines that
+## change while the same hero is showing (null = not drawn yet).
+var _stats_character: GuildCharacter
+var _shown_stat_texts := {}
 ## The Release confirm sheet is open (view state; closes when another hero is shown).
 var _is_confirming_release := false
 var _release_character: GuildCharacter
@@ -106,11 +114,11 @@ func setup(main: HallMain) -> void:
 	_release_cancel_button.text = BUTTON_CANCEL
 	_release_confirm_button.text = BUTTON_RELEASE_CONFIRM
 	_pluck_note.text = TEXT_PLUCK_NOTE
-	Style.style_button(_back_button, "wood")
-	Style.style_button(_hire_button, "gold")
-	Style.style_button(_release_button, "wood")
-	Style.style_button(_release_cancel_button, "paper")
-	Style.style_button(_release_confirm_button, "wood")
+	HallStyle.style_button(_back_button, "wood")
+	HallStyle.style_button(_hire_button, "gold")
+	HallStyle.style_button(_release_button, "wood")
+	HallStyle.style_button(_release_cancel_button, "paper")
+	HallStyle.style_button(_release_confirm_button, "wood")
 
 
 func scroll_to_top() -> void:
@@ -123,16 +131,16 @@ func refresh() -> void:
 
 	_portrait.show_character(character)
 	_name.text = character.name
-	_role.text = TEXT_ROLE % Style.role_name(character)
+	_role.text = TEXT_ROLE % HallStyle.role_name(character)
 	_health_chip.set_health(character)
 	if character.injury_count > 0:
-		_injuries.text = TEXT_INJURIES % Style.count_text(character.injury_count, "injury", "injuries")
+		_injuries.text = TEXT_INJURIES % HallStyle.count_text(character.injury_count, "injury", "injuries")
 	else:
 		_injuries.text = TEXT_NO_INJURIES
 	_show_task(character, is_recruit)
 	_show_stats(character)
 	_show_gear(character, is_recruit)
-	_backstory.text = Style.clean_backstory(character)
+	_backstory.text = HallStyle.clean_backstory(character)
 
 	_hire_button.visible = is_recruit
 	_hire_button.disabled = hall.is_roster_full()
@@ -157,7 +165,7 @@ func _show_task(character: GuildCharacter, is_recruit: bool) -> void:
 	if is_recruit:
 		_task.text = TEXT_RECRUIT
 		return
-	if Style.is_dead(character):
+	if HallStyle.is_dead(character):
 		if character.died_on_day >= 0:
 			_task.text = TEXT_DIED_ON % [character.died_on_day, character.died_on_quest]
 		else:
@@ -166,17 +174,17 @@ func _show_task(character: GuildCharacter, is_recruit: bool) -> void:
 	var quest_index := hall.quest_index_of(character)
 	if quest_index < 0 and GuildUpgrades.is_patient(character):
 		var nights := GuildUpgrades.get_nights_until_healthy(character, true)
-		_task.text = TEXT_IN_BED % Style.count_text(nights, "night", "nights")
+		_task.text = TEXT_IN_BED % HallStyle.count_text(nights, "night", "nights")
 		return
 	if quest_index < 0 and GuildUpgrades.is_training(character):
-		var stat_name: String = Style.STATS[GuildUpgrades.get_training_stat(character)].name
+		var stat_name: String = HallStyle.STATS[GuildUpgrades.get_training_stat(character)].name
 		_task.text = TEXT_TRAINING % [stat_name, GuildUpgrades.get_training_gain()]
 		return
 	if quest_index < 0:
 		_task.text = TEXT_FREE
 		return
 	var entry: Dictionary = hall.quest_entries[quest_index]
-	var party_state := "sent" if entry.state == Style.QUEST_STATE_SENT else "picked"
+	var party_state := "sent" if entry.state == HallStyle.QUEST_STATE_SENT else "picked"
 	_task.text = TEXT_ON_QUEST % [quest_index + 1, entry.quest.questTitle, party_state]
 
 
@@ -185,38 +193,46 @@ func _show_task(character: GuildCharacter, is_recruit: bool) -> void:
 ## outline inked the same colour.
 ## The StatLines node has one authored line per stat, each with Row/Name and Row/Value.
 func _show_stats(character: GuildCharacter) -> void:
-	for stat_index in Style.STAT_COUNT:
-		var stat: Dictionary = Style.STATS[stat_index]
+	var is_same_hero := character == _stats_character
+	_stats_character = character
+	for stat_index in HallStyle.STAT_COUNT:
+		var stat: Dictionary = HallStyle.STATS[stat_index]
 		var line: PanelContainer = _stat_lines.get_child(stat_index)
 		var name_label: Label = line.get_node("Row/Name")
 		var value_label: Label = line.get_node("Row/Value")
 
 		# the Armory only boosts the quest stats, not Pluck
 		var armory_bonus := 0
-		if stat_index < Style.QUEST_STAT_COUNT:
+		if stat_index < HallStyle.QUEST_STAT_COUNT:
 			armory_bonus = GuildUpgrades.get_stat_bonus(character, stat_index)
 
 		var gear_bonus := 0
-		if stat_index < Style.QUEST_STAT_COUNT:
+		if stat_index < HallStyle.QUEST_STAT_COUNT:
 			gear_bonus = ItemShop.get_item_bonus(character, stat_index)
 
 		# Pluck raises the quest stats (not itself); the amount comes from the character
 		var pluck_bonus := 0
-		if stat_index < Style.QUEST_STAT_COUNT:
+		if stat_index < HallStyle.QUEST_STAT_COUNT:
 			pluck_bonus = character.get_pluck_stat_bonus(stat_index)
 
 		# the number is the stat before any bonus, like the stat chips; quests use the sum
 		name_label.text = stat.name
-		value_label.text = str(Style.quest_stat_value(character, stat_index) - Style.stat_bonus(character, stat_index))
+		value_label.text = str(HallStyle.quest_stat_value(character, stat_index) - HallStyle.stat_bonus(character, stat_index))
 		if armory_bonus > 0:
 			value_label.text += TEXT_ARMORY_BONUS % armory_bonus
 		if gear_bonus > 0:
 			value_label.text += TEXT_GEAR_BONUS % gear_bonus
 		if pluck_bonus > 0:
 			value_label.text += TEXT_PLUCK_BONUS % pluck_bonus
-		Style.set_font_color(name_label, stat.color)
-		Style.set_font_color(value_label, stat.color)
-		Style.tint_art(line, stat.color)
+		HallStyle.set_font_color(name_label, stat.color)
+		HallStyle.set_font_color(value_label, stat.color)
+		HallStyle.tint_art(line, stat.color)
+
+		# a number that changed for the same hero (gear on / off) pops and flashes
+		if is_same_hero and _shown_stat_texts.get(stat_index, value_label.text) != value_label.text:
+			HallFx.pop(line, STAT_CHANGE_POP)
+			HallFx.flash_text(value_label, STAT_CHANGE_INK)
+		_shown_stat_texts[stat_index] = value_label.text
 
 
 ## Worn items, empty slots, and (while picking) the owned items that fit.
@@ -227,27 +243,33 @@ func _show_gear(character: GuildCharacter, is_recruit: bool) -> void:
 	if character != _gear_character:
 		_gear_character = character
 		_is_picking_gear = false
-	Style.clear_children(_gear_lines)
+	HallStyle.clear_children(_gear_lines)
 	if is_recruit:
 		return
 
-	var is_dead := Style.is_dead(character)
-	var role_name := Style.role_name(character)
+	var is_dead := HallStyle.is_dead(character)
+	var role_name := HallStyle.role_name(character)
 	if is_dead:
 		_is_picking_gear = false
 
 	for item in character.equipped_items:
-		Style.add_row(_gear_lines, GearRowScene).setup(
-			Style.item_look(item), BUTTON_TAKE_OFF, "paper", hall.unequip_item.bind(item))
+		var worn_row: Control = HallStyle.add_row(_gear_lines, GearRowScene)
+		worn_row.setup(HallStyle.item_look(item), BUTTON_TAKE_OFF, "paper", hall.unequip_item.bind(item))
+		# just equipped: it slams into the slot
+		if hall.pending_fx.get("gear_in") == item:
+			HallFx.stamp_in(worn_row, 1.25)
 
 	var free_slots := maxi(character.max_items - character.equipped_items.size(), 0)
 	for slot in free_slots:
 		var button_text := ""
 		if not is_dead and slot == 0:
 			button_text = BUTTON_CANCEL if _is_picking_gear else BUTTON_EQUIP
-		Style.add_row(_gear_lines, GearRowScene).setup_empty(
-			TEXT_EMPTY_SLOT, TEXT_EMPTY_HINT % role_name, button_text,
-			"paper" if _is_picking_gear else "blue", _toggle_gear_picker)
+		var empty_row: Control = HallStyle.add_row(_gear_lines, GearRowScene)
+		empty_row.setup_empty(TEXT_EMPTY_SLOT, TEXT_EMPTY_HINT % role_name, button_text,
+				"paper" if _is_picking_gear else "blue", _toggle_gear_picker)
+		# just taken off: the freed slot fades back in
+		if slot == 0 and hall.pending_fx.get("gear_out", false):
+			HallFx.fade_in(empty_row)
 	if free_slots == 0:
 		_is_picking_gear = false
 
@@ -255,12 +277,12 @@ func _show_gear(character: GuildCharacter, is_recruit: bool) -> void:
 	if _is_picking_gear:
 		choices = ItemShop.items_for(character)
 	for item in choices:
-		var look := Style.item_look(item)
+		var look := HallStyle.item_look(item)
 		var button_text := BUTTON_EQUIP
 		if item.curr_user != null:
 			look.effect += TEXT_WORN_BY % item.curr_user.name
 			button_text = BUTTON_TAKE
-		Style.add_row(_gear_lines, GearRowScene).setup(
+		HallStyle.add_row(_gear_lines, GearRowScene).setup(
 			look, button_text, "green", _on_gear_picked.bind(item), true)
 
 	if is_dead:
@@ -270,7 +292,7 @@ func _show_gear(character: GuildCharacter, is_recruit: bool) -> void:
 	elif _is_picking_gear:
 		_gear_note.text = TEXT_PICK_NOTE % character.name
 	else:
-		_gear_note.text = TEXT_GEAR_NOTE % Style.count_text(character.max_items, "item", "items")
+		_gear_note.text = TEXT_GEAR_NOTE % HallStyle.count_text(character.max_items, "item", "items")
 
 
 func _toggle_gear_picker() -> void:

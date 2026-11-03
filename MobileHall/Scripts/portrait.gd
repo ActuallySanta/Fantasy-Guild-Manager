@@ -5,10 +5,9 @@
 ## Scene: MobileHall/Scenes/Components/portrait.tscn
 extends Control
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
 
-const ROUND_MASK := preload("res://MobileHall/Art/Textures/portrait_round_mask.png")
-const ROUND_FRAME := preload("res://MobileHall/Art/Textures/portrait_round_frame.png")
+const ROUND_MASK := preload("uid://buv1wa6etd3u3")  # MobileHall/Art/Textures/portrait_round_mask.png
+const ROUND_FRAME := preload("uid://cscfv0x0mk446")  # MobileHall/Art/Textures/portrait_round_frame.png
 ## Multiplied over the art so white backgrounds read as old paper.
 const ART_TINT := Color("#F2EADB")
 ## Greys out the art of dead adventurers.
@@ -35,8 +34,8 @@ func _ready() -> void:
 
 func show_character(character: GuildCharacter) -> void:
 	# ground colour by role, behind the art
-	var role_index := clampi(character.role, 0, Style.ROLE_PORTRAIT_BGS.size() - 1)
-	Style.tint_art(_mask, Style.ROLE_PORTRAIT_BGS[role_index])
+	var role_index := clampi(character.role, 0, HallStyle.ROLE_PORTRAIT_BGS.size() - 1)
+	HallStyle.tint_art(_mask, HallStyle.ROLE_PORTRAIT_BGS[role_index])
 	# the character's own art (picked once when they were made)
 	_art.texture = character.icon if character.icon else ExternalContentContainer.get_character_icon(character.role)
-	_art.modulate = DEAD_TINT if Style.is_dead(character) else ART_TINT
+	_art.modulate = DEAD_TINT if HallStyle.is_dead(character) else ART_TINT

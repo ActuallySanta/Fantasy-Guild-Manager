@@ -1,16 +1,17 @@
-## Menu (header button): how to play, last night's report, the colorblind
+## Menu (header button): how to play, last night's report, Reduced Motion, the colorblind
 ## filter (tap to cycle), and the debug reset.
 ## Scene: MobileHall/Scenes/Overlays/overlay_menu.tscn
 extends Control
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 
 # ---- TEXT
 const BUTTON_HOW_TO_PLAY := "How to play"
 const BUTTON_REPORT := "Last night's report"
 const BUTTON_RESET := "Reset upgrades (debug)"
 const BUTTON_COLOR := "Colorblind filter: %s"
+const BUTTON_MOTION := "Reduced motion: %s"
+const MOTION_ON := "On"
+const MOTION_OFF := "Off"
 const BUTTON_CLOSE := "Close"
 
 # ---- NODES
@@ -23,6 +24,9 @@ const BUTTON_CLOSE := "Close"
 
 ## The main hall script (state + actions), set in setup().
 var hall: HallMain
+## Reduced Motion toggle, built in setup() right under the colorblind button
+## (same look), so the menu scene doesn't need a new node.
+var _motion_button: Button
 
 
 func setup(main: HallMain) -> void:
@@ -31,6 +35,12 @@ func setup(main: HallMain) -> void:
 	_report_button.pressed.connect(hall.open_previous_report)
 	_reset_button.pressed.connect(hall.reset_upgrades)
 	_color_button.pressed.connect(hall.cycle_color_filter)
+	_motion_button = Button.new()
+	_motion_button.name = "MotionButton"
+	_motion_button.custom_minimum_size = _color_button.custom_minimum_size
+	_motion_button.size_flags_horizontal = _color_button.size_flags_horizontal
+	_color_button.add_sibling(_motion_button)
+	_motion_button.pressed.connect(hall.toggle_reduce_motion)
 	_close_button.pressed.connect(hall.close_menu)
 	_dim.gui_input.connect(_on_dim_input)
 
@@ -38,16 +48,17 @@ func setup(main: HallMain) -> void:
 	_report_button.text = BUTTON_REPORT
 	_reset_button.text = BUTTON_RESET
 	_close_button.text = BUTTON_CLOSE
-	for button in [_how_to_play_button, _report_button, _color_button, _reset_button]:
-		Style.style_button(button, "paper", 28)
-	Style.style_button(_close_button, "wood", 28)
+	for button in [_how_to_play_button, _report_button, _color_button, _motion_button, _reset_button]:
+		HallStyle.style_button(button, "paper", 28)
+	HallStyle.style_button(_close_button, "wood", 28)
 
 
 func refresh() -> void:
 	# no report until the first day has ended
 	_report_button.disabled = hall.previous_report.is_empty()
 	_reset_button.visible = GuildUpgrades.SHOW_DEBUG_BUTTONS
-	_color_button.text = BUTTON_COLOR % hall.COLOR_FILTERS[hall.color_filter]
+	_color_button.text = BUTTON_COLOR % HallSettings.COLOR_FILTERS[hall.color_filter]
+	_motion_button.text = BUTTON_MOTION % (MOTION_ON if hall.reduce_motion else MOTION_OFF)
 
 
 ## Tapping the dimmed background closes the menu.

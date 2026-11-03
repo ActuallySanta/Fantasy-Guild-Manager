@@ -51,6 +51,9 @@ var injury_count: int
 ## The day and quest this character died on (-1 / "" while alive).
 var died_on_day: int = -1
 var died_on_quest: String = ""
+## The day this character (last) joined the guild. Starting and playtest
+## heroes count from Day 1. Feeds the credits' longest-serving record.
+var joined_on_day: int = 1
 
 var stat_deviation: int = 2
 

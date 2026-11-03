@@ -11,11 +11,26 @@
 ##   footer  - Deny / Seal & send (or Recall / Reconsider once decided)
 extends VBoxContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const QuestTabScene := preload("res://MobileHall/Scenes/Rows/quest_tab.tscn")
-const PartySlotScene := preload("res://MobileHall/Scenes/Rows/party_slot.tscn")
-const PickRowScene := preload("res://MobileHall/Scenes/Rows/pick_row.tscn")
+const QuestTabScene := preload("uid://cp5084mci60mt")  # MobileHall/Scenes/Rows/quest_tab.tscn
+const PartySlotScene := preload("uid://cisymsmond1")  # MobileHall/Scenes/Rows/party_slot.tscn
+const PickRowScene := preload("uid://cfnuyteanwwp5")  # MobileHall/Scenes/Rows/pick_row.tscn
+
+# ---- MOTION
+## Seconds the odds number and bar take to move to a new chance.
+const ODDS_ROLL_SECONDS := 0.4
+## How big the odds circle grows when the chance changes.
+const ODDS_POP := 1.2
+## The "+12%" / "-12%" that floats off the tapped row: font size, inks.
+const ODDS_DELTA_FONT_SIZE := 32
+const ODDS_UP_INK := Color("#3D5A2A")
+const ODDS_DOWN_INK := Color("#8B2E2A")
+## How hard the quest shakes when it's denied (pixels).
+const DENY_SHAKE := 12.0
+## The SENT stamp inked on a sent quest: where its centre sits (fraction of the
+## quest card's size), text size, tilt (radians).
+const WRIT_STAMP_AT := Vector2(0.74, 0.2)
+const WRIT_STAMP_FONT_SIZE := 60
+const WRIT_STAMP_TILT := -0.16
 
 # ---- TEXT
 # Quest writ
@@ -28,10 +43,16 @@ const STATUS_OPEN := "Pin up to %s. Their stats add up to the chance."
 const STATUS_DRAFT := "Your picks stay pinned if you look at another quest."
 const STATUS_SENT := "Sent. Tap someone to change the party, or recall it."
 const STATUS_DENIED := "Denied. Reconsider to put it back on the board."
+const TEXT_STAMP_SENT := "SENT"
 # Party odds
 const TEXT_ODDS := "%d%%"
+const TEXT_ODDS_UP := "+%d%%"
+const TEXT_ODDS_DOWN := "%d%%"
 const TEXT_ODDS_NONE := "--"
 const TEXT_ODDS_WORD := "Chance of success"
+## Under the odds: what each hero's Pluck goes up by if the party wins.
+## Two lines, so the column never gets wider than the screen (OddsWord wraps too).
+const TEXT_PLUCK_ON_WIN := "%s\nwin for +%d Pluck"
 # Picker
 const PICK_HEADING := "Your adventurers"
 const PICK_HINT := "best fit first"
@@ -60,6 +81,7 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _party_size_chip = %SlotsChip    # chip.gd
 @onready var _favored_chip = %FavChip         # chip.gd
 @onready var _status: Label = %Status
+@onready var _quest_card: PanelContainer = $Scroll/Margin/Col/Writ/WritMargin/QuestCard
 # Party
 @onready var _party_box: Control = %PartyBox
 @onready var _party_seats: VBoxContainer = %Slots
@@ -67,6 +89,7 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _odds_circle: TextureRect = %Circle
 @onready var _odds_word: Label = %OddsWord
 @onready var _odds_bar = %OddsBar             # odds_bar.gd
+@onready var _odds_stack: Control = %Circle.get_parent()
 # Picker
 @onready var _pick_header: Control = %PickHeader
 @onready var _pick_heading: Label = %PickHeading
@@ -82,6 +105,13 @@ const BUTTON_RECONSIDER := "Reconsider"
 
 ## The main hall script (state + actions), set in setup().
 var hall: HallMain
+## The quest and chance the odds were last drawn for (to animate a change on
+## the same quest; switching quests just snaps). -1 = not drawn yet.
+var _odds_quest_index := -1
+var _shown_chance := -1
+## The SENT ink on the quest card (null = none) and which quest it's for.
+var _writ_stamp: Control
+var _writ_stamp_quest := -1
 
 
 func setup(main: HallMain) -> void:
@@ -105,6 +135,7 @@ func refresh() -> void:
 		return
 	_show_quest_tabs()
 	_show_quest_card(entry)
+	_show_writ_stamp(entry)
 	_show_party(entry)
 	_show_picker(entry)
 	_show_footer(entry)
@@ -114,49 +145,49 @@ func refresh() -> void:
 
 ## One tab per quest; hidden when there's only one quest (milestone day).
 func _show_quest_tabs() -> void:
-	Style.clear_children(_quest_tabs)
+	HallStyle.clear_children(_quest_tabs)
 	_quest_tabs.visible = hall.quest_entries.size() > 1
 	for quest_index in hall.quest_entries.size():
 		var is_current: bool = quest_index == hall.active_screen.quest_index
-		Style.add_row(_quest_tabs, QuestTabScene).setup(hall, quest_index, is_current)
+		HallStyle.add_row(_quest_tabs, QuestTabScene).setup(hall, quest_index, is_current)
 
 
 # ---- quest writ
 
 func _show_quest_card(entry: Dictionary) -> void:
-	var type_info := Style.quest_type_info(entry)
+	var type_info := HallStyle.quest_type_info(entry)
 	var quest: CreatedQuest = entry.quest
 	var size_limit: int = hall.party_size_limit(entry)
 
-	_type_label.text = TEXT_TYPE % [type_info.writ, Style.rank_letter(quest)]
-	Style.set_font_color(_type_label, type_info.color)
+	_type_label.text = TEXT_TYPE % [type_info.writ, HallStyle.rank_letter(quest)]
+	HallStyle.set_font_color(_type_label, type_info.color)
 	_title.text = quest.questTitle
 
 	# chips: reward, party size, favored stat
 	# item quests pay pre-rolled equipment instead of gold: show the count and rarities
 	if quest.pays_in_items():
-		_gold_chip.set_chip(quest.get_reward_text(), Style.BLUE_BG, Style.BLUE_TEXT, "chest")
+		_gold_chip.set_chip(quest.get_reward_text(), HallStyle.BLUE_BG, HallStyle.BLUE_TEXT, "chest")
 	else:
-		_gold_chip.set_chip(TEXT_GOLD % quest.goldReward, Style.GOLD_BG, Style.TEXT_MAIN, "coins")
+		_gold_chip.set_chip(TEXT_GOLD % quest.goldReward, HallStyle.GOLD_BG, HallStyle.TEXT_MAIN, "coins")
 	var size_text := TEXT_PARTY_SIZE_SOLO if size_limit == 1 else TEXT_PARTY_SIZE % size_limit
-	_party_size_chip.set_chip(size_text, Style.BLUE_BG, Style.TEXT_MAIN, "person")
-	var favored_stat: Dictionary = Style.STATS[Style.favored_stat_index(quest)]
+	_party_size_chip.set_chip(size_text, HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "person")
+	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_stat_index(quest)]
 	_favored_chip.set_chip(TEXT_FAVORED % favored_stat.name, favored_stat.bg, favored_stat.color, "", true)
 
 	# status line in the state's ink
 	match entry.state:
-		Style.QUEST_STATE_SENT:
+		HallStyle.QUEST_STATE_SENT:
 			_status.text = STATUS_SENT
-			Style.set_font_color(_status, Style.GREEN_TEXT)
-		Style.QUEST_STATE_DENIED:
+			HallStyle.set_font_color(_status, HallStyle.GREEN_TEXT)
+		HallStyle.QUEST_STATE_DENIED:
 			_status.text = STATUS_DENIED
-			Style.set_font_color(_status, Style.RED)
+			HallStyle.set_font_color(_status, HallStyle.RED)
 		_:
 			if entry.party.is_empty():
-				_status.text = STATUS_OPEN % Style.count_text(size_limit, "adventurer", "adventurers")
+				_status.text = STATUS_OPEN % HallStyle.count_text(size_limit, "adventurer", "adventurers")
 			else:
 				_status.text = STATUS_DRAFT
-			Style.set_font_color(_status, Style.TEXT_SOFT)
+			HallStyle.set_font_color(_status, HallStyle.TEXT_SOFT)
 
 
 # ---- party
@@ -164,20 +195,83 @@ func _show_quest_card(entry: Dictionary) -> void:
 ## Seats (pinned cards or empty) and the party's success chance, circled in
 ## its ink. Hidden for denied quests.
 func _show_party(entry: Dictionary) -> void:
-	_party_box.visible = entry.state != Style.QUEST_STATE_DENIED
+	_party_box.visible = entry.state != HallStyle.QUEST_STATE_DENIED
 
-	Style.clear_children(_party_seats)
+	HallStyle.clear_children(_party_seats)
 	for seat_index in hall.party_size_limit(entry):
 		var seated: GuildCharacter = entry.party[seat_index] if seat_index < entry.party.size() else null
-		Style.add_row(_party_seats, PartySlotScene).setup(hall, entry, seated)
+		var seat: Control = HallStyle.add_row(_party_seats, PartySlotScene)
+		seat.setup(hall, entry, seated)
+		# the seat someone just left fades back to empty
+		if hall.pending_fx.get("seat_out", false) and seat_index == entry.party.size():
+			HallFx.fade_in(seat)
 
 	var chance: int = hall.success_chance(entry, entry.party)
-	var odds := Style.odds_look(chance)
+	var odds := HallStyle.odds_look(chance)
 	_odds_value.text = TEXT_ODDS % mini(chance, 100) if chance >= 0 else TEXT_ODDS_NONE
-	_odds_word.text = TEXT_ODDS_WORD if chance >= 0 else odds.word
-	Style.set_font_color(_odds_value, odds.text_color)
-	Style.tint_art(_odds_circle, odds.text_color)
-	_odds_bar.set_chance(mini(chance, 100))
+	_odds_word.text = TEXT_PLUCK_ON_WIN % [odds.word, hall.pluck_gain_for(chance)] if chance >= 0 else odds.word
+	HallStyle.set_font_color(_odds_value, odds.text_color)
+	HallStyle.tint_art(_odds_circle, odds.text_color)
+	_show_odds_change(chance)
+
+
+## The odds number and bar. On the same quest, a new chance rolls the number,
+## slides the bar, pops the circle, and floats "+12%" / "-12%" off the row the
+## player tapped. Switching quests (or the first draw) just snaps.
+func _show_odds_change(chance: int) -> void:
+	var shown := mini(chance, 100)
+	var quest_index: int = hall.active_screen.quest_index
+	var was_drawn := _odds_quest_index == quest_index
+	var old_chance := _shown_chance
+	_odds_quest_index = quest_index
+	_shown_chance = shown
+
+	if not was_drawn or old_chance == shown:
+		_odds_value.text = TEXT_ODDS % shown if shown >= 0 else TEXT_ODDS_NONE
+		_odds_bar.set_chance(shown)
+		return
+
+	_odds_bar.set_chance(shown, true)
+	HallFx.pop(_odds_stack, ODDS_POP)
+	if shown < 0:
+		_odds_value.text = TEXT_ODDS_NONE
+	else:
+		HallFx.count(_odds_value, maxi(old_chance, 0), shown, ODDS_ROLL_SECONDS, TEXT_ODDS)
+	var change := maxi(shown, 0) - maxi(old_chance, 0)
+	if change != 0:
+		var text := (TEXT_ODDS_UP if change > 0 else TEXT_ODDS_DOWN) % change
+		HallFx.float_text(hall.fx_layer, hall.tap_point(), text,
+				ODDS_UP_INK if change > 0 else ODDS_DOWN_INK, ODDS_DELTA_FONT_SIZE)
+
+
+## A sent quest has SENT inked on it. Pressed on with the stamp animation
+## right after Send (hall.pending_fx.writ_stamp); just there when you look at
+## a quest sent earlier; lifted off when it's recalled.
+func _show_writ_stamp(entry: Dictionary) -> void:
+	var quest_index: int = hall.active_screen.quest_index
+	var is_sent: bool = entry.state == HallStyle.QUEST_STATE_SENT
+	var is_just_sent: bool = hall.pending_fx.get("writ_stamp", false)
+	var has_right_stamp := is_instance_valid(_writ_stamp) and _writ_stamp_quest == quest_index
+	if is_instance_valid(_writ_stamp) and (not is_sent or not has_right_stamp or is_just_sent):
+		_writ_stamp.queue_free()
+		_writ_stamp = null
+	if is_sent and _writ_stamp == null:
+		_writ_stamp = HallFx.stamp_onto(_quest_card, TEXT_STAMP_SENT, HallStyle.GREEN_TEXT,
+				WRIT_STAMP_AT, WRIT_STAMP_FONT_SIZE, WRIT_STAMP_TILT, is_just_sent)
+		_writ_stamp_quest = quest_index
+
+
+## Where hall_main lands the DENIED stamp: the middle of the quest's
+## title area, kept inside the visible part of the scroll.
+func stamp_point() -> Vector2:
+	var visible_rect := _scroll.get_global_rect()
+	var point := _title.get_global_rect().get_center()
+	return point.clamp(visible_rect.position, visible_rect.end)
+
+
+## Deny: the quest writ shakes its head.
+func shake_writ() -> void:
+	HallFx.shake($Scroll/Margin/Col/Writ, DENY_SHAKE)
 
 
 # ---- picker
@@ -190,7 +284,7 @@ func _show_picker(entry: Dictionary) -> void:
 	var shown_adventurers: Array = []
 	var hidden_busy_count := 0
 	for character in hall.roster():
-		if Style.is_dead(character):
+		if HallStyle.is_dead(character):
 			continue
 		var quest_index: int = hall.quest_index_of(character)
 		var is_busy_elsewhere: bool = quest_index >= 0 and hall.quest_entries[quest_index] != entry
@@ -203,12 +297,12 @@ func _show_picker(entry: Dictionary) -> void:
 	shown_adventurers.sort_custom(func(first, second):
 		return hall.chance_added_by(entry, first) > hall.chance_added_by(entry, second))
 
-	Style.clear_children(_pick_list)
+	HallStyle.clear_children(_pick_list)
 	for character in shown_adventurers:
-		Style.add_row(_pick_list, PickRowScene).setup(hall, entry, character)
+		HallStyle.add_row(_pick_list, PickRowScene).setup(hall, entry, character)
 
 	# header, toggle and empty states
-	var can_pick: bool = entry.state != Style.QUEST_STATE_DENIED
+	var can_pick: bool = entry.state != HallStyle.QUEST_STATE_DENIED
 	var has_roster: bool = not shown_adventurers.is_empty() or hidden_busy_count > 0
 	_pick_heading.text = PICK_HEADING
 	_pick_hint.text = PICK_HINT_HIDDEN % hidden_busy_count if hidden_busy_count > 0 else PICK_HINT
@@ -230,15 +324,15 @@ func _show_footer(entry: Dictionary) -> void:
 	_right_button.disabled = false
 	_left_button.icon = null
 	match entry.state:
-		Style.QUEST_STATE_SENT:
+		HallStyle.QUEST_STATE_SENT:
 			_left_button.text = BUTTON_RECALL
 			_right_button.text = BUTTON_NEXT if hall.undecided_count() > 0 else BUTTON_BOARD
-		Style.QUEST_STATE_DENIED:
+		HallStyle.QUEST_STATE_DENIED:
 			_left_button.text = BUTTON_BOARD
 			_right_button.text = BUTTON_RECONSIDER
 		_:
 			_left_button.text = BUTTON_DENY
-			_left_button.icon = Style.icon_texture("x")
+			_left_button.icon = HallStyle.icon_texture("x")
 			if entry.party.is_empty():
 				_right_button.text = BUTTON_SEND_EMPTY
 			elif entry.party.size() == 1:
@@ -251,9 +345,9 @@ func _show_footer(entry: Dictionary) -> void:
 ## Recall (sent) / Board (denied) / Deny (open).
 func _on_left_button_pressed() -> void:
 	match hall.current_quest_entry().state:
-		Style.QUEST_STATE_SENT:
+		HallStyle.QUEST_STATE_SENT:
 			hall.recall_party()
-		Style.QUEST_STATE_DENIED:
+		HallStyle.QUEST_STATE_DENIED:
 			hall.close_screen()
 		_:
 			hall.deny_quest()
@@ -262,12 +356,12 @@ func _on_left_button_pressed() -> void:
 ## Next Quest or Board (sent) / Reconsider (denied) / Seal & send (open).
 func _on_right_button_pressed() -> void:
 	match hall.current_quest_entry().state:
-		Style.QUEST_STATE_SENT:
+		HallStyle.QUEST_STATE_SENT:
 			if hall.undecided_count() > 0:
 				hall.open_assign(hall.next_undecided_index(hall.active_screen.quest_index))
 			else:
 				hall.close_screen()
-		Style.QUEST_STATE_DENIED:
+		HallStyle.QUEST_STATE_DENIED:
 			hall.reconsider_quest()
 		_:
 			hall.send_party()

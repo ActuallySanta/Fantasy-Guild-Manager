@@ -5,8 +5,20 @@
 ## Scene: MobileHall/Scenes/Rows/report_entry.tscn
 extends PanelContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const BeatRowScene := preload("res://MobileHall/Scenes/Rows/beat_row.tscn")
+const BeatRowScene := preload("uid://nm3rjurnk3x2")  # MobileHall/Scenes/Rows/beat_row.tscn
+
+# ---- MOTION (the reveal, see reveal())
+## Seconds the letter takes to fade up, then before its stamp slams down.
+const REVEAL_LETTER_SECONDS := 0.25
+const REVEAL_STAMP_DELAY := 0.18
+## Seconds between each tag (Hurt, Died, Found) stamping in.
+const REVEAL_TAG_GAP := 0.14
+## A death holds the letter this long (seconds) and shakes it this hard (pixels).
+const REVEAL_DEATH_PAUSE := 0.45
+const REVEAL_DEATH_SHAKE := 9.0
+## Seconds between story lines; a long story squeezes them into REVEAL_BEATS_MAX.
+const REVEAL_BEAT_GAP := 0.06
+const REVEAL_BEATS_MAX := 0.7
 
 ## CreatedQuest.generateResults writes bright BBCode colours meant for a dark
 ## screen; these swap them for inks that read on parchment.
@@ -43,7 +55,10 @@ const TEXT_INJURED := "Hurt: %s"
 const TEXT_DIED := "Died: %s"
 const TEXT_FOUND := "Found: %s"
 const TEXT_WON := "It is done, master. The reward is ours: %d gold. — %s."
+const TEXT_WON_PLUCK := "It is done, master. The reward is ours: %d gold, and we're bolder for it (+%d Pluck). — %s."
+## Item quests: the reward is the items' names (plus any bonus gold found).
 const TEXT_WON_ITEMS := "It is done, master. The reward is ours: %s. — %s."
+const TEXT_WON_ITEMS_PLUCK := "It is done, master. The reward is ours: %s, and we're bolder for it (+%d Pluck). — %s."
 const TEXT_ITEMS_AND_GOLD := "%s, and %d gold"
 const TEXT_LOST_GOLD := "Sorry, master. No reward this time, but %s brought back %d gold. — %s."
 const TEXT_LOST := "Sorry, master. No reward this time. — %s."
@@ -74,23 +89,23 @@ var _bbcode_tags := RegEx.create_from_string("\\[[^\\]]*\\]")
 ## result = one quest result from hall_main._run_quest.
 func setup(result: Dictionary) -> void:
 	var succeeded: bool = result.succeeded
-	var type_info := Style.quest_type_info(result)
-	Style.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
+	var type_info := HallStyle.quest_type_info(result)
+	HallStyle.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
 	_title.text = result.quest.questTitle
-	_from_line.text = TEXT_FROM % [Style.join_names(result.party), mini(int(result.chance), 100)]
+	_from_line.text = TEXT_FROM % [HallStyle.join_names(result.party), mini(int(result.chance), 100)]
 
 	# the stamp is white art inked green or red (a death turns it red even on a success)
 	var died: Array = result.get("died", [])
 	_stamp_text.text = TEXT_SUCCESS if succeeded else TEXT_FAILED
-	var stamp_ink := Style.GREEN_TEXT if succeeded and died.is_empty() else Style.RED
-	Style.tint_art(_result_stamp, stamp_ink)
-	Style.set_font_color(_stamp_text, stamp_ink)
+	var stamp_ink := HallStyle.GREEN_TEXT if succeeded and died.is_empty() else HallStyle.RED
+	HallStyle.tint_art(_result_stamp, stamp_ink)
+	HallStyle.set_font_color(_stamp_text, stamp_ink)
 
 	var injured: Array = result.get("injured", [])
 	_injured_tag.visible = not injured.is_empty()
-	_injured_text.text = TEXT_INJURED % Style.join_names(injured, ", ")
+	_injured_text.text = TEXT_INJURED % HallStyle.join_names(injured, ", ")
 	_died_tag.visible = not died.is_empty()
-	_died_text.text = TEXT_DIED % Style.join_names(died, ", ")
+	_died_text.text = TEXT_DIED % HallStyle.join_names(died, ", ")
 
 	# equipment found while searching; the guild keeps it even on a failed quest
 	# (results from before this feature have no "items" key, so default to none)
@@ -105,6 +120,39 @@ func setup(result: Dictionary) -> void:
 	_closing_line.text = _closing_text(result)
 
 
+## Play this letter in, starting `delay` seconds from now: it fades up, the
+## Success / Failed stamp slams down, the Hurt / Died / Found tags stamp in
+## (a death holds and shakes the letter), then the story fills in line by
+## line and the sign-off appears.
+## Returns how long that takes (seconds), so the report can start the next letter.
+func reveal(delay: float) -> float:
+	if HallFx.reduce_motion:
+		return 0.0
+	var at := delay
+	HallFx.fade_in(self, at, REVEAL_LETTER_SECONDS)
+	at += REVEAL_STAMP_DELAY
+	HallFx.stamp_in(_result_stamp, 2.4, at)
+	at += REVEAL_LETTER_SECONDS
+
+	for tag in [_injured_tag, _died_tag, _found_tag]:
+		if tag.visible:
+			HallFx.stamp_in(tag, 1.6, at)
+			at += REVEAL_TAG_GAP
+	if _died_tag.visible:
+		HallFx.shake(self, REVEAL_DEATH_SHAKE, at)
+		at += REVEAL_DEATH_PAUSE
+
+	var beats := _beat_list.get_children()
+	var beat_gap := REVEAL_BEAT_GAP
+	if not beats.is_empty():
+		beat_gap = minf(REVEAL_BEAT_GAP, REVEAL_BEATS_MAX / beats.size())
+	for beat in beats:
+		HallFx.fade_in(beat, at)
+		at += beat_gap
+	HallFx.fade_in(_closing_line, at)
+	return at - delay
+
+
 ## One beat row per story line (summary lines are left to the sign-off).
 func _build_story_beats(story: String) -> void:
 	for bright_tag in STORY_RECOLORS:
@@ -114,7 +162,7 @@ func _build_story_beats(story: String) -> void:
 		var plain_text := _bbcode_tags.sub(beat_text, "", true).strip_edges()
 		if plain_text == "" or SKIPPED_LINE_STARTS.any(func(start): return plain_text.begins_with(start)):
 			continue
-		Style.add_row(_beat_list, BeatRowScene).setup(_icon_for_beat(plain_text), Style.TEXT_SOFT, beat_text)
+		HallStyle.add_row(_beat_list, BeatRowScene).setup(_icon_for_beat(plain_text), HallStyle.TEXT_SOFT, beat_text)
 
 
 func _icon_for_beat(plain_text: String) -> String:
@@ -143,8 +191,15 @@ func _closing_text(result: Dictionary) -> String:
 		var reward_text := ", ".join(reward_names)
 		if result.gold > 0:
 			reward_text = TEXT_ITEMS_AND_GOLD % [reward_text, result.gold]
+		var reward_pluck: int = result.get("pluck", 0)
+		if reward_pluck > 0:
+			return TEXT_WON_ITEMS_PLUCK % [reward_text, reward_pluck, signature]
 		return TEXT_WON_ITEMS % [reward_text, signature]
 	if result.succeeded:
+		# results from before Pluck scaled with the odds have no "pluck" key
+		var pluck_gained: int = result.get("pluck", 0)
+		if pluck_gained > 0:
+			return TEXT_WON_PLUCK % [result.gold, pluck_gained, signature]
 		return TEXT_WON % [result.gold, signature]
 	if result.gold > 0:
 		var speaker := "I" if survivors.size() == 1 else "we"

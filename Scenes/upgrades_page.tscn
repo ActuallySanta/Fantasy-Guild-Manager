@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dkgxg3q8vwsol"]
 
-[ext_resource type="Script" path="res://Scripts/Upgrades/upgrades_page.gd" id="1_meq58"]
+[ext_resource type="Script" uid="uid://ceecbldjmp0is" path="res://Scripts/Upgrades/upgrades_page.gd" id="1_meq58"]
 [ext_resource type="Texture2D" uid="uid://do5kjvfstulyu" path="res://Sprites/32x32-Tilesheet.png" id="2_mxo0s"]
 [ext_resource type="PackedScene" uid="uid://kkjpbudn1ejv" path="res://Scenes/UI/Reusable Elements/close_button.tscn" id="3_ykljd"]
 

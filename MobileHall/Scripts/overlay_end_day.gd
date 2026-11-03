@@ -4,10 +4,8 @@
 ## Scene: MobileHall/Scenes/Overlays/overlay_end_day.tscn
 extends Control
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
-const PlanRowScene := preload("res://MobileHall/Scenes/Rows/plan_row.tscn")
-const SuggestRowScene := preload("res://MobileHall/Scenes/Rows/suggest_row.tscn")
+const PlanRowScene := preload("uid://c2ca1up8vmmc6")  # MobileHall/Scenes/Rows/plan_row.tscn
+const SuggestRowScene := preload("uid://bdmft4ngc6x70")  # MobileHall/Scenes/Rows/suggest_row.tscn
 
 # ---- TEXT
 const TEXT_TITLE := "End Day %d?"
@@ -44,11 +42,15 @@ func setup(main: HallMain) -> void:
 	_dim.gui_input.connect(_on_dim_input)
 	_back_button.text = BUTTON_BACK
 	_end_button.text = BUTTON_END
-	Style.style_button(_back_button, "paper", 28)
-	Style.style_button(_end_button, "green", 32)
+	HallStyle.style_button(_back_button, "paper", 28)
+	HallStyle.style_button(_end_button, "green", 32)
 
 
 func refresh() -> void:
+	# End Day was pressed and the night has already played out, so the sheet
+	# keeps tonight's plan as it was while the dusk falls over it
+	if hall.is_night_falling:
+		return
 	_title.text = TEXT_TITLE % GameState.day
 	_show_tonights_plan()
 	_show_upgrade_suggestions()
@@ -60,10 +62,10 @@ func _show_tonights_plan() -> void:
 	if sent.is_empty():
 		_subtitle.text = TEXT_SUBTITLE_NONE
 	else:
-		_subtitle.text = TEXT_SUBTITLE % Style.count_text(sent.size(), "party", "parties")
-	Style.clear_children(_plan_list)
+		_subtitle.text = TEXT_SUBTITLE % HallStyle.count_text(sent.size(), "party", "parties")
+	HallStyle.clear_children(_plan_list)
 	for entry in sent:
-		Style.add_row(_plan_list, PlanRowScene).setup(hall, entry)
+		HallStyle.add_row(_plan_list, PlanRowScene).setup(hall, entry)
 
 	var denied: Array = hall.denied_entries()
 	var denied_titles := PackedStringArray()
@@ -78,9 +80,9 @@ func _show_upgrade_suggestions() -> void:
 	var affordable: Array = hall.affordable_buildings()
 	_upgrade_box.visible = not affordable.is_empty()
 	_upgrade_title.text = TEXT_UPGRADE_TITLE % GameState.gold
-	Style.clear_children(_suggest_list)
+	HallStyle.clear_children(_suggest_list)
 	for building in affordable:
-		Style.add_row(_suggest_list, SuggestRowScene).setup(hall, building)
+		HallStyle.add_row(_suggest_list, SuggestRowScene).setup(hall, building)
 
 
 ## Tapping the dimmed background closes the sheet.

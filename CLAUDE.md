@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-"Fantasy Guild Manager", a Godot **4.7** GDScript game (GL Compatibility, portrait 720x1280, phone-first). You run a guild: hire heroes, send parties on daily quests, buy gear and building upgrades. A Bone Drake milestone quest comes on day 10.
+"Fantasy Guild Manager", a Godot **4.7** GDScript game (GL Compatibility, portrait 720x1280, phone-first). You run a guild: hire heroes, send parties on daily quests, buy gear and building upgrades. A Bone Drake milestone quest comes on day 10, and the main story ends with a final battle on day 50 (a credits roll, then endless freeplay with an S++ rank; see `MobileHall/README.md`).
 
 ## Running and testing
 
@@ -40,13 +40,18 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 - Items (`Item System/`): `StandardItem` (abstract: rarity weights in the `Rarity` enum values, cost) → `PassiveItem` (a stat bonus) and `ActiveItem`.
 
 **There are two UIs.** `MobileHall/` is the current one:
-- `hall_main.gd` owns all of the day's state and every game action: building quests, drafting parties, `end_day()` → `_run_quest()` → the Day Report.
-- Tabs, screens, overlays, and rows get `setup(hall)`, then read queries and call actions on `hall`. They never change game state themselves. After a change, `hall_main` calls `refresh()` on whatever is showing.
+- `hall_main.gd` owns all of the day's state and every game action: drafting parties, `end_day()` → `_run_quest()` → the Day Report. Everything else is split out:
+  - `hall_rules.gd` (`HallRules`): static functions for building the day's quests and playing one out (`build_day_quests`, `play_quest`, `pluck_gain_for`). The quest-count and rank tuning tables live here, plus the final battle (`HallMain.FINAL_DAY`) and freeplay scaling (`freeplay_scale`, the S++ rank).
+  - `hall_ledger.gd` (`HallLedger`): static functions for whether the run is over, the danger checks, the Game Over numbers, and the final battle's credits (`build_credits`, `build_run_records`). They take `run_stats` and the roster as parameters.
+  - `hall_settings.gd` (`HallSettings`): loading and saving the accessibility settings.
+  - The shell pieces are scenes in `MobileHall/Scenes/Shell/`: `hall_header` (the day tile, Bone Drake countdown, gold/standing counters and their motion, danger strip), `hall_action_bar`, `hall_nav`, and `hall_toast`.
+  - `hall_main` keeps one-line query wrappers (`is_run_over()`, `build_run_over_stats()`, …) so views still only talk to `hall`.
+- Tabs, screens, overlays, shell pieces, and rows get `setup(hall)`, then read queries and call actions on `hall`. They never change game state themselves. After a change, `hall_main` calls `refresh()` on whatever is showing.
 - Every widget is an authored scene. Each script has a header naming its scene, a `TEXT` section of string constants, and a `NODES` section of `@onready var _x = %X` unique names.
 - All colors and tables live in `MobileHall/Scripts/hall_style.gd`. Story BBCode colors are bright, meant for dark backgrounds. `report_entry.gd` `STORY_RECOLORS` swaps them for colors that read on the light cards, so a new story color needs an entry there.
 - `MobileHall/README.md` covers the UI's design and rules (training, hospital, revive).
 
-The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still borrows its scoring helpers: it preloads `Scripts/UI/day_bar.gd` for `_get_success_chance`, `_did_succeed`, and `_get_gold_earned`. Changes to quest payout or results need to keep `day_bar.gd` working too.
+The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still borrows its scoring helpers: it uses `Scripts/UI/day_bar.gd` (`class_name DayBar`) for `_get_success_chance`, `_did_succeed`, and `_get_gold_earned`. Changes to quest payout or results need to keep `day_bar.gd` working too.
 
 ## Conventions
 
@@ -54,3 +59,15 @@ The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still b
   - `quest_resource.gd` has legacy camelCase (`goldReward`, `questNum`, `generateResults`). Reference those as they are; don't rename them, since UI code depends on them.
 - Comment new code thoroughly. Tunables get `##` doc comments with units, functions get doc comments covering their params and return value, and non-obvious logic gets `#` comments. This matches the style of the newer files (`item_shop.gd`, `guild_upgrades.gd`, MobileHall scripts).
 - Tuning numbers go in named, documented variables or constants at the top of the file that owns them, not inline.
+- Keep each script to one job, so no new "master script" grows the way `hall_main.gd` once did (1,900 lines).
+  - Soft limit: about 800 lines per script. Past that, find a piece to pull out before adding more. `hall_main.gd` is already near 1,350, so new MobileHall code goes in another file and `hall_main` just calls it.
+  - Game rules that don't touch nodes (quest generation, payouts, run-over checks) go in a script of static functions with a `class_name`, like `HallRules` and `HallLedger`. They take what they need as parameters.
+  - A part of the screen with its own nodes and refresh code becomes its own authored scene with `setup(hall)` and `refresh()`, like the tabs, overlays, and `Scenes/Shell/` pieces. Don't add inline nodes to `hall_main.tscn` for `hall_main.gd` to draw.
+  - `hall_main.gd` keeps only the day's state, the actions that change it, thin query wrappers, and refresh orchestration.
+  - Run state that has to reset on a new run stays in instance variables on `HallMain`. Never put it in a `static var` or a new autoload: `start_new_run` resets by reloading the scene, and those survive the reload.
+- File references should survive files being moved:
+  - Reach scripts through their `class_name` (`HallStyle`, `HallMain`, `HallFx`, `TapPanel`, `DayBar`, …), not `preload("res://….gd")`. Name them directly (`HallStyle.X`, `HallFx.X`): GDScript rejects `const Style := HallStyle` as "not a constant expression" here.
+  - Load scenes and assets by uid with the path in a trailing comment: `preload("uid://…")  # MobileHall/Scenes/Rows/quest_row.tscn`. Look up a file's uid in its header (`.tscn`/`.tres`), its `.import` file, or its `.gd.uid` file.
+  - Text data in `External Content/` (`.txt`, `.csv`) has no UID, so it stays on `res://` paths.
+  - Move files in the Godot FileSystem dock. If you move one outside the editor, move its `.uid` or `.import` file along with it, and commit the `.uid` files.
+  - Hand-written `.tscn`/`.tres` files need a `uid="uid://…"` in their header, and each `ext_resource` line needs a `uid=` as well as its `path=`. Saving the file in the editor fills these in.

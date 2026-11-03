@@ -1,10 +1,11 @@
 [gd_scene format=3 uid="uid://bgwxd653pjox8"]
 
 [ext_resource type="Script" uid="uid://dam4bq8y7a4o6" path="res://MobileHall/Scripts/overlay_welcome.gd" id="1_k3hm8"]
-[ext_resource type="StyleBox" path="res://MobileHall/Styles/dim.tres" id="2_rqmg6"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/scroll.svg" id="4_twoe2"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/person.svg" id="5_d3ton"]
-[ext_resource type="Texture2D" path="res://MobileHall/Art/Icons/hammer.svg" id="6_qmqxm"]
+[ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_rqmg6"]
+[ext_resource type="Texture2D" uid="uid://cb420nxynjehg" path="res://MobileHall/Art/Icons/scroll.svg" id="4_twoe2"]
+[ext_resource type="Texture2D" uid="uid://cv5023acxlou6" path="res://MobileHall/Art/Icons/person.svg" id="5_d3ton"]
+[ext_resource type="Texture2D" uid="uid://cjywbau63ujgi" path="res://MobileHall/Art/Icons/hammer.svg" id="6_qmqxm"]
+[ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.svg" id="7_skull"]
 
 [node name="OverlayWelcome" type="Control" unique_id=1913149125]
 layout_mode = 3
@@ -48,7 +49,7 @@ autowrap_mode = 3
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 23
-text = "Each day: hire adventurers, send parties on quests, upgrade the guild, then end the day. The Bone Drake attacks on Day 10."
+text = "Each day: hire adventurers, send parties on quests, upgrade the guild, then end the day. The Bone Drake attacks on Day 10. Keep your guild alive until then."
 autowrap_mode = 3
 
 [node name="StepBoard" type="HBoxContainer" parent="Center/Sheet/Col" unique_id=461754469]
@@ -114,11 +115,7 @@ custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 21
-text = "Your adventurers and today's recruits. A badge appears when new recruits arrive.
-
-If your standing gets too low, your guild will become too unpopular and new recruits will stop arriving
-
-You will lose the game if you run out of live adventurers to send on quests"
+text = "Your adventurers and today's recruits. A badge shows when new ones arrive."
 autowrap_mode = 3
 
 [node name="StepUpgrades" type="HBoxContainer" parent="Center/Sheet/Col" unique_id=420809502]
@@ -184,6 +181,40 @@ layout_mode = 2
 theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 21
 text = "At the bottom of the screen. It always shows what to do next."
+autowrap_mode = 3
+
+[node name="StepFalls" type="HBoxContainer" parent="Center/Sheet/Col"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Icon" type="TextureRect" parent="Center/Sheet/Col/StepFalls"]
+modulate = Color(0.5451, 0.1804, 0.1647, 1)
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+texture = ExtResource("7_skull")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="VBoxContainer" parent="Center/Sheet/Col/StepFalls"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Name" type="Label" parent="Center/Sheet/Col/StepFalls/Text"]
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
+theme_override_font_sizes/font_size = 32
+text = "Don't run out of heroes"
+
+[node name="Body" type="Label" parent="Center/Sheet/Col/StepFalls/Text"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 21
+text = "Heroes can die on quests. If nobody is left and you can't afford a recruit, the guild falls and the run ends. A red warning appears when you're down to your last hero."
 autowrap_mode = 3
 
 [node name="StartButton" type="Button" parent="Center/Sheet/Col" unique_id=784182996]

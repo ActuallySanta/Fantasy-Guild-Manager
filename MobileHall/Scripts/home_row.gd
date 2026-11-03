@@ -10,8 +10,6 @@
 ## Scene: MobileHall/Scenes/Rows/home_row.tscn
 extends PanelContainer
 
-const Style := preload("res://MobileHall/Scripts/hall_style.gd")
-const HallMain := preload("res://MobileHall/Scripts/hall_main.gd")
 
 ## Rows for heroes who can't do anything here fade back.
 const FADED_OPACITY := 0.6
@@ -63,7 +61,7 @@ func _fill(main: HallMain, hero: GuildCharacter) -> void:
 	character = hero
 	_portrait.show_character(character)
 	_name.text = character.name
-	_role.text = TEXT_ROLE % Style.role_name(character)
+	_role.text = TEXT_ROLE % HallStyle.role_name(character)
 	_health_chip.set_health(character)
 	_show_task_chip()
 	_note.visible = false
@@ -71,38 +69,47 @@ func _fill(main: HallMain, hero: GuildCharacter) -> void:
 	_main_button.visible = false
 	_stat_picker.visible = false
 	modulate = Color.WHITE
-	Style.style_panel(self, Style.CARD_BG, Style.BORDER, 2, 16)
+	HallStyle.style_panel(self, HallStyle.CARD_BG, HallStyle.BORDER, 2, 16)
+	# just moved into a slot / bed (or out, or back from the dead): pop in its
+	# new spot. Deferred until the show_* function has given the row its look,
+	# so a faded row (in a bed, too hurt to train) fades up to faded, not solid.
+	if hall.pending_fx.get("home_row") == hero:
+		_pop_in.call_deferred()
+
+
+func _pop_in() -> void:
+	HallFx.appear(self, 0.9)
 
 
 ## "Free today", "Picked for #2" or "Sent on #2".
 func _show_task_chip() -> void:
 	var quest_index := hall.quest_index_of(character)
 	if quest_index < 0:
-		_task_chip.set_chip(TEXT_FREE, Style.NEUTRAL_BG, Style.TEXT_SOFT)
-	elif hall.quest_entries[quest_index].state == Style.QUEST_STATE_SENT:
-		_task_chip.set_chip(TEXT_SENT_ON % (quest_index + 1), Style.GREEN_BG, Style.GREEN_TEXT, "check")
+		_task_chip.set_chip(TEXT_FREE, HallStyle.NEUTRAL_BG, HallStyle.TEXT_SOFT)
+	elif hall.quest_entries[quest_index].state == HallStyle.QUEST_STATE_SENT:
+		_task_chip.set_chip(TEXT_SENT_ON % (quest_index + 1), HallStyle.GREEN_BG, HallStyle.GREEN_TEXT, "check")
 	else:
-		_task_chip.set_chip(TEXT_PICKED_FOR % (quest_index + 1), Style.BLUE_BG, Style.BLUE_TEXT, "nav_quests")
+		_task_chip.set_chip(TEXT_PICKED_FOR % (quest_index + 1), HallStyle.BLUE_BG, HallStyle.BLUE_TEXT, "nav_quests")
 
 
-func _set_note(text: String, color: Color = Style.TEXT_SOFT) -> void:
+func _set_note(text: String, color: Color = HallStyle.TEXT_SOFT) -> void:
 	_note.text = text
 	_note.visible = true
-	Style.set_font_color(_note, color)
+	HallStyle.set_font_color(_note, color)
 
 
 func _set_button(button: Button, text: String, kind: String, action: Callable) -> void:
 	button.text = text
 	button.visible = true
 	button.disabled = false
-	Style.style_button(button, kind, 22)
+	HallStyle.style_button(button, kind, 22)
 	for connection in button.pressed.get_connections():
 		button.pressed.disconnect(connection.callable)
 	button.pressed.connect(action)
 
 
 func _nights_text(nights: int) -> String:
-	return Style.count_text(nights, "night", "nights")
+	return HallStyle.count_text(nights, "night", "nights")
 
 # ---- Training Yard
 
@@ -110,11 +117,11 @@ func _nights_text(nights: int) -> String:
 func show_training_slot(main: HallMain, hero: GuildCharacter) -> void:
 	_fill(main, hero)
 	var stat := GuildUpgrades.get_training_stat(character)
-	var value := Style.stat_value(character, stat)
-	_set_note(TEXT_GAIN % [Style.STATS[stat].short, value, value + GuildUpgrades.get_training_gain()], Style.GREEN_TEXT)
+	var value := HallStyle.stat_value(character, stat)
+	_set_note(TEXT_GAIN % [HallStyle.STATS[stat].short, value, value + GuildUpgrades.get_training_gain()], HallStyle.GREEN_TEXT)
 	_task_chip.visible = false
 	_set_button(_side_button, BUTTON_REMOVE, "paper", hall.stop_training.bind(character))
-	Style.style_panel(self, TRAINING_CARD_BG, Style.GREEN, 3, 16)
+	HallStyle.style_panel(self, TRAINING_CARD_BG, HallStyle.GREEN, 3, 16)
 	_show_stat_picker(stat)
 
 
@@ -125,13 +132,13 @@ func _show_stat_picker(selected_stat: int) -> void:
 	var buttons := _stat_picker.get_children()
 	for stat_index in buttons.size():
 		var button: Button = buttons[stat_index]
-		var stat: Dictionary = Style.STATS[stat_index]
+		var stat: Dictionary = HallStyle.STATS[stat_index]
 		var is_selected := stat_index == selected_stat
 		button.text = stat.short
-		Style.style_button(button, "paper")
-		Style.tint_art(button, stat.bg if is_selected else Style.WHITE)
-		button.icon = Style.icon_texture("check") if is_selected else null
-		for font_state in Style.BUTTON_FONT_STATES:
+		HallStyle.style_button(button, "paper")
+		HallStyle.tint_art(button, stat.bg if is_selected else HallStyle.WHITE)
+		button.icon = HallStyle.icon_texture("check") if is_selected else null
+		for font_state in HallStyle.BUTTON_FONT_STATES:
 			button.add_theme_color_override(font_state, stat.color)
 		button.add_theme_color_override("icon_normal_color", stat.color)
 		button.add_theme_color_override("icon_pressed_color", stat.color)
@@ -144,8 +151,8 @@ func show_can_train(main: HallMain, hero: GuildCharacter) -> void:
 	_fill(main, hero)
 	# new trainees drill their best quest stat until the player picks another
 	var best_stat := 0
-	for stat_index in Style.QUEST_STAT_COUNT:
-		if Style.stat_value(character, stat_index) > Style.stat_value(character, best_stat):
+	for stat_index in HallStyle.QUEST_STAT_COUNT:
+		if HallStyle.stat_value(character, stat_index) > HallStyle.stat_value(character, best_stat):
 			best_stat = stat_index
 	if not GuildUpgrades.has_free_training_slot():
 		_set_button(_main_button, BUTTON_FULL, "paper", func(): pass)
@@ -160,7 +167,7 @@ func show_cant_train(main: HallMain, hero: GuildCharacter) -> void:
 	_fill(main, hero)
 	_task_chip.visible = false
 	_set_note(TEXT_IN_BED if GuildUpgrades.is_patient(character) else TEXT_TOO_HURT)
-	Style.style_panel(self, Style.DENIED_CARD_BG, Style.BORDER, 2, 16)
+	HallStyle.style_panel(self, HallStyle.DENIED_CARD_BG, HallStyle.BORDER, 2, 16)
 	modulate = Color(1, 1, 1, FADED_OPACITY)
 
 # ---- Hospital
@@ -170,9 +177,9 @@ func show_patient(main: HallMain, hero: GuildCharacter) -> void:
 	_fill(main, hero)
 	_task_chip.visible = false
 	var nights := GuildUpgrades.get_nights_until_healthy(character, true)
-	_set_note(TEXT_NIGHTS_IN_BED % _nights_text(nights), Style.INJURY_LOOKS[2].text)
+	_set_note(TEXT_NIGHTS_IN_BED % _nights_text(nights), HallStyle.INJURY_LOOKS[2].text)
 	_set_button(_main_button, BUTTON_DISCHARGE, "paper", hall.discharge.bind(character))
-	Style.style_panel(self, HOSPITAL_CARD_BG, HOSPITAL_BORDER, 3, 16)
+	HallStyle.style_panel(self, HOSPITAL_CARD_BG, HOSPITAL_BORDER, 3, 16)
 
 
 func show_needs_care(main: HallMain, hero: GuildCharacter) -> void:
@@ -188,15 +195,15 @@ func show_fallen(main: HallMain, hero: GuildCharacter) -> void:
 	_fill(main, hero)
 	_task_chip.visible = false
 	if GuildUpgrades.can_revive() and not hall.is_roster_full():
-		_set_note(TEXT_REVIVE_READY, Style.GREEN_TEXT)
+		_set_note(TEXT_REVIVE_READY, HallStyle.GREEN_TEXT)
 		_set_button(_main_button, BUTTON_REVIVE, "green", hall.revive.bind(character))
 	elif GuildUpgrades.can_revive():
 		# revive is ready, but every bed is taken by a living hero
 		_set_note(TEXT_REVIVE_NO_BED)
-		Style.style_panel(self, Style.DENIED_CARD_BG, Style.BORDER, 2, 16)
+		HallStyle.style_panel(self, HallStyle.DENIED_CARD_BG, HallStyle.BORDER, 2, 16)
 		modulate = Color(1, 1, 1, FADED_OPACITY)
 	else:
 		var is_used := GuildUpgrades.get_level(GuildUpgrades.Building.HOSPITAL) >= GuildUpgrades.REVIVE_LEVEL
 		_set_note(TEXT_REVIVE_USED if is_used else TEXT_REVIVE_LOCKED % GuildUpgrades.REVIVE_LEVEL)
-		Style.style_panel(self, Style.DENIED_CARD_BG, Style.BORDER, 2, 16)
+		HallStyle.style_panel(self, HallStyle.DENIED_CARD_BG, HallStyle.BORDER, 2, 16)
 		modulate = Color(1, 1, 1, FADED_OPACITY)
