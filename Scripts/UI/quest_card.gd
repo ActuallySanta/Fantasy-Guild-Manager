@@ -84,7 +84,8 @@ static func get_details(q: CreatedQuest, chance: int = -1) -> String:
 	if chance >= 0:
 		chance_text = "Success Chance: %d%%" % mini(chance, 100)
 
-	return "%s - %d Gold\n%s - Favors: %s\n%s" % [get_type_name(q), q.goldReward, adventurers, stat, chance_text]
+	# get_reward_text() is "N gold", or the item count and rarities for an item quest
+	return "%s - %s\n%s - Favors: %s\n%s" % [get_type_name(q), q.get_reward_text(), adventurers, stat, chance_text]
 
 
 # turns the QuestType enum into a name players can read

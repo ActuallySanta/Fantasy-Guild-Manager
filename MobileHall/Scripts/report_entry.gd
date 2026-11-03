@@ -56,6 +56,10 @@ const TEXT_DIED := "Died: %s"
 const TEXT_FOUND := "Found: %s"
 const TEXT_WON := "It is done, master. The reward is ours: %d gold. — %s."
 const TEXT_WON_PLUCK := "It is done, master. The reward is ours: %d gold, and we're bolder for it (+%d Pluck). — %s."
+## Item quests: the reward is the items' names (plus any bonus gold found).
+const TEXT_WON_ITEMS := "It is done, master. The reward is ours: %s. — %s."
+const TEXT_WON_ITEMS_PLUCK := "It is done, master. The reward is ours: %s, and we're bolder for it (+%d Pluck). — %s."
+const TEXT_ITEMS_AND_GOLD := "%s, and %d gold"
 const TEXT_LOST_GOLD := "Sorry, master. No reward this time, but %s brought back %d gold. — %s."
 const TEXT_LOST := "Sorry, master. No reward this time. — %s."
 const TEXT_NOBODY_CAME_BACK := "Nobody came back to write this letter."
@@ -178,6 +182,19 @@ func _closing_text(result: Dictionary) -> String:
 	for character in survivors:
 		initials.append(character.name.left(1))
 	var signature := " & ".join(initials)
+	# an item quest's reward replaces its gold; any gold is bonus found on the way
+	var reward_items: Array = result.get("reward_items", [])
+	if result.succeeded and not reward_items.is_empty():
+		var reward_names := PackedStringArray()
+		for reward_item in reward_items:
+			reward_names.append(reward_item.name)
+		var reward_text := ", ".join(reward_names)
+		if result.gold > 0:
+			reward_text = TEXT_ITEMS_AND_GOLD % [reward_text, result.gold]
+		var reward_pluck: int = result.get("pluck", 0)
+		if reward_pluck > 0:
+			return TEXT_WON_ITEMS_PLUCK % [reward_text, reward_pluck, signature]
+		return TEXT_WON_ITEMS % [reward_text, signature]
 	if result.succeeded:
 		# results from before Pluck scaled with the odds have no "pluck" key
 		var pluck_gained: int = result.get("pluck", 0)

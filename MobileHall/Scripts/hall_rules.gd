@@ -157,11 +157,12 @@ static func pluck_gain_for(chance: float) -> int:
 ## the caller (hall_main.gd _tally_quest).
 ## entry: a quest entry (see new_entry); day: GameState.day.
 ## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, pluck, injured, died, items, milestone, final}
+##   {quest, party, story, succeeded, chance, gold, standing, pluck, injured, died, items, reward_items, milestone, final}
 ## (pluck = what each party member gained, 0 on a failure)
 ## (injured = the party members whose injury level went up on this quest but
 ## who survived; died = the party members who died on it; items = the
-## equipment found while searching, already added to the pack)
+## equipment found while searching, already added to the pack; reward_items =
+## an item quest's reward, added to the pack only when the quest succeeded)
 static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 	var party: Array[GuildCharacter] = []
 	party.assign(entry.party)
@@ -193,9 +194,14 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 	GameState.add_standing(standing_earned)
 
 	# equipment found while searching goes to the pack, even if the quest failed
+	# (an item quest's reward replaces its gold, so it's only paid on a success)
 	var found_items: Array[StandardItem] = entry.quest.found_items.duplicate()
-	if not found_items.is_empty():
+	var reward_items: Array[StandardItem] = []
+	if succeeded and entry.quest.pays_in_items():
+		reward_items = entry.quest.reward_items.duplicate()
+	if not found_items.is_empty() or not reward_items.is_empty():
 		ItemContainer.owned_items.append_array(found_items)
+		ItemContainer.owned_items.append_array(reward_items)
 		# refresh gear rows and unworn counts
 		ItemShop.gear_changed.emit()
 
@@ -227,6 +233,7 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 		"injured": injured,
 		"died": died,
 		"items": found_items,
+		"reward_items": reward_items,
 		"milestone": entry.milestone,
 		"final": entry.final,
 	}

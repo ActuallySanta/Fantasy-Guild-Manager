@@ -244,7 +244,7 @@ var final_battle_lost := false
 ##   drake_result: DRAKE_RESULT_NONE | _SLAIN | _LOST
 ##   released:     every GuildCharacter let go this run (Array)
 ##   gold_spent:   gold paid for recruits, buildings, goods and revivals (int)
-##   items_found:  equipment brought back from quests (int)
+##   items_found:  equipment brought back from quests, found or rewarded (int)
 ##   final_result: FINAL_RESULT_NONE | _WON | _LOST
 ##   final_party:  the GuildCharacters sent to the final battle (Array)
 var run_stats := {
@@ -1162,7 +1162,7 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 	if entry.final:
 		run_stats.final_result = FINAL_RESULT_WON if result.succeeded else FINAL_RESULT_LOST
 		run_stats.final_party = entry.party.duplicate()
-	run_stats.items_found += result.items.size()
+	run_stats.items_found += result.items.size() + result.reward_items.size()
 	return result
 
 

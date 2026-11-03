@@ -33,6 +33,9 @@ const TEXT_LETTERS := "%s tonight"
 const TEXT_NO_LETTERS := "a quiet night"
 const TEXT_SUCCEEDED := "%d / %d succeeded"
 const TEXT_GOLD := "+%d gold"
+## The gold chip when equipment was gained too: filled with the item count
+## ("2 items"), leaving a %d for the gold (see _show_totals).
+const TEXT_GOLD_AND_ITEMS := "+%%d gold · +%s"
 const TEXT_NO_INJURIES := "nobody hurt"
 const TEXT_NOBODY_WENT := "Nobody went out. Quests are the only way to earn gold."
 const TEXT_HOME := "At home: %s"
@@ -68,6 +71,8 @@ var hall: HallMain
 var _built_report: Dictionary = {}
 ## The night's total gold (for the count-up on the totals strip).
 var _total_gold := 0
+## The gold chip's format tonight: TEXT_GOLD, or TEXT_GOLD_AND_ITEMS filled in.
+var _gold_format := TEXT_GOLD
 
 
 func setup(main: HallMain) -> void:
@@ -119,7 +124,7 @@ func _play_reveal() -> void:
 		if chip.visible:
 			HallFx.stamp_in(chip, 1.6, at)
 			at += REVEAL_CHIP_GAP
-	HallFx.count(_gold_chip.get_node("Row/Text"), 0, _total_gold, REVEAL_GOLD_SECONDS, TEXT_GOLD, REVEAL_START)
+	HallFx.count(_gold_chip.get_node("Row/Text"), 0, _total_gold, REVEAL_GOLD_SECONDS, _gold_format, REVEAL_START)
 	for note in [_home_note, _released_note]:
 		if note.visible:
 			HallFx.fade_in(note, at)
@@ -136,8 +141,11 @@ func _show_totals(results: Array) -> void:
 	var succeeded_count := 0
 	var injured_count := 0
 	var dead_count := 0
+	# equipment gained tonight: found while searching plus item-quest rewards
+	var item_count := 0
 	for result in results:
 		total_gold += int(result.gold)
+		item_count += result.get("items", []).size() + result.get("reward_items", []).size()
 		if result.succeeded:
 			succeeded_count += 1
 		injured_count += result.get("injured", []).size()
@@ -145,7 +153,12 @@ func _show_totals(results: Array) -> void:
 
 	_succeeded_chip.set_box(TEXT_SUCCEEDED % [succeeded_count, results.size()], HallStyle.BLUE_TEXT)
 	_succeeded_chip.visible = not results.is_empty()
-	_gold_chip.set_box(TEXT_GOLD % total_gold, HallStyle.GOLD_TEXT)
+	# with equipment gained, the item count rides along after the gold
+	# (the format keeps a %d for the gold, so the reveal can count it up)
+	_gold_format = TEXT_GOLD
+	if item_count > 0:
+		_gold_format = TEXT_GOLD_AND_ITEMS % HallStyle.count_text(item_count, "item", "items")
+	_gold_chip.set_box(_gold_format % total_gold, HallStyle.GOLD_TEXT)
 	_total_gold = total_gold
 	if injured_count > 0:
 		_injured_chip.set_box(HallStyle.count_text(injured_count, "hurt", "hurt"), HallStyle.RED)

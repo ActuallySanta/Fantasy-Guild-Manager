@@ -67,6 +67,9 @@ func end_day() -> void:
 		GameState.add_gold(gold_earned)
 		# equipment found while searching is kept even if the quest failed
 		ItemContainer.owned_items.append_array(card.quest.found_items)
+		# an item quest's reward replaces its gold, so it's only paid on a success
+		if succeeded and card.quest.pays_in_items():
+			ItemContainer.owned_items.append_array(card.quest.reward_items)
 
 		results.append({
 			"quest": card.quest,
@@ -91,6 +94,7 @@ static func _did_succeed(story: String) -> bool:
 	return not story.contains("NOT SUCCESSFUL")
 
 # How much gold the guild actually gets
+# (item quests start at 0 gold, so this is only the bonus gold found on the way)
 static func _get_gold_earned(quest: CreatedQuest, succeeded: bool) -> int:
 	if succeeded:
 		return quest.goldReward
