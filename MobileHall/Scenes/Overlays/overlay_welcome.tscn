@@ -115,11 +115,7 @@ custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 21
-text = "Your adventurers and today's recruits. A badge appears when new recruits arrive.
-
-If your standing gets too low, your guild will become too unpopular and new recruits will stop arriving
-
-You will lose the game if you run out of live adventurers to send on quests"
+text = "Your adventurers and today's recruits. A badge shows when new ones arrive."
 autowrap_mode = 3
 
 [node name="StepUpgrades" type="HBoxContainer" parent="Center/Sheet/Col" unique_id=420809502]
