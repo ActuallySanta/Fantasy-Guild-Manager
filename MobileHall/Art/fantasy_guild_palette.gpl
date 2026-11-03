@@ -1,0 +1,57 @@
+GIMP Palette
+Name: Fantasy Guild Manager UI
+Columns: 6
+#
+# Sampled from MobileHall/Art/Textures, plus the inks in MobileHall/Scripts/hall_style.gd.
+# Load in Aseprite: Palette menu > Load Palette (or drop into Aseprite's palettes folder).
+#
+# ---- Wood (backdrop, dark buttons, nav)
+ 24  16  16	Night shadow
+ 32  24  16	Outline
+ 48  36  28	Dark wood
+ 72  56  48	Wood plank
+ 80  64  56	Nav tile
+112  80  48	Signboard
+# ---- Parchment (cards, scrolls, notes)
+224 192 128	Parchment
+192 160  88	Parchment shade
+152 128  88	Aged edge
+120  96  56	Burnt edge
+# ---- Pale paper (tags, bubbles, active tabs)
+248 240 216	Speech bubble
+232 224 200	Goods tag
+224 208 192	Pale card
+208 200 184	Pressed paper
+192 184 168	Strip tab
+# ---- Brass and gold (buttons, coin)
+200 160  80	Coin
+200 176 112	Paper button
+184 160 112	Gold button
+112  96  64	Brass shadow
+ 96  72  32	Coin shadow
+# ---- Stone and ink (disabled, rules, lines)
+176 160 144	Disabled
+152 136 112	Connector
+144 120  96	Tag hole
+120 104  88	Dash rule
+ 48  40  32	Ink line
+# ---- Red (wax seal, awning, pins, shield)
+160  48  48	Wax seal
+145  42  41	Red pin
+128  40  40	Awning
+112  32  32	Seal shadow
+184 104  96	Shield light
+232 176 160	Seal highlight
+# ---- Inks the code tints on top (hall_style.gd)
+ 52  41  32	TEXT_MAIN
+107  93  79	TEXT_SOFT
+237 227 203	CREAM
+139  46  42	RED (also Power)
+184 145  58	GOLD
+ 74 107  53	GREEN
+ 47  74 102	BLUE_TEXT (also Defense)
+ 38  48  74	NAVY
+# ---- Stat inks (Power and Defense match RED and BLUE_TEXT above)
+ 91  74 122	Wisdom
+ 61  90  42	Sleaziness
+122  74  30	Pluck
