@@ -8,15 +8,21 @@ extends Control
 const ReportEntryScene := preload("uid://di7qjsfr530p5")  # MobileHall/Scenes/Rows/report_entry.tscn
 
 # ---- MOTION (only for the report that opens after End Day)
-## Seconds before the reveal starts (the dusk wash is clearing).
-const REVEAL_START := 0.3
+## Seconds after the report opens (under the dusk wash's peak) before the
+## reveal starts. Short, so the night is already playing out as the dusk
+## clears (HallMain.DUSK_OUT_SECONDS) instead of showing a blank page first.
+const REVEAL_START := 0.1
 ## Seconds between the totals chips stamping in, and the gold total's count-up.
 const REVEAL_CHIP_GAP := 0.1
 const REVEAL_GOLD_SECONDS := 0.6
 ## Letters overlap: the next one starts after this share of the last one.
 const REVEAL_LETTER_OVERLAP := 0.55
-## The button shows by this many seconds at the latest, however long the night was.
+## The sign (the button and the strings it hangs from) swings in by this many
+## seconds at the latest, however long the night was.
 const REVEAL_BUTTON_LATEST := 1.6
+## How far below the top of the strings (Art/Textures/connector.png) their
+## nail sits, in pixels. The sign swings on it.
+const SIGN_NAIL_Y := 9.0
 
 ## Chip text size on the totals strip.
 const TOTALS_FONT_SIZE := 28
@@ -53,6 +59,8 @@ const BUTTON_CLOSE := "Close"
 @onready var _entry_list: VBoxContainer = %Entries
 @onready var _empty_label: Label = %Empty
 @onready var _action_button: Button = %ActionButton
+## The strings and the button under them, hung (and swung) as one sign.
+@onready var _hanging_sign: Control = %ActionButton.get_parent()
 
 ## The main hall script (state + actions), set in setup().
 var hall: HallMain
@@ -101,7 +109,8 @@ func refresh() -> void:
 
 ## The report as the night unfolds: the totals stamp in and the gold counts
 ## up, the home / released notes fade in, then each letter plays in turn
-## (report_entry.reveal). The button is always there to skip ahead.
+## (report_entry.reveal), and the sign at the bottom swings in on its nail.
+## The button is always there to skip ahead.
 func _play_reveal() -> void:
 	if HallFx.reduce_motion:
 		return
@@ -117,7 +126,7 @@ func _play_reveal() -> void:
 			at += REVEAL_CHIP_GAP
 	for entry in _entry_list.get_children():
 		at += entry.reveal(at) * REVEAL_LETTER_OVERLAP
-	HallFx.appear(_action_button, 1.2, minf(at, REVEAL_BUTTON_LATEST))
+	HallFx.swing_in(_hanging_sign, SIGN_NAIL_Y, minf(at, REVEAL_BUTTON_LATEST))
 
 
 ## Inked boxes on the torn strip: how many succeeded, total gold, how many

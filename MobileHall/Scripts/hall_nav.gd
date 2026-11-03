@@ -67,8 +67,8 @@ func refresh() -> void:
 
 ## What a nav tab's badge says ("" = no badge).
 func _badge_text_for(tab_id: String) -> String:
-	if hall.tutorial and hall.tutorial.is_tab_locked(tab_id):
-		return BADGE_LOCKED % hall.tutorial.unlock_day(tab_id)
+	if hall.is_tab_locked(tab_id):
+		return BADGE_LOCKED % hall.tab_unlock_day(tab_id)
 	match tab_id:
 		"board":
 			return str(hall.undecided_count()) if hall.undecided_count() > 0 else ""

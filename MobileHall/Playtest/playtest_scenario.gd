@@ -17,7 +17,8 @@
 ## hasn't loaded the name/backstory CSVs yet and GuildCharacter.new() would fail.
 extends Control
 
-## Day to start on. HallMain.MILESTONE_DAY (10) = Bone Drake day.
+## Day to start on. HallMain.MILESTONE_DAY (10) = Bone Drake day,
+## HallMain.FINAL_DAY (50) = the final battle.
 @export var start_day: int = 8
 ## Guild standing. GuildUpgrades.MINIMUM_STANDING is -10; at or below it
 ## nobody new shows up For Hire.

@@ -11,8 +11,9 @@
 ##                 whose Buy bar sits there)
 ##   nav         - Board / Members / Guild / Shop with badges, always visible
 ##                 (ids: board / guild / upgrades / shop)
-## Overlays over everything: End Day check, Day Report, Welcome, Menu, and
-## the Game Over ledger (when the guild is stuck with nobody left; see is_run_over).
+## Overlays over everything: End Day check, Day Report, Welcome, Menu,
+## the Game Over ledger (when the guild is stuck with nobody left; see is_run_over),
+## and the final battle's credits roll (FINAL_DAY; a victory or a defeat).
 ## (The Training Yard and Hospital live on the Upgrades tab's Tonight half.)
 ## On top of all of it: the colorblind filter (set from the Menu, saved to disk).
 ##
@@ -58,7 +59,7 @@ extends Control
 ## Fired at the end of each player action, for the tutorial coach
 ## (overlay_tutorial.gd). event: tab, hire, character, close, assign, pick,
 ## send, deny, end_check, end_day, new_day, upgrade, training_picker, train,
-## admit, buy, equip, game_over.
+## admit, buy, equip, game_over, freeplay.
 signal tutorial_event(event: String, data: Variant)
 
 
@@ -67,6 +68,10 @@ signal tutorial_event(event: String, data: Variant)
 
 ## The day QuestList swaps the board for the milestone (Bone Drake) quest.
 const MILESTONE_DAY := 10
+## The day of the main story's final battle: the board holds only that quest,
+## a win rolls the credits and offers freeplay, a loss ends the run.
+## (The final quest and freeplay's scaling are built in HallRules.)
+const FINAL_DAY := 50
 ## Standing lost for releasing a living hero, plus one more per level of their
 ## Pluck (letting a veteran go hurts more). Releasing the fallen is free.
 const RELEASE_BASE_STANDING_COST := 1
@@ -89,6 +94,10 @@ const MAIN_SCENE_PATH := "uid://dtw7iu2s1gibm"  # MobileHall/hall_main.tscn
 const DRAKE_RESULT_NONE := ""
 const DRAKE_RESULT_SLAIN := "Slain"
 const DRAKE_RESULT_LOST := "Lost"
+## run_stats.final_result values (the FINAL_DAY battle).
+const FINAL_RESULT_NONE := ""
+const FINAL_RESULT_WON := "Won"
+const FINAL_RESULT_LOST := "Lost"
 # ---- motion (see hall_fx.gd; the counters' motion is in hall_header.gd)
 ## Seconds a SENT / DENIED stamp stays on the quest before the next one shows
 ## (taps are blocked meanwhile).
@@ -106,6 +115,14 @@ const HIRE_STAMP_TILT := -0.2
 const DUSK_INK := Color("#26304A")
 const DUSK_IN_SECONDS := 0.35
 const DUSK_OUT_SECONDS := 0.45
+## After a lost final battle the dusk lingers this long (seconds) before the
+## defeat screen shows, and clears this slowly.
+const DEFEAT_DUSK_IN_SECONDS := 1.2
+const DEFEAT_DUSK_OUT_SECONDS := 1.4
+## Draw order of the FX layer: above the overlays (z 10 in hall_main.tscn), so
+## the dusk wash covers the End Day sheet and the Day Report too, and below
+## Pip (OverlayTutorial.TUTORIAL_Z_INDEX).
+const FX_LAYER_Z_INDEX := 15
 ## Each new tab or screen fades in this fast (seconds).
 const VIEW_FADE_SECONDS := 0.14
 
@@ -128,6 +145,7 @@ const TOAST_UPGRADED := "%s upgraded to level %d!"
 const TOAST_RESET := "Upgrades reset"
 const TOAST_NEW_DAY := "Day %d · %s · %s for hire"
 const TOAST_MILESTONE_DAY := "Day %d. The Bone Drake is attacking!"
+const TOAST_FINAL_DAY := "Day %d. The final battle is here!"
 const TOAST_TRAINING := "%s is training %s"
 const TOAST_STOPPED_TRAINING := "%s stopped training"
 const TOAST_SLOTS_FULL := "Every slot is taken. Upgrade the Training Yard for more."
@@ -162,6 +180,7 @@ const STAMP_HIRED := "HIRED"
 ##   state:     HallStyle.QUEST_STATE_OPEN | QUEST_STATE_SENT | QUEST_STATE_DENIED
 ##   party:     Array of GuildCharacter (a draft while the quest is open)
 ##   milestone: bool (true for the Bone Drake quest)
+##   final:     bool (true for the FINAL_DAY battle)
 var quest_entries: Array = []
 
 # ---- what's showing
@@ -194,11 +213,23 @@ var released_today := []
 ## Last night's report, kept so the Menu can show it again.
 var previous_report := {}
 var is_end_check_open := false
+## True from End Day until the night's report (or the credits) shows. The
+## quests have already played out by then (gold, odds and injuries changed),
+## so the End Day sheet stays as the player left it while the dusk falls.
+var is_night_falling := false
 var is_welcome_open := true
 var is_menu_open := false
 ## The Game Over ledger's numbers, or {} while the run is still going.
 ## Filled once by _check_run_over (see build_run_over_stats for the keys).
 var run_over_stats := {}
+## The final battle's credits roll (overlay_credits.gd), or {} when hidden.
+## Filled by end_day on FINAL_DAY (see HallLedger.build_credits for the keys).
+## It covers every other overlay: a win leaves through start_freeplay, a loss
+## through start_new_run.
+var shown_credits := {}
+## True once the final battle is lost: the run is over (is_run_over), and the
+## defeat credits stand in for the Game Over ledger.
+var final_battle_lost := false
 
 # ---- the run so far
 
@@ -210,6 +241,10 @@ var run_over_stats := {}
 ##   heroes_hired: recruits hired from For Hire (int)
 ##   drake_result: DRAKE_RESULT_NONE | _SLAIN | _LOST
 ##   released:     every GuildCharacter let go this run (Array)
+##   gold_spent:   gold paid for recruits, buildings, goods and revivals (int)
+##   items_found:  equipment brought back from quests (int)
+##   final_result: FINAL_RESULT_NONE | _WON | _LOST
+##   final_party:  the GuildCharacters sent to the final battle (Array)
 var run_stats := {
 	"gold_earned": 0,
 	"quests_sent": 0,
@@ -217,6 +252,10 @@ var run_stats := {
 	"heroes_hired": 0,
 	"drake_result": DRAKE_RESULT_NONE,
 	"released": [],
+	"gold_spent": 0,
+	"items_found": 0,
+	"final_result": FINAL_RESULT_NONE,
+	"final_party": [],
 }
 
 # ---- player choices
@@ -278,6 +317,7 @@ var tutorial: Control
 @onready var _welcome_overlay: Control = %OverlayWelcome
 @onready var _menu_overlay: Control = %OverlayMenu
 @onready var _game_over_overlay: Control = %OverlayGameOver
+@onready var _credits_overlay: Control = %OverlayCredits
 
 # ---- colorblind filter
 @onready var _color_filter: ColorRect = %ColorFilter
@@ -306,6 +346,7 @@ func _ready() -> void:
 	fx_layer = Control.new()
 	fx_layer.name = "FxLayer"
 	fx_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fx_layer.z_index = FX_LAYER_Z_INDEX
 	add_child(fx_layer)
 	fx_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
@@ -330,7 +371,12 @@ func _on_day_started(_day: int) -> void:
 
 ## Fill quest_entries for today (see HallRules.build_day_quests).
 func _generate_quests() -> void:
-	quest_entries = HallRules.build_day_quests(GameState.day, GuildUpgrades.standing)
+	quest_entries = HallRules.build_day_quests(GameState.day, GuildUpgrades.standing, GameState.is_freeplay)
+
+
+## Freeplay's multiplier on today's quest requirements and rewards (see HallRules.freeplay_scale).
+func freeplay_scale() -> float:
+	return HallRules.freeplay_scale(GameState.day)
 
 
 # ============================================================ QUERIES
@@ -370,9 +416,10 @@ func unseen_recruit_count() -> int:
 # ---- the run
 
 
-## True when the guild can never send anyone out again (see HallLedger.is_run_over).
+## True when the guild can never send anyone out again (see HallLedger.is_run_over),
+## or the final battle was lost (that ends the story, whoever is left).
 func is_run_over() -> bool:
-	return HallLedger.is_run_over()
+	return final_battle_lost or HallLedger.is_run_over()
 
 
 ## True when one hero is left alive and losing them would (or nearly would)
@@ -389,6 +436,17 @@ func last_living_hero() -> GuildCharacter:
 ## Everything the Game Over ledger shows (see HallLedger.build_run_over_stats for the keys).
 func build_run_over_stats() -> Dictionary:
 	return HallLedger.build_run_over_stats(run_stats, roster())
+
+
+## The run's extra records for the credits roll (see HallLedger.build_run_records for the keys).
+func build_run_records() -> Dictionary:
+	return HallLedger.build_run_records(run_stats, roster())
+
+
+## Everything the final battle's credits roll shows (see HallLedger.build_credits).
+## result: the final quest's _run_quest result.
+func build_credits(result: Dictionary) -> Dictionary:
+	return HallLedger.build_credits(result, run_stats, roster())
 
 # ---- quests
 
@@ -473,8 +531,22 @@ func next_undecided_index(start_index: int = 0) -> int:
 # ---- upgrades and countdown
 
 
+## True while Pip holds a bottom tab back (see OverlayTutorial.UNLOCK_DAY).
+func is_tab_locked(tab_id: String) -> bool:
+	return tutorial != null and tutorial.is_tab_locked(tab_id)
+
+
+## The day a locked tab opens (see is_tab_locked).
+func tab_unlock_day(tab_id: String) -> int:
+	return tutorial.unlock_day(tab_id) if tutorial != null else 0
+
+
 ## Buildings that can be upgraded right now (enough gold and standing).
+## None while the Guild tab (id "upgrades") is still locked, so nothing
+## (the End Day sheet, the Board note, the badge) offers them early.
 func affordable_buildings() -> Array:
+	if is_tab_locked("upgrades"):
+		return []
 	return HallStyle.buildings_in_order().filter(func(building):
 		return GuildUpgrades.get_upgrade_status(building) == GuildUpgrades.UpgradeStatus.READY)
 
@@ -493,8 +565,8 @@ func days_until_drake() -> int:
 ## Switch bottom tab. Closes any screen; party drafts stay on their quests.
 ## `section` optionally picks the tab's half (GUILD_SECTION_* or UPGRADES_SECTION_*).
 func open_tab(tab_id: String, section: String = "") -> void:
-	if tutorial and tutorial.is_tab_locked(tab_id):
-		show_toast(TOAST_TAB_LOCKED % tutorial.unlock_day(tab_id))
+	if is_tab_locked(tab_id):
+		show_toast(TOAST_TAB_LOCKED % tab_unlock_day(tab_id))
 		return
 	active_tab = tab_id
 	if section != "" and tab_id == "guild":
@@ -734,6 +806,7 @@ func hire(character: GuildCharacter) -> bool:
 	var is_hired: bool = CharacterContainer.add_character_to_guild(character)
 	if is_hired:
 		run_stats.heroes_hired += 1
+		_count_spent(gold_before)
 		if GameState.gold < gold_before:
 			_header.pay_fx("gold")
 		pending_fx.hire_next = true
@@ -788,7 +861,13 @@ func release(character: GuildCharacter) -> void:
 
 
 func upgrade_building(building: int) -> void:
+	# buildings open with the Guild tab
+	if is_tab_locked("upgrades"):
+		show_toast(TOAST_TAB_LOCKED % tab_unlock_day("upgrades"))
+		return
+	var gold_before: int = GameState.gold
 	if GuildUpgrades.try_upgrade(building):
+		_count_spent(gold_before)
 		_header.pay_fx("gold")
 		pending_fx.upgraded = building
 		show_toast(TOAST_UPGRADED % [GuildUpgrades.get_building_name(building), GuildUpgrades.get_level(building)])
@@ -804,7 +883,9 @@ func buy_item(index: int) -> void:
 	var item := ItemShop.get_item(index)
 	if item == null or ItemShop.is_sold(index):
 		return
+	var gold_before: int = GameState.gold
 	if ItemShop.buy(index):
+		_count_spent(gold_before)
 		if item.cost > 0:
 			_header.pay_fx("gold")
 		pending_fx.bought = index
@@ -899,12 +980,20 @@ func discharge(character: GuildCharacter) -> void:
 
 
 func revive(character: GuildCharacter) -> void:
+	var gold_before: int = GameState.gold
 	if GuildUpgrades.revive(character):
+		_count_spent(gold_before)
 		pending_fx.home_row = character
 		show_toast(TOAST_REVIVED % character.name)
 	elif is_roster_full():
 		show_toast(TOAST_REVIVE_NO_BED % character.name)
 	queue_refresh()
+
+
+## Add whatever gold left the wallet since `gold_before` to run_stats.gold_spent
+## (for the credits' records). Call it right after a purchase went through.
+func _count_spent(gold_before: int) -> void:
+	run_stats.gold_spent += maxi(gold_before - GameState.gold, 0)
 
 
 ## Take a hero out of whatever quest party they're in (sent or draft).
@@ -989,8 +1078,10 @@ func close_end_check() -> void:
 ## under it. The gold / standing counters hold still until dawn (start_new_day),
 ## so the night's earnings land when the doors open.
 func end_day() -> void:
-	if undecided_count() > 0:
+	# (a second tap while the dusk falls would play the night out twice)
+	if undecided_count() > 0 or is_night_falling:
 		return
+	is_night_falling = true
 	_header.hold_counters()
 	# training and healing happen first, so nobody heals the night they're hurt
 	var home := GuildUpgrades.run_night()
@@ -999,7 +1090,15 @@ func end_day() -> void:
 		results.append(_run_quest(entry))
 	var report := {"starts_next_day": true, "day": GameState.day, "results": results, "home": home,
 			"released": released_today.duplicate()}
+
+	# the final battle's night rolls the credits (victory or defeat) instead of the Day Report
+	var final_results := results.filter(func(result): return result.final)
+	if not final_results.is_empty():
+		_show_final_credits(final_results[0], report)
+		return
+
 	var show_report := func() -> void:
+		is_night_falling = false
 		is_end_check_open = false
 		training_picker_open = false
 		active_screen = {}
@@ -1007,6 +1106,32 @@ func end_day() -> void:
 		queue_refresh()
 		tutorial_event.emit("end_day", results)
 	HallFx.curtain(fx_layer, DUSK_INK, show_report, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
+
+
+## End Day on FINAL_DAY: freeze the run's numbers into shown_credits and open
+## the credits roll under the dusk wash (a slower, darker one for a defeat).
+## result = the final quest's _run_quest result, report = the night's Day
+## Report, kept for the Menu's "Last night's report".
+func _show_final_credits(result: Dictionary, report: Dictionary) -> void:
+	var credits := build_credits(result)
+	final_battle_lost = not credits.won
+	var show_credits := func() -> void:
+		is_night_falling = false
+		is_end_check_open = false
+		is_menu_open = false
+		training_picker_open = false
+		active_screen = {}
+		previous_report = report.duplicate()
+		previous_report.starts_next_day = false
+		shown_credits = credits
+		if tutorial and tutorial.is_running():
+			tutorial.skip_tutorial()
+		queue_refresh()
+		tutorial_event.emit("end_day", report.results)
+	if credits.won:
+		HallFx.curtain(fx_layer, DUSK_INK, show_credits, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
+	else:
+		HallFx.curtain(fx_layer, DUSK_INK, show_credits, 1.0, DEFEAT_DUSK_IN_SECONDS, DEFEAT_DUSK_OUT_SECONDS)
 
 
 ## Play out one quest (HallRules.play_quest pays its gold and standing) and
@@ -1020,6 +1145,10 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		run_stats.quests_won += 1
 	if entry.milestone:
 		run_stats.drake_result = DRAKE_RESULT_SLAIN if result.succeeded else DRAKE_RESULT_LOST
+	if entry.final:
+		run_stats.final_result = FINAL_RESULT_WON if result.succeeded else FINAL_RESULT_LOST
+		run_stats.final_party = entry.party.duplicate()
+	run_stats.items_found += result.items.size()
 	return result
 
 
@@ -1035,6 +1164,8 @@ func start_new_day() -> void:
 	GameState.start_new_day()
 	if GameState.day == MILESTONE_DAY:
 		show_toast(TOAST_MILESTONE_DAY % GameState.day)
+	elif GameState.day == FINAL_DAY and not GameState.is_freeplay:
+		show_toast(TOAST_FINAL_DAY % GameState.day)
 	else:
 		var quests_text := HallStyle.count_text(quest_entries.size(), "new quest", "new quests")
 		show_toast(TOAST_NEW_DAY % [GameState.day, quests_text, CharacterContainer.hireable_characters.size()])
@@ -1048,7 +1179,8 @@ func start_new_day() -> void:
 ## If the guild is stuck (is_run_over), freeze the ledger's numbers and open
 ## the Game Over overlay. Pip stops coaching: there's nothing left to teach.
 func _check_run_over() -> void:
-	if not run_over_stats.is_empty() or not is_run_over():
+	# a lost final battle already has its own ending (the defeat credits)
+	if not run_over_stats.is_empty() or not shown_credits.is_empty() or not is_run_over():
 		return
 	run_over_stats = build_run_over_stats()
 	is_end_check_open = false
@@ -1072,6 +1204,23 @@ func start_new_run() -> void:
 	# after GameState.reset, so For Hire is sized for Day 1
 	CharacterContainer.reset()
 	get_tree().change_scene_to_file(MAIN_SCENE_PATH)
+
+
+## The victory credits' "Begin Freeplay" button: the story is over, so the
+## days go on without end (GameState.is_freeplay) and quests keep scaling up
+## (HallRules.freeplay_scale, the S++ rank). Dawn breaks on the next day under
+## the usual dusk wash, then Pip explains freeplay (the "freeplay" tutorial event).
+func start_freeplay() -> void:
+	if shown_credits.is_empty() or not shown_credits.won:
+		return
+	var begin := func() -> void:
+		GameState.is_freeplay = true
+		shown_credits = {}
+		# the night's report was already kept for the Menu by _show_final_credits
+		shown_report = {}
+		start_new_day()
+		tutorial_event.emit("freeplay", GameState.day)
+	HallFx.curtain(fx_layer, DUSK_INK, begin, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
 
 
 ## The report's button: starts the next day after End Day (under a dusk wash,
@@ -1169,12 +1318,15 @@ func action_button() -> Button:
 # ---- overlays
 
 
-## The Game Over ledger hides every other overlay; the Day Report hides the rest.
+## The credits roll hides every other overlay, then the Game Over ledger;
+## the Day Report hides the rest.
 func _refresh_overlays() -> void:
-	var is_game_over := not run_over_stats.is_empty()
+	var is_credits_open := not shown_credits.is_empty()
+	_credits_overlay.visible = is_credits_open
+	var is_game_over := not run_over_stats.is_empty() and not is_credits_open
 	_game_over_overlay.visible = is_game_over
-	var is_report_open := not shown_report.is_empty() or is_game_over
-	_report_overlay.visible = is_report_open and not is_game_over
+	var is_report_open := not shown_report.is_empty() or is_game_over or is_credits_open
+	_report_overlay.visible = not shown_report.is_empty() and not is_game_over and not is_credits_open
 	_end_check_overlay.visible = not is_report_open and is_end_check_open
 	_menu_overlay.visible = not is_report_open and is_menu_open
 	_welcome_overlay.visible = not is_report_open and is_welcome_open
@@ -1184,7 +1336,7 @@ func _refresh_overlays() -> void:
 
 
 func _all_overlays() -> Array:
-	return [_report_overlay, _end_check_overlay, _menu_overlay, _welcome_overlay, _game_over_overlay]
+	return [_report_overlay, _end_check_overlay, _menu_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay]
 
 
 # ============================================================ TOAST

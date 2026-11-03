@@ -35,7 +35,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Picked parties are dropped unless you send them (Flow) | A quest's party is a **draft** that stays until you send, recall or change it. Switching quests keeps every draft |
 | Hard to switch between quests (Ledger) | Numbered **quest strip** at the top of Assign Party. One tap switches quests, and each tab is coloured by state |
 | Not sure what to do next (Ledger) | One **action bar** button above the nav, always the next step: *For Hire* → *Next Quest* → *End Day* |
-| Upgrades forgotten in every version | **Upgrades** tab badge when you can afford something, an Upgrades box on the Board's Today checklist, and the **End Day check** offers affordable upgrades before the day ends |
+| Upgrades forgotten in every version | **Upgrades** tab badge when you can afford something, an Upgrades box on the Board's Today checklist, and the **End Day check** offers affordable upgrades before the day ends. None of these offer upgrades while Pip still holds the Guild tab back (until Day 3); the Board's box says when it opens |
 | No way to get denied quests back (Ledger) | Denied quests stay on the Board. Open one and tap **Reconsider** |
 | No signal when new recruits arrive (Ledger) | **Guild** badge ("3 new") each morning until you open Applicants |
 | Hiring and questing blurred together (Deck) | Guild tab has two clearly separate folder tabs: **Your Guild** / **Applicants** |
@@ -64,6 +64,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
 | Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story |
+| Final Battle credits | Day 50 only. **Victory**: on a warm, dark backdrop the night's story rolls up the screen line by line, then who fought, a parchment ledger (final stats without the Bone Drake, run records, roll call), the team credits, and **Begin Freeplay**. **Defeat**: the same roll in cold colours with an epitaph, and **Found a New Guild** |
 | Game Over | The guild ledger: days survived, a 2 x 3 grid (gold earned, quests won, heroes hired, fallen, final standing, Bone Drake), a roll call of every hero and their fate, and Found a New Guild |
 | Menu | How to play, last night's report, colorblind filter (tap to cycle Off / Red-weak / Green-weak / Blue-yellow, saved to `user://settings.cfg`), reset upgrades (debug) |
 
@@ -84,6 +85,44 @@ from falling (`HallMain.is_one_death_from_falling`). That means one hero is aliv
 in today's For Hire is affordable, and either tomorrow's recruit price is more than your
 gold or standing is within `DANGER_STANDING_MARGIN` of the floor. The Welcome card's
 "Don't run out of heroes" row and Pip's Day 1 Day Report step explain the rule.
+
+## Final battle, credits and freeplay
+
+`HallMain.FINAL_DAY` (50) has a single quest, the final battle (`entry.final`). It's a
+random S-rank quest for now. The `FINAL QUEST CONTENT` / `FINAL QUEST STORY` comments in
+`hall_rules.gd` (`build_day_quests`, `play_quest`) and `FINAL QUEST DEFEAT TEXT` in
+`overlay_credits.gd` mark where the real quest goes.
+
+Ending Day 50 opens the credits roll (`Scenes/Overlays/overlay_credits.tscn`) instead of the
+Day Report. The night's letters are still in the Menu's "Last night's report". The roll
+scrolls by itself after a moment. Any touch, drag or wheel hands it to the player, and
+Reduced Motion turns the auto-scroll off. The button appears once the bottom is first
+reached and stays, so the player can scroll back up.
+
+- **Won:** **Begin Freeplay** (`HallMain.start_freeplay`) sets `GameState.is_freeplay`
+  and opens Day 51, and Pip explains freeplay (it runs even if the tutorial was skipped).
+  From then on, quests can roll past S into **S++** (`CreatedQuest.QuestDifficulty.SPP`).
+  Every quest's stat requirement and gold also grow by `HallRules.FREEPLAY_SCALE_PER_DAY` (2%) for
+  each day past 50, without a cap. Game Over still applies.
+- **Lost:** the run ends (`HallMain.final_battle_lost`). The defeat roll stands in for the
+  Game Over ledger and ends on **Found a New Guild**.
+
+Run records (gold spent, items found, building levels, longest-serving hero) come from
+`HallLedger.build_run_records`. `Playtest/scenario_final_battle.tscn` starts on Day 50.
+
+### Adding your team credits
+
+The "Made By" block near the end of the roll reads `MobileHall/Data/credits.tres`, a
+`CreditsList` (`Scripts/Credits/`). Edit it in the Godot editor:
+
+1. Double-click `MobileHall/Data/credits.tres` in the FileSystem dock.
+2. In the Inspector, expand **Entries** and click **Add Element**.
+3. Click the new empty slot and pick **New CreditEntry**.
+4. Fill in **Section** (the heading, e.g. "Art"), **Name**, and **Contribution**.
+5. Drag elements to reorder them, then save.
+
+Entries that share a Section are grouped under one heading, in the order the section first
+appears. Entries with an empty Name are skipped.
 
 ## Colorblind filter
 
@@ -131,7 +170,8 @@ than overriding colours or styles on the node, so a reskin reaches it.
 - `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip), action bar, nav and toast
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
-- `Scenes/Overlays/`: End Day check, Day Report, Welcome, Menu
+- `Scenes/Overlays/`: End Day check, Day Report, Welcome, Menu, Game Over, Final Battle credits
+- `Data/credits.tres`: the team credits for the credits roll (see Adding your team credits)
 - `Scenes/Rows/`: list rows (quest row, quest tab, party seat, picker row, roster / hire cards, applicant peek, upgrade card, Today note, plan row, upgrade suggestion, report entry, story line, Training / Hospital card, row and heading, shop tile)
 - `Scenes/Components/`: chip, portrait, stat strip, odds bar, divider, seal button, rolled-up scroll tag
 - `Art/`: every image, icon and font (placeholders; see `Art/README.md`)

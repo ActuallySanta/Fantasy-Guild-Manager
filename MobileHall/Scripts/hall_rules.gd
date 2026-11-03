@@ -38,28 +38,60 @@ const PLUCK_GAIN_BY_ODDS := [
 	{"min": 40, "gain": 3},
 	{"min": 0, "gain": 4},
 ]
+## Rank of the placeholder final quest (a CreatedQuest.QuestDifficulty), until
+## the real final quest is written (see build_day_quests).
+const FINAL_QUEST_RANK := CreatedQuest.QuestDifficulty.S
+## Freeplay difficulty climb: each day past HallMain.FINAL_DAY adds this share
+## to every new quest's stat requirement and gold reward (0.02 = +2% a day, so
+## Day 75 quests ask for and pay 1.5x). Linear and without a cap.
+const FREEPLAY_SCALE_PER_DAY := 0.02
 
 
 # ============================================================ QUESTS
 
 ## A new quest entry for hall_main's quest_entries:
-##   {quest, state (HallStyle.QUEST_STATE_*), party: Array, milestone: bool}
+##   {quest, state (HallStyle.QUEST_STATE_*), party: Array, milestone: bool,
+##    final: bool (true for the HallMain.FINAL_DAY battle; set by build_day_quests)}
 static func new_entry(quest: CreatedQuest, is_milestone: bool) -> Dictionary:
-	return {"quest": quest, "state": HallStyle.QUEST_STATE_OPEN, "party": [], "milestone": is_milestone}
+	return {"quest": quest, "state": HallStyle.QUEST_STATE_OPEN, "party": [], "milestone": is_milestone, "final": false}
 
 
 ## Today's quest entries. Mirrors QuestList.populate / _generate_quests:
-## the milestone day has only the Bone Drake, every other day has quests_per_day(day).
-## day: GameState.day; standing: GuildUpgrades.standing.
+## the milestone day has only the Bone Drake, HallMain.FINAL_DAY has only the
+## final battle, every other day has quests_per_day(day). In freeplay (after
+## FINAL_DAY) ranks can roll past S into S++, and every quest scales up a
+## little more each day (freeplay_scale).
+## day: GameState.day; standing: GuildUpgrades.standing;
+## is_freeplay: GameState.is_freeplay.
 ## Returns an Array of new_entry() Dictionaries, in board order.
-static func build_day_quests(day: int, standing: int) -> Array:
+static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Array:
 	if day == HallMain.MILESTONE_DAY:
 		return [new_entry(CreatedQuest.new(2, 10), true)]
 
+	if day == HallMain.FINAL_DAY and not is_freeplay:
+		# ==== FINAL QUEST CONTENT ===========================================
+		# PLACEHOLDER: the final battle is a random quest at FINAL_QUEST_RANK
+		# for now. To give it its own content, replace the quest built below
+		# with the real one, the same way the Bone Drake does it:
+		#   1. In quest_resource.gd, add a FINAL_DAY (50) case to _init that
+		#      calls a new _initFinalVars() (like _initMilestoneVars: difficulty,
+		#      maxAdventurers, questNum, location, goldReward, favStat, questTitle).
+		#   2. Add its story rows to External Content and a reader for them in
+		#      ExternalContentContainer (like get_Milestone_story).
+		#   3. Build it here with CreatedQuest.new(<rank>, HallMain.FINAL_DAY).
+		#   4. Play its story out in play_quest (see FINAL QUEST STORY there).
+		# Keep `final_entry.final = true`: it's what rolls the credits.
+		var final_entry := new_entry(CreatedQuest.new(FINAL_QUEST_RANK, HallMain.FINAL_DAY), false)
+		final_entry.final = true
+		return [final_entry]
+		# ==== END FINAL QUEST CONTENT =======================================
+
 	var standing_rank := standing_rank_for(standing)
+	# the highest rank a quest can roll: S, or S++ once freeplay has begun
+	var top_rank: int = CreatedQuest.QuestDifficulty.SPP if is_freeplay else CreatedQuest.QuestDifficulty.S
 	var entries := []
 	for quest_number in quests_per_day(day):
-		var rank: int = clampi(standing_rank + int(rand_bell_curve()), 0, CreatedQuest.QuestDifficulty.S)
+		var rank: int = clampi(standing_rank + int(rand_bell_curve()), 0, top_rank)
 		# a roll two ranks off the guild's standing is pulled one rank back toward it
 		if rank - standing_rank == 2:
 			rank -= 1
@@ -68,8 +100,17 @@ static func build_day_quests(day: int, standing: int) -> Array:
 		if standing <= STARTER_STANDING:
 			rank = 0
 
-		entries.append(new_entry(CreatedQuest.new(rank, 0), false))
+		var quest := CreatedQuest.new(rank, 0)
+		if is_freeplay:
+			quest.apply_freeplay_scaling(freeplay_scale(day))
+		entries.append(new_entry(quest, false))
 	return entries
+
+
+## Freeplay's multiplier on quest requirements and rewards on `day`: 1.0 on
+## HallMain.FINAL_DAY, then FREEPLAY_SCALE_PER_DAY more for each day after it.
+static func freeplay_scale(day: int) -> float:
+	return 1.0 + FREEPLAY_SCALE_PER_DAY * maxi(day - HallMain.FINAL_DAY, 0)
 
 
 ## How many quests the board gets on `day` (see QUESTS_PER_DAY_BY_DAY).
@@ -116,7 +157,7 @@ static func pluck_gain_for(chance: float) -> int:
 ## the caller (hall_main.gd _tally_quest).
 ## entry: a quest entry (see new_entry); day: GameState.day.
 ## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, pluck, injured, died, items, milestone}
+##   {quest, party, story, succeeded, chance, gold, standing, pluck, injured, died, items, milestone, final}
 ## (pluck = what each party member gained, 0 on a failure)
 ## (injured = the party members whose injury level went up on this quest but
 ## who survived; died = the party members who died on it; items = the
@@ -136,6 +177,13 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 	var story: String
 	if day == HallMain.MILESTONE_DAY:
 		story = entry.quest.generateMilestoneResults(party, chance)
+	# ==== FINAL QUEST STORY ==================================================
+	# PLACEHOLDER: the final battle plays out like any other quest for now.
+	# When it has its own story, add a branch here, for example:
+	#   elif entry.final:
+	#       story = entry.quest.generateFinalResults(party, chance)
+	# A loss must still contain "NOT SUCCESSFUL" (DayBar._did_succeed).
+	# ==== END FINAL QUEST STORY ==============================================
 	else:
 		story = entry.quest.generateResults(party, chance)
 	var succeeded: bool = DayBar._did_succeed(story)
@@ -180,4 +228,5 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 		"died": died,
 		"items": found_items,
 		"milestone": entry.milestone,
+		"final": entry.final,
 	}

@@ -21,6 +21,10 @@ var standing: int:
 	get:
 		return GuildUpgrades.standing
 
+## True once the main story is over and the player chose Begin Freeplay
+## (HallMain.start_freeplay): days go on forever and quests keep scaling up.
+var is_freeplay := false
+
 
 func _ready() -> void:
 	GuildUpgrades.resources_changed.connect(resources_changed.emit)
@@ -42,6 +46,7 @@ func start_new_day() -> void:
 ## day_started: the hall scene is reloaded right after and builds Day 1 itself.
 func reset() -> void:
 	day = 1
+	is_freeplay = false
 
 
 func _refresh_temp_stats():

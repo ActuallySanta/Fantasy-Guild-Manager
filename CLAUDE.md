@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-"Fantasy Guild Manager", a Godot **4.7** GDScript game (GL Compatibility, portrait 720x1280, phone-first). You run a guild: hire heroes, send parties on daily quests, buy gear and building upgrades. A Bone Drake milestone quest comes on day 10.
+"Fantasy Guild Manager", a Godot **4.7** GDScript game (GL Compatibility, portrait 720x1280, phone-first). You run a guild: hire heroes, send parties on daily quests, buy gear and building upgrades. A Bone Drake milestone quest comes on day 10, and the main story ends with a final battle on day 50 (a credits roll, then endless freeplay with an S++ rank; see `MobileHall/README.md`).
 
 ## Running and testing
 
@@ -41,8 +41,8 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 
 **There are two UIs.** `MobileHall/` is the current one:
 - `hall_main.gd` owns all of the day's state and every game action: drafting parties, `end_day()` → `_run_quest()` → the Day Report. Everything else is split out:
-  - `hall_rules.gd` (`HallRules`): static functions for building the day's quests and playing one out (`build_day_quests`, `play_quest`, `pluck_gain_for`). The quest-count and rank tuning tables live here.
-  - `hall_ledger.gd` (`HallLedger`): static functions for whether the run is over, the danger checks, and the Game Over numbers. They take `run_stats` and the roster as parameters.
+  - `hall_rules.gd` (`HallRules`): static functions for building the day's quests and playing one out (`build_day_quests`, `play_quest`, `pluck_gain_for`). The quest-count and rank tuning tables live here, plus the final battle (`HallMain.FINAL_DAY`) and freeplay scaling (`freeplay_scale`, the S++ rank).
+  - `hall_ledger.gd` (`HallLedger`): static functions for whether the run is over, the danger checks, the Game Over numbers, and the final battle's credits (`build_credits`, `build_run_records`). They take `run_stats` and the roster as parameters.
   - `hall_settings.gd` (`HallSettings`): loading and saving the accessibility settings.
   - The shell pieces are scenes in `MobileHall/Scenes/Shell/`: `hall_header` (the day tile, Bone Drake countdown, gold/standing counters and their motion, danger strip), `hall_action_bar`, `hall_nav`, and `hall_toast`.
   - `hall_main` keeps one-line query wrappers (`is_run_over()`, `build_run_over_stats()`, …) so views still only talk to `hall`.
@@ -60,7 +60,7 @@ The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still b
 - Comment new code thoroughly. Tunables get `##` doc comments with units, functions get doc comments covering their params and return value, and non-obvious logic gets `#` comments. This matches the style of the newer files (`item_shop.gd`, `guild_upgrades.gd`, MobileHall scripts).
 - Tuning numbers go in named, documented variables or constants at the top of the file that owns them, not inline.
 - Keep each script to one job, so no new "master script" grows the way `hall_main.gd` once did (1,900 lines).
-  - Soft limit: about 800 lines per script. Past that, find a piece to pull out before adding more. `hall_main.gd` is already near 1,200, so new MobileHall code goes in another file and `hall_main` just calls it.
+  - Soft limit: about 800 lines per script. Past that, find a piece to pull out before adding more. `hall_main.gd` is already near 1,350, so new MobileHall code goes in another file and `hall_main` just calls it.
   - Game rules that don't touch nodes (quest generation, payouts, run-over checks) go in a script of static functions with a `class_name`, like `HallRules` and `HallLedger`. They take what they need as parameters.
   - A part of the screen with its own nodes and refresh code becomes its own authored scene with `setup(hall)` and `refresh()`, like the tabs, overlays, and `Scenes/Shell/` pieces. Don't add inline nodes to `hall_main.tscn` for `hall_main.gd` to draw.
   - `hall_main.gd` keeps only the day's state, the actions that change it, thin query wrappers, and refresh orchestration.

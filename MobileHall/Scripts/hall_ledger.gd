@@ -100,3 +100,61 @@ static func build_run_over_stats(run_stats: Dictionary, roster: Array) -> Dictio
 		"released": released,
 	}
 
+
+# ============================================================ CREDITS
+
+## The run's extra records for the final battle's credits roll.
+## run_stats: hall_main's tallies; roster: CharacterContainer.active_characters.
+## Returns:
+##   gold_spent, items_found (int)
+##   buildings: Array of {name: String, level: int}, working buildings only
+##   longest_serving: the GuildCharacter who served the most days (null if
+##                    nobody did), and longest_days (int) how many
+## A hero's service runs from joined_on_day to the day they fell, or to today.
+## Released heroes who are still alive aren't counted (their leaving day isn't kept).
+static func build_run_records(run_stats: Dictionary, roster: Array) -> Dictionary:
+	var buildings := []
+	for building in HallStyle.buildings_in_order():
+		if GuildUpgrades.is_implemented(building):
+			buildings.append({"name": GuildUpgrades.get_building_name(building), "level": GuildUpgrades.get_level(building)})
+
+	var longest_serving: GuildCharacter = null
+	var longest_days := 0
+	var everyone: Array = roster.duplicate()
+	for character in run_stats.released:
+		if HallStyle.is_dead(character) and not everyone.has(character):
+			everyone.append(character)
+	for character in everyone:
+		var has_death_day: bool = HallStyle.is_dead(character) and character.died_on_day > 0
+		var last_day: int = character.died_on_day if has_death_day else GameState.day
+		var served: int = last_day - character.joined_on_day + 1
+		if served > longest_days:
+			longest_days = served
+			longest_serving = character
+
+	return {
+		"gold_spent": run_stats.gold_spent,
+		"items_found": run_stats.items_found,
+		"buildings": buildings,
+		"longest_serving": longest_serving,
+		"longest_days": longest_days,
+	}
+
+
+## Everything the final battle's credits roll shows (overlay_credits.gd).
+## result: the final quest's HallRules.play_quest result; run_stats, roster: as above.
+## Returns:
+##   won: bool (the victory roll with Begin Freeplay, or the defeat screen)
+##   day: int
+##   result: the final quest's result (story, party, died, ...)
+##   stats: build_run_over_stats() (the screen leaves out the Bone Drake)
+##   records: build_run_records()
+static func build_credits(result: Dictionary, run_stats: Dictionary, roster: Array) -> Dictionary:
+	return {
+		"won": result.succeeded,
+		"day": GameState.day,
+		"result": result,
+		"stats": build_run_over_stats(run_stats, roster),
+		"records": build_run_records(run_stats, roster),
+	}
+

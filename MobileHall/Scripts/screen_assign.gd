@@ -51,7 +51,8 @@ const TEXT_ODDS_DOWN := "%d%%"
 const TEXT_ODDS_NONE := "--"
 const TEXT_ODDS_WORD := "Chance of success"
 ## Under the odds: what each hero's Pluck goes up by if the party wins.
-const TEXT_PLUCK_ON_WIN := "%s · win for +%d Pluck"
+## Two lines, so the column never gets wider than the screen (OddsWord wraps too).
+const TEXT_PLUCK_ON_WIN := "%s\nwin for +%d Pluck"
 # Picker
 const PICK_HEADING := "Your adventurers"
 const PICK_HINT := "best fit first"

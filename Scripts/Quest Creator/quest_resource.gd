@@ -9,6 +9,10 @@ enum QuestDifficulty {
 	B = 3,
 	A = 4,
 	S = 5,
+	## Freeplay only (after HallMain.FINAL_DAY): every quest that would roll
+	## above S lands here. Shown as "S++" (HallStyle.rank_letter); its
+	## requirement and pay keep climbing through requirement_multiplier.
+	SPP = 6,
 }
 
 enum QuestType {
@@ -59,6 +63,10 @@ var questNum: int:
 
 var dead_adventurers : Array[GuildCharacter]
 
+## Freeplay scaling on the stat total this quest asks for (1.0 = none).
+## Set by apply_freeplay_scaling; calcSuccessChance multiplies statHitNum by it.
+var requirement_multiplier: float = 1.0
+
 ## Equipment the party found while searching on this quest. The guild keeps it
 ## whether or not the quest succeeds (hall_main adds it to ItemContainer).
 var found_items: Array[StandardItem]
@@ -98,25 +106,50 @@ func _init(diff := 0, dayNum := 0) -> void:
 	match type:
 		1:
 			favStat = FavoredStat.Power
-			questTitle = str("Raid the ", location)
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Raid the ", location)
+				1:
+					questTitle = str("Storm the ", location)
 		2:
 			favStat = FavoredStat.Defense
-			questTitle = str("Escort someone to ", location)
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Protect a client on their journey to ", location)
+				1:
+					questTitle = str("Escort a client to ", location)
 		3:
 			favStat = FavoredStat.Wisdom
-			questTitle = str("Explore ", location)
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Survey ", location)
+				1:
+					questTitle = str("Explore ", location)
 		4:
 			favStat = FavoredStat.Sleaze
-			questTitle = str("Gather information on ", location)
+			match randi_range(0, 1):
+				0:
+					questTitle = str("Scour for intel on ", location)
+				1:
+					questTitle = str("Gather information on ", location)
 
 	print("")
 	pass
+
+
+## Freeplay: makes this quest harder and better paid by the same factor.
+## multiplier: 1.0 = unchanged, 1.5 = needs half again the stats and pays
+## half again the gold (see HallRules.FREEPLAY_SCALE_PER_DAY).
+func apply_freeplay_scaling(multiplier: float) -> void:
+	requirement_multiplier = multiplier
+	goldReward = roundi(goldReward * multiplier)
 
 
 func calcSuccessChance(_questingAdventurers: Array) -> int:
 	var statHitNum = 60.0 + (20 * difficulty)
 	if (maxAdventurers == 1):
 		statHitNum = (statHitNum / 2)
+	statHitNum *= requirement_multiplier
 	var statTotal = 0.0
 
 	for adventurer in _questingAdventurers:

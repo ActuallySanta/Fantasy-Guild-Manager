@@ -70,9 +70,15 @@ func _fill(main: HallMain, hero: GuildCharacter) -> void:
 	_stat_picker.visible = false
 	modulate = Color.WHITE
 	HallStyle.style_panel(self, HallStyle.CARD_BG, HallStyle.BORDER, 2, 16)
-	# just moved into a slot / bed (or out, or back from the dead): pop in its new spot
+	# just moved into a slot / bed (or out, or back from the dead): pop in its
+	# new spot. Deferred until the show_* function has given the row its look,
+	# so a faded row (in a bed, too hurt to train) fades up to faded, not solid.
 	if hall.pending_fx.get("home_row") == hero:
-		HallFx.appear(self, 0.9)
+		_pop_in.call_deferred()
+
+
+func _pop_in() -> void:
+	HallFx.appear(self, 0.9)
 
 
 ## "Free today", "Picked for #2" or "Sent on #2".
