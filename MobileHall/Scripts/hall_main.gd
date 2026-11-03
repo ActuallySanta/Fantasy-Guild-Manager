@@ -356,6 +356,12 @@ func _ready() -> void:
 	add_child(tutorial)
 	tutorial.setup(self)
 
+	# balancing data: a row per day to a CSV and the run-log Google Sheet
+	var run_logger := RunLogger.new()
+	run_logger.name = "RunLogger"
+	add_child(run_logger)
+	run_logger.setup(self)
+
 	_load_settings()
 	_generate_quests()
 	refresh()
