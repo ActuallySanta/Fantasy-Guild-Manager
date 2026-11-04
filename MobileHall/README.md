@@ -149,6 +149,23 @@ are played out), and the tuning numbers sit at the top of that file.
 - **Revive:** Hospital level 5 brings one fallen hero back per run, Gravely hurt and in a bed.
 - The Day Report's header has an "At home" line with who trained and who healed.
 
+## Quest growth
+
+A won quest grows the party in one of two ways, based on the odds it was sent at
+(`HallRules`, tuning at the top of `hall_rules.gd`):
+
+- **Good odds train a stat.** The good-odds threshold is `train_odds_for(rank)`: F 60%,
+  D 65%, C 70%, B 75%, A 80%, S and S++ 85%. A win at or above it gives every party member
+  +`TRAIN_STAT_GAIN` to one stat and no Pluck. One coin flip for the whole party picks the
+  stat: the quest's favored stat or the region's favored stat
+  (`CreatedQuest.REGION_FAVORED_STAT`).
+- **Riskier odds build Pluck.** A win below the threshold gives Pluck by
+  `PLUCK_GAIN_BY_ODDS`, the same as before. The threshold rises with rank, so more
+  high-rank wins pay Pluck.
+
+Assign Party's odds caption shows which one a win would give ("win to train Defense or
+Power" or "win for +2 Pluck"), and the Day Report's sign-off names what the party gained.
+
 Looks come from the theme, not from overrides: a label is `TitleLabel`, `CapsLabel`,
 `ItalicLabel` (or `TitleLight` / `ItalicLight` / `LabelLight` on wood), a panel is
 `PaperCard`, `PlanCard`, `TornPaper`... and a button is `GoldButton`, `WoodButton`,

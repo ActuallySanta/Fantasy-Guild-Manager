@@ -49,6 +49,11 @@ const TEXT_ODDS_WORD := "Chance of success"
 ## Under the odds: what each hero's Pluck goes up by if the party wins.
 ## Two lines, so the column never gets wider than the screen (OddsWord wraps too).
 const TEXT_PLUCK_ON_WIN := "%s\nwin for +%d Pluck"
+## Under the odds, at good odds for the quest's rank: the stat(s) a win can
+## train instead of Pluck (HallRules.trains_stat), e.g. "Defense or Power".
+const TEXT_TRAIN_ON_WIN := "%s\nwin to train %s"
+## Joins the two stats a win can train.
+const TEXT_TRAIN_OR := " or "
 # Picker
 const PICK_HEADING := "Your adventurers"
 ## Only shown when "Show busy" is off and someone is hidden.
@@ -189,10 +194,25 @@ func _show_party(entry: Dictionary) -> void:
 	var chance: int = hall.success_chance(entry, entry.party)
 	var odds := HallStyle.odds_look(chance)
 	_odds_value.text = TEXT_ODDS % mini(chance, 100) if chance >= 0 else TEXT_ODDS_NONE
-	_odds_word.text = TEXT_PLUCK_ON_WIN % [odds.word, hall.pluck_gain_for(chance)] if chance >= 0 else odds.word
+	_odds_word.text = _odds_caption(entry, chance, odds.word)
 	HallStyle.set_font_color(_odds_value, odds.text_color)
 	HallStyle.tint_art(_odds_circle, odds.text_color)
 	_show_odds_change(chance)
+
+
+## The caption under the odds: the odds word, then what a win grows. At good
+## odds for the quest's rank that's a stat to train, otherwise Pluck.
+## entry: the quest entry; chance: the party's success chance (-1 = no party);
+## odds_word: HallStyle.odds_look(chance).word. Returns the caption text.
+func _odds_caption(entry: Dictionary, chance: int, odds_word: String) -> String:
+	if chance < 0:
+		return odds_word
+	if hall.trains_stat(entry, chance):
+		var stat_names := PackedStringArray()
+		for stat_index in hall.trained_stat_options(entry):
+			stat_names.append(HallStyle.STATS[stat_index].name)
+		return TEXT_TRAIN_ON_WIN % [odds_word, TEXT_TRAIN_OR.join(stat_names)]
+	return TEXT_PLUCK_ON_WIN % [odds_word, hall.pluck_gain_for(chance)]
 
 
 ## The odds number and bar. On the same quest, a new chance rolls the number,

@@ -516,6 +516,18 @@ func pluck_gain_for(chance: float) -> int:
 	return HallRules.pluck_gain_for(chance)
 
 
+## Whether winning this quest entry at `chance` percent trains a stat instead
+## of giving Pluck (see HallRules.trains_stat).
+func trains_stat(entry: Dictionary, chance: float) -> bool:
+	return HallRules.trains_stat(chance, entry.quest.difficulty)
+
+
+## The one or two GuildCharacter.StatType indexes a good-odds win on this quest
+## entry can train (see CreatedQuest.trained_stat_options).
+func trained_stat_options(entry: Dictionary) -> Array[int]:
+	return entry.quest.trained_stat_options()
+
+
 ## How many points of success chance this character gives a quest on their own.
 func chance_added_by(entry: Dictionary, character: GuildCharacter) -> int:
 	return int(entry.quest.calcSuccessChance([character]))

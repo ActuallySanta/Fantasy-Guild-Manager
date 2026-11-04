@@ -31,6 +31,12 @@ enum FavoredStat {
 	Pluck = 4,
 }
 
+## The stat each world region favors, by regionNum (Region.RegionType), as a
+## GuildCharacter.StatType index: Windswept Meadows -> Defense, Boglands ->
+## Sleaze, Ashen Wastes -> Power, Glass Mountains -> Wisdom. calcSuccessChance
+## counts it twice, and a good-odds win can train it (roll_trained_stat).
+const REGION_FAVORED_STAT := [1, 3, 0, 2]
+
 #enum for modifiers if we ever choose to do them
 
 var numAdventurers: int
@@ -97,6 +103,10 @@ var item_reward_max_chance: float = 30.0
 ## Extra reward items per difficulty rank: the count is 1 + difficulty * this,
 ## rounded down (F/D 1 item, C/B 2, A/S 3).
 var item_reward_count_per_rank: float = 0.5
+
+## Chance (percent) that a good-odds win trains the quest's favored stat
+## (favStat) rather than the region's (REGION_FAVORED_STAT). See roll_trained_stat.
+var trained_stat_quest_chance: float = 50.0
 
 func _init(diff := 0, dayNum := 0) -> void:
 	if (dayNum == 10):
@@ -181,16 +191,9 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 		adventurer.reset_temp_stats()
 
 		statTotal += adventurer.get_quest_stat(0) + adventurer.get_quest_stat(1) + adventurer.get_quest_stat(2) + adventurer.get_quest_stat(3)
-		match regionNum:
-			0:
-				statTotal += adventurer.get_quest_stat(1)
-			1:
-				statTotal += adventurer.get_quest_stat(3)
-			2:
-				statTotal += adventurer.get_quest_stat(0)
-			3:
-				statTotal += adventurer.get_quest_stat(2)
-				
+		# the region's favored stat counts twice
+		statTotal += adventurer.get_quest_stat(region_favored_stat())
+
 		match favStat:
 			0:
 				statTotal += adventurer.get_quest_stat(0)
@@ -202,6 +205,32 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 				statTotal += adventurer.get_quest_stat(3)
 
 	return (snapped((statTotal / statHitNum), 0.01) * 100)
+
+
+## The GuildCharacter.StatType index this quest's region favors
+## (see REGION_FAVORED_STAT).
+func region_favored_stat() -> int:
+	return REGION_FAVORED_STAT[regionNum]
+
+
+## The one or two stats a good-odds win on this quest can train: the quest's
+## favored stat, then the region's. Only one when they're the same stat.
+## Returns an Array of GuildCharacter.StatType indexes.
+func trained_stat_options() -> Array[int]:
+	var options: Array[int] = [int(favStat)]
+	if region_favored_stat() != int(favStat):
+		options.append(region_favored_stat())
+	return options
+
+
+## Pick the stat a good-odds win trains: the quest's favored stat
+## trained_stat_quest_chance percent of the time, otherwise the region's.
+## Returns a GuildCharacter.StatType index (the same one either way when the
+## quest and region favor the same stat).
+func roll_trained_stat() -> int:
+	if randf_range(0.0, 100.0) < trained_stat_quest_chance:
+		return int(favStat)
+	return region_favored_stat()
 
 
 #this is the main root method for deciding and generating results I'll have
