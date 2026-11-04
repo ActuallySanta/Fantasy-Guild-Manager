@@ -165,6 +165,7 @@ const TOAST_WRONG_ROLE := "Only %ss can use the %s."
 const TOAST_HANDS_FULL := "%s's hands are full"
 const TOAST_GEAR_DEAD := "%s can't use gear anymore."
 const TOAST_TAB_LOCKED := "Pip will open this on Day %d."
+const TOAST_WELCOME_BACK := "Welcome back · Day %d"
 
 # ---- stamps (SENT is inked on the quest itself, see screen_assign / quest_row)
 const STAMP_DENIED := "DENIED"
@@ -272,6 +273,20 @@ var color_filter := 0
 ## Reduced Motion: animations off (HallFx.reduce_motion mirrors it). Saved by HallSettings.
 var reduce_motion := false
 
+# ---- the save file (HallSave)
+
+## True when this hall reads and writes the save file: only when it's the
+## game itself (the scene root). A playtest scenario wraps the hall in its own
+## scene, so its preset day never loads or overwrites the player's real run.
+var uses_save_file := false
+## True when start-up brought back a saved run (no Welcome card, a welcome-back toast).
+var is_resumed_run := false
+## While End Day's dusk falls, the report (or credits) about to show:
+## {"shown_report": Dictionary} or {"shown_credits": Dictionary,
+## "previous_report": Dictionary}. HallSave saves them as already showing, so
+## closing the game mid-dusk can't replay the night. {} the rest of the time.
+var night_save := {}
+
 # ---- motion
 
 ## One-shot hints from an action to the rows the next refresh rebuilds, so the
@@ -355,6 +370,13 @@ func _ready() -> void:
 	# the tutorial coach goes on top of everything; on Day 1 it replaces the Welcome card
 	tutorial = OverlayTutorial.new()
 	tutorial.name = "OverlayTutorial"
+
+	# a saved run comes back before Pip's setup, which picks its script from the day
+	uses_save_file = get_parent() == get_tree().root
+	if uses_save_file:
+		HallSave.request_persistent_storage()
+		is_resumed_run = HallSave.load_run(self)
+
 	add_child(tutorial)
 	tutorial.setup(self)
 
@@ -365,7 +387,13 @@ func _ready() -> void:
 	run_logger.setup(self)
 
 	_load_settings()
-	_generate_quests()
+	if is_resumed_run:
+		# the saved Board, For Hire and Shop are already back
+		is_welcome_open = false
+		show_toast(TOAST_WELCOME_BACK % GameState.day)
+		tutorial.resume_today()
+	else:
+		_generate_quests()
 	refresh()
 	# a playtest scenario can start already stuck. Deferred: the scenario
 	# builds its roster in its own _ready, which runs after this one
@@ -1123,12 +1151,17 @@ func end_day() -> void:
 		_show_final_credits(final_results[0], report)
 		return
 
+	# the dice are rolled: save the night now, with its report as already showing
+	night_save = {"shown_report": report}
+	save_now()
+
 	var show_report := func() -> void:
 		is_night_falling = false
 		is_end_check_open = false
 		training_picker_open = false
 		active_screen = {}
 		shown_report = report
+		night_save = {}
 		queue_refresh()
 		tutorial_event.emit("end_day", results)
 	HallFx.curtain(fx_layer, DUSK_INK, show_report, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
@@ -1141,15 +1174,20 @@ func end_day() -> void:
 func _show_final_credits(result: Dictionary, report: Dictionary) -> void:
 	var credits := build_credits(result)
 	final_battle_lost = not credits.won
+	var kept_report := report.duplicate()
+	kept_report.starts_next_day = false
+	# the battle is decided: save it now, with the credits as already rolling
+	night_save = {"shown_credits": credits, "previous_report": kept_report}
+	save_now()
 	var show_credits := func() -> void:
 		is_night_falling = false
 		is_end_check_open = false
 		is_menu_open = false
 		training_picker_open = false
 		active_screen = {}
-		previous_report = report.duplicate()
-		previous_report.starts_next_day = false
+		previous_report = kept_report
 		shown_credits = credits
+		night_save = {}
 		if tutorial and tutorial.is_running():
 			tutorial.skip_tutorial()
 		queue_refresh()
@@ -1219,10 +1257,15 @@ func _check_run_over() -> void:
 	tutorial_event.emit("game_over", run_over_stats)
 
 
-## The Game Over ledger's "Found a New Guild" button: every autoload goes back
-## to a fresh Day 1, then the hall scene is loaded again (which resets this
-## script's state, the Welcome card and Pip).
+## The Game Over ledger's "Found a New Guild" button (and the Menu's Abandon
+## run): the saved run is deleted, every autoload goes back to a fresh Day 1,
+## then the hall scene is loaded again (which resets this script's state, the
+## Welcome card and Pip).
 func start_new_run() -> void:
+	if uses_save_file:
+		HallSave.delete_save()
+		# this hall is on its way out: the refresh its resets queue mustn't save a half-reset run
+		uses_save_file = false
 	GameState.reset()
 	GuildUpgrades.reset()
 	ItemContainer.owned_items.clear()
@@ -1295,6 +1338,23 @@ func refresh() -> void:
 	_refresh_overlays()
 	# every rebuilt row has read its hint by now
 	pending_fx.clear()
+	# every action ends in a refresh, so this is the autosave (an unchanged run isn't rewritten)
+	save_now()
+
+
+## Write the run to the save file now (HallSave.save_run skips it if nothing
+## changed). Does nothing for a playtest scenario (see uses_save_file).
+func save_now() -> void:
+	if uses_save_file and is_inside_tree():
+		HallSave.save_run(self)
+
+
+## The app is going to the background or closing (a phone's home button, a
+## hidden browser tab): save now, in case it never comes back.
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_WM_CLOSE_REQUEST]:
+		if is_node_ready():
+			save_now()
 
 # ---- content (tabs and screens)
 
