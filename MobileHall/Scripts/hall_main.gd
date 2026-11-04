@@ -1336,6 +1336,9 @@ func refresh() -> void:
 	_action_bar.refresh()
 	_nav.refresh()
 	_refresh_overlays()
+	# rows were just rebuilt: let every card and button in a scroll list pass
+	# touches through, so the lists drag-scroll from anywhere on a phone
+	DragScroll.fix_tree(self)
 	# every rebuilt row has read its hint by now
 	pending_fx.clear()
 	# every action ends in a refresh, so this is the autosave (an unchanged run isn't rewritten)
