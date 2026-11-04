@@ -70,11 +70,11 @@ func returnName(questType: int) -> String:
 	var location = ""
 	var searchArray = dungeonNames
 	match questType:
-			1:
+			1, 5:
 				searchArray = dungeonNames
-			2:
+			2, 6, 8:
 				searchArray = escortLocations
-			3:
+			3, 7:
 				searchArray = explorationAreas
 			4:
 				searchArray = intelTargets

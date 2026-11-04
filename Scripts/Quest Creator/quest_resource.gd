@@ -16,11 +16,15 @@ enum QuestDifficulty {
 }
 
 enum QuestType {
-	#skip 0 for now
+	MiscNoBonus = 0,
 	DungeonClear = 1,
 	Escort = 2,
 	ScoutTerrain = 3,
 	GatherIntel = 4,
+	EliminateMonsters = 5,
+	DefendLocation = 6,
+	SearchForResources = 7,
+	RepresentTheGuild = 8,
 }
 
 enum FavoredStat {
@@ -36,7 +40,6 @@ enum FavoredStat {
 var numAdventurers: int
 var maxAdventurers: int
 var goldReward: int
-#var for statReward if applicable
 
 var location: String
 var regionNum: int:
@@ -93,7 +96,7 @@ func _init(diff := 0, dayNum := 0) -> void:
 	else:
 		maxAdventurers = randi_range(1, 3)
 	regionNum = randi_range(0, 3)
-	questNum = randi_range(0, 7)
+	questNum = randi_range(0, 15)
 	type = ExternalContentContainer.get_Quest_Story(questNum, 0).to_int()
 	location = QuestManager.world_regions[regionNum].returnName(type)
 	print(regionNum, " ", location)
@@ -104,34 +107,62 @@ func _init(diff := 0, dayNum := 0) -> void:
 		goldReward = 150 + (175 * difficulty)
 
 	match type:
-		1:
+		1, 5:
 			favStat = FavoredStat.Power
-			match randi_range(0, 1):
-				0:
-					questTitle = str("Raid the ", location)
-				1:
-					questTitle = str("Storm the ", location)
-		2:
+			if (type == 1):
+				match randi_range(0, 1):
+					0:
+						questTitle = str("Raid the ", location)
+					1:
+						questTitle = str("Storm the ", location)
+			else:
+				match randi_range(0, 1):
+					0:
+						questTitle = str("Clear out monsters at the ", location)
+					1:
+						questTitle = str("Eliminate monsters at the ", location)
+		2, 6:
 			favStat = FavoredStat.Defense
-			match randi_range(0, 1):
-				0:
-					questTitle = str("Protect a client on their journey to ", location)
-				1:
-					questTitle = str("Escort a client to ", location)
-		3:
+			if (type == 2):
+				match randi_range(0, 1):
+					0:
+						questTitle = str("Protect a client on their journey to ", location)
+					1:
+						questTitle = str("Escort a client to ", location)
+			else:
+				match randi_range(0, 1):
+					0:
+						questTitle = str("Defend ", location, " from attack")
+					1:
+						questTitle = str("Protect ", location, " from attack")
+		3, 7:
 			favStat = FavoredStat.Wisdom
-			match randi_range(0, 1):
-				0:
-					questTitle = str("Survey ", location)
-				1:
-					questTitle = str("Explore ", location)
-		4:
+			if (type == 3):
+				match randi_range(0, 1):
+					0:
+						questTitle = str("Survey ", location)
+					1:
+						questTitle = str("Explore ", location)
+			else:
+				match randi_range(0, 1):
+					0:
+						questTitle = str("Search for resources in ", location)
+					1:
+						questTitle = str("Seek rare resources in ", location)
+		4, 8:
 			favStat = FavoredStat.Sleaze
-			match randi_range(0, 1):
-				0:
-					questTitle = str("Scour for intel on ", location)
-				1:
-					questTitle = str("Gather information on ", location)
+			if (type == 3):
+				match randi_range(0, 1):
+					0:
+						questTitle = str("Scour for intel on ", location)
+					1:
+						questTitle = str("Gather information on ", location)
+			else:
+				match randi_range(0, 1):
+					0:
+						questTitle = str("Represent the guild at ", location)
+					1:
+						questTitle = str("Speak for the guild at ", location)
 
 	print("")
 	pass

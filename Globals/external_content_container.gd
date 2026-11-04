@@ -111,7 +111,7 @@ func _ready() -> void:
 	monster_test_names.append(MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 1))
 	monster_test_names.append(MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 2))
 
-	for i in range(8):
+	for i in range(16):
 		quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, i))
 
 	for i in range(1):
