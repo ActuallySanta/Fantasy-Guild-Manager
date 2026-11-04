@@ -61,7 +61,7 @@ border width, open the matching `Styles/*.tres` and change its *Texture Margin*.
 | `dash.png` | Dashed underlines (tiles) |
 | `box_on.png`, `box_off.png` | "Show busy" checkbox |
 | `tag_hole.png` | The string hole at the top of each shop price tag |
-| `../shopkeeper.png` | Grizzle on the Shop tab. It covers the 720 x 440 strip under the awning, centred, so anything taller is cropped evenly top and bottom (the top ~66 px sit under the awning) |
+| `Sprites/Shop/shopBackground.png`, `Sprites/Shop/shopkeeper.png` (outside this folder) | Grizzle on the Shop tab: the shop behind him (`Background` in `tab_shop.tscn`) and Grizzle on top (`ShopKeeper`) |
 
 ### Icons: `Art/Icons`
 

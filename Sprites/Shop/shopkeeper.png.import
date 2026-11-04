@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://busj11we3jq70"
-path="res://.godot/imported/shopkeeper.png-e379c7ea76099c7daeeffded3444df64.ctex"
+uid="uid://2pkjqgiqxtys"
+path="res://.godot/imported/shopkeeper.png-4e01cbf505e942fd0d01dfe1ddd7e218.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://MobileHall/Art/shopkeeper.png"
-dest_files=["res://.godot/imported/shopkeeper.png-e379c7ea76099c7daeeffded3444df64.ctex"]
+source_file="res://Sprites/Shop/shopkeeper.png"
+dest_files=["res://.godot/imported/shopkeeper.png-4e01cbf505e942fd0d01dfe1ddd7e218.ctex"]
 
 [params]
 

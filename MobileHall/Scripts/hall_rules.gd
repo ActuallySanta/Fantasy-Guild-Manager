@@ -139,6 +139,17 @@ static func standing_rank_for(standing: int) -> int:
 	return clampi(ceili(float(standing) / STANDING_PER_RANK) - 1, 0, TOP_STANDING_RANK)
 
 
+## Standing a won quest pays: one more than its rank (F = 1, E = 2, ...).
+static func standing_for_win(quest: CreatedQuest) -> int:
+	return quest.difficulty + 1
+
+
+## Standing lost for denying a quest: its rank, but never less than 1, so
+## even an F-Rank quest costs something to turn down.
+static func standing_for_deny(quest: CreatedQuest) -> int:
+	return maxi(quest.difficulty, 1)
+
+
 ## A normally distributed random number (Box-Muller transform).
 ## mean: the center; standard_deviation: the spread. Returns the sample.
 static func rand_bell_curve(mean: float = 0.0, standard_deviation: float = 1.0) -> float:
@@ -217,7 +228,7 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 		story = entry.quest.generateResults(party, chance)
 	var succeeded: bool = DayBar._did_succeed(story)
 	var gold_earned: int = DayBar._get_gold_earned(entry.quest, succeeded)
-	var standing_earned: int = entry.quest.difficulty + 1 if succeeded else 0
+	var standing_earned: int = standing_for_win(entry.quest) if succeeded else 0
 	GameState.add_gold(gold_earned)
 	GameState.add_standing(standing_earned)
 
