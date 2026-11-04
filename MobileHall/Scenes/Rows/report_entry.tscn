@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.svg" id="3_skull"]
 
 [node name="ReportEntry" type="PanelContainer"]
+mouse_filter = 1
 theme_type_variation = &"PaperCard"
 script = ExtResource("1_entry")
 

@@ -206,6 +206,13 @@ milestone day, release cost, dusk timings). Quests per day and quest ranks are i
 `hall_rules.gd`, toast time in `hall_toast.gd`. Screens call its actions and never change
 game state themselves.
 
+Anything that sits inside a ScrollContainer must let touches through, or a drag that
+starts on it won't scroll on a phone. `PanelContainer` and `Button` default to Mouse
+Filter **Stop**, which swallows the drag. A card you can tap extends `TapPanel`
+(`Scripts/tap_panel.gd`). A plain card gets Mouse Filter **Pass** on its root and on any
+inner panel. A large Button that fills the list (like the shop tile) gets Pass plus the
+same tap-vs-drag check as `TapPanel`, so scrolling across it doesn't press it.
+
 ## Known issues (in the game systems, not changed here)
 
 - Dead adventurers are shown greyed out and can't be picked in this UI, but the game
