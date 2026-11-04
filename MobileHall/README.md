@@ -208,10 +208,13 @@ game state themselves.
 
 Anything that sits inside a ScrollContainer must let touches through, or a drag that
 starts on it won't scroll on a phone. `PanelContainer` and `Button` default to Mouse
-Filter **Stop**, which swallows the drag. A card you can tap extends `TapPanel`
-(`Scripts/tap_panel.gd`). A plain card gets Mouse Filter **Pass** on its root and on any
-inner panel. A large Button that fills the list (like the shop tile) gets Pass plus the
-same tap-vs-drag check as `TapPanel`, so scrolling across it doesn't press it.
+Filter **Stop**, which swallows the drag. `hall_main.refresh()` ends with
+`DragScroll.fix_tree(self)` (`Scripts/drag_scroll.gd`), which sets every Stop control
+inside a scroll list to **Pass**. Buttons there also get a tap-vs-drag check, so a scroll
+that starts on a button scrolls instead of pressing it. A row you can tap extends
+`TapPanel` (`Scripts/tap_panel.gd`); a tap on a button inside it belongs to the button,
+not the row. Something built outside a refresh, inside a scroll list, needs its own
+`DragScroll.fix_tree(...)` call.
 
 ## Known issues (in the game systems, not changed here)
 
