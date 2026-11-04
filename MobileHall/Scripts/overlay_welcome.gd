@@ -14,7 +14,7 @@ const BUTTON_CLOSE := "Close"
 ## Share of the screen height a page may fill before it scrolls.
 const MAX_PAGE_HEIGHT := 0.62
 
-const ICONS := "res://MobileHall/Art/Icons/%s.svg"
+const ICONS := "res://MobileHall/Art/Icons/%s.tres"
 
 ## Topics after Basics. Each row: [icon file, heading, body].
 const TOPICS := [

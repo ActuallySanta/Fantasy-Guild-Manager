@@ -374,29 +374,29 @@ static func buildings_in_order() -> Array:
 ## tinted; swap any file for your own art (keep it white to keep the tinting).
 ## Names not listed here have no icon, so it's hidden.
 const ICON_FILES := {
-	"coins": "uid://baflbvuj3ew0p",  # MobileHall/Art/Icons/coins.svg
-	"shield": "uid://b7f3ai3fc4j6r",  # MobileHall/Art/Icons/shield.svg
-	"person": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.svg
-	"bed": "uid://ih4xtkgfq1o8",  # MobileHall/Art/Icons/bed.svg
-	"swords": "uid://ce33qlc0iebc7",  # MobileHall/Art/Icons/swords.svg
-	"chest": "uid://dcn1cfg46tkrb",  # MobileHall/Art/Icons/chest.svg
-	"scroll": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.svg
-	"x": "uid://ealg7qhxhkmi",  # MobileHall/Art/Icons/x.svg
-	"back": "uid://c2nc04lk4jmw3",  # MobileHall/Art/Icons/arrow_left.svg
-	"check": "uid://xecbrm0mx34l",  # MobileHall/Art/Icons/check.svg
-	"diamond": "uid://b2bcm5mk7g15t",  # MobileHall/Art/Icons/diamond.svg
-	"diamond_empty": "uid://dkis35yrvae8t",  # MobileHall/Art/Icons/diamond_empty.svg
-	"target": "uid://c328bo4vnwlwo",  # MobileHall/Art/Icons/target.svg
-	"cross": "uid://d1p0h336y6eev",  # MobileHall/Art/Icons/cross.svg
-	"quill": "uid://bbkg4p4knjkde",  # MobileHall/Art/Icons/quill.svg
-	"skull": "uid://dv4aeys4diph4",  # MobileHall/Art/Icons/skull.svg
-	"heart": "uid://dbq8w0d0gocej",  # MobileHall/Art/Icons/heart.svg
-	"stall": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.svg
-	"nav_settings": "uid://ysb0ogcuiwff",  # MobileHall/Art/Icons/gear.svg
-	"nav_quests": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.svg
-	"nav_characters": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.svg
-	"nav_upgrades": "uid://cjywbau63ujgi",  # MobileHall/Art/Icons/hammer.svg
-	"nav_shop": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.svg
+	"coins": "uid://baflbvuj3ew0p",  # MobileHall/Art/Icons/coins.tres
+	"shield": "uid://b7f3ai3fc4j6r",  # MobileHall/Art/Icons/shield.tres
+	"person": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.tres
+	"bed": "uid://ih4xtkgfq1o8",  # MobileHall/Art/Icons/bed.tres
+	"swords": "uid://ce33qlc0iebc7",  # MobileHall/Art/Icons/swords.tres
+	"chest": "uid://dcn1cfg46tkrb",  # MobileHall/Art/Icons/chest.tres
+	"scroll": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.tres
+	"x": "uid://ealg7qhxhkmi",  # MobileHall/Art/Icons/x.tres
+	"back": "uid://c2nc04lk4jmw3",  # MobileHall/Art/Icons/arrow_left.tres
+	"check": "uid://xecbrm0mx34l",  # MobileHall/Art/Icons/check.tres
+	"diamond": "uid://b2bcm5mk7g15t",  # MobileHall/Art/Icons/diamond.tres
+	"diamond_empty": "uid://dkis35yrvae8t",  # MobileHall/Art/Icons/diamond_empty.tres
+	"target": "uid://c328bo4vnwlwo",  # MobileHall/Art/Icons/target.tres
+	"cross": "uid://d1p0h336y6eev",  # MobileHall/Art/Icons/cross.tres
+	"quill": "uid://bbkg4p4knjkde",  # MobileHall/Art/Icons/quill.tres
+	"skull": "uid://dv4aeys4diph4",  # MobileHall/Art/Icons/skull.tres
+	"heart": "uid://dbq8w0d0gocej",  # MobileHall/Art/Icons/heart.tres
+	"stall": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.tres
+	"nav_settings": "uid://ysb0ogcuiwff",  # MobileHall/Art/Icons/gear.tres
+	"nav_quests": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.tres
+	"nav_characters": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.tres
+	"nav_upgrades": "uid://cjywbau63ujgi",  # MobileHall/Art/Icons/hammer.tres
+	"nav_shop": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.tres
 }
 
 ## Loaded icon textures by uid, so each file is only loaded once.

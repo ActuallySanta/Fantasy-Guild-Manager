@@ -5,7 +5,7 @@
 [ext_resource type="StyleBox" uid="uid://1371ec6b7611" path="res://MobileHall/Styles/action_bar.tres" id="3_bar"]
 [ext_resource type="Texture2D" uid="uid://2pkjqgiqxtys" path="res://Sprites/Shop/shopkeeper.png" id="3_tmxhf"]
 [ext_resource type="Texture2D" uid="uid://4x4uklt6lg6v" path="res://MobileHall/Art/Textures/awning.png" id="4_awning"]
-[ext_resource type="Texture2D" uid="uid://baflbvuj3ew0p" path="res://MobileHall/Art/Icons/coins.svg" id="5_coins"]
+[ext_resource type="Texture2D" uid="uid://baflbvuj3ew0p" path="res://MobileHall/Art/Icons/coins.tres" id="5_coins"]
 
 [node name="TabShop" type="VBoxContainer" unique_id=146077538]
 theme_override_constants/separation = 0

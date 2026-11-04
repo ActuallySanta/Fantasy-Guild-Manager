@@ -1,0 +1,8 @@
+[gd_resource type="Texture2D" script_class="PixelIcon" format=3 uid="uid://cb420nxynjehg"]
+
+[ext_resource type="Script" uid="uid://1s5us13m2q1v" path="res://MobileHall/Scripts/pixel_icon.gd" id="1_icon"]
+[ext_resource type="Texture2D" uid="uid://bah6wddf7mblk" path="res://MobileHall/Art/Icons/scroll.png" id="2_art"]
+
+[resource]
+script = ExtResource("1_icon")
+source = ExtResource("2_art")

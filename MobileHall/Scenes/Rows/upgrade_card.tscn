@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://bsodxki3j2b0o"]
 
 [ext_resource type="Script" uid="uid://c4b6ejc73tjii" path="res://MobileHall/Scripts/upgrade_card.gd" id="1_upgrade"]
-[ext_resource type="Texture2D" uid="uid://ce33qlc0iebc7" path="res://MobileHall/Art/Icons/swords.svg" id="2_icon"]
-[ext_resource type="Texture2D" uid="uid://b2bcm5mk7g15t" path="res://MobileHall/Art/Icons/diamond.svg" id="3_diamond"]
+[ext_resource type="Texture2D" uid="uid://ce33qlc0iebc7" path="res://MobileHall/Art/Icons/swords.tres" id="2_icon"]
+[ext_resource type="Texture2D" uid="uid://b2bcm5mk7g15t" path="res://MobileHall/Art/Icons/diamond.tres" id="3_diamond"]
 [ext_resource type="Texture2D" uid="uid://bqjjx2xnallqq" path="res://MobileHall/Art/Textures/dash.png" id="4_dash"]
-[ext_resource type="Texture2D" uid="uid://baflbvuj3ew0p" path="res://MobileHall/Art/Icons/coins.svg" id="5_coins"]
+[ext_resource type="Texture2D" uid="uid://baflbvuj3ew0p" path="res://MobileHall/Art/Icons/coins.tres" id="5_coins"]
 [ext_resource type="Texture2D" uid="uid://djwbyqk4uhihw" path="res://MobileHall/Art/Textures/pin.png" id="6_pin"]
 
 [node name="UpgradeCard" type="PanelContainer"]

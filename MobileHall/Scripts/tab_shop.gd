@@ -8,7 +8,8 @@
 ## The goods come from the ItemShop autoload (generated items, new stock every
 ## dawn). Bought items go into the guild's pack; heroes equip them from their
 ## own page (screen_character.gd, Gear section).
-## The keeper art (MobileHall/Art/shopkeeper_placeholder.svg) is stand-in art.
+## The keeper art is two layers in the scene: Sprites/Shop/shopBackground.png
+## (Background) with Sprites/Shop/shopkeeper.png (ShopKeeper) drawn over it.
 ## Which item is picked is view state only, kept here.
 ## Scene: MobileHall/Scenes/Tabs/tab_shop.tscn
 extends VBoxContainer
