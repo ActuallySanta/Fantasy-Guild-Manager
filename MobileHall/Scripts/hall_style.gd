@@ -375,6 +375,7 @@ static func buildings_in_order() -> Array:
 ## Names not listed here have no icon, so it's hidden.
 const ICON_FILES := {
 	"coins": "uid://baflbvuj3ew0p",  # MobileHall/Art/Icons/coins.svg
+	"shield": "uid://b7f3ai3fc4j6r",  # MobileHall/Art/Icons/shield.svg
 	"person": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.svg
 	"bed": "uid://ih4xtkgfq1o8",  # MobileHall/Art/Icons/bed.svg
 	"swords": "uid://ce33qlc0iebc7",  # MobileHall/Art/Icons/swords.svg

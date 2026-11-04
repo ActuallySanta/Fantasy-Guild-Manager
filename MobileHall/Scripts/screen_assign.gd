@@ -36,6 +36,7 @@ const WRIT_STAMP_TILT := -0.16
 # Quest writ
 const TEXT_TYPE := "%s · Rank %s"
 const TEXT_GOLD := "%d gold"
+const TEXT_STANDING := "+%d standing"
 const TEXT_PARTY_SIZE := "Up to %d"
 const TEXT_PARTY_SIZE_SOLO := "Solo"
 const TEXT_FAVORED := "Favors %s"
@@ -62,6 +63,10 @@ const BUTTON_SHOW_BUSY := "Show busy"
 const NO_ROSTER := "You have no adventurers yet."
 # Footer
 const BUTTON_DENY := "Deny"
+## Inside the shield on the Deny button: the standing denying costs.
+const TEXT_DENY_COST := "-%d"
+## Room kept on the Deny button's right for the shield.
+const DENY_COST_ROOM := 64.0
 const BUTTON_SEND := "Seal & send %s"
 const BUTTON_SEND_PARTY := "Seal & send party"
 const BUTTON_SEND_EMPTY := "Pin someone first"
@@ -79,6 +84,7 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _type_label: Label = %TypeLabel
 @onready var _title: Label = %Title
 @onready var _gold_chip = %GoldChip           # chip.gd
+@onready var _standing_chip = %StandingChip   # chip.gd
 @onready var _party_size_chip = %SlotsChip    # chip.gd
 @onready var _favored_chip = %FavChip         # chip.gd
 @onready var _quest_card: PanelContainer = $Scroll/Margin/Col/Writ/WritMargin/QuestCard
@@ -101,6 +107,8 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _hire_button: Button = %HireButton
 # Footer (left = wood, right = the wax-sealed button)
 @onready var _left_button: Button = %LeftButton
+@onready var _deny_cost: Control = %DenyCost
+@onready var _deny_cost_value: Label = %DenyCostValue
 @onready var _right_button: Button = %RightButton
 
 ## The main hall script (state + actions), set in setup().
@@ -123,6 +131,19 @@ func setup(main: HallMain) -> void:
 	_show_busy_toggle.toggled.connect(hall.set_show_busy_adventurers)
 	_show_busy_toggle.text = BUTTON_SHOW_BUSY
 	_back_button.text = BUTTON_BOARD
+	_make_room_for_deny_cost()
+
+
+## The Deny button's shield sits on its right edge: pad every look of the
+## button on that side so the "Deny" text never runs under it.
+func _make_room_for_deny_cost() -> void:
+	for look in ["normal", "hover", "pressed", "disabled", "focus"]:
+		var box := _left_button.get_theme_stylebox(look)
+		if box == null:
+			continue
+		box = box.duplicate()
+		box.content_margin_right = maxf(box.content_margin_right, 0.0) + DENY_COST_ROOM
+		_left_button.add_theme_stylebox_override(look, box)
 
 
 func scroll_to_top() -> void:
@@ -163,12 +184,9 @@ func _show_quest_card(entry: Dictionary) -> void:
 	HallStyle.set_font_color(_type_label, type_info.color)
 	_title.text = quest.questTitle
 
-	# chips: reward, party size, favored stat
-	# item quests pay pre-rolled equipment instead of gold: show the count and rarities
-	if quest.pays_in_items():
-		_gold_chip.set_chip(HallStyle.item_reward_text(quest), HallStyle.BLUE_BG, HallStyle.BLUE_TEXT, "chest")
-	else:
-		_gold_chip.set_chip(TEXT_GOLD % quest.goldReward, HallStyle.GOLD_BG, HallStyle.TEXT_MAIN, "coins")
+	# chips: reward (gold, standing on a win), party size, favored stat
+	_gold_chip.set_chip(TEXT_GOLD % quest.goldReward, HallStyle.GOLD_BG, HallStyle.TEXT_MAIN, "coins")
+	_standing_chip.set_chip(TEXT_STANDING % HallRules.standing_for_win(quest), HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "shield")
 	var size_text := TEXT_PARTY_SIZE_SOLO if size_limit == 1 else TEXT_PARTY_SIZE % size_limit
 	_party_size_chip.set_chip(size_text, HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "person")
 	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_stat_index(quest)]
@@ -317,13 +335,14 @@ func _show_picker(entry: Dictionary) -> void:
 # ---- footer
 
 ## Left / right footer buttons depend on the quest's state:
-##   open   -> Deny | Seal & send <name>
+##   open   -> Deny [shield -N] | Seal & send <name>
 ##   sent   -> Recall | Next Quest (or Board when nothing's left to decide)
 ##   denied -> Board | Reconsider
 ## The left button is always wood; the right one is the wax-sealed button.
 func _show_footer(entry: Dictionary) -> void:
 	_right_button.disabled = false
 	_left_button.icon = null
+	_deny_cost.visible = false
 	match entry.state:
 		HallStyle.QUEST_STATE_SENT:
 			_left_button.text = BUTTON_RECALL
@@ -334,6 +353,8 @@ func _show_footer(entry: Dictionary) -> void:
 		_:
 			_left_button.text = BUTTON_DENY
 			_left_button.icon = HallStyle.icon_texture("x")
+			_deny_cost_value.text = TEXT_DENY_COST % HallRules.standing_for_deny(entry.quest)
+			_deny_cost.visible = true
 			if entry.party.is_empty():
 				_right_button.text = BUTTON_SEND_EMPTY
 			elif entry.party.size() == 1:

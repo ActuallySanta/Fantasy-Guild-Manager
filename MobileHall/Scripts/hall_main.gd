@@ -131,8 +131,8 @@ const VIEW_FADE_SECONDS := 0.14
 
 # ---- toasts
 const TOAST_SENT := "Party sent: %s"
-const TOAST_DENIED := "Denied: %s"
-const TOAST_RECALLED := "Party recalled"
+const TOAST_DENIED := "Denied: %s (-%d standing)"
+const TOAST_RECALLED := "Party recalled. Your picks are kept."
 const TOAST_RECONSIDER := "Back on the board: %s"
 const TOAST_MOVED := "%s moved from %s"
 const TOAST_PARTY_FULL := "Party is full"
@@ -758,10 +758,10 @@ func deny_quest() -> void:
 		return
 	entry.party.clear()
 	entry.state = HallStyle.QUEST_STATE_DENIED
-	if entry.quest.difficulty > 0:
-		_header.pay_fx("standing")
-	GameState.reduce_standing(entry.quest.difficulty)
-	show_toast(TOAST_DENIED % entry.quest.questTitle)
+	var standing_cost := HallRules.standing_for_deny(entry.quest)
+	_header.pay_fx("standing")
+	GameState.reduce_standing(standing_cost)
+	show_toast(TOAST_DENIED % [entry.quest.questTitle, standing_cost])
 	_screens[SCREEN_ASSIGN].shake_writ()
 	HallFx.stamp_mark(fx_layer, _screens[SCREEN_ASSIGN].stamp_point(), STAMP_DENIED, HallStyle.RED, STAMP_HOLD_SECONDS)
 	_hold_then_move_on()
