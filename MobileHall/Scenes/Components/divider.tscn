@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://0ruw74gtfe6k"]
 
-[ext_resource type="Texture2D" uid="uid://b2bcm5mk7g15t" path="res://MobileHall/Art/Icons/diamond.svg" id="1_diamond"]
+[ext_resource type="Texture2D" uid="uid://b2bcm5mk7g15t" path="res://MobileHall/Art/Icons/diamond.tres" id="1_diamond"]
 
 [node name="Divider" type="HBoxContainer"]
 mouse_filter = 2

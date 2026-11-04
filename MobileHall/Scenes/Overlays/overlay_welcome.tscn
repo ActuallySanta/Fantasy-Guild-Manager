@@ -2,10 +2,10 @@
 
 [ext_resource type="Script" uid="uid://dam4bq8y7a4o6" path="res://MobileHall/Scripts/overlay_welcome.gd" id="1_k3hm8"]
 [ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_rqmg6"]
-[ext_resource type="Texture2D" uid="uid://cb420nxynjehg" path="res://MobileHall/Art/Icons/scroll.svg" id="4_twoe2"]
-[ext_resource type="Texture2D" uid="uid://cv5023acxlou6" path="res://MobileHall/Art/Icons/person.svg" id="5_d3ton"]
-[ext_resource type="Texture2D" uid="uid://cjywbau63ujgi" path="res://MobileHall/Art/Icons/hammer.svg" id="6_qmqxm"]
-[ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.svg" id="7_skull"]
+[ext_resource type="Texture2D" uid="uid://cb420nxynjehg" path="res://MobileHall/Art/Icons/scroll.tres" id="4_twoe2"]
+[ext_resource type="Texture2D" uid="uid://cv5023acxlou6" path="res://MobileHall/Art/Icons/person.tres" id="5_d3ton"]
+[ext_resource type="Texture2D" uid="uid://cjywbau63ujgi" path="res://MobileHall/Art/Icons/hammer.tres" id="6_qmqxm"]
+[ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.tres" id="7_skull"]
 
 [node name="OverlayWelcome" type="Control" unique_id=1913149125]
 layout_mode = 3

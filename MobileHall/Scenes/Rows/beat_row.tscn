@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://nm3rjurnk3x2"]
 
 [ext_resource type="Script" uid="uid://b217255da2e7w" path="res://MobileHall/Scripts/beat_row.gd" id="1_beat"]
-[ext_resource type="Texture2D" uid="uid://cb420nxynjehg" path="res://MobileHall/Art/Icons/scroll.svg" id="2_icon"]
+[ext_resource type="Texture2D" uid="uid://cb420nxynjehg" path="res://MobileHall/Art/Icons/scroll.tres" id="2_icon"]
 
 [node name="BeatRow" type="HBoxContainer"]
 theme_override_constants/separation = 14

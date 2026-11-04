@@ -95,7 +95,7 @@ const GOLD := "[color=#6B5A1E]gold[/color]"
 const PORTRAIT_MASK := preload("uid://buv1wa6etd3u3")  # MobileHall/Art/Textures/portrait_round_mask.png
 const PORTRAIT_FRAME := preload("uid://cscfv0x0mk446")  # MobileHall/Art/Textures/portrait_round_frame.png
 ## The pointer is the pixel arrow icon (it points left; it's turned to point up / down).
-const ARROW_ICON := preload("uid://c2nc04lk4jmw3")  # MobileHall/Art/Icons/arrow_left.svg
+const ARROW_ICON := preload("uid://c2nc04lk4jmw3")  # MobileHall/Art/Icons/arrow_left.tres
 ## Ground behind Pip inside the frame (a parchment tint).
 const PIP_GROUND := Color("#E9DEC4")
 

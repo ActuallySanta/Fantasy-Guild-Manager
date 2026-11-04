@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://ca70e6ixyakqm"]
 
 [ext_resource type="Script" uid="uid://dxe8tbqykou4m" path="res://MobileHall/Scripts/hall_nav.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://cb420nxynjehg" path="res://MobileHall/Art/Icons/scroll.svg" id="25_board"]
-[ext_resource type="Texture2D" uid="uid://cv5023acxlou6" path="res://MobileHall/Art/Icons/person.svg" id="27_guild"]
-[ext_resource type="Texture2D" uid="uid://cjywbau63ujgi" path="res://MobileHall/Art/Icons/hammer.svg" id="28_upgrades"]
-[ext_resource type="Texture2D" uid="uid://du8qg2ro1ddxi" path="res://MobileHall/Art/Icons/stall.svg" id="29_shop"]
+[ext_resource type="Texture2D" uid="uid://cb420nxynjehg" path="res://MobileHall/Art/Icons/scroll.tres" id="25_board"]
+[ext_resource type="Texture2D" uid="uid://cv5023acxlou6" path="res://MobileHall/Art/Icons/person.tres" id="27_guild"]
+[ext_resource type="Texture2D" uid="uid://cjywbau63ujgi" path="res://MobileHall/Art/Icons/hammer.tres" id="28_upgrades"]
+[ext_resource type="Texture2D" uid="uid://du8qg2ro1ddxi" path="res://MobileHall/Art/Icons/stall.tres" id="29_shop"]
 [ext_resource type="FontVariation" uid="uid://b7dyj081fpsg2" path="res://MobileHall/Art/Fonts/font_title.tres" id="5_title"]
 
 [node name="Nav" type="PanelContainer" unique_id=1524568463]

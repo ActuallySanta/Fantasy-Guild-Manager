@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://ctiyuxdww3u5j"]
 
 [ext_resource type="Script" uid="uid://bcpgb8nxlfyed" path="res://MobileHall/Scripts/hall_header.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.svg" id="38_skull"]
+[ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.tres" id="38_skull"]
 [ext_resource type="FontVariation" uid="uid://byfd5ncwh8y08" path="res://MobileHall/Art/Fonts/font_bold.tres" id="5_title"]
 [ext_resource type="Texture2D" uid="uid://ckv2l6r1wpg1p" path="res://MobileHall/Art/Textures/coin.png" id="6_coin"]
 [ext_resource type="Texture2D" uid="uid://dq7yxvfputc03" path="res://MobileHall/Art/Textures/shield.png" id="7_shield"]
-[ext_resource type="Texture2D" uid="uid://ysb0ogcuiwff" path="res://MobileHall/Art/Icons/gear.svg" id="8_gear"]
+[ext_resource type="Texture2D" uid="uid://ysb0ogcuiwff" path="res://MobileHall/Art/Icons/gear.tres" id="8_gear"]
 
 [node name="Header" type="VBoxContainer" unique_id=1201068063]
 layout_mode = 2

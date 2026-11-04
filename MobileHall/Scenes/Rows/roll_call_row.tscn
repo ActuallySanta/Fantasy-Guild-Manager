@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://bqn0i28l67um7"]
 
 [ext_resource type="Script" uid="uid://d25j0wv2m448s" path="res://MobileHall/Scripts/roll_call_row.gd" id="1_row"]
-[ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.svg" id="2_skull"]
+[ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.tres" id="2_skull"]
 
 [node name="RollCallRow" type="HBoxContainer"]
 mouse_filter = 2
