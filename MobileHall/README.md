@@ -172,6 +172,42 @@ Looks come from the theme, not from overrides: a label is `TitleLabel`, `CapsLab
 `PaperButton` or `SealButton`. Pick one in the inspector (*Theme > Type Variation*) rather
 than overriding colours or styles on the node, so a reskin reaches it.
 
+## Saving and offline play
+
+The run saves itself. Close the game at any point (the browser tab, the home-screen app,
+or the desktop window), open it again, and the hall picks up where it was with a
+"Welcome back" toast instead of the Welcome card. `Scripts/hall_save.gd` (`HallSave`)
+holds the whole format:
+
+- **When:** after every refresh (every action ends in one), when the app goes to the
+  background, and right after End Day plays the night out. The night's report (or the
+  final battle's credits) is saved as already showing, so closing during the dusk
+  can't replay the night with new dice. An unchanged run isn't written again.
+- **Where:** `user://run_save.dat`, with `run_save.bak` (the save before it). On the web,
+  `user://` is the browser's IndexedDB, and `HallSave` asks the browser to keep it
+  (`navigator.storage.persist()`). Settings stay in their own `user://settings.cfg`.
+- **What:** the day, wallet, buildings, Training Yard and Hospital, roster, For Hire,
+  released heroes, gear, Shop stock, today's Board and parties, the run's tallies, the
+  open report / credits / Game Over, and Pip's progress. Not the open tab or menus.
+  A tutorial day cut off halfway starts again from its first step.
+- **Shared objects:** each hero, item and quest is written once in a numbered table, and
+  everywhere else (parties, training, `curr_user`, reports) holds a reference like
+  `{"$character": 3}`, so a hero in three lists is still one hero after loading.
+- **New fields:** a new `GuildCharacter`, item or `CreatedQuest` property that matters
+  between sessions goes in `CHARACTER_FIELDS` / `ITEM_FIELDS` / `QUEST_FIELDS`. A new
+  piece of run state on `HallMain` or an autoload goes in `build_snapshot` and
+  `apply_snapshot`. Bump `SAVE_VERSION` when old saves can't be read with the new
+  layout: saves with another version are ignored and the player starts fresh.
+- **Starting over:** Game Over's "Found a New Guild" and the Menu's **Abandon run** (two
+  taps) delete the save. Playtest scenarios never load or write it (`uses_save_file` is
+  only true when the hall is the scene root).
+- **Offline:** the Web export is a PWA, so after one online visit the service worker
+  serves the game files with no connection. Its home-screen icons come from the
+  project icon (`icon.svg`) while the preset's icon fields are empty.
+- **iPhone:** a home-screen app has its own storage, separate from Safari. A run started
+  in a Safari tab doesn't carry over to the installed app, and Safari can clear a tab's
+  storage after about a week unused (installed apps are kept).
+
 ## Things to watch in the playtest
 
 - Do players compare quests on the Board, or go straight to Next Quest?
@@ -183,7 +219,7 @@ than overriding colours or styles on the node, so a reskin reaches it.
 ## Files
 
 - `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, refresh
-- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings (static functions, no state)
+- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`, `hall_save.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings, the saved run (static functions, no state)
 - `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip), action bar, nav and toast
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character

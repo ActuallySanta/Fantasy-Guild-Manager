@@ -71,6 +71,14 @@ focus_mode = 0
 theme_override_font_sizes/font_size = 28
 text = "ResetButton"
 
+[node name="AbandonButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "AbandonButton"
+
 [node name="CloseButton" type="Button" parent="Center/Sheet/Col" unique_id=2045574900]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 88)

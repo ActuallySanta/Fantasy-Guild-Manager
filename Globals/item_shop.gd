@@ -32,7 +32,15 @@ var stock: Array[Dictionary] = []
 func _ready() -> void:
 	GameState.day_started.connect(_on_day_started)
 	# deferred so the other autoloads (ExternalContentContainer names items) are ready
-	restock.call_deferred()
+	_first_restock.call_deferred()
+
+
+## The opening stock. A saved run (HallSave.load_run, in HallMain._ready) has
+## already put its own stock on the counter by the time this deferred call
+## runs, so it's only rolled when the counter is still empty.
+func _first_restock() -> void:
+	if stock.is_empty():
+		restock()
 
 
 func _on_day_started(_day: int) -> void:

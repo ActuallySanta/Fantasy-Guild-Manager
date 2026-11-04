@@ -167,9 +167,22 @@ func setup(main: Control) -> void:
 	visible = false
 	set_process(false)
 	hall.tutorial_event.connect(_on_event)
-	if ENABLED and GameState.day == 1:
+	# a run brought back from the save file picks up through resume_today() instead
+	if ENABLED and GameState.day == 1 and not hall.is_resumed_run:
 		hall.is_welcome_open = false
 		start.call_deferred(1)
+
+
+## A saved run was just loaded (HallSave.load_run restored is_skipped and done):
+## if today has a tutorial script that wasn't finished, run it again from its
+## first step. Not while the night's report, the credits or Game Over is up.
+func resume_today() -> void:
+	var day := GameState.day
+	if not ENABLED or is_skipped or not TUTORIAL_DAYS.has(day) or done.get(day, false):
+		return
+	if not (hall.shown_report.is_empty() and hall.shown_credits.is_empty() and hall.run_over_stats.is_empty()):
+		return
+	start.call_deferred(day)
 
 
 ## Tabs held back until the tutorial gets to them.
