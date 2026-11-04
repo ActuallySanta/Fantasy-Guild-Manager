@@ -4,7 +4,8 @@
 ## the player learns by doing instead of reading an intro screen.
 ##   Day 1 - the core loop only: hiring, reading a quest, picking a party,
 ##           Send, End Day, the Day Report
-##   Day 2 - a hero's page (stats, Pluck, gear), odds and Pluck gain, Deny,
+##   Day 2 - a hero's page (stats, Pluck, gear), odds and what a win grows
+##           (a trained stat or Pluck), Deny,
 ##           how the guild can fall (HallMain.is_run_over)
 ##   Day 3 - the Guild tab: upgrading a building, the Training Yard, the
 ##           Hospital, and why posted heroes can't quest
@@ -799,16 +800,18 @@ func _pick_text() -> String:
 	return "Tap heroes to add them. Each row's number is the chance they add."
 
 
-## The Assign Party odds step: risk vs. reward. Riskier quests pay more Pluck
-## on a win. The numbers and odds words come from HallRules.PLUCK_GAIN_BY_ODDS
+## The Assign Party odds step: risk vs. reward. A win at good odds trains the
+## quest's or region's stat; a riskier win grows Pluck instead. The threshold is
+## the open quest's (HallRules.train_odds_for, an F quest's if none is open),
+## and the Pluck numbers and odds word come from HallRules.PLUCK_GAIN_BY_ODDS
 ## and HallStyle.ODDS_BANDS, so the text follows the tuning.
 func _odds_text() -> String:
-	var safest: Dictionary = HallRules.PLUCK_GAIN_BY_ODDS[0]
+	var entry: Dictionary = hall.current_quest_entry()
+	var rank: int = entry.quest.difficulty if not entry.is_empty() else 0
 	var riskiest: Dictionary = HallRules.PLUCK_GAIN_BY_ODDS[-1]
-	var safest_word: String = HallStyle.odds_look(safest.min).word
 	var riskiest_word: String = HallStyle.odds_look(riskiest.min).word
-	return "Riskier wins grow more %s: +%d at %s, up to +%d on a %s." \
-			% [PLK, safest.gain, safest_word, riskiest.gain, riskiest_word]
+	return "Win at %d%%+ to train the quest's or region's stat. Riskier wins grow %s instead, up to +%d on a %s." \
+			% [HallRules.train_odds_for(rank), PLK, riskiest.gain, riskiest_word]
 
 
 func _anyone_can_train() -> bool:
@@ -904,7 +907,7 @@ func _day_two() -> Array:
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"), "on": "character",
 			"do": "Tap a hero", "text": "Tap a hero to open their page."},
 		{"target": func(): return _u(_screen("character"), "StatLines"),
-			"text": "Quests lean on the favoured stat. %s grows with each win and boosts every other stat." % PLK},
+			"text": "Quests lean on the favoured stat. Safe wins train a stat; risky wins grow %s, which boosts every other stat." % PLK},
 		{"target": func(): return _u(_screen("character"), "GearLines"),
 			"text": "Gear slots. Items are role-locked. The Shop opens on Day 5."},
 		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close",
@@ -914,7 +917,7 @@ func _day_two() -> Array:
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
 			"do": "Tap a quest card", "text": "Open a quest."},
 		{"target": func(): return _u(_screen("assign"), "PartyBox"),
-			"text": _odds_text()},
+			"text": func(): return _odds_text()},
 		{"target": func(): return _u(_screen("assign"), "LeftButton"),
 			"text": "[b]Deny[/b] skips a quest for a little standing. You can Reconsider later today."},
 		{"text": "Heroes can [b]die[/b]. Lose them all with no gold to hire, and the guild falls. The rest of today is yours. See you on Day 3!"},

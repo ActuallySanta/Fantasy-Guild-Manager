@@ -29,6 +29,8 @@ const TOP_STANDING_RANK := 5
 const STARTER_STANDING := 5
 ## Pluck each party member gains for winning a quest, by the odds the party
 ## was sent at: the longer the odds, the more they grow from beating them.
+## Only paid on wins under the quest rank's train_odds_for threshold; wins at
+## or above it train a stat instead (TRAIN_STAT_GAIN).
 ## Checked top to bottom: the first row whose `min` chance (percent) the odds
 ## reach is used. The `min`s match HallStyle.ODDS_BANDS, so the gain lines up with
 ## the odds word on Assign Party (Strong odds / Fair odds / Risky / Long shot).
@@ -38,6 +40,16 @@ const PLUCK_GAIN_BY_ODDS := [
 	{"min": 40, "gain": 3},
 	{"min": 0, "gain": 4},
 ]
+## Good-odds threshold (percent success chance) on an F-rank quest: a win sent
+## at or above a rank's threshold trains a stat instead of giving Pluck.
+const TRAIN_ODDS_BASE := 60
+## How much the good-odds threshold rises per quest rank (percent), so harder
+## quests need better odds to train and pay Pluck more often (F 60 .. S 85).
+const TRAIN_ODDS_PER_RANK := 5
+## The rank where the threshold stops rising (S++ uses S's threshold).
+const TRAIN_ODDS_TOP_RANK := CreatedQuest.QuestDifficulty.S
+## Stat points each party member gains in the trained stat on a good-odds win.
+const TRAIN_STAT_GAIN := 1
 ## Rank of the placeholder final quest (a CreatedQuest.QuestDifficulty), until
 ## the real final quest is written (see build_day_quests).
 const FINAL_QUEST_RANK := CreatedQuest.QuestDifficulty.S
@@ -149,16 +161,32 @@ static func pluck_gain_for(chance: float) -> int:
 	return PLUCK_GAIN_BY_ODDS[-1].gain
 
 
+## The good-odds threshold (percent success chance) for a quest of `rank`
+## (a CreatedQuest.QuestDifficulty): TRAIN_ODDS_BASE plus TRAIN_ODDS_PER_RANK
+## per rank, up to TRAIN_ODDS_TOP_RANK.
+static func train_odds_for(rank: int) -> int:
+	return TRAIN_ODDS_BASE + TRAIN_ODDS_PER_RANK * clampi(rank, 0, TRAIN_ODDS_TOP_RANK)
+
+
+## Whether winning a quest of `rank` sent at `chance` percent trains a stat
+## (true) or gives Pluck (false). A party with no chance yet (-1) never trains.
+static func trains_stat(chance: float, rank: int) -> bool:
+	return chance >= train_odds_for(rank)
+
+
 # ============================================================ PLAYING A QUEST
 
 ## Play out one quest with DayBar's helpers and pay its gold and standing into
-## GameState. Party members gain Pluck on a win, found equipment goes into the
-## pack, and the fallen remember where they fell. The run's tallies are left to
-## the caller (hall_main.gd _tally_quest).
+## GameState. On a win the party trains a stat (good odds, see trains_stat) or
+## gains Pluck (riskier odds), found equipment goes into the pack, and the
+## fallen remember where they fell. The run's tallies are left to the caller
+## (hall_main.gd _tally_quest).
 ## entry: a quest entry (see new_entry); day: GameState.day.
 ## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, pluck, injured, died, items, reward_items, milestone, final}
-## (pluck = what each party member gained, 0 on a failure)
+##   {quest, party, story, succeeded, chance, gold, standing, pluck, trained_stat, stat_gain, injured, died, items, reward_items, milestone, final}
+## (pluck = what each party member gained, 0 on a failure or a trained win;
+## trained_stat = the GuildCharacter.StatType index the party trained, -1 if
+## none; stat_gain = how much each party member gained in it)
 ## (injured = the party members whose injury level went up on this quest but
 ## who survived; died = the party members who died on it; items = the
 ## equipment found while searching, already added to the pack; reward_items =
@@ -205,10 +233,21 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 		# refresh gear rows and unworn counts
 		ItemShop.gear_changed.emit()
 
-	# a win raises everyone's Pluck, more for winning against worse odds
-	var pluck_gained := pluck_gain_for(chance) if succeeded else 0
-	for character in party:
-		character.pluck += pluck_gained
+	# A win at good odds for the quest's rank trains one stat for the whole
+	# party (the quest's or the region's favored stat); a riskier win raises
+	# everyone's Pluck instead, more for winning against worse odds.
+	var pluck_gained := 0
+	var trained_stat := -1
+	var stat_gained := 0
+	if succeeded and trains_stat(chance, entry.quest.difficulty):
+		trained_stat = entry.quest.roll_trained_stat()
+		stat_gained = TRAIN_STAT_GAIN
+		for character in party:
+			character.stats[trained_stat] += stat_gained
+	elif succeeded:
+		pluck_gained = pluck_gain_for(chance)
+		for character in party:
+			character.pluck += pluck_gained
 
 	# the dead are listed apart from the hurt, and remember where they fell
 	var injured := []
@@ -230,6 +269,8 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 		"gold": gold_earned,
 		"standing": standing_earned,
 		"pluck": pluck_gained,
+		"trained_stat": trained_stat,
+		"stat_gain": stat_gained,
 		"injured": injured,
 		"died": died,
 		"items": found_items,
