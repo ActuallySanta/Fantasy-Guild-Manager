@@ -42,9 +42,9 @@ const EARNINGS_DELAY := 0.2
 const HEADER_DAY := "%d"
 ## The countdown note (BBCode); the days left are in red ink, and the whole
 ## note turns red once DRAKE_WARNING_DAYS or fewer are left.
-const HEADER_DRAKE := "The Bone Drake wakes in [color=#%s]%d %s[/color]"
-const HEADER_DRAKE_TODAY := "The Bone Drake [color=#%s]attacks today![/color]"
-const HEADER_DRAKE_GONE := "The Bone Drake has come and gone"
+const HEADER_DRAKE := "Bone Drake in [color=#%s]%d %s[/color]"
+const HEADER_DRAKE_TODAY := "Bone Drake [color=#%s]attacks today![/color]"
+const HEADER_DRAKE_GONE := "Bone Drake has passed"
 ## The warning strip under the header (see HallLedger.is_one_death_from_falling).
 ## DANGER_GOLD when gold is the problem, DANGER_STANDING when standing is.
 const DANGER_TITLE := "Last hero standing"

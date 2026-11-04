@@ -135,10 +135,10 @@ const TOAST_DENIED := "Denied: %s (-%d standing)"
 const TOAST_RECALLED := "Party recalled. Your picks are kept."
 const TOAST_RECONSIDER := "Back on the board: %s"
 const TOAST_MOVED := "%s moved from %s"
-const TOAST_PARTY_FULL := "Party is full. Tap someone in it to swap them out."
+const TOAST_PARTY_FULL := "Party is full"
 const TOAST_DEAD := "%s can't go on quests anymore."
 const TOAST_HIRED := "%s joined the guild!"
-const TOAST_ROSTER_FULL := "No room. Upgrade the Barracks for more beds."
+const TOAST_ROSTER_FULL := "No free beds. Upgrade the Barracks."
 const TOAST_RELEASED := "%s left the guild"
 const TOAST_RELEASED_COST := "%s left the guild (-%d standing)"
 const TOAST_UPGRADED := "%s upgraded to level %d!"
@@ -148,21 +148,21 @@ const TOAST_MILESTONE_DAY := "Day %d. The Bone Drake is attacking!"
 const TOAST_FINAL_DAY := "Day %d. The final battle is here!"
 const TOAST_TRAINING := "%s is training %s"
 const TOAST_STOPPED_TRAINING := "%s stopped training"
-const TOAST_SLOTS_FULL := "Every slot is taken. Upgrade the Training Yard for more."
-const TOAST_TOO_HURT := "%s is too hurt to train. Try the Hospital (Guild > Tonight)."
+const TOAST_SLOTS_FULL := "Training slots full"
+const TOAST_TOO_HURT := "%s is too hurt to train"
 const TOAST_ADMITTED := "%s is in a Hospital bed"
 const TOAST_DISCHARGED := "%s went home"
 const TOAST_REVIVED := "%s is back from the dead!"
-const TOAST_REVIVE_NO_BED := "No free bed for %s. Upgrade the Barracks first."
-const TOAST_IN_HOSPITAL := "%s is in the Hospital. Discharge them first."
-const TOAST_IN_TRAINING := "%s is training. Take them out of the Training Yard first."
+const TOAST_REVIVE_NO_BED := "No free bed for %s"
+const TOAST_IN_HOSPITAL := "%s is in the Hospital"
+const TOAST_IN_TRAINING := "%s is training"
 const TOAST_LEFT_QUEST := "%s left %s"
-const TOAST_BOUGHT := "Bought the %s! Equip it from a hero's page."
+const TOAST_BOUGHT := "Bought the %s!"
 const TOAST_CANT_BUY := "Not enough gold for that."
 const TOAST_EQUIPPED := "%s equipped the %s"
 const TOAST_UNEQUIPPED := "%s took off the %s"
 const TOAST_WRONG_ROLE := "Only %ss can use the %s."
-const TOAST_HANDS_FULL := "%s's hands are full. Take something off first."
+const TOAST_HANDS_FULL := "%s's hands are full"
 const TOAST_GEAR_DEAD := "%s can't use gear anymore."
 const TOAST_TAB_LOCKED := "Pip will open this on Day %d."
 
@@ -244,7 +244,7 @@ var final_battle_lost := false
 ##   drake_result: DRAKE_RESULT_NONE | _SLAIN | _LOST
 ##   released:     every GuildCharacter let go this run (Array)
 ##   gold_spent:   gold paid for recruits, buildings, goods and revivals (int)
-##   items_found:  equipment brought back from quests (int)
+##   items_found:  equipment brought back from quests, found or rewarded (int)
 ##   final_result: FINAL_RESULT_NONE | _WON | _LOST
 ##   final_party:  the GuildCharacters sent to the final battle (Array)
 var run_stats := {
@@ -357,6 +357,12 @@ func _ready() -> void:
 	tutorial.name = "OverlayTutorial"
 	add_child(tutorial)
 	tutorial.setup(self)
+
+	# balancing data: a row per day to a CSV and the run-log Google Sheet
+	var run_logger := RunLogger.new()
+	run_logger.name = "RunLogger"
+	add_child(run_logger)
+	run_logger.setup(self)
 
 	_load_settings()
 	_generate_quests()
@@ -508,6 +514,18 @@ func success_chance(entry: Dictionary, party: Array) -> int:
 ## (see HallRules.pluck_gain_for).
 func pluck_gain_for(chance: float) -> int:
 	return HallRules.pluck_gain_for(chance)
+
+
+## Whether winning this quest entry at `chance` percent trains a stat instead
+## of giving Pluck (see HallRules.trains_stat).
+func trains_stat(entry: Dictionary, chance: float) -> bool:
+	return HallRules.trains_stat(chance, entry.quest.difficulty)
+
+
+## The one or two GuildCharacter.StatType indexes a good-odds win on this quest
+## entry can train (see CreatedQuest.trained_stat_options).
+func trained_stat_options(entry: Dictionary) -> Array[int]:
+	return entry.quest.trained_stat_options()
 
 
 ## How many points of success chance this character gives a quest on their own.
@@ -1156,7 +1174,7 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 	if entry.final:
 		run_stats.final_result = FINAL_RESULT_WON if result.succeeded else FINAL_RESULT_LOST
 		run_stats.final_party = entry.party.duplicate()
-	run_stats.items_found += result.items.size()
+	run_stats.items_found += result.items.size() + result.reward_items.size()
 	return result
 
 

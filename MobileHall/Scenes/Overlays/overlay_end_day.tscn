@@ -36,7 +36,7 @@ theme_override_constants/separation = 12
 [node name="Title" type="Label" parent="Sheet/Col" unique_id=2123615656]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"TitleLabel"
+theme_type_variation = &"HeadingLabel"
 theme_override_font_sizes/font_size = 46
 text = "End Day 1?"
 
@@ -56,7 +56,7 @@ theme_override_constants/separation = 10
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
 text = "Denied: ..."
 autowrap_mode = 3

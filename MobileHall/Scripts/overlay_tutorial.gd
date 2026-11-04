@@ -4,7 +4,8 @@
 ## the player learns by doing instead of reading an intro screen.
 ##   Day 1 - the core loop only: hiring, reading a quest, picking a party,
 ##           Send, End Day, the Day Report
-##   Day 2 - a hero's page (stats, Pluck, gear), odds and Pluck gain, Deny,
+##   Day 2 - a hero's page (stats, Pluck, gear), odds and what a win grows
+##           (a trained stat or Pluck), Deny,
 ##           how the guild can fall (HallMain.is_run_over)
 ##   Day 3 - the Guild tab: upgrading a building, the Training Yard, the
 ##           Hospital, and why posted heroes can't quest
@@ -17,7 +18,7 @@
 ## UI only: it calls nothing but hall_main's own actions and queries.
 ##
 ## WHAT THE PLAYER SEES
-##   - everything outside the spotlight is greyed out (desaturated + dimmed)
+##   - everything outside the spotlight is dimmed (a dark wash)
 ##     and swallows taps; every button outside the spotlight is disabled
 ##   - a gold ring and a bouncing arrow on the one thing to tap
 ##   - Pip's bubble docks at the top or bottom, whichever is clear of the
@@ -61,7 +62,7 @@ const UNLOCK_DAY := {"upgrades": 3, "shop": 5}
 
 ## Draw order: above the hall's overlays (z 10: Day Report, End Day sheet,
 ## toast) and the raised art inside tabs (applicant letters, scroll rollers),
-## so the grey-out, ring and Pip always sit on top of what they point at.
+## so the dim, ring and Pip always sit on top of what they point at.
 const TUTORIAL_Z_INDEX := 20
 ## The spotlight ring and the arrow are white art (Styles/stamp.tres, Art/Icons)
 ## tinted this gold.
@@ -76,17 +77,10 @@ const MISSING_GRACE := 0.6
 ## since the hall rebuilds rows on every refresh.
 const LOCK_INTERVAL := 0.1
 
-## Grey-out for everything outside the spotlight.
-const GREY_SHADER := """
-shader_type canvas_item;
-uniform sampler2D screen_tex : hint_screen_texture, filter_linear_mipmap;
-uniform float darken = 0.35;
-void fragment() {
-	vec3 c = texture(screen_tex, SCREEN_UV).rgb;
-	float g = dot(c, vec3(0.299, 0.587, 0.114));
-	COLOR = vec4(vec3(g) * (1.0 - darken), 1.0);
-}
-"""
+## Dim laid over everything outside the spotlight: a plain translucent wash.
+## (Reading the screen back to grey it out rendered wrong on iPhone Safari:
+## ghost copies of Pip and cropped slices.) Alpha = how dark it gets, 0..1.
+const DIM_COLOR := Color(0.0, 0.0, 0.0, 0.55)
 
 # ---- coloured words (the stat inks in HallStyle.STATS, and HallStyle.GOLD_TEXT)
 const POW := "[color=#8B2E2A]Power[/color]"
@@ -331,7 +325,7 @@ func _is_live(step: Dictionary) -> bool:
 # ============================================================ BUTTON LOCKS
 
 ## Disable every button in the hall except the ones inside a live spotlight.
-## (Rows that are tap panels, not Buttons, are stopped by the grey blockers.)
+## (Rows that are tap panels, not Buttons, are stopped by the dim blockers.)
 func _apply_locks(step: Dictionary, target: Control) -> void:
 	var live_root: Control = target if (target != null and _is_live(step)) else null
 	var denied: Array = step.get("deny", [])
@@ -383,7 +377,7 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 	var is_lost: bool = step.get("target") != null and target == null and _missing_for > MISSING_GRACE
 	var show_next: bool = not waits or is_lost
 
-	# ---- the spotlight hole and the grey-out around it
+	# ---- the spotlight hole and the dim around it
 	var hole := Rect2()
 	if target != null:
 		var xf: Transform2D = get_global_transform().affine_inverse() * target.get_global_transform()
@@ -397,7 +391,7 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 		_set_rect(_blockers[0], Rect2(Vector2.ZERO, full))
 		for blocker_index in range(1, 4):
 			_set_rect(_blockers[blocker_index], Rect2())
-	# explain-only steps cover the hole too (no grey, just no taps)
+	# explain-only steps cover the hole too (no dim, just no taps)
 	_set_rect(_cover, hole if (hole.has_area() and not _is_live(step)) else Rect2())
 
 	_ring.visible = hole.has_area()
@@ -544,12 +538,9 @@ func _is_press(event: InputEvent) -> bool:
 # ============================================================ BUILD
 
 func _build() -> void:
-	var grey := ShaderMaterial.new()
-	grey.shader = Shader.new()
-	grey.shader.code = GREY_SHADER
 	for blocker_index in 4:
 		var blocker := ColorRect.new()
-		blocker.material = grey
+		blocker.color = DIM_COLOR
 		blocker.mouse_filter = Control.MOUSE_FILTER_STOP
 		blocker.gui_input.connect(_on_blocked_input)
 		add_child(blocker)
@@ -596,7 +587,7 @@ func _build() -> void:
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_hint.custom_minimum_size.x = 84
-	_hint.add_theme_font_size_override("font_size", 16)
+	_hint.add_theme_font_size_override("font_size", 19)
 	face_col.add_child(_hint)
 
 	var col := VBoxContainer.new()
@@ -616,7 +607,7 @@ func _build() -> void:
 	_counter.theme_type_variation = &"CapsLabel"
 	_counter.uppercase = true
 	_counter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_counter.add_theme_font_size_override("font_size", 17)
+	_counter.add_theme_font_size_override("font_size", 20)
 	head.add_child(_counter)
 
 	_text = RichTextLabel.new()
@@ -639,7 +630,7 @@ func _build() -> void:
 	_do_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_do_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_do_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_do_label.add_theme_font_size_override("font_size", 19)
+	_do_label.add_theme_font_size_override("font_size", 22)
 	HallStyle.set_font_color(_do_label, HallStyle.BLUE_TEXT)
 	# the instruction takes all the room left of Skip / Next, so it doesn't wrap early
 	foot.add_child(_do_label)
@@ -647,7 +638,7 @@ func _build() -> void:
 	_skip_button.text = "Skip tutorial"
 	_skip_button.flat = true
 	_skip_button.add_theme_font_override("font", load("uid://dvhjw1533s75"))  # MobileHall/Art/Fonts/font_italic.tres
-	_skip_button.add_theme_font_size_override("font_size", 20)
+	_skip_button.add_theme_font_size_override("font_size", 22)
 	_skip_button.add_theme_color_override("font_color", HallStyle.TEXT_SOFT)
 	_skip_button.pressed.connect(skip_tutorial)
 	foot.add_child(_skip_button)
@@ -665,7 +656,8 @@ func _build() -> void:
 	foot.add_child(_next_button)
 
 
-## Pip's portrait: the round portrait mask (parchment ground, clips Pip) and
+## Pip's portrait: the round portrait mask (parchment ground; its shape clips
+## Pip through HallStyle.mask_to) and
 ## the round portrait frame on top, the same art as the heroes' portraits.
 func _build_portrait() -> Control:
 	var holder := Control.new()
@@ -675,7 +667,6 @@ func _build_portrait() -> Control:
 	var mask := TextureRect.new()
 	mask.texture = PORTRAIT_MASK
 	mask.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	mask.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
 	mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mask.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	HallStyle.tint_art(mask, PIP_GROUND)
@@ -684,6 +675,10 @@ func _build_portrait() -> Control:
 	pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pip.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mask.add_child(pip)
+	# clipped by the portrait mask shader, not clip_children (broken on iPhone
+	# Safari); Pip fills the mask, so the mask's rect is Pip's own rect
+	pip.resized.connect(func() -> void: HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(Vector2.ZERO, pip.size)))
+	HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(Vector2.ZERO, pip.size))
 	var frame := TextureRect.new()
 	frame.texture = PORTRAIT_FRAME
 	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -805,16 +800,18 @@ func _pick_text() -> String:
 	return "Tap heroes to add them. Each row's number is the chance they add."
 
 
-## The Assign Party odds step: risk vs. reward. Riskier quests pay more Pluck
-## on a win. The numbers and odds words come from HallRules.PLUCK_GAIN_BY_ODDS
+## The Assign Party odds step: risk vs. reward. A win at good odds trains the
+## quest's or region's stat; a riskier win grows Pluck instead. The threshold is
+## the open quest's (HallRules.train_odds_for, an F quest's if none is open),
+## and the Pluck numbers and odds word come from HallRules.PLUCK_GAIN_BY_ODDS
 ## and HallStyle.ODDS_BANDS, so the text follows the tuning.
 func _odds_text() -> String:
-	var safest: Dictionary = HallRules.PLUCK_GAIN_BY_ODDS[0]
+	var entry: Dictionary = hall.current_quest_entry()
+	var rank: int = entry.quest.difficulty if not entry.is_empty() else 0
 	var riskiest: Dictionary = HallRules.PLUCK_GAIN_BY_ODDS[-1]
-	var safest_word: String = HallStyle.odds_look(safest.min).word
 	var riskiest_word: String = HallStyle.odds_look(riskiest.min).word
-	return "Riskier wins grow more %s: +%d at %s, up to +%d on a %s." \
-			% [PLK, safest.gain, safest_word, riskiest.gain, riskiest_word]
+	return "Win at %d%%+ to train the quest's or region's stat. Riskier wins grow %s instead, up to +%d on a %s." \
+			% [HallRules.train_odds_for(rank), PLK, riskiest.gain, riskiest_word]
 
 
 func _anyone_can_train() -> bool:
@@ -910,7 +907,7 @@ func _day_two() -> Array:
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"), "on": "character",
 			"do": "Tap a hero", "text": "Tap a hero to open their page."},
 		{"target": func(): return _u(_screen("character"), "StatLines"),
-			"text": "Quests lean on the favoured stat. %s grows with each win and boosts every other stat." % PLK},
+			"text": "Quests lean on the favoured stat. Safe wins train a stat; risky wins grow %s, which boosts every other stat." % PLK},
 		{"target": func(): return _u(_screen("character"), "GearLines"),
 			"text": "Gear slots. Items are role-locked. The Shop opens on Day 5."},
 		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close",
@@ -920,7 +917,7 @@ func _day_two() -> Array:
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
 			"do": "Tap a quest card", "text": "Open a quest."},
 		{"target": func(): return _u(_screen("assign"), "PartyBox"),
-			"text": _odds_text()},
+			"text": func(): return _odds_text()},
 		{"target": func(): return _u(_screen("assign"), "LeftButton"),
 			"text": "[b]Deny[/b] skips a quest for a little standing. You can Reconsider later today."},
 		{"text": "Heroes can [b]die[/b]. Lose them all with no gold to hire, and the guild falls. The rest of today is yours. See you on Day 3!"},

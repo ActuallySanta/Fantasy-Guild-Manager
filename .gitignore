@@ -1,3 +1,6 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Web export (built and deployed by .github/workflows/deploy-web.yml)
+/Builds/Web/

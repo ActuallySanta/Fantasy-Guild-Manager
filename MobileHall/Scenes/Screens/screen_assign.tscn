@@ -92,7 +92,7 @@ theme_override_constants/separation = 8
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"CapsLabel"
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 22
 text = "Writ of Scouting · Rank F"
 uppercase = true
 
@@ -126,15 +126,6 @@ layout_mode = 2
 [node name="FavChip" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/Chips" instance=ExtResource("4_chip")]
 unique_name_in_owner = true
 layout_mode = 2
-
-[node name="Status" type="Label" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-theme_type_variation = &"ItalicLabel"
-theme_override_font_sizes/font_size = 23
-text = "Pin up to 1 adventurer. Their stats add up to the chance."
-autowrap_mode = 3
 
 [node name="Divider" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col" instance=ExtResource("5_divider")]
 layout_mode = 2
@@ -202,7 +193,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"CapsLabel"
-theme_override_font_sizes/font_size = 19
+theme_override_font_sizes/font_size = 22
 text = "Chance of success"
 horizontal_alignment = 1
 autowrap_mode = 3
@@ -233,7 +224,7 @@ theme_override_constants/separation = -4
 [node name="PickHeading" type="Label" parent="Scroll/Margin/Col/PickHeader/PickTitles"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"TitleLight"
+theme_type_variation = &"HeadingLight"
 theme_override_font_sizes/font_size = 42
 text = "Your adventurers"
 
@@ -241,7 +232,7 @@ text = "Your adventurers"
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"ItalicLight"
-theme_override_font_sizes/font_size = 21
+theme_override_font_sizes/font_size = 23
 text = "2 busy hidden"
 
 [node name="BusyToggle" type="CheckButton" parent="Scroll/Margin/Col/PickHeader"]
@@ -263,7 +254,7 @@ custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"ItalicLight"
 theme_override_font_sizes/font_size = 23
-text = "Everyone is on another quest. Turn on Show busy to move someone here."
+text = "Everyone is on another quest."
 horizontal_alignment = 1
 autowrap_mode = 3
 

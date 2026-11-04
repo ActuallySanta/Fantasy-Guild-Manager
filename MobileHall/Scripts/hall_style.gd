@@ -27,6 +27,10 @@ class_name HallStyle
 extends RefCounted
 
 
+## Clips portrait art to its round or oval mask (see mask_to).
+const PORTRAIT_MASK_SHADER := preload("uid://bkumb84ipevs1")  # MobileHall/Styles/portrait_mask.gdshader
+
+
 # ============================================================ QUEST STATES
 # Every quest entry on the day's board is in exactly one of these states.
 # (See hall_main.gd -> quest_entries for the full entry layout.)
@@ -318,6 +322,27 @@ static func item_look(item: StandardItem) -> Dictionary:
 	}
 
 
+## Reward chip text for a quest that pays in items, using the short rarity tags
+## so the chip fits a phone row. Full: "3 items · LEG, UNC, COM" (the quest
+## writ, which has a line to itself). Compact: "3 items · best LEG" (Board
+## rows: hard quests roll many items, and a chip wider than the row pushed the
+## whole Board off screen). CreatedQuest.get_reward_text() spells the
+## rarities out, for the old UI.
+static func item_reward_text(quest: CreatedQuest, compact: bool = false) -> String:
+	var tags := PackedStringArray()
+	# reward_items is sorted rarest first
+	for reward_item in quest.reward_items:
+		var rarity_name := str(StandardItem.Rarity.find_key(reward_item.rarity))
+		tags.append(ITEM_RARITY_LOOKS.get(rarity_name, ITEM_RARITY_LOOKS.COMMON).tag)
+	var count: int = tags.size()
+	var count_text := "%d %s" % [count, pick_plural(count, "item", "items")]
+	if count == 0:
+		return count_text
+	if compact and count > 1:
+		return "%s · best %s" % [count_text, tags[0]]
+	return "%s · %s" % [count_text, ", ".join(tags)]
+
+
 ## "+16 Power · Knights only"
 static func item_effect(item: StandardItem) -> String:
 	var role_text := "%ss only" % item_role_name(item)
@@ -461,6 +486,21 @@ static func set_look(panel: Control, variation: StringName) -> void:
 ## parchment. self_modulate tints the node's own drawing, not its children.
 static func tint_art(node: CanvasItem, ink: Color) -> void:
 	node.self_modulate = ink
+
+
+## Clip `node` to the alpha of `mask` (a portrait mask texture) laid over the
+## rect `mask_rect`, given in `node`'s local pixels. Used instead of
+## clip_children, which renders wrong on iPhone Safari. Call again with the new
+## rect whenever the node or mask is resized (the material is reused).
+static func mask_to(node: CanvasItem, mask: Texture2D, mask_rect: Rect2) -> void:
+	var material := node.material as ShaderMaterial
+	if material == null or material.shader != PORTRAIT_MASK_SHADER:
+		material = ShaderMaterial.new()
+		material.shader = PORTRAIT_MASK_SHADER
+		node.material = material
+	material.set_shader_parameter("mask_tex", mask)
+	material.set_shader_parameter("mask_origin", mask_rect.position)
+	material.set_shader_parameter("mask_size", mask_rect.size.max(Vector2.ONE))
 
 
 ## Recolour a label's (or button's, or rich text's) text.

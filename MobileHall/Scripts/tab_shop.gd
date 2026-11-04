@@ -17,14 +17,13 @@ const ShopTileScene := preload("uid://b25qy8uoil5du")  # MobileHall/Scenes/Rows/
 
 # ---- TEXT
 const SHOP_NAME := "Grizzle's Goods"
-const KEEPER_LINE := "Fresh stock every dawn. Touch it, you bought it."
+const KEEPER_LINE := "Fresh stock every dawn!"
 const GOODS_TITLE := "TODAY'S GOODS"
-const RESTOCK_NOTE := "New goods at dawn"
-const RESTOCK_NOTE_PACK := "New goods at dawn · %s in your pack"
+## Only shown when the pack holds unworn items (a reminder to equip them).
+const PACK_NOTE := "%s in your pack"
 const BUY_BUTTON := "Buy · %dg"
 const SOLD_BUTTON := "Sold"
 const NOTHING_PICKED := "Pick something"
-const NOTHING_PICKED_HINT := "Tap an item to see what it does"
 const SOLD_HINT := "Bought! Equip it from a hero's page."
 const TOO_POOR_HINT := " · Not enough gold"
 
@@ -92,18 +91,16 @@ func _show_goods() -> void:
 
 func _show_restock_note() -> void:
 	var unworn := ItemShop.unworn_count()
-	if unworn > 0:
-		_restock_note.text = RESTOCK_NOTE_PACK % HallStyle.count_text(unworn, "item", "items")
-	else:
-		_restock_note.text = RESTOCK_NOTE
+	_restock_note.visible = unworn > 0
+	_restock_note.text = PACK_NOTE % HallStyle.count_text(unworn, "item", "items")
 
 
 ## Name, what it does, and Buy for the picked item.
 func _show_buy_bar() -> void:
 	var item := ItemShop.get_item(_selected)
+	_item_effect.visible = item != null
 	if item == null:
 		_item_name.text = NOTHING_PICKED
-		_item_effect.text = NOTHING_PICKED_HINT
 		_buy_button.visible = false
 		return
 	var look := HallStyle.item_look(item)

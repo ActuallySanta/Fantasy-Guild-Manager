@@ -22,8 +22,6 @@ const SECTION_TONIGHT := "Tonight"
 const SECTION_BUILD := "Build"
 const WALLET := "%d gold"
 const STANDING := "· Standing %d"
-const WALLET_HINT_AFFORDABLE := "You can afford %s. Quests pay for the rest."
-const WALLET_HINT_NONE := "Nothing affordable yet. Quests earn gold."
 
 # ---- NODES
 # Folder tabs
@@ -42,7 +40,6 @@ const WALLET_HINT_NONE := "Nothing affordable yet. Quests earn gold."
 @onready var _build_box: Control = %Build
 @onready var _wallet: Label = %Wallet
 @onready var _standing: Label = %Standing
-@onready var _wallet_hint: Label = %WalletHint
 @onready var _card_list: VBoxContainer = %List
 @onready var _coming_soon_box: Control = %SoonBox
 @onready var _coming_soon_row: HFlowContainer = %SoonRow
@@ -75,7 +72,7 @@ func refresh() -> void:
 		_training_section.refresh()
 		_hospital_section.refresh()
 	else:
-		_show_wallet(affordable)
+		_show_wallet()
 		_show_building_cards(affordable)
 		_show_coming_soon()
 
@@ -96,16 +93,10 @@ func _show_section_buttons(is_tonight: bool, affordable: Array) -> void:
 # ---- Build
 
 
-## The treasury ledger: gold, standing, and how many upgrades that buys right now.
-func _show_wallet(affordable: Array) -> void:
+## The treasury ledger: gold and standing (each card says whether it's affordable).
+func _show_wallet() -> void:
 	_wallet.text = WALLET % GameState.gold
 	_standing.text = STANDING % GameState.standing
-	if affordable.is_empty():
-		_wallet_hint.text = WALLET_HINT_NONE
-		HallStyle.set_font_color(_wallet_hint, HallStyle.TEXT_SOFT)
-	else:
-		_wallet_hint.text = WALLET_HINT_AFFORDABLE % HallStyle.count_text(affordable.size(), "upgrade", "upgrades")
-		HallStyle.set_font_color(_wallet_hint, HallStyle.GREEN_TEXT)
 
 
 ## One plan per working building, affordable ones first.

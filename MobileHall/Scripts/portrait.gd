@@ -1,5 +1,6 @@
 ## Character portrait: the character's own art clipped to an oval (or a
-## circle) on a soft ground, inside an ink frame. Set the size on each
+## circle) on a soft ground, inside an ink frame. The clipping is the
+## portrait_mask shader (HallStyle.mask_to). Set the size on each
 ## instance with custom_minimum_size.
 ## Art: MobileHall/Art/Textures/portrait_<oval|round>_<mask|frame>.png
 ## Scene: MobileHall/Scenes/Components/portrait.tscn
@@ -30,6 +31,15 @@ func _ready() -> void:
 		_mask.texture = ROUND_MASK
 		_frame.texture = ROUND_FRAME
 	_pin.visible = pinned
+	# the art is much bigger than the mask (see the scene's anchors) and is
+	# clipped by a shader, not clip_children (broken on iPhone Safari)
+	_art.resized.connect(_update_mask)
+	_update_mask()
+
+
+## Point the art's mask shader at the mask's rect, in the art's own pixels.
+func _update_mask() -> void:
+	HallStyle.mask_to(_art, _mask.texture, Rect2(-_art.position, _mask.size))
 
 
 func show_character(character: GuildCharacter) -> void:

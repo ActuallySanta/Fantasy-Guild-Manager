@@ -21,7 +21,6 @@ const TEXT_TRAINING := "Training %s"
 const TEXT_ADDS := "+%d%%"
 const TEXT_ADDS_SUB := "to odds"
 const TEXT_IN_PARTY := "Pinned"
-const TEXT_IN_PARTY_SUB := "tap to unpin"
 const TEXT_CANT_GO := "-"
 const TEXT_CANT_GO_SUB := "can't go"
 const TEXT_IN_BED_SUB := "in a bed"
@@ -78,7 +77,7 @@ func _show_elsewhere(hall: HallMain, entry: Dictionary, character: GuildCharacte
 func _show_pick_state(hall: HallMain, entry: Dictionary, character: GuildCharacter) -> void:
 	if entry.party.has(character):
 		_adds_value.text = TEXT_IN_PARTY
-		_adds_sub.text = TEXT_IN_PARTY_SUB
+		_adds_sub.visible = false
 		HallStyle.set_font_color(_adds_value, HallStyle.GREEN_TEXT)
 		HallStyle.style_panel(self, HallStyle.SENT_CARD_BG)
 		# just pinned: "Pinned" stamps onto the row

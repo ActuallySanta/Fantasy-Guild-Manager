@@ -74,10 +74,13 @@ Buildings pick their icon in `BUILDING_ICONS` in the same file. `stall.svg` is t
 
 | Wrapper | File now | Used for |
 |---|---|---|
-| `font_title.tres` | Pirata One | Blackletter titles, names, big numbers, gold / wood buttons |
+| `font_title.tres` | Pirata One | Blackletter headings only (`HeadingLabel` / `HeadingLight`: screen and overlay titles, the Day number, stamps, badges) |
 | `font_body.tres` | Alegreya (weight 450) | Body text |
-| `font_bold.tres` | Alegreya (weight 700) | Nav tabs, paper buttons, bold story words |
-| `font_caps.tres` | Alegreya (weight 800, wider spacing) | Small caps labels (TREASURY LEDGER, NAME...) |
+| `font_bold.tres` | Alegreya (weight 700) | `TitleLabel` / `TitleLight` (names, quest titles, numbers), every button, nav tabs, bold story words |
+| `font_caps.tres` | Alegreya (weight 800, wider spacing) | Small caps labels (RECRUITS, POW...) |
+
+Blackletter is hard to read at small sizes and in sentences, so keep it to short headings.
+Anything a player has to read or compare uses `TitleLabel` (bold Alegreya).
 | `font_italic.tres` | Alegreya Italic | Hints and asides |
 
 Pirata One and Alegreya are under the SIL Open Font License (`OFL-*.txt`), so they're

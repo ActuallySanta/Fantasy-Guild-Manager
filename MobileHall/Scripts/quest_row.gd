@@ -27,7 +27,6 @@ const TEXT_DRAFT := "Party picked"
 const TEXT_SENT := "Sent"
 const TEXT_SENT_STAMP := "SENT"
 const TEXT_DENIED := "Denied"
-const TEXT_DENIED_HINT := "tap to reconsider"
 const TEXT_ODDS := "%d%%"
 
 # ---- NODES
@@ -42,7 +41,6 @@ const TEXT_ODDS := "%d%%"
 # State (right)
 @onready var _state_label: Label = %StateLabel
 @onready var _odds_label: Label = %OddsLabel
-@onready var _sub_label: Label = %SubLabel
 @onready var _party_portraits: HBoxContainer = %Party
 
 
@@ -69,7 +67,11 @@ func _show_quest_facts(hall: HallMain, entry: Dictionary) -> void:
 	HallStyle.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
 	_title.text = entry.quest.questTitle
 	_rank_chip.set_box(TEXT_RANK % HallStyle.rank_letter(entry.quest), HallStyle.TEXT_MAIN)
-	_gold_chip.set_chip(TEXT_GOLD % entry.quest.goldReward, HallStyle.GOLD_BG, HallStyle.TEXT_MAIN, "coins")
+	# item quests pay pre-rolled equipment instead of gold: show the count and rarities
+	if entry.quest.pays_in_items():
+		_gold_chip.set_chip(HallStyle.item_reward_text(entry.quest, true), HallStyle.BLUE_BG, HallStyle.BLUE_TEXT, "chest")
+	else:
+		_gold_chip.set_chip(TEXT_GOLD % entry.quest.goldReward, HallStyle.GOLD_BG, HallStyle.TEXT_MAIN, "coins")
 	_party_size_chip.set_chip(TEXT_PARTY_SIZE % hall.party_size_limit(entry), HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "person")
 	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_stat_index(entry.quest)]
 	_favored_chip.set_chip(favored_stat.short, favored_stat.bg, favored_stat.color, "", true)
@@ -100,8 +102,6 @@ func _show_state(entry: Dictionary) -> void:
 		HallStyle.QUEST_STATE_DENIED:
 			_state_label.text = TEXT_DENIED
 			HallStyle.set_font_color(_state_label, HallStyle.RED)
-			_sub_label.visible = true
-			_sub_label.text = TEXT_DENIED_HINT
 			modulate = Color(1, 1, 1, DENIED_OPACITY)
 		_:
 			_state_label.text = TEXT_DRAFT if not entry.party.is_empty() else TEXT_OPEN

@@ -59,7 +59,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"ItalicLabel"
-theme_override_font_sizes/font_size = 19
+theme_override_font_sizes/font_size = 22
 text = "Picked for #2 Escort"
 autowrap_mode = 3
 
@@ -87,7 +87,7 @@ horizontal_alignment = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"ItalicLabel"
-theme_override_font_sizes/font_size = 19
+theme_override_font_sizes/font_size = 22
 text = "to odds"
 horizontal_alignment = 2
 
