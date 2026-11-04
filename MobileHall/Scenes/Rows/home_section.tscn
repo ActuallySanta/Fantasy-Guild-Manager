@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://djwbyqk4uhihw" path="res://MobileHall/Art/Textures/pin.png" id="3_pin"]
 
 [node name="HomeSection" type="PanelContainer"]
+mouse_filter = 1
 theme_type_variation = &"PlanCard"
 script = ExtResource("2_sec")
 

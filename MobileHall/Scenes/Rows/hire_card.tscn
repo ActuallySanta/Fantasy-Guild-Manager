@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://j7s636wj68s6" path="res://MobileHall/Scenes/Components/seal_button.tscn" id="5_seal"]
 
 [node name="HireCard" type="PanelContainer"]
+mouse_filter = 1
 theme_type_variation = &"PaperCard"
 script = ExtResource("1_hire")
 

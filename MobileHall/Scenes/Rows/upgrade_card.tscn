@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://djwbyqk4uhihw" path="res://MobileHall/Art/Textures/pin.png" id="6_pin"]
 
 [node name="UpgradeCard" type="PanelContainer"]
+mouse_filter = 1
 theme_type_variation = &"PlanCard"
 script = ExtResource("1_upgrade")
 
@@ -20,6 +21,7 @@ layout_mode = 2
 theme_override_constants/separation = 22
 
 [node name="IconBox" type="PanelContainer" parent="Col/Top"]
+mouse_filter = 1
 self_modulate = Color(0.2039, 0.1608, 0.1255, 1)
 custom_minimum_size = Vector2(124, 124)
 layout_mode = 2

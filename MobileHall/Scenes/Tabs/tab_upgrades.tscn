@@ -142,6 +142,7 @@ layout_mode = 2
 theme_override_constants/separation = 20
 
 [node name="WalletBox" type="PanelContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build"]
+mouse_filter = 1
 layout_mode = 2
 theme_type_variation = &"LedgerCard"
 

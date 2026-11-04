@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://mxarx3uliw24" path="res://MobileHall/Scripts/gear_row.gd" id="1_gear"]
 
 [node name="GearRow" type="PanelContainer"]
+mouse_filter = 1
 size_flags_horizontal = 3
 theme_type_variation = &"PaperCard"
 script = ExtResource("1_gear")
