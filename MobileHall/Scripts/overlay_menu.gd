@@ -1,9 +1,13 @@
 ## Menu (header button): how to play, last night's report, Reduced Motion, the colorblind
 ## filter (tap to cycle), the debug reset, and Abandon run (two taps: the first
 ## asks, the second deletes the saved run and starts a new guild).
+## A small line under Close says which build is running (HallBuildInfo), so a
+## phone can tell whether it's on the latest web deploy.
 ## Scene: MobileHall/Scenes/Overlays/overlay_menu.tscn
 extends Control
 
+## Font size of the build line under Close (pixels): small, it's a footnote.
+const BUILD_FONT_SIZE := 20
 
 # ---- TEXT
 const BUTTON_HOW_TO_PLAY := "How to play"
@@ -31,6 +35,8 @@ var hall: HallMain
 ## Reduced Motion toggle, built in setup() right under the colorblind button
 ## (same look), so the menu scene doesn't need a new node.
 var _motion_button: Button
+## Which build is running, built in setup() under Close (same reason as _motion_button).
+var _build_label: Label
 ## Abandon run was tapped once: the next tap really abandons. Cleared when the menu closes.
 var _is_abandon_armed := false
 
@@ -47,6 +53,13 @@ func setup(main: HallMain) -> void:
 	_motion_button.size_flags_horizontal = _color_button.size_flags_horizontal
 	_color_button.add_sibling(_motion_button)
 	_motion_button.pressed.connect(hall.toggle_reduce_motion)
+	_build_label = Label.new()
+	_build_label.name = "BuildLabel"
+	_build_label.theme_type_variation = &"ItalicLabel"
+	_build_label.add_theme_font_size_override("font_size", BUILD_FONT_SIZE)
+	_build_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_build_label.text = HallBuildInfo.label()
+	_close_button.add_sibling(_build_label)
 	_close_button.pressed.connect(hall.close_menu)
 	_abandon_button.pressed.connect(_on_abandon_pressed)
 	_dim.gui_input.connect(_on_dim_input)
