@@ -343,6 +343,10 @@ var tutorial: Control
 # ============================================================ SETUP
 
 func _ready() -> void:
+	# web: a newer deploy is waiting behind the cached one, so switch to it
+	# (the page reloads; the saved run comes back after)
+	if HallWebUpdate.apply_waiting_update():
+		return
 	# every shell piece, tab, screen and overlay gets a reference back to this script
 	var views: Array = [_header, _action_bar, _nav] + _tabs.values() + _screens.values() + _all_overlays()
 	for view in views:
@@ -395,6 +399,8 @@ func _ready() -> void:
 	else:
 		_generate_quests()
 	refresh()
+	# web: watch for a newer deploy turning up while the game is open
+	HallWebUpdate.watch(self)
 	# a playtest scenario can start already stuck. Deferred: the scenario
 	# builds its roster in its own _ready, which runs after this one
 	_check_run_over.call_deferred()

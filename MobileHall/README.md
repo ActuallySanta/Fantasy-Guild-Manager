@@ -252,6 +252,16 @@ that starts on a button scrolls instead of pressing it. A row you can tap extend
 not the row. Something built outside a refresh, inside a scroll list, needs its own
 `DragScroll.fix_tree(...)` call.
 
+### Web updates and the build line
+
+The web build is a PWA, and its service worker serves the game files cache-first, so a
+plain reload can keep running an old deploy. `Scripts/hall_web_update.gd` switches to a
+waiting deploy at start-up (the page reloads and the saved run comes back), or shows a
+toast if one turns up mid-game. The Menu's bottom line (`Scripts/hall_build_info.gd`)
+names the commit and time of the build that's running: the deploy workflow writes
+`External Content/build_info.txt` (gitignored), and without it the line says "Build dev".
+To check a phone, compare that line with the latest commit on `master`.
+
 ## Known issues (in the game systems, not changed here)
 
 - Dead adventurers are shown greyed out and can't be picked in this UI, but the game
