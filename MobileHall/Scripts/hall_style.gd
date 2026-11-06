@@ -27,6 +27,10 @@ class_name HallStyle
 extends RefCounted
 
 
+## Clips portrait art to its round or oval mask (see mask_to).
+const PORTRAIT_MASK_SHADER := preload("uid://bkumb84ipevs1")  # MobileHall/Styles/portrait_mask.gdshader
+
+
 # ============================================================ QUEST STATES
 # Every quest entry on the day's board is in exactly one of these states.
 # (See hall_main.gd -> quest_entries for the full entry layout.)
@@ -318,6 +322,27 @@ static func item_look(item: StandardItem) -> Dictionary:
 	}
 
 
+## Reward chip text for a quest that pays in items, using the short rarity tags
+## so the chip fits a phone row. Full: "3 items · LEG, UNC, COM" (the quest
+## writ, which has a line to itself). Compact: "3 items · best LEG" (Board
+## rows: hard quests roll many items, and a chip wider than the row pushed the
+## whole Board off screen). CreatedQuest.get_reward_text() spells the
+## rarities out, for the old UI.
+static func item_reward_text(quest: CreatedQuest, compact: bool = false) -> String:
+	var tags := PackedStringArray()
+	# reward_items is sorted rarest first
+	for reward_item in quest.reward_items:
+		var rarity_name := str(StandardItem.Rarity.find_key(reward_item.rarity))
+		tags.append(ITEM_RARITY_LOOKS.get(rarity_name, ITEM_RARITY_LOOKS.COMMON).tag)
+	var count: int = tags.size()
+	var count_text := "%d %s" % [count, pick_plural(count, "item", "items")]
+	if count == 0:
+		return count_text
+	if compact and count > 1:
+		return "%s · best %s" % [count_text, tags[0]]
+	return "%s · %s" % [count_text, ", ".join(tags)]
+
+
 ## "+16 Power · Knights only"
 static func item_effect(item: StandardItem) -> String:
 	var role_text := "%ss only" % item_role_name(item)
@@ -349,28 +374,29 @@ static func buildings_in_order() -> Array:
 ## tinted; swap any file for your own art (keep it white to keep the tinting).
 ## Names not listed here have no icon, so it's hidden.
 const ICON_FILES := {
-	"coins": "uid://baflbvuj3ew0p",  # MobileHall/Art/Icons/coins.svg
-	"person": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.svg
-	"bed": "uid://ih4xtkgfq1o8",  # MobileHall/Art/Icons/bed.svg
-	"swords": "uid://ce33qlc0iebc7",  # MobileHall/Art/Icons/swords.svg
-	"chest": "uid://dcn1cfg46tkrb",  # MobileHall/Art/Icons/chest.svg
-	"scroll": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.svg
-	"x": "uid://ealg7qhxhkmi",  # MobileHall/Art/Icons/x.svg
-	"back": "uid://c2nc04lk4jmw3",  # MobileHall/Art/Icons/arrow_left.svg
-	"check": "uid://xecbrm0mx34l",  # MobileHall/Art/Icons/check.svg
-	"diamond": "uid://b2bcm5mk7g15t",  # MobileHall/Art/Icons/diamond.svg
-	"diamond_empty": "uid://dkis35yrvae8t",  # MobileHall/Art/Icons/diamond_empty.svg
-	"target": "uid://c328bo4vnwlwo",  # MobileHall/Art/Icons/target.svg
-	"cross": "uid://d1p0h336y6eev",  # MobileHall/Art/Icons/cross.svg
-	"quill": "uid://bbkg4p4knjkde",  # MobileHall/Art/Icons/quill.svg
-	"skull": "uid://dv4aeys4diph4",  # MobileHall/Art/Icons/skull.svg
-	"heart": "uid://dbq8w0d0gocej",  # MobileHall/Art/Icons/heart.svg
-	"stall": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.svg
-	"nav_settings": "uid://ysb0ogcuiwff",  # MobileHall/Art/Icons/gear.svg
-	"nav_quests": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.svg
-	"nav_characters": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.svg
-	"nav_upgrades": "uid://cjywbau63ujgi",  # MobileHall/Art/Icons/hammer.svg
-	"nav_shop": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.svg
+	"coins": "uid://baflbvuj3ew0p",  # MobileHall/Art/Icons/coins.tres
+	"shield": "uid://b7f3ai3fc4j6r",  # MobileHall/Art/Icons/shield.tres
+	"person": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.tres
+	"bed": "uid://ih4xtkgfq1o8",  # MobileHall/Art/Icons/bed.tres
+	"swords": "uid://ce33qlc0iebc7",  # MobileHall/Art/Icons/swords.tres
+	"chest": "uid://dcn1cfg46tkrb",  # MobileHall/Art/Icons/chest.tres
+	"scroll": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.tres
+	"x": "uid://ealg7qhxhkmi",  # MobileHall/Art/Icons/x.tres
+	"back": "uid://c2nc04lk4jmw3",  # MobileHall/Art/Icons/arrow_left.tres
+	"check": "uid://xecbrm0mx34l",  # MobileHall/Art/Icons/check.tres
+	"diamond": "uid://b2bcm5mk7g15t",  # MobileHall/Art/Icons/diamond.tres
+	"diamond_empty": "uid://dkis35yrvae8t",  # MobileHall/Art/Icons/diamond_empty.tres
+	"target": "uid://c328bo4vnwlwo",  # MobileHall/Art/Icons/target.tres
+	"cross": "uid://d1p0h336y6eev",  # MobileHall/Art/Icons/cross.tres
+	"quill": "uid://bbkg4p4knjkde",  # MobileHall/Art/Icons/quill.tres
+	"skull": "uid://dv4aeys4diph4",  # MobileHall/Art/Icons/skull.tres
+	"heart": "uid://dbq8w0d0gocej",  # MobileHall/Art/Icons/heart.tres
+	"stall": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.tres
+	"nav_settings": "uid://ysb0ogcuiwff",  # MobileHall/Art/Icons/gear.tres
+	"nav_quests": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.tres
+	"nav_characters": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.tres
+	"nav_upgrades": "uid://cjywbau63ujgi",  # MobileHall/Art/Icons/hammer.tres
+	"nav_shop": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.tres
 }
 
 ## Loaded icon textures by uid, so each file is only loaded once.
@@ -460,6 +486,21 @@ static func set_look(panel: Control, variation: StringName) -> void:
 ## parchment. self_modulate tints the node's own drawing, not its children.
 static func tint_art(node: CanvasItem, ink: Color) -> void:
 	node.self_modulate = ink
+
+
+## Clip `node` to the alpha of `mask` (a portrait mask texture) laid over the
+## rect `mask_rect`, given in `node`'s local pixels. Used instead of
+## clip_children, which renders wrong on iPhone Safari. Call again with the new
+## rect whenever the node or mask is resized (the material is reused).
+static func mask_to(node: CanvasItem, mask: Texture2D, mask_rect: Rect2) -> void:
+	var material := node.material as ShaderMaterial
+	if material == null or material.shader != PORTRAIT_MASK_SHADER:
+		material = ShaderMaterial.new()
+		material.shader = PORTRAIT_MASK_SHADER
+		node.material = material
+	material.set_shader_parameter("mask_tex", mask)
+	material.set_shader_parameter("mask_origin", mask_rect.position)
+	material.set_shader_parameter("mask_size", mask_rect.size.max(Vector2.ONE))
 
 
 ## Recolour a label's (or button's, or rich text's) text.

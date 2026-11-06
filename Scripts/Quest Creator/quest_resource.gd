@@ -36,6 +36,12 @@ enum FavoredStat {
 	Pluck = 4,
 }
 
+## The stat each world region favors, by regionNum (Region.RegionType), as a
+## GuildCharacter.StatType index: Windswept Meadows -> Defense, Boglands ->
+## Sleaze, Ashen Wastes -> Power, Glass Mountains -> Wisdom. calcSuccessChance
+## counts it twice, and a good-odds win can train it (roll_trained_stat).
+const REGION_FAVORED_STAT := [1, 3, 0, 2]
+
 #enum for modifiers if we ever choose to do them
 
 var numAdventurers: int
@@ -72,7 +78,7 @@ var dead_adventurers : Array[GuildCharacter]
 var requirement_multiplier: float = 1.0
 
 ## Equipment the party found while searching on this quest. The guild keeps it
-## whether or not the quest succeeds (hall_main adds it to ItemContainer).
+## whether or not the quest succeeds (HallRules.play_quest adds it to ItemContainer).
 var found_items: Array[StandardItem]
 
 ## Chance (percent) that a successful search turns up equipment, before any
@@ -87,6 +93,26 @@ var equipment_shorthanded_bonus: float = 10.0
 var equipment_max_chance: float = 50.0
 
 var successfulChecks: int
+
+## The equipment this quest pays instead of gold, rolled when the quest is made
+## so the Board can show it. Empty for a normal gold quest. Only paid out when
+## the quest succeeds (HallRules.play_quest / DayBar add it to ItemContainer).
+var reward_items: Array[StandardItem]
+
+## Chance (percent) on day 1 that a standard quest pays in items instead of gold.
+var item_reward_base_chance: float = 5.0
+## Extra item-quest chance (percent) for each day after day 1, so item quests
+## turn up more often the further into the game the player gets.
+var item_reward_chance_per_day: float = 1.5
+## The highest the item-quest chance (percent) can go.
+var item_reward_max_chance: float = 30.0
+## Extra reward items per difficulty rank: the count is 1 + difficulty * this,
+## rounded down (F/D 1 item, C/B 2, A/S 3).
+var item_reward_count_per_rank: float = 0.5
+
+## Chance (percent) that a good-odds win trains the quest's favored stat
+## (favStat) rather than the region's (REGION_FAVORED_STAT). See roll_trained_stat.
+var trained_stat_quest_chance: float = 50.0
 
 func _init(diff := 0, dayNum := 0) -> void:
 	if (dayNum == 10):
@@ -110,6 +136,13 @@ func _init(diff := 0, dayNum := 0) -> void:
 		goldReward = 100 + (125 * difficulty)
 	else:
 		goldReward = 150 + (175 * difficulty)
+
+	# Some standard quests (dayNum 0) pay in equipment instead: the items replace
+	# the base gold. The final battle (HallMain.FINAL_DAY) always pays gold, like
+	# the Bone Drake. (search finds can still add bonus gold to goldReward later)
+	if (dayNum == 0 and randf_range(0.0, 100.0) < _get_item_reward_chance()):
+		_roll_reward_items()
+		goldReward = 0
 
 	match type:
 		1, 5:
@@ -175,7 +208,7 @@ func _init(diff := 0, dayNum := 0) -> void:
 
 ## Freeplay: makes this quest harder and better paid by the same factor.
 ## multiplier: 1.0 = unchanged, 1.5 = needs half again the stats and pays
-## half again the gold (see HallMain.FREEPLAY_SCALE_PER_DAY).
+## half again the gold (see HallRules.FREEPLAY_SCALE_PER_DAY).
 func apply_freeplay_scaling(multiplier: float) -> void:
 	requirement_multiplier = multiplier
 	goldReward = roundi(goldReward * multiplier)
@@ -194,16 +227,9 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 		adventurer.reset_temp_stats()
 
 		statTotal += adventurer.get_quest_stat(0) + adventurer.get_quest_stat(1) + adventurer.get_quest_stat(2) + adventurer.get_quest_stat(3)
-		match regionNum:
-			0:
-				statTotal += adventurer.get_quest_stat(1)
-			1:
-				statTotal += adventurer.get_quest_stat(3)
-			2:
-				statTotal += adventurer.get_quest_stat(0)
-			3:
-				statTotal += adventurer.get_quest_stat(2)
-				
+		# the region's favored stat counts twice
+		statTotal += adventurer.get_quest_stat(region_favored_stat())
+
 		match favStat:
 			0:
 				statTotal += adventurer.get_quest_stat(0)
@@ -215,6 +241,32 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 				statTotal += adventurer.get_quest_stat(3)
 
 	return (snapped((statTotal / statHitNum), 0.01) * 100)
+
+
+## The GuildCharacter.StatType index this quest's region favors
+## (see REGION_FAVORED_STAT).
+func region_favored_stat() -> int:
+	return REGION_FAVORED_STAT[regionNum]
+
+
+## The one or two stats a good-odds win on this quest can train: the quest's
+## favored stat, then the region's. Only one when they're the same stat.
+## Returns an Array of GuildCharacter.StatType indexes.
+func trained_stat_options() -> Array[int]:
+	var options: Array[int] = [int(favStat)]
+	if region_favored_stat() != int(favStat):
+		options.append(region_favored_stat())
+	return options
+
+
+## Pick the stat a good-odds win trains: the quest's favored stat
+## trained_stat_quest_chance percent of the time, otherwise the region's.
+## Returns a GuildCharacter.StatType index (the same one either way when the
+## quest and region favor the same stat).
+func roll_trained_stat() -> int:
+	if randf_range(0.0, 100.0) < trained_stat_quest_chance:
+		return int(favStat)
+	return region_favored_stat()
 
 
 #this is the main root method for deciding and generating results I'll have
@@ -330,8 +382,19 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 				goldReward += extraGold
 			elif (runMiddle):
 				goldReward -= extraGold
-			returnString = str(returnString, "[b]Summary[/b]: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=FFE700][b]", goldReward, " gold[/b][/color].\n")
-			questSummary = str(questSummary, "[b]Summary[/b]: The quest was SUCCESSFUL. Your guild gained ", goldReward, " gold.\n")
+			if pays_in_items():
+				# item quests name their reward, plus any bonus gold found on the way
+				var reward_names := ", ".join(_get_reward_item_names())
+				returnString = str(returnString, "[b]Summary[/b]: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=4FC3F7][b]", reward_names, "[/b][/color]")
+				questSummary = str(questSummary, "[b]Summary[/b]: The quest was SUCCESSFUL. Your guild gained ", reward_names)
+				if (goldReward > 0):
+					returnString = str(returnString, " and [color=FFE700][b]", goldReward, " gold[/b][/color]")
+					questSummary = str(questSummary, " and ", goldReward, " gold")
+				returnString = str(returnString, ".\n")
+				questSummary = str(questSummary, ".\n")
+			else:
+				returnString = str(returnString, "[b]Summary[/b]: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=FFE700][b]", goldReward, " gold[/b][/color].\n")
+				questSummary = str(questSummary, "[b]Summary[/b]: The quest was SUCCESSFUL. Your guild gained ", goldReward, " gold.\n")
 
 	# list found equipment after either outcome, since the guild keeps it either way
 	returnString = str(returnString, _get_found_items_lines())
@@ -554,6 +617,61 @@ func _get_found_items_lines() -> String:
 	var found_items_line := str("Your adventurers also brought back: ", ", ".join(item_names), ".\n")
 	questSummary = str(questSummary, found_items_line)
 	return str("[color=4FC3F7][b]Equipment found[/b][/color]: ", ", ".join(item_names), ".\n")
+
+
+## True if this quest pays in equipment (reward_items) instead of gold.
+func pays_in_items() -> bool:
+	return not reward_items.is_empty()
+
+
+## The reward as shown on the Board and Assign Party, e.g. "2 items · RARE,
+## COMMON" for an item quest or "250 gold" for a gold quest.
+func get_reward_text() -> String:
+	if not pays_in_items():
+		return str(goldReward, " gold")
+
+	var rarity_names := PackedStringArray()
+	for reward_item in reward_items:
+		rarity_names.append(str(StandardItem.Rarity.find_key(reward_item.rarity)))
+	var item_word := "item" if reward_items.size() == 1 else "items"
+	return "%d %s · %s" % [reward_items.size(), item_word, ", ".join(rarity_names)]
+
+
+## How likely (percent) a new standard quest is to pay in items, growing with
+## GameState.day (HallRules passes dayNum = 0 for normal quests, so the day is
+## read from GameState instead).
+## Returns the chance, clamped to 0..item_reward_max_chance.
+func _get_item_reward_chance() -> float:
+	var days_in: int = maxi(GameState.day - 1, 0)
+	var reward_chance: float = item_reward_base_chance + item_reward_chance_per_day * days_in
+	return clampf(reward_chance, 0.0, item_reward_max_chance)
+
+
+## Fills reward_items for an item quest: more items on harder quests, each for
+## a random hero role (like Shop stock), with rarity weighted by difficulty.
+## Sorted rarest first so the Board lists the best item first.
+func _roll_reward_items() -> void:
+	reward_items.clear()
+	var item_count: int = 1 + int(difficulty * item_reward_count_per_rank)
+	for i in item_count:
+		var role: GuildCharacter.CharacterRole = GuildCharacter.CharacterRole.values().pick_random()
+		var reward_item := PassiveItem.new(role, difficulty)
+		# match ItemShop._make_item: equipping checks item.role
+		reward_item.role = role
+		reward_items.append(reward_item)
+
+	# a higher tier index in the Rarity enum means a rarer item
+	var rarity_order: Array = StandardItem.Rarity.values()
+	reward_items.sort_custom(func(a: StandardItem, b: StandardItem) -> bool:
+		return rarity_order.find(a.rarity) > rarity_order.find(b.rarity))
+
+
+## The names of the reward items, e.g. ["RARE Dagger", "COMMON Charm"].
+func _get_reward_item_names() -> PackedStringArray:
+	var reward_names := PackedStringArray()
+	for reward_item in reward_items:
+		reward_names.append(reward_item.name)
+	return reward_names
 
 
 func _initMilestoneVars(dayNum: int):

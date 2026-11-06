@@ -36,13 +36,10 @@ const WRIT_STAMP_TILT := -0.16
 # Quest writ
 const TEXT_TYPE := "%s · Rank %s"
 const TEXT_GOLD := "%d gold"
+const TEXT_STANDING := "+%d standing"
 const TEXT_PARTY_SIZE := "Up to %d"
 const TEXT_PARTY_SIZE_SOLO := "Solo"
 const TEXT_FAVORED := "Favors %s"
-const STATUS_OPEN := "Pin up to %s. Their stats add up to the chance."
-const STATUS_DRAFT := "Your picks stay pinned if you look at another quest."
-const STATUS_SENT := "Sent. Tap someone to change the party, or recall it."
-const STATUS_DENIED := "Denied. Reconsider to put it back on the board."
 const TEXT_STAMP_SENT := "SENT"
 # Party odds
 const TEXT_ODDS := "%d%%"
@@ -53,14 +50,23 @@ const TEXT_ODDS_WORD := "Chance of success"
 ## Under the odds: what each hero's Pluck goes up by if the party wins.
 ## Two lines, so the column never gets wider than the screen (OddsWord wraps too).
 const TEXT_PLUCK_ON_WIN := "%s\nwin for +%d Pluck"
+## Under the odds, at good odds for the quest's rank: the stat(s) a win can
+## train instead of Pluck (HallRules.trains_stat), e.g. "Defense or Power".
+const TEXT_TRAIN_ON_WIN := "%s\nwin to train %s"
+## Joins the two stats a win can train.
+const TEXT_TRAIN_OR := " or "
 # Picker
 const PICK_HEADING := "Your adventurers"
-const PICK_HINT := "best fit first"
-const PICK_HINT_HIDDEN := "best fit first · %d busy hidden"
+## Only shown when "Show busy" is off and someone is hidden.
+const PICK_HINT_HIDDEN := "%d busy hidden"
 const BUTTON_SHOW_BUSY := "Show busy"
 const NO_ROSTER := "You have no adventurers yet."
 # Footer
 const BUTTON_DENY := "Deny"
+## Inside the shield on the Deny button: the standing denying costs.
+const TEXT_DENY_COST := "-%d"
+## Room kept on the Deny button's right for the shield.
+const DENY_COST_ROOM := 64.0
 const BUTTON_SEND := "Seal & send %s"
 const BUTTON_SEND_PARTY := "Seal & send party"
 const BUTTON_SEND_EMPTY := "Pin someone first"
@@ -78,9 +84,9 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _type_label: Label = %TypeLabel
 @onready var _title: Label = %Title
 @onready var _gold_chip = %GoldChip           # chip.gd
+@onready var _standing_chip = %StandingChip   # chip.gd
 @onready var _party_size_chip = %SlotsChip    # chip.gd
 @onready var _favored_chip = %FavChip         # chip.gd
-@onready var _status: Label = %Status
 @onready var _quest_card: PanelContainer = $Scroll/Margin/Col/Writ/WritMargin/QuestCard
 # Party
 @onready var _party_box: Control = %PartyBox
@@ -101,6 +107,8 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _hire_button: Button = %HireButton
 # Footer (left = wood, right = the wax-sealed button)
 @onready var _left_button: Button = %LeftButton
+@onready var _deny_cost: Control = %DenyCost
+@onready var _deny_cost_value: Label = %DenyCostValue
 @onready var _right_button: Button = %RightButton
 
 ## The main hall script (state + actions), set in setup().
@@ -123,6 +131,19 @@ func setup(main: HallMain) -> void:
 	_show_busy_toggle.toggled.connect(hall.set_show_busy_adventurers)
 	_show_busy_toggle.text = BUTTON_SHOW_BUSY
 	_back_button.text = BUTTON_BOARD
+	_make_room_for_deny_cost()
+
+
+## The Deny button's shield sits on its right edge: pad every look of the
+## button on that side so the "Deny" text never runs under it.
+func _make_room_for_deny_cost() -> void:
+	for look in ["normal", "hover", "pressed", "disabled", "focus"]:
+		var box := _left_button.get_theme_stylebox(look)
+		if box == null:
+			continue
+		box = box.duplicate()
+		box.content_margin_right = maxf(box.content_margin_right, 0.0) + DENY_COST_ROOM
+		_left_button.add_theme_stylebox_override(look, box)
 
 
 func scroll_to_top() -> void:
@@ -163,27 +184,13 @@ func _show_quest_card(entry: Dictionary) -> void:
 	HallStyle.set_font_color(_type_label, type_info.color)
 	_title.text = quest.questTitle
 
-	# chips: reward, party size, favored stat
+	# chips: reward (gold, standing on a win), party size, favored stat
 	_gold_chip.set_chip(TEXT_GOLD % quest.goldReward, HallStyle.GOLD_BG, HallStyle.TEXT_MAIN, "coins")
+	_standing_chip.set_chip(TEXT_STANDING % HallRules.standing_for_win(quest), HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "shield")
 	var size_text := TEXT_PARTY_SIZE_SOLO if size_limit == 1 else TEXT_PARTY_SIZE % size_limit
 	_party_size_chip.set_chip(size_text, HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "person")
 	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_stat_index(quest)]
 	_favored_chip.set_chip(TEXT_FAVORED % favored_stat.name, favored_stat.bg, favored_stat.color, "", true)
-
-	# status line in the state's ink
-	match entry.state:
-		HallStyle.QUEST_STATE_SENT:
-			_status.text = STATUS_SENT
-			HallStyle.set_font_color(_status, HallStyle.GREEN_TEXT)
-		HallStyle.QUEST_STATE_DENIED:
-			_status.text = STATUS_DENIED
-			HallStyle.set_font_color(_status, HallStyle.RED)
-		_:
-			if entry.party.is_empty():
-				_status.text = STATUS_OPEN % HallStyle.count_text(size_limit, "adventurer", "adventurers")
-			else:
-				_status.text = STATUS_DRAFT
-			HallStyle.set_font_color(_status, HallStyle.TEXT_SOFT)
 
 
 # ---- party
@@ -205,10 +212,25 @@ func _show_party(entry: Dictionary) -> void:
 	var chance: int = hall.success_chance(entry, entry.party)
 	var odds := HallStyle.odds_look(chance)
 	_odds_value.text = TEXT_ODDS % mini(chance, 100) if chance >= 0 else TEXT_ODDS_NONE
-	_odds_word.text = TEXT_PLUCK_ON_WIN % [odds.word, hall.pluck_gain_for(chance)] if chance >= 0 else odds.word
+	_odds_word.text = _odds_caption(entry, chance, odds.word)
 	HallStyle.set_font_color(_odds_value, odds.text_color)
 	HallStyle.tint_art(_odds_circle, odds.text_color)
 	_show_odds_change(chance)
+
+
+## The caption under the odds: the odds word, then what a win grows. At good
+## odds for the quest's rank that's a stat to train, otherwise Pluck.
+## entry: the quest entry; chance: the party's success chance (-1 = no party);
+## odds_word: HallStyle.odds_look(chance).word. Returns the caption text.
+func _odds_caption(entry: Dictionary, chance: int, odds_word: String) -> String:
+	if chance < 0:
+		return odds_word
+	if hall.trains_stat(entry, chance):
+		var stat_names := PackedStringArray()
+		for stat_index in hall.trained_stat_options(entry):
+			stat_names.append(HallStyle.STATS[stat_index].name)
+		return TEXT_TRAIN_ON_WIN % [odds_word, TEXT_TRAIN_OR.join(stat_names)]
+	return TEXT_PLUCK_ON_WIN % [odds_word, hall.pluck_gain_for(chance)]
 
 
 ## The odds number and bar. On the same quest, a new chance rolls the number,
@@ -301,7 +323,8 @@ func _show_picker(entry: Dictionary) -> void:
 	var can_pick: bool = entry.state != HallStyle.QUEST_STATE_DENIED
 	var has_roster: bool = not shown_adventurers.is_empty() or hidden_busy_count > 0
 	_pick_heading.text = PICK_HEADING
-	_pick_hint.text = PICK_HINT_HIDDEN % hidden_busy_count if hidden_busy_count > 0 else PICK_HINT
+	_pick_hint.visible = hidden_busy_count > 0
+	_pick_hint.text = PICK_HINT_HIDDEN % hidden_busy_count
 	_show_busy_toggle.set_pressed_no_signal(hall.show_busy_adventurers)
 	_pick_header.visible = can_pick and has_roster
 	_pick_list.visible = can_pick
@@ -312,13 +335,14 @@ func _show_picker(entry: Dictionary) -> void:
 # ---- footer
 
 ## Left / right footer buttons depend on the quest's state:
-##   open   -> Deny | Seal & send <name>
+##   open   -> Deny [shield -N] | Seal & send <name>
 ##   sent   -> Recall | Next Quest (or Board when nothing's left to decide)
 ##   denied -> Board | Reconsider
 ## The left button is always wood; the right one is the wax-sealed button.
 func _show_footer(entry: Dictionary) -> void:
 	_right_button.disabled = false
 	_left_button.icon = null
+	_deny_cost.visible = false
 	match entry.state:
 		HallStyle.QUEST_STATE_SENT:
 			_left_button.text = BUTTON_RECALL
@@ -329,6 +353,8 @@ func _show_footer(entry: Dictionary) -> void:
 		_:
 			_left_button.text = BUTTON_DENY
 			_left_button.icon = HallStyle.icon_texture("x")
+			_deny_cost_value.text = TEXT_DENY_COST % HallRules.standing_for_deny(entry.quest)
+			_deny_cost.visible = true
 			if entry.party.is_empty():
 				_right_button.text = BUTTON_SEND_EMPTY
 			elif entry.party.size() == 1:

@@ -1,0 +1,157 @@
+[gd_scene format=3 uid="uid://ca70e6ixyakqm"]
+
+[ext_resource type="Script" uid="uid://dxe8tbqykou4m" path="res://MobileHall/Scripts/hall_nav.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cb420nxynjehg" path="res://MobileHall/Art/Icons/scroll.tres" id="25_board"]
+[ext_resource type="Texture2D" uid="uid://cv5023acxlou6" path="res://MobileHall/Art/Icons/person.tres" id="27_guild"]
+[ext_resource type="Texture2D" uid="uid://cjywbau63ujgi" path="res://MobileHall/Art/Icons/hammer.tres" id="28_upgrades"]
+[ext_resource type="Texture2D" uid="uid://du8qg2ro1ddxi" path="res://MobileHall/Art/Icons/stall.tres" id="29_shop"]
+[ext_resource type="FontVariation" uid="uid://b7dyj081fpsg2" path="res://MobileHall/Art/Fonts/font_title.tres" id="5_title"]
+
+[node name="Nav" type="PanelContainer" unique_id=1524568463]
+layout_mode = 2
+theme_type_variation = &"NavBar"
+script = ExtResource("1_script")
+
+[node name="Row" type="HBoxContainer" parent="." unique_id=355818876]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Nav_board" type="Button" parent="Row" unique_id=1737672358]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+focus_mode = 0
+theme_type_variation = &"NavTab"
+text = "Board"
+icon = ExtResource("25_board")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Badge" type="PanelContainer" parent="Row/Nav_board" unique_id=1591115068]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -32.0
+offset_top = -18.0
+offset_right = 10.0
+offset_bottom = 24.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"Badge"
+
+[node name="Text" type="Label" parent="Row/Nav_board/Badge" unique_id=1976606555]
+layout_mode = 2
+theme_type_variation = &"LabelLight"
+theme_override_fonts/font = ExtResource("5_title")
+theme_override_font_sizes/font_size = 26
+text = "5"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Nav_guild" type="Button" parent="Row" unique_id=2073842401]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+focus_mode = 0
+theme_type_variation = &"NavTab"
+text = "Members"
+icon = ExtResource("27_guild")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Badge" type="PanelContainer" parent="Row/Nav_guild" unique_id=946514635]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -32.0
+offset_top = -18.0
+offset_right = 10.0
+offset_bottom = 24.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"Badge"
+
+[node name="Text" type="Label" parent="Row/Nav_guild/Badge" unique_id=1908661972]
+layout_mode = 2
+theme_type_variation = &"LabelLight"
+theme_override_fonts/font = ExtResource("5_title")
+theme_override_font_sizes/font_size = 26
+text = "!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Nav_upgrades" type="Button" parent="Row" unique_id=2097630605]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+focus_mode = 0
+theme_type_variation = &"NavTab"
+text = "Guild"
+icon = ExtResource("28_upgrades")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Badge" type="PanelContainer" parent="Row/Nav_upgrades" unique_id=732784974]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -32.0
+offset_top = -18.0
+offset_right = 10.0
+offset_bottom = 24.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"Badge"
+
+[node name="Text" type="Label" parent="Row/Nav_upgrades/Badge" unique_id=769313509]
+layout_mode = 2
+theme_type_variation = &"LabelLight"
+theme_override_fonts/font = ExtResource("5_title")
+theme_override_font_sizes/font_size = 26
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Nav_shop" type="Button" parent="Row" unique_id=995203544]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+focus_mode = 0
+theme_type_variation = &"NavTab"
+text = "Shop"
+icon = ExtResource("29_shop")
+icon_alignment = 1
+vertical_icon_alignment = 0
+
+[node name="Badge" type="PanelContainer" parent="Row/Nav_shop" unique_id=1191919301]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -32.0
+offset_top = -18.0
+offset_right = 10.0
+offset_bottom = 24.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"Badge"
+
+[node name="Text" type="Label" parent="Row/Nav_shop/Badge" unique_id=723039896]
+layout_mode = 2
+theme_type_variation = &"LabelLight"
+theme_override_fonts/font = ExtResource("5_title")
+theme_override_font_sizes/font_size = 26
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1

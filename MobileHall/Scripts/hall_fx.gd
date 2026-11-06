@@ -392,7 +392,8 @@ static func _make_stamp(text: String, ink: Color, font_size: int) -> PanelContai
 	var label := Label.new()
 	label.text = text
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.theme_type_variation = &"TitleLabel"
+	# stamps keep the blackletter heading font; a single short word reads fine
+	label.theme_type_variation = &"HeadingLabel"
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", ink)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

@@ -1,10 +1,12 @@
 ## Tutorial coach: Pip the guild clerk walks a new player through the real
-## Mobile Hall UI on Days 1, 3 and 5. Each step spotlights one control and
+## Mobile Hall UI on Days 1, 2, 3 and 5. Each step spotlights one control and
 ## waits for the player to use it (or press Next on explain-only steps), so
 ## the player learns by doing instead of reading an intro screen.
-##   Day 1 - hiring, a hero's page (stats, gear), reading a quest, picking a
-##           party, odds, Deny vs Send, End Day, the Day Report, how the
-##           guild can fall (HallMain.is_run_over)
+##   Day 1 - the core loop only: hiring, reading a quest, picking a party,
+##           Send, End Day, the Day Report
+##   Day 2 - a hero's page (stats, Pluck, gear), odds and what a win grows
+##           (a trained stat or Pluck), Deny,
+##           how the guild can fall (HallMain.is_run_over)
 ##   Day 3 - the Guild tab: upgrading a building, the Training Yard, the
 ##           Hospital, and why posted heroes can't quest
 ##   Day 5 - the Shop: role-locked items, buying, equipping from a hero's page
@@ -16,7 +18,7 @@
 ## UI only: it calls nothing but hall_main's own actions and queries.
 ##
 ## WHAT THE PLAYER SEES
-##   - everything outside the spotlight is greyed out (desaturated + dimmed)
+##   - everything outside the spotlight is dimmed (a dark wash)
 ##     and swallows taps; every button outside the spotlight is disabled
 ##   - a gold ring and a bouncing arrow on the one thing to tap
 ##   - Pip's bubble docks at the top or bottom, whichever is clear of the
@@ -52,7 +54,7 @@ extends Control
 
 ## Off = no coach, no tab locks, and the old Welcome card shows instead.
 const ENABLED := true
-const TUTORIAL_DAYS := [1, 3, 5]
+const TUTORIAL_DAYS := [1, 2, 3, 5]
 ## Script key for the freeplay walkthrough (not a day: it starts on the
 ## "freeplay" event, whatever day that is).
 const FREEPLAY_SCRIPT := -1
@@ -60,7 +62,7 @@ const UNLOCK_DAY := {"upgrades": 3, "shop": 5}
 
 ## Draw order: above the hall's overlays (z 10: Day Report, End Day sheet,
 ## toast) and the raised art inside tabs (applicant letters, scroll rollers),
-## so the grey-out, ring and Pip always sit on top of what they point at.
+## so the dim, ring and Pip always sit on top of what they point at.
 const TUTORIAL_Z_INDEX := 20
 ## The spotlight ring and the arrow are white art (Styles/stamp.tres, Art/Icons)
 ## tinted this gold.
@@ -75,17 +77,10 @@ const MISSING_GRACE := 0.6
 ## since the hall rebuilds rows on every refresh.
 const LOCK_INTERVAL := 0.1
 
-## Grey-out for everything outside the spotlight.
-const GREY_SHADER := """
-shader_type canvas_item;
-uniform sampler2D screen_tex : hint_screen_texture, filter_linear_mipmap;
-uniform float darken = 0.35;
-void fragment() {
-	vec3 c = texture(screen_tex, SCREEN_UV).rgb;
-	float g = dot(c, vec3(0.299, 0.587, 0.114));
-	COLOR = vec4(vec3(g) * (1.0 - darken), 1.0);
-}
-"""
+## Dim laid over everything outside the spotlight: a plain translucent wash.
+## (Reading the screen back to grey it out rendered wrong on iPhone Safari:
+## ghost copies of Pip and cropped slices.) Alpha = how dark it gets, 0..1.
+const DIM_COLOR := Color(0.0, 0.0, 0.0, 0.55)
 
 # ---- coloured words (the stat inks in HallStyle.STATS, and HallStyle.GOLD_TEXT)
 const POW := "[color=#8B2E2A]Power[/color]"
@@ -100,7 +95,7 @@ const GOLD := "[color=#6B5A1E]gold[/color]"
 const PORTRAIT_MASK := preload("uid://buv1wa6etd3u3")  # MobileHall/Art/Textures/portrait_round_mask.png
 const PORTRAIT_FRAME := preload("uid://cscfv0x0mk446")  # MobileHall/Art/Textures/portrait_round_frame.png
 ## The pointer is the pixel arrow icon (it points left; it's turned to point up / down).
-const ARROW_ICON := preload("uid://c2nc04lk4jmw3")  # MobileHall/Art/Icons/arrow_left.svg
+const ARROW_ICON := preload("uid://c2nc04lk4jmw3")  # MobileHall/Art/Icons/arrow_left.tres
 ## Ground behind Pip inside the frame (a parchment tint).
 const PIP_GROUND := Color("#E9DEC4")
 
@@ -136,6 +131,13 @@ var _dock_forced := false
 ## Compact chip opened up by tapping it.
 var _expanded := false
 var _bubble_goal := Vector2.ZERO
+## Steps shown so far this script (for Back), newest last.
+var _history: Array[int] = []
+## Furthest step the player has reached. Steps before it are being reviewed:
+## read-only, with Next (their action was already done).
+var _reached := -1
+## Steps left behind by Back, so Next retraces exactly what was shown.
+var _forward: Array[int] = []
 
 # ---- nodes (built in _build)
 var _blockers: Array[ColorRect] = []
@@ -150,6 +152,7 @@ var _text: RichTextLabel
 var _do_label: Label
 var _hint: Label
 var _next_button: Button
+var _back_button: Button
 var _skip_button: Button
 
 
@@ -164,9 +167,22 @@ func setup(main: Control) -> void:
 	visible = false
 	set_process(false)
 	hall.tutorial_event.connect(_on_event)
-	if ENABLED and GameState.day == 1:
+	# a run brought back from the save file picks up through resume_today() instead
+	if ENABLED and GameState.day == 1 and not hall.is_resumed_run:
 		hall.is_welcome_open = false
 		start.call_deferred(1)
+
+
+## A saved run was just loaded (HallSave.load_run restored is_skipped and done):
+## if today has a tutorial script that wasn't finished, run it again from its
+## first step. Not while the night's report, the credits or Game Over is up.
+func resume_today() -> void:
+	var day := GameState.day
+	if not ENABLED or is_skipped or not TUTORIAL_DAYS.has(day) or done.get(day, false):
+		return
+	if not (hall.shown_report.is_empty() and hall.shown_credits.is_empty() and hall.run_over_stats.is_empty()):
+		return
+	start.call_deferred(day)
 
 
 ## Tabs held back until the tutorial gets to them.
@@ -193,6 +209,9 @@ func start(day: int, script: int = day) -> void:
 	_steps = _steps_for(script)
 	_seen = {}
 	_index = -1
+	_history = []
+	_forward = []
+	_reached = -1
 	visible = true
 	set_process(true)
 	_bubble.position = Vector2(BUBBLE_MARGIN, size.y)
@@ -200,17 +219,43 @@ func start(day: int, script: int = day) -> void:
 
 
 func _advance() -> void:
+	if _index >= 0:
+		_history.append(_index)
+	if not _forward.is_empty():
+		# retracing after Back: the next step that was actually shown
+		_index = _forward.pop_back()
+		_reset_step()
+		return
 	_index += 1
 	while _index < _steps.size() and _steps[_index].has("skip") and _steps[_index]["skip"].call():
 		_index += 1
+	_reached = maxi(_reached, _index)
+	_reset_step()
+	if _index >= _steps.size():
+		_finish()
+
+
+## Back: show the previous step again, read-only.
+func _go_back() -> void:
+	if _history.is_empty():
+		return
+	_forward.append(_index)
+	_index = _history.pop_back()
+	_reset_step()
+
+
+## A step before the furthest one reached: its action is already done.
+func _is_reviewing() -> bool:
+	return _index < _reached
+
+
+func _reset_step() -> void:
 	_missing_for = 0.0
 	_last_target = null
 	_shown_text = ""
 	_dock_forced = false
 	_expanded = false
 	_lock_timer = 0.0
-	if _index >= _steps.size():
-		_finish()
 
 
 func _finish() -> void:
@@ -244,7 +289,7 @@ func _on_event(event: String, data: Variant = null) -> void:
 			_finish()
 		start(int(data), FREEPLAY_SCRIPT)
 		return
-	if not is_running():
+	if not is_running() or _is_reviewing():
 		return
 	var step: Dictionary = _steps[_index]
 	if step.get("on", "") != event:
@@ -286,12 +331,14 @@ func _process(delta: float) -> void:
 
 ## Is the spotlit control meant to be used on this step?
 func _is_live(step: Dictionary) -> bool:
+	if _is_reviewing():
+		return false
 	return step.has("on") or step.get("tap", false)
 
 # ============================================================ BUTTON LOCKS
 
 ## Disable every button in the hall except the ones inside a live spotlight.
-## (Rows that are tap panels, not Buttons, are stopped by the grey blockers.)
+## (Rows that are tap panels, not Buttons, are stopped by the dim blockers.)
 func _apply_locks(step: Dictionary, target: Control) -> void:
 	var live_root: Control = target if (target != null and _is_live(step)) else null
 	var denied: Array = step.get("deny", [])
@@ -339,11 +386,11 @@ func _release_locks() -> void:
 
 func _layout(step: Dictionary, target: Control, delta: float) -> void:
 	var full: Vector2 = size
-	var waits: bool = step.has("on")
+	var waits: bool = step.has("on") and not _is_reviewing()
 	var is_lost: bool = step.get("target") != null and target == null and _missing_for > MISSING_GRACE
 	var show_next: bool = not waits or is_lost
 
-	# ---- the spotlight hole and the grey-out around it
+	# ---- the spotlight hole and the dim around it
 	var hole := Rect2()
 	if target != null:
 		var xf: Transform2D = get_global_transform().affine_inverse() * target.get_global_transform()
@@ -357,7 +404,7 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 		_set_rect(_blockers[0], Rect2(Vector2.ZERO, full))
 		for blocker_index in range(1, 4):
 			_set_rect(_blockers[blocker_index], Rect2())
-	# explain-only steps cover the hole too (no grey, just no taps)
+	# explain-only steps cover the hole too (no dim, just no taps)
 	_set_rect(_cover, hole if (hole.has_area() and not _is_live(step)) else Rect2())
 
 	_ring.visible = hole.has_area()
@@ -373,7 +420,7 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 		_text.text = text
 	_counter.text = "Day %d · %d/%d" % [_day, _index + 1, _steps.size()]
 	var do_text: String = step.get("do", "")
-	if is_lost:
+	if is_lost or _is_reviewing():
 		do_text = ""
 	elif do_text == "" and waits:
 		do_text = "Tap the glowing spot"
@@ -382,6 +429,7 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 	_do_label.text = ("▶  " + do_text.to_upper()) if do_text != "" else ""
 	_do_label.visible = do_text != ""
 	_next_button.visible = show_next
+	_back_button.visible = not _history.is_empty()
 	_next_button.text = "Got it" if _index == _steps.size() - 1 else "Next"
 	_hint.text = "Tap me to move"
 
@@ -503,12 +551,9 @@ func _is_press(event: InputEvent) -> bool:
 # ============================================================ BUILD
 
 func _build() -> void:
-	var grey := ShaderMaterial.new()
-	grey.shader = Shader.new()
-	grey.shader.code = GREY_SHADER
 	for blocker_index in 4:
 		var blocker := ColorRect.new()
-		blocker.material = grey
+		blocker.color = DIM_COLOR
 		blocker.mouse_filter = Control.MOUSE_FILTER_STOP
 		blocker.gui_input.connect(_on_blocked_input)
 		add_child(blocker)
@@ -555,7 +600,7 @@ func _build() -> void:
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_hint.custom_minimum_size.x = 84
-	_hint.add_theme_font_size_override("font_size", 16)
+	_hint.add_theme_font_size_override("font_size", 19)
 	face_col.add_child(_hint)
 
 	var col := VBoxContainer.new()
@@ -575,7 +620,7 @@ func _build() -> void:
 	_counter.theme_type_variation = &"CapsLabel"
 	_counter.uppercase = true
 	_counter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_counter.add_theme_font_size_override("font_size", 17)
+	_counter.add_theme_font_size_override("font_size", 20)
 	head.add_child(_counter)
 
 	_text = RichTextLabel.new()
@@ -598,7 +643,7 @@ func _build() -> void:
 	_do_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_do_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_do_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_do_label.add_theme_font_size_override("font_size", 19)
+	_do_label.add_theme_font_size_override("font_size", 22)
 	HallStyle.set_font_color(_do_label, HallStyle.BLUE_TEXT)
 	# the instruction takes all the room left of Skip / Next, so it doesn't wrap early
 	foot.add_child(_do_label)
@@ -606,10 +651,16 @@ func _build() -> void:
 	_skip_button.text = "Skip tutorial"
 	_skip_button.flat = true
 	_skip_button.add_theme_font_override("font", load("uid://dvhjw1533s75"))  # MobileHall/Art/Fonts/font_italic.tres
-	_skip_button.add_theme_font_size_override("font_size", 20)
+	_skip_button.add_theme_font_size_override("font_size", 22)
 	_skip_button.add_theme_color_override("font_color", HallStyle.TEXT_SOFT)
 	_skip_button.pressed.connect(skip_tutorial)
 	foot.add_child(_skip_button)
+	_back_button = Button.new()
+	_back_button.text = "Back"
+	_back_button.custom_minimum_size = Vector2(110, 64)
+	HallStyle.style_button(_back_button, "paper", 28)
+	_back_button.pressed.connect(_go_back)
+	foot.add_child(_back_button)
 	_next_button = Button.new()
 	_next_button.text = "Next"
 	_next_button.custom_minimum_size = Vector2(120, 64)
@@ -618,7 +669,8 @@ func _build() -> void:
 	foot.add_child(_next_button)
 
 
-## Pip's portrait: the round portrait mask (parchment ground, clips Pip) and
+## Pip's portrait: the round portrait mask (parchment ground; its shape clips
+## Pip through HallStyle.mask_to) and
 ## the round portrait frame on top, the same art as the heroes' portraits.
 func _build_portrait() -> Control:
 	var holder := Control.new()
@@ -628,7 +680,6 @@ func _build_portrait() -> Control:
 	var mask := TextureRect.new()
 	mask.texture = PORTRAIT_MASK
 	mask.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	mask.clip_children = CanvasItem.CLIP_CHILDREN_AND_DRAW
 	mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	mask.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	HallStyle.tint_art(mask, PIP_GROUND)
@@ -637,6 +688,10 @@ func _build_portrait() -> Control:
 	pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pip.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mask.add_child(pip)
+	# clipped by the portrait mask shader, not clip_children (broken on iPhone
+	# Safari); Pip fills the mask, so the mask's rect is Pip's own rect
+	pip.resized.connect(func() -> void: HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(Vector2.ZERO, pip.size)))
+	HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(Vector2.ZERO, pip.size))
 	var frame := TextureRect.new()
 	frame.texture = PORTRAIT_FRAME
 	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -703,7 +758,7 @@ func _screen(kind: String) -> Node:
 
 
 func _nav(tab_id: String) -> Control:
-	return hall._nav_button(tab_id)
+	return hall.nav_button(tab_id)
 
 
 ## A scene-unique node (%Name) inside `node`'s scene.
@@ -754,8 +809,22 @@ func _party_ready(entry: Dictionary) -> bool:
 func _pick_text() -> String:
 	var entry: Dictionary = hall.current_quest_entry()
 	if not entry.is_empty() and hall.party_size_limit(entry) == 1:
-		return "This quest takes one hero. The number on each row is how much chance they add, so tap the best fit."
-	return "Tap heroes to put them in the party. The number on each row is how much chance that hero adds."
+		return "One hero only. Each row's number is the chance they add."
+	return "Tap heroes to add them. Each row's number is the chance they add."
+
+
+## The Assign Party odds step: risk vs. reward. A win at good odds trains the
+## quest's or region's stat; a riskier win grows Pluck instead. The threshold is
+## the open quest's (HallRules.train_odds_for, an F quest's if none is open),
+## and the Pluck numbers and odds word come from HallRules.PLUCK_GAIN_BY_ODDS
+## and HallStyle.ODDS_BANDS, so the text follows the tuning.
+func _odds_text() -> String:
+	var entry: Dictionary = hall.current_quest_entry()
+	var rank: int = entry.quest.difficulty if not entry.is_empty() else 0
+	var riskiest: Dictionary = HallRules.PLUCK_GAIN_BY_ODDS[-1]
+	var riskiest_word: String = HallStyle.odds_look(riskiest.min).word
+	return "Win at %d%%+ to train the quest's or region's stat. Riskier wins grow %s instead, up to +%d on a %s." \
+			% [HallRules.train_odds_for(rank), PLK, riskiest.gain, riskiest_word]
 
 
 func _anyone_can_train() -> bool:
@@ -791,6 +860,8 @@ func _steps_for(script: int) -> Array:
 	match script:
 		1:
 			return _day_one()
+		2:
+			return _day_two()
 		3:
 			return _day_three()
 		5:
@@ -802,118 +873,122 @@ func _steps_for(script: int) -> Array:
 
 func _day_one() -> Array:
 	return [
-		{"text": "Welcome to your new guild, Guildmaster! I'm [b]Pip[/b], your clerk. Let's run your first day together. Tap each glowing spot as I point it out."},
+		{"text": "Welcome, Guildmaster! I'm [b]Pip[/b], your clerk. Tap whatever glows."},
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
-			"do": "Tap Members", "text": "A guild is only as good as its adventurers. Open [b]Members[/b]."},
+			"do": "Tap Members", "text": "First, heroes. Open [b]Members[/b]."},
 		{"target": func(): return _u(_tab("guild"), "SegHire"), "on": "tab", "when": func(d): return d.guild == "hire",
 			"skip": func(): return hall.guild_section == "hire",
-			"do": "Tap Applicants", "text": "Nobody works here yet. Open [b]Applicants[/b] to see today's recruits."},
+			"do": "Tap Applicants", "text": "Open [b]Applicants[/b]."},
 		{"target": func(): return _row(_tab("guild"), "hire_card.gd"),
-			"text": "Each recruit has a role and four stats: %s, %s, %s and %s. Every quest favours one of them." % [POW, DEF, WIS, SLZ]},
+			"text": "Recruits have four stats: %s, %s, %s and %s." % [POW, DEF, WIS, SLZ]},
 		{"target": func(): return _row(_tab("guild"), "hire_card.gd", "HireButton"), "on": "hire",
-			"do": "Tap Hire", "deny": ["DetailsButton"], "text": "Hiring is free for your first two days. Hire this one."},
+			"do": "Tap Hire", "deny": ["DetailsButton"], "text": "Hiring is free for two days. Hire one."},
 		# the applicants are a stack of letters (%Stack): the next one is on top now
 		{"target": func(): return _row(_tab("guild"), "hire_card.gd", "HireButton"), "on": "hire",
 			"skip": func(): return not hall.can_hire_anyone(),
-			"do": "Tap Hire on another recruit", "deny": ["DetailsButton"], "text": "Hire one more. Two heroes means better odds, and a backup if someone falls. A guild with nobody left is finished."},
-		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
-			"do": "Tap Your Guild", "text": "Now meet your people. Open [b]Your Guild[/b]."},
-		{"target": func(): return _row(_tab("guild"), "member_card.gd"), "on": "character",
-			"do": "Tap the hero card", "text": "Tap a hero to open their page."},
-		{"target": func(): return _u(_screen("character"), "StatLines"),
-			"text": "Their stats. Quests lean hardest on the favoured stat. %s goes up by one every time they finish a quest." % PLK},
-		{"target": func(): return _u(_screen("character"), "GearLines"),
-			"text": "Gear slots. Items are role-locked, so only some gear fits each hero. The Shop opens on Day 5."},
-		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close",
-			"do": "Tap Back", "text": "Head back."},
+			"do": "Tap Hire", "deny": ["DetailsButton"], "text": "And one more. Two heroes beat one."},
 		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
-			"do": "Tap Board", "text": "Time to find them work. Open the [b]Board[/b]."},
-		{"target": func(): return _row(_tab("board"), "quest_row.gd"),
-			"text": "Each card is a job: its rank, the %s it pays, how many heroes it takes, and the stat it favours." % GOLD},
+			"do": "Tap Board", "text": "Now find them work. Open the [b]Board[/b]."},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
-			"do": "Tap the quest card", "text": "Tap the quest to plan a party."},
-		{"target": func(): return _u(_screen("assign"), "QuestCard"),
-			"text": "The full posting. Check the favoured stat before you pick anyone."},
+			"do": "Tap the quest card", "text": "A quest: its rank, %s, party size and favoured stat. Tap it." % GOLD},
 		{"target": func(): return _u(_screen("assign"), "PickList"), "on": "pick", "when": func(d): return _party_ready(d),
 			"do": "Tap a hero row to add them", "deny": ["InfoButton"], "text": func(): return _pick_text()},
 		{"target": func(): return _u(_screen("assign"), "PartyBox"),
-			"text": "Your party and its success chance. Low odds mean failure and injuries. Swap heroes in and out until it looks right."},
-		{"target": func(): return _u(_screen("assign"), "LeftButton"),
-			"text": "[b]Deny[/b] turns a quest down. It costs a little standing, and you can Reconsider later the same day. This one's worth taking."},
+			"text": "Your odds. Low odds risk failure and injuries."},
 		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "send",
-			"do": "Tap Seal & send", "text": "Seal the orders and send the party. They head out tonight."},
-		{"target": func(): return hall.get_node("%ActionButton"), "on": "end_check",
-			"do": "Tap End Day", "text": "Every quest is decided. This bar always shows your next step. Tap [b]End Day[/b]."},
+			"do": "Tap Seal & send", "text": "Send them. They leave tonight."},
+		{"target": func(): return hall.action_button(), "on": "end_check",
+			"do": "Tap End Day", "text": "This bar always shows your next step. Tap [b]End Day[/b]."},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
-			"do": "Tap End Day", "text": "A last look at tonight's plan. End the day."},
+			"do": "Tap End Day", "text": "Confirm tonight's plan."},
 		{"target": func(): return _u(hall.get_node("%OverlayReport"), "Entries"),
-			"text": "Morning! Each party tells you what happened out there."},
+			"text": "Morning! Here's how each party did."},
 		{"target": func(): return _report_totals(),
-			"text": "The tally: quests won, %s earned, and who came back hurt. Hurt heroes heal at home, or faster in the Hospital." % GOLD},
-		{"target": func(): return _report_totals(),
-			"text": "Heroes can [b]die[/b] out there. If everyone is gone and you can't afford a new recruit, the guild falls and the run is over. When you're down to your last hero, a red warning shows under the header."},
+			"text": "Wins, %s earned, and who got hurt." % GOLD},
 		{"target": func(): return _u(hall.get_node("%OverlayReport"), "ActionButton"), "on": "new_day",
-			"do": "Tap the button to start Day 2", "text": "Start Day 2. New recruits and quests show up every morning."},
-		{"text": "Day 2 is yours: hire, plan, send, end the day. I'll be back on Day 3 to show you the guild's buildings."},
+			"do": "Tap to start Day 2", "text": "On to Day 2."},
+	]
+
+
+func _day_two() -> Array:
+	return [
+		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
+			"do": "Tap Members", "text": "Day 2! Let's meet your heroes. Open [b]Members[/b]."},
+		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
+			"skip": func(): return hall.guild_section == "roster",
+			"do": "Tap Your Guild", "text": "Open [b]Your Guild[/b]."},
+		{"target": func(): return _row(_tab("guild"), "member_card.gd"), "on": "character",
+			"do": "Tap a hero", "text": "Tap a hero to open their page."},
+		{"target": func(): return _u(_screen("character"), "StatLines"),
+			"text": "Quests lean on the favoured stat. Safe wins train a stat; risky wins grow %s, which boosts every other stat." % PLK},
+		{"target": func(): return _u(_screen("character"), "GearLines"),
+			"text": "Gear slots. Items are role-locked. The Shop opens on Day 5."},
+		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close",
+			"do": "Tap Back", "text": "Head back."},
+		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
+			"do": "Tap Board", "text": "Open the [b]Board[/b]."},
+		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
+			"do": "Tap a quest card", "text": "Open a quest."},
+		{"target": func(): return _u(_screen("assign"), "PartyBox"),
+			"text": func(): return _odds_text()},
+		{"target": func(): return _u(_screen("assign"), "LeftButton"),
+			"text": "[b]Deny[/b] skips a quest for a little standing. You can Reconsider later today."},
+		{"text": "Heroes can [b]die[/b]. Lose them all with no gold to hire, and the guild falls. The rest of today is yours. See you on Day 3!"},
 	]
 
 
 func _day_three() -> Array:
 	return [
-		{"text": "Day 3! Time to work on the guild itself. The [b]Guild[/b] tab is open now."},
 		{"target": func(): return _nav("upgrades"), "on": "tab", "when": func(d): return d.tab == "upgrades",
-			"do": "Tap Guild", "text": "Open [b]Guild[/b]."},
+			"do": "Tap Guild", "text": "Day 3! The [b]Guild[/b] tab is open. Take a look."},
 		{"target": func(): return _u(_tab("upgrades"), "SegBuild"), "on": "tab", "when": func(d): return d.upgrades == "build",
 			"skip": func(): return hall.upgrades_section == "build",
-			"do": "Tap Build", "text": "Start with [b]Build[/b]."},
+			"do": "Tap Build", "text": "Open [b]Build[/b]."},
 		{"target": func(): return _row(_tab("upgrades"), "upgrade_card.gd"),
-			"text": "Each building has five levels. Upgrades cost %s and need enough standing. A card shows what you have now and what the next level adds." % GOLD},
+			"text": "Buildings have five levels. Upgrades cost %s and standing." % GOLD},
 		{"target": func(): return _row(_tab("upgrades"), "upgrade_card.gd", "UpgradeButton", func(b): return _is_enabled(b)), "on": "upgrade",
 			"skip": func(): return hall.affordable_buildings().is_empty(),
 			"do": "Tap Build", "text": "You can afford this one. Build it."},
 		{"target": func(): return _u(_tab("upgrades"), "Wallet"),
 			"skip": func(): return _seen.get("upgrade", false),
-			"text": "Not enough yet. When you can afford an upgrade, a number shows up on the Guild tab."},
+			"text": "Not enough yet. A badge on the tab shows when you can."},
 		{"target": func(): return _u(_tab("upgrades"), "SegTonight"), "on": "tab", "when": func(d): return d.upgrades == "tonight",
-			"do": "Tap Tonight", "text": "Now [b]Tonight[/b]. This is where heroes stay home and work."},
+			"do": "Tap Tonight", "text": "Now [b]Tonight[/b]: who stays home."},
 		{"target": func(): return _training_section(),
-			"text": "The [b]Training Yard[/b]: a hero who stays home drills one stat overnight."},
+			"text": "[b]Training Yard[/b]: a hero drills one stat overnight."},
 		{"target": func(): return _u(_training_section(), "AddButton"), "on": "training_picker",
 			"skip": func(): return not GuildUpgrades.has_free_training_slot() or not _anyone_can_train(),
-			"do": "Tap Add a hero", "text": "Tap the button to pick a trainee."},
+			"do": "Tap Add a hero", "text": "Pick a trainee."},
 		{"target": func(): return _row(_training_section(), "home_row.gd", "MainButton", func(b): return _is_enabled(b)), "on": "train",
 			"skip": func(): return not hall.training_picker_open,
-			"do": "Tap Add next to a hero", "deny": ["SideButton"], "text": "Pick someone who's free today."},
+			"do": "Tap Add next to a hero", "deny": ["SideButton"], "text": "Choose someone free today."},
 		{"target": func(): return _row(_training_section(), "home_row.gd", "StatPicker"), "tap": true,
 			"skip": func(): return not _seen.get("train", false),
-			"do": "Tap a stat, then Next", "text": "Choose which stat they drill: %s, %s, %s or %s." % [POW, DEF, WIS, SLZ]},
+			"do": "Tap a stat, then Next", "text": "Pick the stat to drill."},
 		{"target": func(): return _hospital_section(),
-			"text": "The [b]Hospital[/b]: a hurt hero in a bed heals faster than at home. Each card shows nights at home against nights in bed."},
+			"text": "[b]Hospital[/b]: hurt heroes heal faster in a bed than at home."},
 		{"target": func(): return _row(_hospital_section(), "home_row.gd", "MainButton", func(b): return b.text.contains("dmit")), "on": "admit",
 			"skip": func(): return hall.hurt_waiting_count() == 0,
-			"do": "Tap Admit", "text": "Someone's hurt. Tap [b]Admit[/b] to give them a bed."},
-		{"text": "One rule to remember: heroes who are training or in a bed [b]can't go on quests[/b]. Each day, choose who works, who rests and who goes out."},
-		{"target": func(): return _nav("board"),
-			"text": "That's the guild. Plan today's quests on the Board and end the day as usual. On Day 5 a merchant comes to town."},
+			"do": "Tap Admit", "text": "Someone's hurt. [b]Admit[/b] them."},
+		{"text": "Heroes training or in bed [b]can't quest[/b]. Choose who works, rests and goes out. Back on Day 5!"},
 	]
 
 
 func _day_five() -> Array:
 	return [
-		{"text": "Day 5. A travelling merchant has set up in the guild. The [b]Shop[/b] tab is open."},
 		{"target": func(): return _nav("shop"), "on": "tab", "when": func(d): return d.tab == "shop",
-			"do": "Tap Shop", "text": "Open the [b]Shop[/b]."},
+			"do": "Tap Shop", "text": "Day 5. A merchant's in town! Open the [b]Shop[/b]."},
 		{"target": func(): return _tab("shop").get_node_or_null("Keeper"),
-			"text": "Fresh stock every morning. Whatever you don't buy today is gone tomorrow."},
+			"text": "Stock changes every morning. Unbought items are gone."},
 		{"target": func(): return _u(_tab("shop"), "Grid"), "tap": true,
 			"skip": func(): return not _any_affordable(),
-			"do": "Tap items to compare, then Next", "text": "Every item is role-locked. Tap a tag and the bar below says what it does and which role can use it. Pick one for a role you have."},
+			"do": "Tap items to compare, then Next", "text": "Items are role-locked. Tap one to see what it does and who can use it."},
 		{"target": func(): return _u(_tab("shop"), "BuyButton"), "on": "buy",
 			"skip": func(): return not _any_affordable(),
-			"do": "Tap Buy", "text": "The bar shows the picked item and what it does. Buy it."},
+			"do": "Tap Buy", "text": "Buy it."},
 		{"target": func(): return _u(_tab("shop"), "Grid"),
 			"skip": func(): return _seen.get("buy", false),
-			"text": "Nothing here you can afford yet. Quests pay in %s, and the stock changes tomorrow. Gear goes on from a hero's page." % GOLD},
+			"text": "Nothing affordable yet. Earn %s and check back tomorrow." % GOLD},
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
 			"skip": func(): return not _seen.get("buy", false) or not _someone_fits_bought(),
 			"do": "Tap Members", "text": "Gear goes on from a hero's page. Open [b]Members[/b]."},
@@ -923,23 +998,23 @@ func _day_five() -> Array:
 		{"target": func(): return _u(_tab("guild"), "List"), "tap": true, "on": "character", "when": func(d): return _fits_bought(d),
 			"reject": func(): return "Only %ss can use the %s." % [_bought_role(), _bought_name()],
 			"skip": func(): return not _seen.get("buy", false) or not _someone_fits_bought(),
-			"do": "Tap a hero with the right role", "text": func(): return "Open a [b]%s[/b]. Only they can use the %s." % [_bought_role(), _bought_name()]},
+			"do": "Tap a hero with the right role", "text": func(): return "Open a [b]%s[/b]." % _bought_role()},
 		{"target": func(): return _u(_screen("character"), "GearLines"), "tap": true, "on": "equip",
 			"skip": func(): return not _seen.get("buy", false) or not _someone_fits_bought(),
-			"do": "Tap Equip, then the item", "deny": ["SideButton"], "text": func(): return "Tap [b]Equip[/b] on an empty slot, then pick the %s." % _bought_name()},
+			"do": "Tap Equip, then the item", "deny": ["SideButton"], "text": func(): return "Tap [b]Equip[/b], then the %s." % _bought_name()},
 		{"target": func(): return _u(_screen("character"), "StatLines"),
 			"skip": func(): return not _seen.get("equip", false),
-			"text": "The gear's bonus is added to their stats and counts on every quest."},
-		{"text": func(): return ("You bought gear nobody can use yet. Hire a %s and equip it from their page." % _bought_role()) if (_seen.get("buy", false) and not _someone_fits_bought()) else "That's everything I can teach. Keep your heroes alive, watch the Bone Drake countdown, and good luck, Guildmaster."},
+			"text": "Its bonus now counts on every quest."},
+		{"text": func(): return ("Hire a %s to use that gear." % _bought_role()) if (_seen.get("buy", false) and not _someone_fits_bought()) else "That's everything! More help is under Menu > How to play. Good luck, Guildmaster."},
 	]
 
 
 ## After the final battle is won: what freeplay changes.
 func _freeplay() -> Array:
 	return [
-		{"text": "You did it, Guildmaster! The final battle is won and the story is told. But the guild's doors stay open: welcome to [b]freeplay[/b]."},
-		{"text": "From now on the days never end. Each new day, every quest asks a little more of your heroes, and pays a little more %s too." % GOLD},
+		{"text": "You did it, Guildmaster! The story's done, but the guild stays open: welcome to [b]freeplay[/b]."},
+		{"text": "Days never end now. Quests get harder each day, and pay more %s." % GOLD},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd", "RankChip"),
-			"text": "Quests can now go past S rank. Anything tougher than S is [b]S++[/b]. It's the hardest work there is, and the best paid."},
-		{"text": "One thing hasn't changed: if every hero falls and you can't hire more, the guild falls with them. See how long your legend lasts!"},
+			"text": "Quests can now pass S rank, up to [b]S++[/b]."},
+		{"text": "Lose every hero with no gold to hire, and the guild still falls. How long can you last?"},
 	]

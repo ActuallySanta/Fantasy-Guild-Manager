@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://d3mb2mcim2mnm" path="res://MobileHall/Art/Textures/tag_hole.png" id="3_hole"]
 
 [node name="ShopTile" type="Button"]
+mouse_filter = 1
 custom_minimum_size = Vector2(0, 222)
 size_flags_horizontal = 3
 focus_mode = 0
@@ -95,7 +96,7 @@ unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_type_variation = &"ItalicLabel"
-theme_override_font_sizes/font_size = 21
+theme_override_font_sizes/font_size = 23
 text = "Back tomorrow"
 horizontal_alignment = 1
 

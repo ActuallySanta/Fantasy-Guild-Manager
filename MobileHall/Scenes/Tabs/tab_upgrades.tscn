@@ -133,7 +133,7 @@ custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"ItalicLight"
 theme_override_font_sizes/font_size = 23
-text = "Heroes in training or in a bed can't be sent on quests. Changes happen when the day ends."
+text = "Heroes training or in a bed can't go on quests."
 autowrap_mode = 3
 
 [node name="Build" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col"]
@@ -142,20 +142,13 @@ layout_mode = 2
 theme_override_constants/separation = 20
 
 [node name="WalletBox" type="PanelContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build"]
+mouse_filter = 1
 layout_mode = 2
 theme_type_variation = &"LedgerCard"
 
 [node name="Col" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/WalletBox"]
 layout_mode = 2
 theme_override_constants/separation = -4
-
-[node name="Caps" type="Label" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/WalletBox/Col"]
-layout_mode = 2
-theme_type_variation = &"CapsLabel"
-theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
-theme_override_font_sizes/font_size = 19
-text = "Treasury ledger"
-uppercase = true
 
 [node name="Row" type="HBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/WalletBox/Col"]
 layout_mode = 2
@@ -176,15 +169,6 @@ theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 26
 text = "· Standing 1"
 
-[node name="WalletHint" type="Label" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/WalletBox/Col"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-theme_type_variation = &"TitleLabel"
-theme_override_font_sizes/font_size = 30
-text = "You can afford 2 upgrades. Quests pay for the rest."
-autowrap_mode = 3
-
 [node name="List" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -199,7 +183,7 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_type_variation = &"ItalicLight"
 theme_override_font_sizes/font_size = 28
-text = "Still rolled up · coming soon"
+text = "Coming soon"
 
 [node name="SoonRow" type="HFlowContainer" parent="FolderMargin/Folder/Scroll/Margin/Col/Build/SoonBox"]
 unique_name_in_owner = true

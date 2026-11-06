@@ -24,15 +24,12 @@ const UPGRADES_LOCKED := "opens Day %d"
 const HEADING := "Today's Quests"
 const HEADING_MILESTONE := "The Bone Drake"
 const HEADING_FINAL := "The Final Battle"
-const HINT := "unroll one to staff it"
-const HINT_ALL_DECIDED := "all decided · tap to change"
 
 # ---- NODES
 @onready var _today_recruits = %TodayRecruits     # today_item.gd
 @onready var _today_quests = %TodayQuests         # today_item.gd
 @onready var _today_upgrades = %TodayUpgrades     # today_item.gd
 @onready var _heading: Label = %Heading
-@onready var _hint: Label = %Hint
 @onready var _quest_list: VBoxContainer = %QuestList
 
 ## The main hall script (state + actions), set in setup().
@@ -107,7 +104,6 @@ func _show_quest_list() -> void:
 		_heading.text = HEADING_FINAL
 	else:
 		_heading.text = HEADING_MILESTONE if is_milestone_day else HEADING
-	_hint.text = HINT_ALL_DECIDED if hall.undecided_count() == 0 else HINT
 	HallStyle.clear_children(_quest_list)
 	for quest_index in hall.quest_entries.size():
 		HallStyle.add_row(_quest_list, QuestRowScene).setup(hall, quest_index)

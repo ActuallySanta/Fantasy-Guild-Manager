@@ -32,5 +32,13 @@ func _gui_input(event: InputEvent) -> void:
 	elif _is_pressing:
 		_is_pressing = false
 		var moved_distance := mouse_event.global_position.distance_to(_press_position)
-		if moved_distance < TAP_MOVE_LIMIT:
+		if moved_distance < TAP_MOVE_LIMIT and not _is_over_child_button():
 			pressed.emit()
+
+
+## True when the finger is on a button inside this panel (e.g. pick_row's Info
+## button). Buttons in scroll lists are Pass (DragScroll), so their taps also
+## reach this panel; that tap belongs to the button, not to the row.
+func _is_over_child_button() -> bool:
+	var hovered := get_viewport().gui_get_hovered_control()
+	return hovered is BaseButton and hovered != self and is_ancestor_of(hovered)

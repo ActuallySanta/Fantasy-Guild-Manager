@@ -1,0 +1,91 @@
+# Exports the game with the "Web" preset (export_presets.cfg) and publishes it
+# to GitHub Pages. Runs on every push to master, or by hand from the Actions
+# tab ("Run workflow"), which can also build another branch.
+#
+# One-time setup: repo Settings -> Pages -> Build and deployment -> Source:
+# "GitHub Actions".
+name: Deploy web build
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deploy at a time; a newer push cancels an older queued one.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+env:
+  # Must match the editor the project is made with (CLAUDE.md: Godot 4.7).
+  # Upgrading = change this one line.
+  GODOT_VERSION: 4.7.2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Godot and export templates
+        id: cache-godot
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/godot
+            ~/.local/share/godot/export_templates/${{ env.GODOT_VERSION }}.stable
+          key: godot-${{ env.GODOT_VERSION }}
+
+      - name: Download Godot and export templates
+        if: steps.cache-godot.outputs.cache-hit != 'true'
+        run: |
+          base="https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}-stable"
+          mkdir -p ~/godot
+          curl -fsSL -o godot.zip "$base/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip -d ~/godot
+          mv ~/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 ~/godot/godot
+          curl -fsSL -o templates.tpz "$base/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          unzip -q templates.tpz
+          dest=~/.local/share/godot/export_templates/${GODOT_VERSION}.stable
+          mkdir -p "$dest"
+          mv templates/* "$dest"
+          rm -rf godot.zip templates.tpz templates
+
+      - name: Import project
+        # Builds .godot/ (imported assets, class_name cache) before exporting.
+        # Import can exit non-zero on harmless warnings, so don't fail here;
+        # the export step fails loudly if something is really broken.
+        run: ~/godot/godot --headless --import || true
+
+      - name: Stamp the build
+        # The Menu shows this line (HallBuildInfo), so a phone can tell which
+        # build it's running. Shipped by the preset's External Content/*.txt
+        # include_filter; gitignored, so local builds just say "Build dev".
+        run: |
+          echo "$(git rev-parse --short HEAD) · $(date -u '+%Y-%m-%d %H:%M') UTC" > "External Content/build_info.txt"
+          cat "External Content/build_info.txt"
+
+      - name: Export web build
+        run: |
+          mkdir -p build/web
+          ~/godot/godot --headless --export-release "Web" build/web/index.html
+          test -f build/web/index.pck
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

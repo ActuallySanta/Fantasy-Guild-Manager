@@ -61,23 +61,33 @@ border width, open the matching `Styles/*.tres` and change its *Texture Margin*.
 | `dash.png` | Dashed underlines (tiles) |
 | `box_on.png`, `box_off.png` | "Show busy" checkbox |
 | `tag_hole.png` | The string hole at the top of each shop price tag |
-| `../shopkeeper_placeholder.svg` | Grizzle behind his counter on the Shop tab (stand-in from the Shop groundwork) |
+| `Sprites/Shop/shopBackground.png`, `Sprites/Shop/shopkeeper.png` (outside this folder) | Grizzle on the Shop tab: the shop behind him (`Background` in `tab_shop.tscn`) and Grizzle on top (`ShopKeeper`) |
 
 ### Icons: `Art/Icons`
 
-Line icons, **white** so the UI can tint them (ink on paper, cream on wood). Keep your
-replacements white on transparent and they'll be tinted the same way. The table that maps
-names to files is `ICON_FILES` in `Scripts/hall_style.gd`; add a row there to add an icon.
-Buildings pick their icon in `BUILDING_ICONS` in the same file. `stall.svg` is the Shop tab.
+Pixel-art icons, **16 x 16 PNGs** (edit them in Aseprite at that size). They're **white**
+(with grey shading and a dark outline) so the UI can tint them: ink on paper, cream on wood.
+Keep your replacements white on transparent and they'll be tinted the same way.
+
+Each `name.png` has a `name.tres` beside it. That's what the scenes and code use: a
+`PixelIcon` (`Scripts/pixel_icon.gd`) that draws the PNG 6x bigger with sharp pixels, so a
+16 x 16 icon is laid out like the old 96 x 96 ones and never blurs. **Edit the `.png`**; the
+`.tres` picks it up. To add an icon: draw `name.png`, duplicate any icon's `.tres` in the
+FileSystem dock as `name.tres` and set its *Source* to the new PNG, then add a row to
+`ICON_FILES` in `Scripts/hall_style.gd`. Buildings pick their icon in `BUILDING_ICONS` in
+the same file. `stall` is the Shop tab.
 
 ## Fonts: `Art/Fonts`
 
 | Wrapper | File now | Used for |
 |---|---|---|
-| `font_title.tres` | Pirata One | Blackletter titles, names, big numbers, gold / wood buttons |
+| `font_title.tres` | Pirata One | Blackletter headings only (`HeadingLabel` / `HeadingLight`: screen and overlay titles, the Day number, stamps, badges) |
 | `font_body.tres` | Alegreya (weight 450) | Body text |
-| `font_bold.tres` | Alegreya (weight 700) | Nav tabs, paper buttons, bold story words |
-| `font_caps.tres` | Alegreya (weight 800, wider spacing) | Small caps labels (TREASURY LEDGER, NAME...) |
+| `font_bold.tres` | Alegreya (weight 700) | `TitleLabel` / `TitleLight` (names, quest titles, numbers), every button, nav tabs, bold story words |
+| `font_caps.tres` | Alegreya (weight 800, wider spacing) | Small caps labels (RECRUITS, POW...) |
+
+Blackletter is hard to read at small sizes and in sentences, so keep it to short headings.
+Anything a player has to read or compare uses `TitleLabel` (bold Alegreya).
 | `font_italic.tres` | Alegreya Italic | Hints and asides |
 
 Pirata One and Alegreya are under the SIL Open Font License (`OFL-*.txt`), so they're

@@ -90,7 +90,7 @@ gold or standing is within `DANGER_STANDING_MARGIN` of the floor. The Welcome ca
 
 `HallMain.FINAL_DAY` (50) has a single quest, the final battle (`entry.final`). It's a
 random S-rank quest for now. The `FINAL QUEST CONTENT` / `FINAL QUEST STORY` comments in
-`hall_main.gd` (`_generate_quests`, `_run_quest`) and `FINAL QUEST DEFEAT TEXT` in
+`hall_rules.gd` (`build_day_quests`, `play_quest`) and `FINAL QUEST DEFEAT TEXT` in
 `overlay_credits.gd` mark where the real quest goes.
 
 Ending Day 50 opens the credits roll (`Scenes/Overlays/overlay_credits.tscn`) instead of the
@@ -102,13 +102,13 @@ reached and stays, so the player can scroll back up.
 - **Won:** **Begin Freeplay** (`HallMain.start_freeplay`) sets `GameState.is_freeplay`
   and opens Day 51, and Pip explains freeplay (it runs even if the tutorial was skipped).
   From then on, quests can roll past S into **S++** (`CreatedQuest.QuestDifficulty.SPP`).
-  Every quest's stat requirement and gold also grow by `FREEPLAY_SCALE_PER_DAY` (2%) for
+  Every quest's stat requirement and gold also grow by `HallRules.FREEPLAY_SCALE_PER_DAY` (2%) for
   each day past 50, without a cap. Game Over still applies.
 - **Lost:** the run ends (`HallMain.final_battle_lost`). The defeat roll stands in for the
   Game Over ledger and ends on **Found a New Guild**.
 
 Run records (gold spent, items found, building levels, longest-serving hero) come from
-`HallMain.build_run_records`. `Playtest/scenario_final_battle.tscn` starts on Day 50.
+`HallLedger.build_run_records`. `Playtest/scenario_final_battle.tscn` starts on Day 50.
 
 ### Adding your team credits
 
@@ -149,11 +149,64 @@ are played out), and the tuning numbers sit at the top of that file.
 - **Revive:** Hospital level 5 brings one fallen hero back per run, Gravely hurt and in a bed.
 - The Day Report's header has an "At home" line with who trained and who healed.
 
+## Quest growth
+
+A won quest grows the party in one of two ways, based on the odds it was sent at
+(`HallRules`, tuning at the top of `hall_rules.gd`):
+
+- **Good odds train a stat.** The good-odds threshold is `train_odds_for(rank)`: F 60%,
+  D 65%, C 70%, B 75%, A 80%, S and S++ 85%. A win at or above it gives every party member
+  +`TRAIN_STAT_GAIN` to one stat and no Pluck. One coin flip for the whole party picks the
+  stat: the quest's favored stat or the region's favored stat
+  (`CreatedQuest.REGION_FAVORED_STAT`).
+- **Riskier odds build Pluck.** A win below the threshold gives Pluck by
+  `PLUCK_GAIN_BY_ODDS`, the same as before. The threshold rises with rank, so more
+  high-rank wins pay Pluck.
+
+Assign Party's odds caption shows which one a win would give ("win to train Defense or
+Power" or "win for +2 Pluck"), and the Day Report's sign-off names what the party gained.
+
 Looks come from the theme, not from overrides: a label is `TitleLabel`, `CapsLabel`,
 `ItalicLabel` (or `TitleLight` / `ItalicLight` / `LabelLight` on wood), a panel is
 `PaperCard`, `PlanCard`, `TornPaper`... and a button is `GoldButton`, `WoodButton`,
 `PaperButton` or `SealButton`. Pick one in the inspector (*Theme > Type Variation*) rather
 than overriding colours or styles on the node, so a reskin reaches it.
+
+## Saving and offline play
+
+The run saves itself. Close the game at any point (the browser tab, the home-screen app,
+or the desktop window), open it again, and the hall picks up where it was with a
+"Welcome back" toast instead of the Welcome card. `Scripts/hall_save.gd` (`HallSave`)
+holds the whole format:
+
+- **When:** after every refresh (every action ends in one), when the app goes to the
+  background, and right after End Day plays the night out. The night's report (or the
+  final battle's credits) is saved as already showing, so closing during the dusk
+  can't replay the night with new dice. An unchanged run isn't written again.
+- **Where:** `user://run_save.dat`, with `run_save.bak` (the save before it). On the web,
+  `user://` is the browser's IndexedDB, and `HallSave` asks the browser to keep it
+  (`navigator.storage.persist()`). Settings stay in their own `user://settings.cfg`.
+- **What:** the day, wallet, buildings, Training Yard and Hospital, roster, For Hire,
+  released heroes, gear, Shop stock, today's Board and parties, the run's tallies, the
+  open report / credits / Game Over, and Pip's progress. Not the open tab or menus.
+  A tutorial day cut off halfway starts again from its first step.
+- **Shared objects:** each hero, item and quest is written once in a numbered table, and
+  everywhere else (parties, training, `curr_user`, reports) holds a reference like
+  `{"$character": 3}`, so a hero in three lists is still one hero after loading.
+- **New fields:** a new `GuildCharacter`, item or `CreatedQuest` property that matters
+  between sessions goes in `CHARACTER_FIELDS` / `ITEM_FIELDS` / `QUEST_FIELDS`. A new
+  piece of run state on `HallMain` or an autoload goes in `build_snapshot` and
+  `apply_snapshot`. Bump `SAVE_VERSION` when old saves can't be read with the new
+  layout: saves with another version are ignored and the player starts fresh.
+- **Starting over:** Game Over's "Found a New Guild" and the Menu's **Abandon run** (two
+  taps) delete the save. Playtest scenarios never load or write it (`uses_save_file` is
+  only true when the hall is the scene root).
+- **Offline:** the Web export is a PWA, so after one online visit the service worker
+  serves the game files with no connection. Its home-screen icons come from the
+  project icon (`icon.svg`) while the preset's icon fields are empty.
+- **iPhone:** a home-screen app has its own storage, separate from Safari. A run started
+  in a Safari tab doesn't carry over to the installed app, and Safari can clear a tab's
+  storage after about a week unused (installed apps are kept).
 
 ## Things to watch in the playtest
 
@@ -165,7 +218,9 @@ than overriding colours or styles on the node, so a reskin reaches it.
 
 ## Files
 
-- `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, the shell (header, action bar, nav, toast)
+- `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, refresh
+- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`, `hall_save.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings, the saved run (static functions, no state)
+- `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip), action bar, nav and toast
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
 - `Scenes/Overlays/`: End Day check, Day Report, Welcome, Menu, Game Over, Final Battle credits
@@ -183,8 +238,29 @@ and scripts only fill in text, show/hide nodes and instance rows. Each script ha
 comment naming its scene, a **TEXT** section with every message as a constant, a **NODES**
 section of `@onready var _x = %X` (unique names in the scene), then `setup(main)` and
 `refresh()`. Game state and actions live only in `hall_main.gd` (SETTINGS at the top:
-quests per day, milestone day, toast time). Screens call its actions and never change
+milestone day, release cost, dusk timings). Quests per day and quest ranks are in
+`hall_rules.gd`, toast time in `hall_toast.gd`. Screens call its actions and never change
 game state themselves.
+
+Anything that sits inside a ScrollContainer must let touches through, or a drag that
+starts on it won't scroll on a phone. `PanelContainer` and `Button` default to Mouse
+Filter **Stop**, which swallows the drag. `hall_main.refresh()` ends with
+`DragScroll.fix_tree(self)` (`Scripts/drag_scroll.gd`), which sets every Stop control
+inside a scroll list to **Pass**. Buttons there also get a tap-vs-drag check, so a scroll
+that starts on a button scrolls instead of pressing it. A row you can tap extends
+`TapPanel` (`Scripts/tap_panel.gd`); a tap on a button inside it belongs to the button,
+not the row. Something built outside a refresh, inside a scroll list, needs its own
+`DragScroll.fix_tree(...)` call.
+
+### Web updates and the build line
+
+The web build is a PWA, and its service worker serves the game files cache-first, so a
+plain reload can keep running an old deploy. `Scripts/hall_web_update.gd` switches to a
+waiting deploy at start-up (the page reloads and the saved run comes back), or shows a
+toast if one turns up mid-game. The Menu's bottom line (`Scripts/hall_build_info.gd`)
+names the commit and time of the build that's running: the deploy workflow writes
+`External Content/build_info.txt` (gitignored), and without it the line says "Build dev".
+To check a phone, compare that line with the latest commit on `master`.
 
 ## Known issues (in the game systems, not changed here)
 

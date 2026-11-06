@@ -72,10 +72,11 @@ text = "Explore Mistwater Marsh"
 autowrap_mode = 3
 max_lines_visible = 2
 
-[node name="Chips" type="HBoxContainer" parent="Row/BodyMargin/Body/Content/Info" unique_id=57835270]
+[node name="Chips" type="HFlowContainer" parent="Row/BodyMargin/Body/Content/Info" unique_id=57835270]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 12
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 6
 
 [node name="RankChip" parent="Row/BodyMargin/Body/Content/Info/Chips" unique_id=1055289194 instance=ExtResource("3_chip")]
 unique_name_in_owner = true
@@ -118,17 +119,6 @@ theme_type_variation = &"TitleLabel"
 theme_override_font_sizes/font_size = 34
 text = "72%"
 horizontal_alignment = 2
-
-[node name="SubLabel" type="Label" parent="Row/BodyMargin/Body/Content/StateCol" unique_id=1710402794]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-theme_type_variation = &"ItalicLabel"
-theme_override_font_sizes/font_size = 18
-text = "tap to reconsider"
-horizontal_alignment = 2
-autowrap_mode = 3
 
 [node name="Party" type="HBoxContainer" parent="Row/BodyMargin/Body/Content/StateCol" unique_id=275098860]
 unique_name_in_owner = true

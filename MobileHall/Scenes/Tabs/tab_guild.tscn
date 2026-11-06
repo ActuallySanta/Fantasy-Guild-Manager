@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://d1tcydf3636ec" path="res://MobileHall/Scripts/tab_guild.gd" id="1_y07pm"]
 [ext_resource type="FontVariation" uid="uid://b7dyj081fpsg2" path="res://MobileHall/Art/Fonts/font_title.tres" id="2_title"]
-[ext_resource type="Texture2D" uid="uid://ih4xtkgfq1o8" path="res://MobileHall/Art/Icons/bed.svg" id="3_bed"]
+[ext_resource type="Texture2D" uid="uid://ih4xtkgfq1o8" path="res://MobileHall/Art/Icons/bed.tres" id="3_bed"]
 
 [node name="TabGuild" type="VBoxContainer"]
 theme_override_constants/separation = 0
@@ -124,15 +124,6 @@ focus_mode = 0
 theme_type_variation = &"GoldButton"
 theme_override_font_sizes/font_size = 28
 text = "Barracks"
-
-[node name="Note" type="Label" parent="FolderMargin/Folder/Scroll/Margin/Col"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-theme_type_variation = &"ItalicLight"
-theme_override_font_sizes/font_size = 23
-text = "Hiring is free. New applicants arrive every morning."
-autowrap_mode = 3
 
 [node name="List" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col"]
 unique_name_in_owner = true
