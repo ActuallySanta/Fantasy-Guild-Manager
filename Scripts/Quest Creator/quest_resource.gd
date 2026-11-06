@@ -244,23 +244,43 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 			"[/b] ",
 			ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data),
 		)
-
-	var loopbreaker = 12 + (3 * difficulty)
-	if(difficulty >= 0):
-		loopbreaker = 6 + (2 * difficulty)
-	while randi_range(-1, 10) < loopbreaker:
-		match randi_range(0, 1):
-			0:
-				returnString = str(returnString, _combatEncounter(_questingAdventurers, _successChance))
-			1:
-				returnString = str(returnString, _search(_questingAdventurers, _successChance))
-		loopbreaker = loopbreaker - 1
-	if(difficulty >= 0):
-		returnString = str(
-			returnString,
-			ExternalContentContainer.get_Quest_Story(questNum, 2).c_unescape().format(data))
-		loopbreaker = 6 + (2 * difficulty)
+	
+	var extraGold = 50 + (25 * difficulty)
+	var addGold = true
+	var runMiddle = false
+	if(difficulty <= 1):
+		var loopbreaker = 12 + (3 * difficulty)
 		while randi_range(-1, 10) < loopbreaker:
+			match randi_range(0, 1):
+				0:
+					returnString = str(returnString, _combatEncounter(_questingAdventurers, _successChance))
+				1:
+					returnString = str(returnString, _search(_questingAdventurers, _successChance))
+			loopbreaker = loopbreaker - 1
+	else:
+		runMiddle = true
+		var loopbreaker = 4 + (2 * difficulty)
+		while randi_range(-1, 6) < loopbreaker:
+			match randi_range(0, 1):
+				0:
+					returnString = str(returnString, _combatEncounter(_questingAdventurers, _successChance))
+				1:
+					returnString = str(returnString, _search(_questingAdventurers, _successChance))
+			loopbreaker = loopbreaker - 1
+			
+		if(successfulChecks >= 2 + difficulty):
+			returnString = str(
+			returnString,
+			ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data),
+			"[color=FFE700][b] ", extraGold, " gold[/b][/color]", " added to potential quest reward.\n")
+		else:
+			addGold = false
+			returnString = str(
+			returnString,
+			ExternalContentContainer.get_Quest_Story(questNum, 2).c_unescape().format(data),
+			"[color=FFE700][b] ", extraGold, " gold[/b][/color]", " removed from potential quest reward.\n")
+		loopbreaker = 4 + (2 * difficulty)
+		while randi_range(-1, 6) < loopbreaker:
 			match randi_range(0, 1):
 				0:
 					returnString = str(returnString, _combatEncounter(_questingAdventurers, _successChance))
@@ -272,7 +292,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	match true:
 		_ when successDetermination >= _successChance:
 			if (numAdventurers == 1):
-				returnString = str(returnString, "[b]", _questingAdventurers[0].name, " ", ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data))
+				returnString = str(returnString, "[b]", _questingAdventurers[0].name, " ", ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data))
 			else:
 				returnString = str(
 					returnString,
@@ -281,7 +301,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					"[/b] and [b]",
 					_questingAdventurers[1].name,
 					" ",
-					ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data),
+					ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data),
 				)
 			returnString = str(returnString, "[b]Summary[/b]: The quest was [color=red][b]NOT SUCCESSFUL[/b][/color]. Your guild failed to obtain the reward.\n")
 			questSummary = str(questSummary, "[b]Summary[/b]: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
@@ -295,7 +315,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					returnString,
 					"[b]",
 					_questingAdventurers[0].name, " ",
-					ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data),
+					ExternalContentContainer.get_Quest_Story(questNum, 5).c_unescape().format(data),
 				)
 			else:
 				returnString = str(
@@ -304,8 +324,12 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					_questingAdventurers[0].name,
 					"[/b] and [b]",
 					_questingAdventurers[1].name, " ",
-					ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data),
+					ExternalContentContainer.get_Quest_Story(questNum, 5).c_unescape().format(data),
 				)
+			if(addGold && runMiddle):
+				goldReward += extraGold
+			elif (runMiddle):
+				goldReward -= extraGold
 			returnString = str(returnString, "[b]Summary[/b]: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=FFE700][b]", goldReward, " gold[/b][/color].\n")
 			questSummary = str(questSummary, "[b]Summary[/b]: The quest was SUCCESSFUL. Your guild gained ", goldReward, " gold.\n")
 
