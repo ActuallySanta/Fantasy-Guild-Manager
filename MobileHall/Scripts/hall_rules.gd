@@ -215,8 +215,6 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 	var chance: float = DayBar._get_success_chance(entry.quest, party)
 	# only play the quest out once, or its loot and injuries would be rolled twice
 	var story: String
-	if day == HallMain.MILESTONE_DAY:
-		story = entry.quest.generateMilestoneResults(party, chance)
 	# ==== FINAL QUEST STORY ==================================================
 	# PLACEHOLDER: the final battle plays out like any other quest for now.
 	# When it has its own story, add a branch here, for example:
@@ -224,8 +222,7 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 	#       story = entry.quest.generateFinalResults(party, chance)
 	# A loss must still contain "NOT SUCCESSFUL" (DayBar._did_succeed).
 	# ==== END FINAL QUEST STORY ==============================================
-	else:
-		story = entry.quest.generateResults(party, chance)
+	story = entry.quest.generateResults(party, chance)
 	var succeeded: bool = DayBar._did_succeed(story)
 	var gold_earned: int = DayBar._get_gold_earned(entry.quest, succeeded)
 	var standing_earned: int = standing_for_win(entry.quest) if succeeded else 0

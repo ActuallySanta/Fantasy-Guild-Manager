@@ -1,4 +1,4 @@
-2|quickly rode to [b]{location}[/b], intent on protecting the land and its citizens against the [b]Bone Drake[/b].\n|middle|[color=red]DID NOT[/color][/b] manage to defend [b]{location}[/b] from the [b]Bone Drake[/b].\n|[/b] [color=green][b]SAVED[/b][/color] [b]{location}[/b] and all its people from the [b]Bone Drake[/b].\n
+2|quickly rode to [b]{location}[/b], intent on protecting the land and its citizens against the [b]Bone Drake[/b].\n|The party is [color=red][b]NOT MOVING FAST ENOUGH[/b][/color]! Who knows what destruction that creature is causing at this moment?|The party is [color=green][b]MOVING FAST[/b][/color] towards [b]{location}[/b]! Who knows what destruction that creature is causing at this moment?|[color=red]DID NOT[/color][/b] manage to defend [b]{location}[/b] from the [b]Bone Drake[/b].\n|[/b] [color=green][b]SAVED[/b][/color] [b]{location}[/b] and all its people from the [b]Bone Drake[/b].\n
 1|
 3|
 4|

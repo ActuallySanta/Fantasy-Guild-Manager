@@ -36,6 +36,12 @@ enum FavoredStat {
 	Pluck = 4,
 }
 
+enum QuestStyle {
+	Normal = 0,
+	MinorStory = 1,
+	MajorMilestone = 2,
+}
+
 ## The stat each world region favors, by regionNum (Region.RegionType), as a
 ## GuildCharacter.StatType index: Windswept Meadows -> Defense, Boglands ->
 ## Sleaze, Ashen Wastes -> Power, Glass Mountains -> Wisdom. calcSuccessChance
@@ -93,6 +99,7 @@ var equipment_shorthanded_bonus: float = 10.0
 var equipment_max_chance: float = 50.0
 
 var successfulChecks: int
+var styleOfQuest = QuestStyle
 
 ## The equipment this quest pays instead of gold, rolled when the quest is made
 ## so the Board can show it. Empty for a normal gold quest. Only paid out when
@@ -131,6 +138,7 @@ func _init(diff := 0, dayNum := 0) -> void:
 	print(regionNum, " ", location)
 	
 	successfulChecks = 0
+	styleOfQuest = 0
 	
 	if(maxAdventurers == 1):
 		goldReward = 100 + (125 * difficulty)
@@ -279,23 +287,48 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 
 	var data = { "location": location }
 	if (numAdventurers == 1):
-		returnString = str(
+		match(styleOfQuest):
+			0:
+				returnString = str(
 			returnString,
 			"[b]",
 			_questingAdventurers[0].name,
 			"[/b] ",
-			ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data),
-		)
+			ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data),)
+			1:
+				returnString = str(
+			returnString,
+			"[b]",
+			_questingAdventurers[0].name,
+			"[/b] ",
+			ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data),)
+			2:
+				returnString = str(
+			returnString,
+			"[b]",
+			_questingAdventurers[0].name,
+			"[/b] ",
+			ExternalContentContainer.get_Milestone_story(questNum, 1).c_unescape().format(data),)
 	else:
-		returnString = str(
+		match(styleOfQuest):
+			0:
+				returnString = str(
 			returnString,
 			"[b]",
 			_questingAdventurers[0].name,
 			"[/b] and [b]",
 			_questingAdventurers[1].name,
 			"[/b] ",
-			ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data),
-		)
+			ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data),)
+			2:
+				returnString = str(
+			returnString,
+			"[b]",
+			_questingAdventurers[0].name,
+			"[/b] and [b]",
+			_questingAdventurers[1].name,
+			"[/b] ",
+			ExternalContentContainer.get_Milestone_story(questNum, 1).c_unescape().format(data),)
 	
 	var extraGold = 50 + (25 * difficulty)
 	var addGold = true
@@ -321,16 +354,31 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 			loopbreaker = loopbreaker - 1
 			
 		if(successfulChecks >= 2 + difficulty):
-			returnString = str(
+			match(styleOfQuest):
+				0:
+					returnString = str(
 			returnString,
 			ExternalContentContainer.get_Quest_Story(questNum, 3).c_unescape().format(data),
 			"[color=FFE700][b] ", extraGold, " gold[/b][/color]", " added to potential quest reward.\n")
+				2:
+					returnString = str(
+			returnString,
+			ExternalContentContainer.get_Milestone_story(questNum, 3).c_unescape().format(data),
+			"[color=FFE700][b] ", extraGold, " gold[/b][/color]", " added to potential quest reward.\n")
 		else:
 			addGold = false
-			returnString = str(
+			match(styleOfQuest):
+				0:
+					returnString = str(
 			returnString,
 			ExternalContentContainer.get_Quest_Story(questNum, 2).c_unescape().format(data),
 			"[color=FFE700][b] ", extraGold, " gold[/b][/color]", " removed from potential quest reward.\n")
+				2:
+					returnString = str(
+			returnString,
+			ExternalContentContainer.get_Milestone_story(questNum, 2).c_unescape().format(data),
+			"[color=FFE700][b] ", extraGold, " gold[/b][/color]", " removed from potential quest reward.\n")
+
 		loopbreaker = 4 + (2 * difficulty)
 		while randi_range(-1, 6) < loopbreaker:
 			match randi_range(0, 1):
@@ -344,40 +392,51 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	match true:
 		_ when successDetermination >= _successChance:
 			if (numAdventurers == 1):
-				returnString = str(returnString, "[b]", _questingAdventurers[0].name, " ", ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data))
+				match(styleOfQuest):
+					0:
+						returnString = str(
+returnString, "[b]", _questingAdventurers[0].name, " ", ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data))
+					2:
+						returnString = str(
+returnString, "[b]", _questingAdventurers[0].name, " ", ExternalContentContainer.get_Milestone_story(questNum, 4).c_unescape().format(data))
 			else:
-				returnString = str(
-					returnString,
-					"[b]",
-					_questingAdventurers[0].name,
-					"[/b] and [b]",
-					_questingAdventurers[1].name,
-					" ",
-					ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data),
-				)
+				match(styleOfQuest):
+					0:
+						returnString = str(
+					returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, " ",
+					ExternalContentContainer.get_Quest_Story(questNum, 4).c_unescape().format(data),)
+					2:
+						returnString = str(
+					returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, " ",
+					ExternalContentContainer.get_Milestone_story(questNum, 4).c_unescape().format(data),)
+
 			returnString = str(returnString, "[b]Summary[/b]: The quest was [color=red][b]NOT SUCCESSFUL[/b][/color]. Your guild failed to obtain the reward.\n")
 			questSummary = str(questSummary, "[b]Summary[/b]: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
 
-			if (goldReward > 200):
+			if (goldReward > 200):#broken for high difficulties
 				returnString = str(returnString, "However, your adventurers did bring back [color=FFE700][b]", goldReward - 200, " gold[/b][/color].\n")
 				questSummary = str(questSummary, "However, your adventurers did bring back ", goldReward - 200, " gold")
 		_:
 			if (numAdventurers == 1):
-				returnString = str(
-					returnString,
-					"[b]",
-					_questingAdventurers[0].name, " ",
-					ExternalContentContainer.get_Quest_Story(questNum, 5).c_unescape().format(data),
-				)
+				match(styleOfQuest):
+					0:
+						returnString = str(
+					returnString, "[b]", _questingAdventurers[0].name, " ",
+					ExternalContentContainer.get_Quest_Story(questNum, 5).c_unescape().format(data),)
+					2:
+						returnString = str(
+					returnString, "[b]", _questingAdventurers[0].name, " ",
+					ExternalContentContainer.get_Milestone_story(questNum, 5).c_unescape().format(data),)
 			else:
-				returnString = str(
-					returnString,
-					"[b]",
-					_questingAdventurers[0].name,
-					"[/b] and [b]",
-					_questingAdventurers[1].name, " ",
-					ExternalContentContainer.get_Quest_Story(questNum, 5).c_unescape().format(data),
-				)
+				match(styleOfQuest):
+					0:
+						returnString = str(
+					returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, " ",
+					ExternalContentContainer.get_Quest_Story(questNum, 5).c_unescape().format(data),)
+					2:
+						returnString = str(
+					returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, " ",
+					ExternalContentContainer.get_Milestone_story(questNum, 5).c_unescape().format(data),)
 			if(addGold && runMiddle):
 				goldReward += extraGold
 			elif (runMiddle):
@@ -685,92 +744,10 @@ func _initMilestoneVars(dayNum: int):
 			goldReward = 300 + (150 * difficulty)
 			favStat = FavoredStat.Defense
 			questTitle = str("A Bone Drake is ATTACKING ", location, "! Save the town before it is DESTROYED!")
+			styleOfQuest = 2
 
 	print("")
-	pass
-
-
-func generateMilestoneResults(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
-	var returnString = ""
-	numAdventurers = _questingAdventurers.size()
-
-	var data = { "location": location }
-	if (numAdventurers == 1):
-		returnString = str(
-			returnString,
-			"[b]",
-			_questingAdventurers[0].name,
-			"[/b] ",
-			ExternalContentContainer.get_Milestone_story(questNum, 1).c_unescape().format(data),
-		)
-	else:
-		returnString = str(
-			returnString,
-			"[b]",
-			_questingAdventurers[0].name,
-			"[/b] and [b]",
-			_questingAdventurers[1].name,
-			"[/b] ",
-			ExternalContentContainer.get_Milestone_story(questNum, 1).c_unescape().format(data),
-		)
-
-	var loopbreaker = 12 + (3 * difficulty)
-	while randi_range(-1, 10) < loopbreaker:
-		match randi_range(0, 1):
-			0:
-				returnString = str(returnString, _combatEncounter(_questingAdventurers, _successChance))
-			1:
-				returnString = str(returnString, _search(_questingAdventurers, _successChance))
-		loopbreaker = loopbreaker - 1
-
-	var successDetermination = randi_range(0, 100)
-	match true:
-		_ when successDetermination >= _successChance:
-			if (numAdventurers == 1):
-				returnString = str(returnString, "[b]", _questingAdventurers[0].name, "[/b] ", ExternalContentContainer.get_Milestone_story(questNum, 3).c_unescape().format(data))
-			else:
-				returnString = str(
-					returnString,
-					"[b]",
-					_questingAdventurers[0].name,
-					"[/b] and [b]",
-					_questingAdventurers[1].name,
-					" ",
-					ExternalContentContainer.get_Milestone_story(questNum, 3).c_unescape().format(data),
-				)
-			returnString = str(returnString, "Summary: The quest was [color=red][b]NOT SUCCESSFUL[/b][/color]. Your guild failed to obtain the reward.\n")
-			questSummary = str(questSummary, "Summary: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
-
-			if (goldReward > 200):
-				returnString = str(returnString, "However, your adventurers did bring back [color=gold][b]", goldReward - 200, " gold[/b][/color].\n")
-				questSummary = str(questSummary, "However, your adventurers did bring back ", goldReward - 200, " gold")
-		_:
-			if (numAdventurers == 1):
-				returnString = str(
-					returnString,
-					"[b]",
-					_questingAdventurers[0].name,
-					"[/b] ",
-					ExternalContentContainer.get_Milestone_story(questNum, 4).c_unescape().format(data),
-				)
-			else:
-				returnString = str(
-					returnString,
-					"[b]",
-					_questingAdventurers[0].name,
-					"[/b] and [b]",
-					_questingAdventurers[1].name,
-					ExternalContentContainer.get_Milestone_story(questNum, 4).c_unescape().format(data),
-				)
-			returnString = str(returnString, "Summary: The quest was [color=green][b]SUCCESSFUL[/b][/color]. Your guild gained [color=gold][b]", goldReward, " gold[/b][/color].\n")
-			questSummary = str(questSummary, "Summary: The quest was SUCCESSFUL. Your guild gained ", goldReward, " gold.")
-
-	# list found equipment after either outcome, since the guild keeps it either way
-	returnString = str(returnString, _get_found_items_lines())
-	returnString = str(returnString, _deathLines())
-
-	return returnString
-
+	#pass
 
 #one line per adventurer who died on this quest, added to the summary too
 #(dead adventurers stay in the roster so the Hospital can revive them)
