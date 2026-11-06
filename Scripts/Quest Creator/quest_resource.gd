@@ -3,6 +3,7 @@ extends Resource
 class_name CreatedQuest
 
 enum QuestDifficulty {
+	Tutorial = -1,
 	F = 0,
 	D = 1,
 	C = 2,
@@ -85,6 +86,8 @@ var equipment_shorthanded_bonus: float = 10.0
 ## The highest the equipment find chance (percent) can go.
 var equipment_max_chance: float = 50.0
 
+var successfulChecks: int
+
 func _init(diff := 0, dayNum := 0) -> void:
 	if (dayNum == 10):
 		_initMilestoneVars(dayNum)
@@ -101,8 +104,10 @@ func _init(diff := 0, dayNum := 0) -> void:
 	location = QuestManager.world_regions[regionNum].returnName(type)
 	print(regionNum, " ", location)
 	
+	successfulChecks = 0
+	
 	if(maxAdventurers == 1):
-		goldReward = 100 + (150 * difficulty)
+		goldReward = 100 + (125 * difficulty)
 	else:
 		goldReward = 150 + (175 * difficulty)
 
@@ -151,7 +156,7 @@ func _init(diff := 0, dayNum := 0) -> void:
 						questTitle = str("Seek rare resources in ", location)
 		4, 8:
 			favStat = FavoredStat.Sleaze
-			if (type == 3):
+			if (type == 4):
 				match randi_range(0, 1):
 					0:
 						questTitle = str("Scour for intel on ", location)
@@ -241,6 +246,8 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 		)
 
 	var loopbreaker = 12 + (3 * difficulty)
+	if(difficulty >= 0):
+		loopbreaker = 6 + (2 * difficulty)
 	while randi_range(-1, 10) < loopbreaker:
 		match randi_range(0, 1):
 			0:
@@ -248,6 +255,18 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 			1:
 				returnString = str(returnString, _search(_questingAdventurers, _successChance))
 		loopbreaker = loopbreaker - 1
+	if(difficulty >= 0):
+		returnString = str(
+			returnString,
+			ExternalContentContainer.get_Quest_Story(questNum, 2).c_unescape().format(data))
+		loopbreaker = 6 + (2 * difficulty)
+		while randi_range(-1, 10) < loopbreaker:
+			match randi_range(0, 1):
+				0:
+					returnString = str(returnString, _combatEncounter(_questingAdventurers, _successChance))
+				1:
+					returnString = str(returnString, _search(_questingAdventurers, _successChance))
+			loopbreaker = loopbreaker - 1
 
 	var successDetermination = randi_range(0, 100)
 	match true:
@@ -357,7 +376,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 				
 				if(died and not dead_adventurers.has(attackedAdventurer)):
 					dead_adventurers.append(attackedAdventurer)
-
+		successfulChecks += 1
 	else:
 		var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
 		var succComDet = randi_range(1, 100)
@@ -442,6 +461,7 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 			goldReward += extraGold
 			returnString = str(returnString, "[b]", searchingAdventurer.name, 
 			"[/b] unearthed a rather gaudy looking artifact, which turned out to be worth [color=FFE700][b]", extraGold, " gold[/b][/color].\n")
+		successfulChecks += 1
 	else:
 		var succSearDet = randi_range(1, 100)
 		if(1 <= succSearDet && succSearDet <= 15):
