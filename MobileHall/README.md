@@ -174,7 +174,13 @@ than overriding colours or styles on the node, so a reskin reaches it.
 
 ## Saving and offline play
 
-The run saves itself. Close the game at any point (the browser tab, the home-screen app,
+**Dev switch:** saving is **off by default** (`HallSettings.DEFAULT_SAVE_ENABLED`), so
+every launch starts a fresh Day 1. Tick "Save runs (debug)" in the Menu (shown while
+`GuildUpgrades.SHOW_DEBUG_BUTTONS` is on) to turn it on; the choice is kept in
+`settings.cfg`. Off means the save is neither loaded nor written (the file on disk is
+left alone). Flip the default to `true` before a release.
+
+With saving on, the run saves itself. Close the game at any point (the browser tab, the home-screen app,
 or the desktop window), open it again, and the hall picks up where it was with a
 "Welcome back" toast instead of the Welcome card. `Scripts/hall_save.gd` (`HallSave`)
 holds the whole format:
