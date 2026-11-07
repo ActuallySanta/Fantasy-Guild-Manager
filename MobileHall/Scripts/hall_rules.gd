@@ -112,7 +112,7 @@ static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Arra
 		if standing <= STARTER_STANDING:
 			rank = 0
 
-		var quest := CreatedQuest.new(rank, 0)
+		var quest := CreatedQuest.new(rank, GameState.day)
 		if is_freeplay:
 			quest.apply_freeplay_scaling(freeplay_scale(day))
 		entries.append(new_entry(quest, false))

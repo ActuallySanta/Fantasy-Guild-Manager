@@ -12,12 +12,14 @@ class_name Region
 @export var boglands_location_path: String = "res://External Content/Quest Stuff (Test)/The Boglands (Locations).txt"
 @export var wastes_location_path: String = "res://External Content/Quest Stuff (Test)/The Ashen Wastes (Locations).txt"
 @export var mountains_location_path: String = "res://External Content/Quest Stuff (Test)/The Glass Mountains (Locations).txt"
+@export var city_locations_path: String = "res://External Content/Quest Stuff (Test)/The Capital City (Locations).txt"
 
 enum RegionType {
 	theWindsweptMeadows = 0,
 	theBoglands = 1,
 	theAshenWastes = 2,
-	theGlassMountains = 3
+	theGlassMountains = 3,
+	theCapitalCity = 4,
 }
 
 var dungeonNames: Array[String]:
@@ -63,8 +65,16 @@ func _init(regionNum := 0) -> void:
 			escortLocations = (MultiColumnLoader._load_info_from_file(mountains_location_path, 1, 1))
 			explorationAreas = (MultiColumnLoader._load_info_from_file(mountains_location_path, 1, 2))
 			intelTargets = (MultiColumnLoader._load_info_from_file(mountains_location_path, 1, 3))
+		4:
+			dungeonNames = (MultiColumnLoader._load_info_from_file(city_locations_path, 1, 0))
+			escortLocations = (MultiColumnLoader._load_info_from_file(city_locations_path, 1, 1))
+			explorationAreas = (MultiColumnLoader._load_info_from_file(city_locations_path, 1, 2))
+			intelTargets = (MultiColumnLoader._load_info_from_file(city_locations_path, 1, 3))
 	
-	regionMonsters = MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, regionNum)
+	if(regionNum >= 0):
+		regionMonsters = MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, regionNum)
+	else:
+		regionMonsters = MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 0)
 
 func returnName(questType: int) -> String:
 	var location = ""

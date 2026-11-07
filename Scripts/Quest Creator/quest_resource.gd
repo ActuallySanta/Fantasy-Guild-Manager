@@ -123,7 +123,7 @@ var item_reward_count_per_rank: float = 0.5
 var trained_stat_quest_chance: float = 50.0
 
 func _init(diff := 0, dayNum := 0) -> void:
-	if (dayNum == 10):
+	if (dayNum == 1 || dayNum == 2 ||dayNum == 4 ||dayNum == 7 ||dayNum == 9 ||dayNum == 10):
 		_initMilestoneVars(dayNum)
 		return
 
@@ -324,6 +324,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 			_questingAdventurers[1].name,
 			"[/b] ",
 			ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data),)
+				print("0000000000000")
 			1:
 				returnString = str(
 			returnString,
@@ -333,6 +334,8 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 			_questingAdventurers[1].name,
 			"[/b] ",
 			ExternalContentContainer.get_Minor_Story(questNum, 1).c_unescape().format(data),)
+				print("11111111111111")
+				print(ExternalContentContainer.get_Minor_Story(questNum, 1).c_unescape().format(data))
 			2:
 				returnString = str(
 			returnString,
@@ -342,6 +345,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 			_questingAdventurers[1].name,
 			"[/b] ",
 			ExternalContentContainer.get_Milestone_story(questNum, 1).c_unescape().format(data),)
+				print("2222222222222")
 	
 	var extraGold = 50 + (25 * difficulty)
 	var addGold = true
@@ -664,6 +668,7 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 		elif(91 <= succSearDet && succSearDet <= 100):
 			goldReward += 1
 			returnString = str(returnString, "[b]The Party[/b] unearthed a lockbox that contained [color=FFE700][b]1 gold[/b][/color].\n")
+			
 	return returnString
 
 
@@ -775,14 +780,42 @@ func _initMilestoneVars(dayNum: int):
 	match dayNum:
 		10:
 			difficulty = 2
-			maxAdventurers = 2
+			maxAdventurers = 3
 			questNum = 0
 			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
-			location = ExternalContentContainer.get_Location_Name(1)
+			regionNum = 1
+			location = QuestManager.world_regions[regionNum].returnName(type)
 			goldReward = 300 + (150 * difficulty)
 			favStat = FavoredStat.Defense
 			questTitle = str("A Bone Drake is ATTACKING ", location, "! Save the town before it is DESTROYED!")
 			styleOfQuest = 2
+		_:
+			var storyNum = 0
+			match dayNum:
+				1:
+					storyNum = 0
+				2:
+					storyNum = 1
+				4:
+					storyNum = 2
+				7:
+					storyNum = 3
+				9:
+					storyNum = 4
+					
+			difficulty = ExternalContentContainer.get_Minor_Story_Variables(storyNum, 0).to_int()
+			maxAdventurers = ExternalContentContainer.get_Minor_Story_Variables(storyNum, 1).to_int()
+			questNum = ExternalContentContainer.get_Minor_Story_Variables(storyNum, 2).to_int()
+			type = ExternalContentContainer.get_Minor_Story(questNum, 0).to_int()
+			regionNum = ExternalContentContainer.get_Minor_Story_Variables(storyNum, 3).to_int()
+			location = QuestManager.world_regions[regionNum].returnName(type)
+			goldReward = ExternalContentContainer.get_Minor_Story_Variables(storyNum, 4).to_int()
+			favStat = ExternalContentContainer.get_Minor_Story_Variables(storyNum, 5).to_int()
+			questTitle = ExternalContentContainer.get_Minor_Story_Variables(storyNum, 6)
+			styleOfQuest = 1
+			
+			print("diff: ", difficulty, " maxAd: ", maxAdventurers, " questNum: ", questNum, " type: ", type, " region: ", regionNum,
+			" loc: ", location, " gold: ", goldReward, " favStat: ", favStat, " title: ", questTitle, " style: ", styleOfQuest)
 
 	print("")
 	#pass

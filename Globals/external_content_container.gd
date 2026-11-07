@@ -20,6 +20,7 @@ extends Node
 @export var milestone_story_path: String = "res://External Content/Quest Stuff (Test)/Milestone Story Parts.txt"
 @export var boglands_location_path: String = "res://External Content/Quest Stuff (Test)/The Boglands (Locations).txt"
 @export var minor_story_path: String = "res://External Content/Quest Stuff (Test)/Minor Story Parts.txt"
+@export var minor_variable_path: String = "res://External Content/Quest Stuff (Test)/MinorVariables.txt"
 
 #Character Names
 var male_character_names: Array[String]
@@ -38,6 +39,7 @@ var location_names = [] #test array for locations
 var quest_story = []
 var milestone_story = []
 var minor_story = []
+var minor_vars = []
 
 #Used for text replacement
 var child_gender: Array[String] = [
@@ -120,10 +122,13 @@ func _ready() -> void:
 		milestone_story.append(MultiColumnLoader._load_info_from_rows(milestone_story_path, i))
 		
 	for i in range(5):
-		minor_story.append(MultiColumnLoader._load_info_from_rows(milestone_story_path, i))
+		minor_story.append(MultiColumnLoader._load_info_from_rows(minor_story_path, i))
 
 	for i in range(4):
 		location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, i))
+		
+	for i in range(5):
+		minor_vars.append((MultiColumnLoader._load_info_from_rows(minor_variable_path, i)))
 	pass # Replace with function body.
 
 
@@ -161,6 +166,8 @@ func get_Milestone_story(quest_idx: int, story_part: int) -> String:
 func get_Minor_Story(quest_idx: int, story_part: int) -> String:
 	return minor_story[quest_idx][story_part]
 
+func get_Minor_Story_Variables(quest_idx: int, varNum: int) -> String:
+	return minor_vars[quest_idx][varNum]
 
 func get_character_icon(_role: GuildCharacter.CharacterRole) -> Texture2D:
 	match _role:

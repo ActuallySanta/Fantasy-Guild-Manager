@@ -1,12 +1,12 @@
-Anthousai Nymph|Beav'r|Naga|Porcelain Puppet
-Mischievous Slime|Wereboar|Umber Hulk|Crackling Gorgon
-Giant Eagle|Zombified Ogre|Salamander|Werepenguin
-Blighted Worms|Centaur|Parched Lich|Frostcloak
-Bandit|Banshee|Spined Imp|Thunderbird
-Skeleton Warrior|Necroghoul|Living Gargoyle|Flesh-Eating Yeti
-Shambling Mound|Kelpie|Igneous Drakeling|Discarded Construct
-Blightbloom|Marsh Troll|Black-Eyed Condor|Wendigo
-Orc|Giant Tarantula|Fire Snake|Cave Crawler
-Mantrap|Treant|Hell Hound|Kobold
-Goblin|Sprite|Gnoll|Crystal Gremlin
-Stray Cat|Swamp Siren|Apex Trogladyte|Powder Golem
+Anthousai Nymph|Beav'r|Naga|Porcelain Puppet|aaa
+Mischievous Slime|Wereboar|Umber Hulk|Crackling Gorgon|bbb
+Giant Eagle|Zombified Ogre|Salamander|Werepenguin|ccc
+Blighted Worms|Centaur|Parched Lich|Frostcloak|ddd
+Bandit|Banshee|Spined Imp|Thunderbird|eee
+Skeleton Warrior|Necroghoul|Living Gargoyle|Flesh-Eating Yeti|fff
+Shambling Mound|Kelpie|Igneous Drakeling|Discarded Construct|ggg
+Blightbloom|Marsh Troll|Black-Eyed Condor|Wendigo|hhh
+Orc|Giant Tarantula|Fire Snake|Cave Crawler|iii
+Mantrap|Treant|Hell Hound|Kobold|jjj
+Goblin|Sprite|Gnoll|Crystal Gremlin|lll
+Stray Cat|Swamp Siren|Apex Trogladyte|Powder Golem|mmm

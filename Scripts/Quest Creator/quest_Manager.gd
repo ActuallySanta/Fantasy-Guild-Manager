@@ -8,8 +8,9 @@ var theWindsweptMeadows: Region = Region.new(0)
 var theBoglands: Region = Region.new(1)
 var theAshenWastes: Region = Region.new(2)
 var theGlassMountains: Region = Region.new(3)
+var theCapitalCity: Region = Region.new(4)
 
-var world_regions := [theWindsweptMeadows, theBoglands, theAshenWastes, theGlassMountains]
+var world_regions := [theWindsweptMeadows, theBoglands, theAshenWastes, theGlassMountains, theCapitalCity]
 var total_regions : int = 4
 
 var dayNum = 0;
