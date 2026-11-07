@@ -1,4 +1,4 @@
-0|2|0|-1|100|0|Fetch a Client's Blacksmith Order
+-1|2|0|-1|100|0|Fetch a Client's Blacksmith Order
 0|2|1|-1|100|0|Raid the Crumbling Crypt
 0|2|2|0|150|2|Survey the Sinister Sanctuary
 1|3|3|0|200|1|Escort a Scholar to the Shrine of Silence
