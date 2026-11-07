@@ -13,9 +13,9 @@ class_name HallRules
 ## day is at or under is used. Days past the last row get QUESTS_PER_DAY_LATE.
 ## (Same ramp as QuestList.quests_per_day.)
 const QUESTS_PER_DAY_BY_DAY := [
-	{"max_day": 1, "count": 1},
-	{"max_day": 3, "count": 2},
-	{"max_day": 5, "count": 3},
+	{"max_day": 2, "count": 1},
+	{"max_day": 6, "count": 2},
+	{"max_day": 9, "count": 3},
 	{"max_day": 10, "count": 4},
 ]
 const QUESTS_PER_DAY_LATE := 5
@@ -102,6 +102,8 @@ static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Arra
 	# the highest rank a quest can roll: S, or S++ once freeplay has begun
 	var top_rank: int = CreatedQuest.QuestDifficulty.SPP if is_freeplay else CreatedQuest.QuestDifficulty.S
 	var entries := []
+	
+	var noRepeatQuests = false #used to avoid cloning minor quests
 	for quest_number in quests_per_day(day):
 		var rank: int = clampi(standing_rank + int(rand_bell_curve()), 0, top_rank)
 		# a roll two ranks off the guild's standing is pulled one rank back toward it
@@ -113,6 +115,12 @@ static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Arra
 			rank = 0
 
 		var quest := CreatedQuest.new(rank, GameState.day)
+		if(noRepeatQuests): #if a minor quest has already been created, create only standard quests
+			quest = CreatedQuest.new(rank, 5)
+		match(GameState.day): #set the boolean
+			2, 4, 7, 9:
+				noRepeatQuests = true
+			
 		if is_freeplay:
 			quest.apply_freeplay_scaling(freeplay_scale(day))
 		entries.append(new_entry(quest, false))
