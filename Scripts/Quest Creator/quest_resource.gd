@@ -3,7 +3,7 @@ extends Resource
 class_name CreatedQuest
 
 enum QuestDifficulty {
-	Tutorial = -1,
+	G = -1,
 	F = 0,
 	D = 1,
 	C = 2,
@@ -287,7 +287,6 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	var returnString = ""
 
 	numAdventurers = _questingAdventurers.size()
-	#print(numAdventurers)
 
 	var data = { "location": location }
 	if (numAdventurers == 1):
@@ -324,7 +323,6 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 			_questingAdventurers[1].name,
 			"[/b] ",
 			ExternalContentContainer.get_Quest_Story(questNum, 1).c_unescape().format(data),)
-				print("0000000000000")
 			1:
 				returnString = str(
 			returnString,
@@ -334,8 +332,6 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 			_questingAdventurers[1].name,
 			"[/b] ",
 			ExternalContentContainer.get_Minor_Story(questNum, 1).c_unescape().format(data),)
-				print("11111111111111")
-				print(ExternalContentContainer.get_Minor_Story(questNum, 1).c_unescape().format(data))
 			2:
 				returnString = str(
 			returnString,
@@ -345,13 +341,18 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 			_questingAdventurers[1].name,
 			"[/b] ",
 			ExternalContentContainer.get_Milestone_story(questNum, 1).c_unescape().format(data),)
-				print("2222222222222")
 	
 	var extraGold = 50 + (25 * difficulty)
 	var addGold = true
 	var runMiddle = false
 	if(difficulty <= 1):
 		var loopbreaker = 12 + (3 * difficulty)
+		if(difficulty == QuestDifficulty.G):
+			loopbreaker = -1
+			returnString = str(returnString, _search(_questingAdventurers, _successChance))
+			returnString = str(returnString, _combatEncounter(_questingAdventurers, _successChance))
+			returnString = str(returnString, _search(_questingAdventurers, _successChance))
+			
 		while randi_range(-1, 10) < loopbreaker:
 			match randi_range(0, 1):
 				0:

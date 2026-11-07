@@ -32,21 +32,11 @@ func _ready() -> void:
 	adventurerArrayAgain.append(adventurerArray[0])
 	
 	var successChance = thisQuest.calcSuccessChance(adventurerArray)
-	print(successChance)
-	print(thisQuest.questTitle)
 	
 	questResults = thisQuest.generateResults(adventurerArrayAgain, successChance)
 	acceptedQuestResults.append(questResults)
 
 	testQuestNumber = testQuestNumber + 1
-	print(questResults, "\n")
-	
-	for int in range(10):
-		print(theWindsweptMeadows.returnName(0))
-		print(theWindsweptMeadows.returnName(1))
-		print(theWindsweptMeadows.returnName(2))
-		print(theWindsweptMeadows.returnName(3))
-
 
 	pass
 

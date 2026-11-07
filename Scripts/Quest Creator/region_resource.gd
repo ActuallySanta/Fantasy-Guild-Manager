@@ -43,7 +43,6 @@ var regionMonsters: Array[String]:
 func _init(regionNum := 0) -> void:
 	regionNumber = regionNum
 	
-	print(regionNum)
 	match(regionNum):
 		0:
 			dungeonNames = (MultiColumnLoader._load_info_from_file(meadows_location_path, 1, 0))

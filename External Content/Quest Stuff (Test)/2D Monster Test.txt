@@ -1,12 +1,12 @@
-Anthousai Nymph|Beav'r|Naga|Porcelain Puppet|aaa
-Mischievous Slime|Wereboar|Umber Hulk|Crackling Gorgon|bbb
-Giant Eagle|Zombified Ogre|Salamander|Werepenguin|ccc
-Blighted Worms|Centaur|Parched Lich|Frostcloak|ddd
-Bandit|Banshee|Spined Imp|Thunderbird|eee
-Skeleton Warrior|Necroghoul|Living Gargoyle|Flesh-Eating Yeti|fff
-Shambling Mound|Kelpie|Igneous Drakeling|Discarded Construct|ggg
-Blightbloom|Marsh Troll|Black-Eyed Condor|Wendigo|hhh
-Orc|Giant Tarantula|Fire Snake|Cave Crawler|iii
-Mantrap|Treant|Hell Hound|Kobold|jjj
-Goblin|Sprite|Gnoll|Crystal Gremlin|lll
-Stray Cat|Swamp Siren|Apex Trogladyte|Powder Golem|mmm
+Anthousai Nymph|Beav'r|Naga|Porcelain Puppet|Stray Cat
+Mischievous Slime|Wereboar|Umber Hulk|Crackling Gorgon|Goblin
+Giant Eagle|Zombified Ogre|Salamander|Werepenguin|Bandit
+Blighted Worms|Centaur|Parched Lich|Frostcloak|Slime
+Bandit|Banshee|Spined Imp|Thunderbird|Skeleton
+Skeleton Warrior|Necroghoul|Living Gargoyle|Flesh-Eating Yeti|Goblin
+Shambling Mound|Kelpie|Igneous Drakeling|Discarded Construct|Skeleton
+Blightbloom|Marsh Troll|Black-Eyed Condor|Wendigo|Slime
+Orc|Giant Tarantula|Fire Snake|Cave Crawler|Bandit
+Mantrap|Treant|Hell Hound|Kobold|Mean Gnome
+Goblin|Sprite|Gnoll|Crystal Gremlin|Ghoul
+Stray Cat|Swamp Siren|Apex Trogladyte|Powder Golem|Brigand
