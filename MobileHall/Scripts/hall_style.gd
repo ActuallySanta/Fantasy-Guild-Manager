@@ -457,7 +457,7 @@ const PAPER_LOOK := &"PaperCard"
 static func style_button(button: Button, kind: String = "gold", font_size: int = 0) -> void:
 	button.theme_type_variation = BUTTON_KINDS.get(kind, &"PaperButton")
 	if font_size > 0:
-		button.add_theme_font_size_override("font_size", font_size)
+		HallFontScale.set_size(button, "font_size", font_size)
 
 
 ## A coloured seal (white art tinted `fill`) with a short tag on it (quest type, building).

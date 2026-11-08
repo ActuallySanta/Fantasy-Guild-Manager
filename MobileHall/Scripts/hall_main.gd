@@ -342,6 +342,20 @@ var tutorial: Control
 
 # ============================================================ SETUP
 
+## Before any child enters: size the text for this screen (see hall_font_scale.gd).
+## The theme is scaled now, and every node added after this gets its .tscn
+## font-size overrides scaled as it enters the tree.
+func _enter_tree() -> void:
+	HallFontScale.init(get_window(), theme)
+	if not get_tree().node_added.is_connected(HallFontScale.scale_authored_overrides):
+		get_tree().node_added.connect(HallFontScale.scale_authored_overrides)
+
+
+func _exit_tree() -> void:
+	if get_tree().node_added.is_connected(HallFontScale.scale_authored_overrides):
+		get_tree().node_added.disconnect(HallFontScale.scale_authored_overrides)
+
+
 func _ready() -> void:
 	# web: a newer deploy is waiting behind the cached one, so switch to it
 	# (the page reloads; the saved run comes back after)

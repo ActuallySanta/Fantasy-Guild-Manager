@@ -56,7 +56,7 @@ func setup(main: HallMain) -> void:
 	_build_label = Label.new()
 	_build_label.name = "BuildLabel"
 	_build_label.theme_type_variation = &"ItalicLabel"
-	_build_label.add_theme_font_size_override("font_size", BUILD_FONT_SIZE)
+	HallFontScale.set_size(_build_label, "font_size", BUILD_FONT_SIZE)
 	_build_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_build_label.text = HallBuildInfo.label()
 	_close_button.add_sibling(_build_label)

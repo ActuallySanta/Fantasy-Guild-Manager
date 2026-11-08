@@ -13,6 +13,9 @@ const BUTTON_BACK := "Back"
 const BUTTON_CLOSE := "Close"
 ## Share of the screen height a page may fill before it scrolls.
 const MAX_PAGE_HEIGHT := 0.62
+## A topic row's heading and body text, in design px (HallFontScale grows them for the screen).
+const TOPIC_TITLE_FONT_SIZE := 32
+const TOPIC_BODY_FONT_SIZE := 23
 
 const ICONS := "res://MobileHall/Art/Icons/%s.tres"
 
@@ -204,12 +207,12 @@ func _build_row(icon: String, heading: String, body: String) -> HBoxContainer:
 	row.add_child(text)
 	var name_label := Label.new()
 	name_label.theme_type_variation = &"TitleLabel"
-	name_label.add_theme_font_size_override("font_size", 32)
+	HallFontScale.set_size(name_label, "font_size", TOPIC_TITLE_FONT_SIZE)
 	name_label.text = heading
 	text.add_child(name_label)
 	var body_label := Label.new()
 	body_label.theme_type_variation = &"ItalicLabel"
-	body_label.add_theme_font_size_override("font_size", 23)
+	HallFontScale.set_size(body_label, "font_size", TOPIC_BODY_FONT_SIZE)
 	body_label.custom_minimum_size.x = 40
 	body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	body_label.text = body
