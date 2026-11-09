@@ -54,7 +54,7 @@ const BARRACKS_MAX_HEROES := [4, 6, 8, 10, 12]
 ## Gold to reach level N is UPGRADE_GOLD_COST[N - 1]. Level 1 is free (owned at start).
 const UPGRADE_GOLD_COST := [0, 150, 300, 500, 800]
 ## Standing needed to buy level N.
-const UPGRADE_STANDING_REQ := [0, 1, 2, 3, 4]
+const UPGRADE_STANDING_REQ := [0, 5, 10, 15, 20]
 
 # ---- Economy: the wallet a new run starts with, and the standing floor for recruits ----
 const STARTING_GOLD := 0
