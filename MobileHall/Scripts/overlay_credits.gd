@@ -260,8 +260,8 @@ func _show_story(story: String) -> void:
 		label.scroll_active = false
 		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		label.add_theme_font_size_override("normal_font_size", STORY_FONT_SIZE)
-		label.add_theme_font_size_override("bold_font_size", STORY_FONT_SIZE)
+		HallFontScale.set_size(label, "normal_font_size", STORY_FONT_SIZE)
+		HallFontScale.set_size(label, "bold_font_size", STORY_FONT_SIZE)
 		HallStyle.set_font_color(label, _ink)
 		label.text = "[center]%s[/center]" % beat
 		_story.add_child(label)
@@ -363,6 +363,6 @@ func _make_line(text: String, ink: Color, font_size: int, look: StringName = &"L
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.custom_minimum_size.x = 40
-	label.add_theme_font_size_override("font_size", font_size)
+	HallFontScale.set_size(label, "font_size", font_size)
 	HallStyle.set_font_color(label, ink)
 	return label

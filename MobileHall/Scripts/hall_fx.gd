@@ -282,7 +282,7 @@ static func float_text(layer: Control, at: Vector2, text: String, color: Color, 
 	label.text = text
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.theme_type_variation = &"TitleLabel"
-	label.add_theme_font_size_override("font_size", font_size)
+	HallFontScale.set_size(label, "font_size", font_size)
 	label.add_theme_color_override("font_color", color)
 	label.add_theme_color_override("font_outline_color", FLOAT_OUTLINE)
 	label.add_theme_constant_override("outline_size", FLOAT_OUTLINE_SIZE)
@@ -394,7 +394,7 @@ static func _make_stamp(text: String, ink: Color, font_size: int) -> PanelContai
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	# stamps keep the blackletter heading font; a single short word reads fine
 	label.theme_type_variation = &"HeadingLabel"
-	label.add_theme_font_size_override("font_size", font_size)
+	HallFontScale.set_size(label, "font_size", font_size)
 	label.add_theme_color_override("font_color", ink)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
