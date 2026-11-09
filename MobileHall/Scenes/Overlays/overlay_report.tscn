@@ -1,42 +1,42 @@
 [gd_scene format=3 uid="uid://3cdpykowgja4"]
 
 [ext_resource type="Script" uid="uid://cpybvnpe5d7yb" path="res://MobileHall/Scripts/overlay_report.gd" id="1_s0qxh"]
-[ext_resource type="Texture2D" uid="uid://6sc4epkipif0" path="res://MobileHall/Art/Textures/wood.png" id="2_wood"]
+[ext_resource type="Texture2D" uid="uid://b1hmopbs70bmw" path="res://Sprites/Quest Board/questboardBackground.png" id="2_pgsep"]
 [ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://MobileHall/Scenes/Components/chip.tscn" id="3_chip"]
 [ext_resource type="Texture2D" uid="uid://bswbe5m6msbdj" path="res://MobileHall/Art/Textures/connector.png" id="4_connector"]
 
-[node name="OverlayReport" type="Control"]
+[node name="OverlayReport" type="Control" unique_id=1951187906]
 layout_mode = 3
-anchors_preset = 0
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_s0qxh")
 
-[node name="Bg" type="TextureRect" parent="."]
+[node name="Bg" type="TextureRect" parent="." unique_id=1751058679]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-texture = ExtResource("2_wood")
+texture = ExtResource("2_pgsep")
 expand_mode = 1
 stretch_mode = 1
 
-[node name="Layout" type="VBoxContainer" parent="."]
+[node name="Layout" type="VBoxContainer" parent="." unique_id=1810161249]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_constants/separation = 0
 
-[node name="HeadMargin" type="MarginContainer" parent="Layout"]
+[node name="HeadMargin" type="MarginContainer" parent="Layout" unique_id=369460710]
 layout_mode = 2
 theme_override_constants/margin_left = 24
 theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 8
 
-[node name="Head" type="HBoxContainer" parent="Layout/HeadMargin"]
+[node name="Head" type="HBoxContainer" parent="Layout/HeadMargin" unique_id=2077872049]
 layout_mode = 2
 
-[node name="Title" type="Label" parent="Layout/HeadMargin/Head"]
+[node name="Title" type="Label" parent="Layout/HeadMargin/Head" unique_id=1596395023]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -44,60 +44,55 @@ theme_type_variation = &"HeadingLight"
 theme_override_font_sizes/font_size = 62
 text = "Day 1 Report"
 
-[node name="Sub" type="Label" parent="Layout/HeadMargin/Head"]
+[node name="Sub" type="Label" parent="Layout/HeadMargin/Head" unique_id=698769533]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_vertical = 4
 theme_type_variation = &"ItalicLight"
 theme_override_font_sizes/font_size = 28
 text = "one letter tonight"
 
-[node name="TotalsMargin" type="MarginContainer" parent="Layout"]
+[node name="TotalsMargin" type="MarginContainer" parent="Layout" unique_id=1267743582]
 layout_mode = 2
 theme_override_constants/margin_left = 6
 theme_override_constants/margin_right = 6
 
-[node name="Totals" type="PanelContainer" parent="Layout/TotalsMargin"]
+[node name="Totals" type="PanelContainer" parent="Layout/TotalsMargin" unique_id=754125951]
 layout_mode = 2
 theme_type_variation = &"TornPaper"
 
-[node name="Chips" type="HBoxContainer" parent="Layout/TotalsMargin/Totals"]
+[node name="Chips" type="HBoxContainer" parent="Layout/TotalsMargin/Totals" unique_id=2079792528]
 layout_mode = 2
 theme_override_constants/separation = 24
 alignment = 1
 
-[node name="WinsChip" parent="Layout/TotalsMargin/Totals/Chips" instance=ExtResource("3_chip")]
+[node name="WinsChip" parent="Layout/TotalsMargin/Totals/Chips" unique_id=1572222487 instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
-rotation = -0.03
 
-[node name="GoldChip" parent="Layout/TotalsMargin/Totals/Chips" instance=ExtResource("3_chip")]
+[node name="GoldChip" parent="Layout/TotalsMargin/Totals/Chips" unique_id=1588663949 instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
-rotation = 0.015
 
-[node name="HurtChip" parent="Layout/TotalsMargin/Totals/Chips" instance=ExtResource("3_chip")]
+[node name="HurtChip" parent="Layout/TotalsMargin/Totals/Chips" unique_id=310695636 instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 layout_mode = 2
-rotation = 0.03
 
-[node name="DeadChip" parent="Layout/TotalsMargin/Totals/Chips" instance=ExtResource("3_chip")]
+[node name="DeadChip" parent="Layout/TotalsMargin/Totals/Chips" unique_id=708157474 instance=ExtResource("3_chip")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-rotation = -0.02
 
-[node name="HomeMargin" type="MarginContainer" parent="Layout"]
+[node name="HomeMargin" type="MarginContainer" parent="Layout" unique_id=1986577635]
 layout_mode = 2
 theme_override_constants/margin_left = 26
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_right = 26
 
-[node name="Notes" type="VBoxContainer" parent="Layout/HomeMargin"]
+[node name="Notes" type="VBoxContainer" parent="Layout/HomeMargin" unique_id=675604044]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="HomeNote" type="Label" parent="Layout/HomeMargin/Notes"]
+[node name="HomeNote" type="Label" parent="Layout/HomeMargin/Notes" unique_id=522080522]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(40, 0)
@@ -107,7 +102,7 @@ theme_override_font_sizes/font_size = 23
 text = "At home: Sela +1 Pow · Pip Hurt → Sore"
 autowrap_mode = 3
 
-[node name="ReleasedNote" type="Label" parent="Layout/HomeMargin/Notes"]
+[node name="ReleasedNote" type="Label" parent="Layout/HomeMargin/Notes" unique_id=1477002759]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(40, 0)
@@ -117,13 +112,13 @@ theme_override_font_sizes/font_size = 23
 text = "Left the guild: Bram (-2 standing) · Ilsa (fallen)"
 autowrap_mode = 3
 
-[node name="Scroll" type="ScrollContainer" parent="Layout"]
+[node name="Scroll" type="ScrollContainer" parent="Layout" unique_id=1423454257]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="Margin" type="MarginContainer" parent="Layout/Scroll"]
+[node name="Margin" type="MarginContainer" parent="Layout/Scroll" unique_id=739394868]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 18
@@ -131,16 +126,16 @@ theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 20
 
-[node name="Col" type="VBoxContainer" parent="Layout/Scroll/Margin"]
+[node name="Col" type="VBoxContainer" parent="Layout/Scroll/Margin" unique_id=359469031]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Entries" type="VBoxContainer" parent="Layout/Scroll/Margin/Col"]
+[node name="Entries" type="VBoxContainer" parent="Layout/Scroll/Margin/Col" unique_id=1169201348]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 26
 
-[node name="Empty" type="Label" parent="Layout/Scroll/Margin/Col"]
+[node name="Empty" type="Label" parent="Layout/Scroll/Margin/Col" unique_id=745870457]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
@@ -150,17 +145,17 @@ text = "Nobody went out."
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="Footer" type="MarginContainer" parent="Layout"]
+[node name="Footer" type="MarginContainer" parent="Layout" unique_id=1551154502]
 layout_mode = 2
 theme_override_constants/margin_left = 40
 theme_override_constants/margin_right = 40
 theme_override_constants/margin_bottom = 26
 
-[node name="Col" type="VBoxContainer" parent="Layout/Footer"]
+[node name="Col" type="VBoxContainer" parent="Layout/Footer" unique_id=160110109]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="Connector" type="TextureRect" parent="Layout/Footer/Col"]
+[node name="Connector" type="TextureRect" parent="Layout/Footer/Col" unique_id=1915198524]
 custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 mouse_filter = 2
@@ -168,7 +163,7 @@ texture = ExtResource("4_connector")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ActionButton" type="Button" parent="Layout/Footer/Col"]
+[node name="ActionButton" type="Button" parent="Layout/Footer/Col" unique_id=384721263]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 108)
 layout_mode = 2
