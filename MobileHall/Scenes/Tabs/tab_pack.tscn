@@ -1,0 +1,208 @@
+[gd_scene format=3 uid="uid://0cap4im6ysp2"]
+
+[ext_resource type="Script" uid="uid://ff56ldxfoili" path="res://MobileHall/Scripts/tab_pack.gd" id="1_pack"]
+[ext_resource type="StyleBox" uid="uid://1371ec6b7611" path="res://MobileHall/Styles/action_bar.tres" id="2_bar"]
+[ext_resource type="PackedScene" uid="uid://h87tubvsjwc3" path="res://MobileHall/Scenes/Components/portrait.tscn" id="3_portrait"]
+[ext_resource type="PackedScene" uid="uid://flyjj7sxlpwa" path="res://MobileHall/Scenes/Overlays/overlay_equip_picker.tscn" id="4_picker"]
+[ext_resource type="PackedScene" uid="uid://bm0aa64qy0h57" path="res://MobileHall/Scenes/Overlays/overlay_gear_confirm.tscn" id="5_confirm"]
+
+[node name="TabPack" type="VBoxContainer"]
+theme_override_constants/separation = 0
+script = ExtResource("1_pack")
+
+[node name="FolderMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="Folder" type="PanelContainer" parent="FolderMargin"]
+layout_mode = 2
+theme_type_variation = &"FolderBody"
+
+[node name="Col" type="VBoxContainer" parent="FolderMargin/Folder"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Head" type="HBoxContainer" parent="FolderMargin/Folder/Col"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="FolderMargin/Folder/Col/Head"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 40
+text = "The Guild Pack"
+text_overrun_behavior = 3
+
+[node name="HideWornToggle" type="CheckButton" parent="FolderMargin/Folder/Col/Head"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+text = "Hide equipped"
+
+[node name="CountLine" type="Label" parent="FolderMargin/Folder/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "9 items · 5 worn · 4 spare"
+autowrap_mode = 3
+
+[node name="FilterScroll" type="ScrollContainer" parent="FolderMargin/Folder/Col"]
+layout_mode = 2
+vertical_scroll_mode = 0
+
+[node name="Filters" type="HBoxContainer" parent="FolderMargin/Folder/Col/FilterScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="FilterAll" type="Button" parent="FolderMargin/Folder/Col/FilterScroll/Filters"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"WoodButton"
+text = "All"
+
+[node name="FilterKnight" type="Button" parent="FolderMargin/Folder/Col/FilterScroll/Filters"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"PaperButton"
+text = "Knight"
+
+[node name="FilterPriest" type="Button" parent="FolderMargin/Folder/Col/FilterScroll/Filters"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"PaperButton"
+text = "Priest"
+
+[node name="FilterPathfinder" type="Button" parent="FolderMargin/Folder/Col/FilterScroll/Filters"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"PaperButton"
+text = "Pathfinder"
+
+[node name="FilterMage" type="Button" parent="FolderMargin/Folder/Col/FilterScroll/Filters"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"PaperButton"
+text = "Mage"
+
+[node name="Scroll" type="ScrollContainer" parent="FolderMargin/Folder/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="GridMargin" type="MarginContainer" parent="FolderMargin/Folder/Col/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="GridCol" type="VBoxContainer" parent="FolderMargin/Folder/Col/Scroll/GridMargin"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="FolderMargin/Folder/Col/Scroll/GridMargin/GridCol"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 24
+columns = 3
+
+[node name="EmptyNote" type="Label" parent="FolderMargin/Folder/Col/Scroll/GridMargin/GridCol"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 26
+text = "The pack is empty. Buy gear in the Shop, or win it on quests."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ItemBar" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("2_bar")
+
+[node name="Banner" type="PanelContainer" parent="ItemBar"]
+layout_mode = 2
+theme_type_variation = &"TornPaper"
+
+[node name="Row" type="HBoxContainer" parent="ItemBar/Banner"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="WearerPortrait" parent="ItemBar/Banner/Row" instance=ExtResource("3_portrait")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+circle = true
+
+[node name="Text" type="VBoxContainer" parent="ItemBar/Banner/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="ItemName" type="Label" parent="ItemBar/Banner/Row/Text"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 34
+text = "Drakebone Blade"
+text_overrun_behavior = 3
+
+[node name="ItemEffect" type="Label" parent="ItemBar/Banner/Row/Text"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "+22 Power · Knights only"
+autowrap_mode = 3
+
+[node name="ItemStatus" type="Label" parent="ItemBar/Banner/Row/Text"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 22
+text = "Worn by Gwen"
+autowrap_mode = 3
+
+[node name="ActionButton" type="Button" parent="ItemBar/Banner/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 84)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_type_variation = &"GoldButton"
+theme_override_font_sizes/font_size = 30
+text = "Equip on…"
+
+[node name="EquipPicker" parent="." instance=ExtResource("4_picker")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="GearConfirm" parent="." instance=ExtResource("5_confirm")]
+unique_name_in_owner = true
+layout_mode = 1

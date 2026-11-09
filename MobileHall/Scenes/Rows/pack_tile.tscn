@@ -1,0 +1,115 @@
+[gd_scene format=3 uid="uid://g3ntvsh05abd"]
+
+[ext_resource type="Script" uid="uid://bldrufw82je85" path="res://MobileHall/Scripts/pack_tile.gd" id="1_tile"]
+[ext_resource type="PackedScene" uid="uid://h87tubvsjwc3" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ribbon"]
+content_margin_left = 4.0
+content_margin_top = 4.0
+content_margin_right = 4.0
+content_margin_bottom = 4.0
+bg_color = Color(0.149, 0.188, 0.2902, 1)
+
+[node name="PackTile" type="Button"]
+mouse_filter = 1
+custom_minimum_size = Vector2(0, 268)
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"GoodsTag"
+script = ExtResource("1_tile")
+
+[node name="Col" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 22.0
+offset_right = -8.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+
+[node name="Tag" type="PanelContainer" parent="Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_type_variation = &"TypeSeal"
+
+[node name="TagText" type="Label" parent="Col/Tag"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SealLabel"
+theme_override_font_sizes/font_size = 20
+text = "LEG"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ItemName" type="Label" parent="Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 27
+text = "Blade"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+
+[node name="Bonus" type="Label" parent="Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 22
+text = "+22 Pow"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="Col"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Ribbon" type="PanelContainer" parent="Col"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ribbon")
+
+[node name="RibbonText" type="Label" parent="Col/Ribbon"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"LabelLight"
+theme_override_font_sizes/font_size = 20
+text = "On Gwen"
+horizontal_alignment = 1
+text_overrun_behavior = 3
+uppercase = true
+
+[node name="SpareNote" type="Label" parent="Col"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 20
+text = "Spare"
+horizontal_alignment = 1
+uppercase = true
+
+[node name="Medallion" parent="." instance=ExtResource("2_portrait")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(66, 66)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -52.0
+offset_top = -16.0
+offset_right = 14.0
+offset_bottom = 50.0
+grow_horizontal = 0
+mouse_filter = 2
+circle = true

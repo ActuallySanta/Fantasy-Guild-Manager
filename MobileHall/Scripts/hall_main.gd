@@ -4,12 +4,12 @@
 ##
 ## Shell, top to bottom:
 ##   header      - day, Bone Drake countdown, gold, standing, menu button
-##   content     - one of four tabs (Board, Members, Guild, Shop), or a screen
+##   content     - one of four tabs (Board, Members, Guild, Items), or a screen
 ##                 over them (Assign Party, Character)
 ##   action bar  - one big "what to do next" button (hidden on screens, which
-##                 have their own buttons in that spot, and on the Shop tab,
-##                 whose Buy bar sits there)
-##   nav         - Board / Members / Guild / Shop with badges, always visible
+##                 have their own buttons in that spot, and on the Items tab,
+##                 whose Pack item bar / Shop Buy bar sits there)
+##   nav         - Board / Members / Guild / Items with badges, always visible
 ##                 (ids: board / guild / upgrades / shop)
 ## Overlays over everything: End Day check, Day Report, Welcome, Menu,
 ## the Game Over ledger (when the guild is stuck with nobody left; see is_run_over),
@@ -77,8 +77,11 @@ const FINAL_DAY := 50
 const RELEASE_BASE_STANDING_COST := 1
 ## Bottom tabs, left to right (ids match the Nav_<id> buttons and Tab nodes in the scene).
 const TAB_IDS := ["board", "guild", "upgrades", "shop"]
-## The Shop tab (goods come from the ItemShop autoload).
+## The Items tab (Pack + Shop; the id stays "shop" for the tutorial and saves).
 const TAB_SHOP := "shop"
+## Halves of the Items tab: the guild's gear, and Grizzle's counter.
+const ITEMS_SECTION_PACK := "pack"
+const ITEMS_SECTION_SHOP := "shop"
 ## Screen kinds that can cover the tabs (see `active_screen`).
 const SCREEN_ASSIGN := "assign"
 const SCREEN_CHARACTER := "character"
@@ -161,6 +164,7 @@ const TOAST_BOUGHT := "Bought the %s!"
 const TOAST_CANT_BUY := "Not enough gold for that."
 const TOAST_EQUIPPED := "%s equipped the %s"
 const TOAST_UNEQUIPPED := "%s took off the %s"
+const TOAST_SWAPPED := "%s swapped the %s for the %s"
 const TOAST_WRONG_ROLE := "Only %ss can use the %s."
 const TOAST_HANDS_FULL := "%s's hands are full"
 const TOAST_GEAR_DEAD := "%s can't use gear anymore."
@@ -192,6 +196,11 @@ var active_tab := "board"
 var guild_section := GUILD_SECTION_ROSTER
 ## Which half of the Upgrades tab is showing (UPGRADES_SECTION_TONIGHT | _BUILD).
 var upgrades_section := UPGRADES_SECTION_TONIGHT
+## Which half of the Items tab is showing (ITEMS_SECTION_PACK | _SHOP).
+var items_section := ITEMS_SECTION_SHOP
+## The day the Items tab last opened on its own: the first visit each day
+## shows the Shop (fresh stock), later ones keep whichever half was left open.
+var shop_last_seen_day := 0
 ## Upgrades > Tonight: the "+ Add a hero" list under the Training Yard is open.
 var training_picker_open := false
 ## The screen covering the tabs, or {} for none:
@@ -329,7 +338,7 @@ var tutorial: Control
 @onready var _toast: HallToast = %Toast
 
 # ---- content
-@onready var _tabs := {"board": %TabBoard, "guild": %TabGuild, "upgrades": %TabUpgrades, "shop": %TabShop}
+@onready var _tabs := {"board": %TabBoard, "guild": %TabGuild, "upgrades": %TabUpgrades, "shop": %TabItems}
 @onready var _screens := {SCREEN_ASSIGN: %ScreenAssign, SCREEN_CHARACTER: %ScreenCharacter}
 
 # ---- overlays
@@ -648,6 +657,12 @@ func open_tab(tab_id: String, section: String = "") -> void:
 		guild_section = section
 	elif section != "" and tab_id == "upgrades":
 		upgrades_section = section
+	elif tab_id == TAB_SHOP:
+		if section != "":
+			items_section = section
+		elif shop_last_seen_day != GameState.day:
+			items_section = ITEMS_SECTION_SHOP
+		shop_last_seen_day = GameState.day
 	if active_tab == "guild" and guild_section == GUILD_SECTION_HIRE:
 		for_hire_last_seen_day = GameState.day
 	active_screen = {}
@@ -663,6 +678,11 @@ func show_guild_section(section: String) -> void:
 ## The Upgrades tab's Tonight / Build buttons.
 func show_upgrades_section(section: String) -> void:
 	open_tab("upgrades", section)
+
+
+## The Items tab's Pack / Shop folder tabs.
+func show_items_section(section: String) -> void:
+	open_tab(TAB_SHOP, section)
 
 
 ## Open Assign Party on one quest.
@@ -1017,6 +1037,24 @@ func unequip_item(item: StandardItem) -> void:
 	ItemShop.unequip(item)
 	pending_fx.gear_out = true
 	show_toast(TOAST_UNEQUIPPED % [user.name, HallStyle.item_look(item).name])
+	queue_refresh()
+
+
+## Swap gear on a hero whose slots are full: item_off comes off (back to the
+## pack) and item_on goes on in its place. If item_on can't go on, item_off
+## goes back on, so a failed swap leaves the hero as they were.
+func swap_gear(item_on: StandardItem, item_off: StandardItem, character: GuildCharacter) -> void:
+	if item_off.curr_user != character:
+		equip_item(item_on, character)
+		return
+	ItemShop.unequip(item_off)
+	if ItemShop.equip(item_on, character) != ItemShop.EquipResult.OK:
+		ItemShop.equip(item_off, character)
+		equip_item(item_on, character)  # shows why it can't go on
+		return
+	pending_fx.gear_in = item_on
+	show_toast(TOAST_SWAPPED % [character.name, HallStyle.item_look(item_off).name, HallStyle.item_look(item_on).name])
+	tutorial_event.emit("equip", item_on)
 	queue_refresh()
 
 
@@ -1434,7 +1472,7 @@ func _refresh_content() -> void:
 	var view_key: String
 	if screen_kind == "":
 		shown_view = _tabs[active_tab]
-		view_key = "tab:%s:%s:%s" % [active_tab, guild_section, upgrades_section]
+		view_key = "tab:%s:%s:%s:%s" % [active_tab, guild_section, upgrades_section, items_section]
 	else:
 		shown_view = _screens[screen_kind]
 		view_key = "screen:%s:%d" % [screen_kind, active_screen.get("quest_index", 0)]
