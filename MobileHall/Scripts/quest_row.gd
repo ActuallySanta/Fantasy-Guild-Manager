@@ -33,6 +33,7 @@ const TEXT_ODDS := "%d%%"
 # Quest facts (left)
 @onready var _type_seal: PanelContainer = %TypeSeal
 @onready var _type_tag: Label = %TypeTag
+@onready var _type_icon: TextureRect = %TypeIcon
 @onready var _title: Label = %Title
 @onready var _rank_chip = %RankChip           # chip.gd
 @onready var _gold_chip = %GoldChip           # chip.gd
@@ -64,7 +65,7 @@ func setup(hall: HallMain, quest_index: int) -> void:
 ## Type seal, title, rank, reward, party size, favored stat.
 func _show_quest_facts(hall: HallMain, entry: Dictionary) -> void:
 	var type_info := HallStyle.quest_type_info(entry)
-	HallStyle.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
+	HallStyle.style_icon_tag(_type_seal, _type_tag, _type_icon, type_info.tag, type_info.get("icon", ""), type_info.color)
 	_title.text = entry.quest.questTitle
 	_rank_chip.set_box(TEXT_RANK % HallStyle.rank_letter(entry.quest), HallStyle.TEXT_MAIN)
 	# item quests pay pre-rolled equipment instead of gold: show the count and rarities

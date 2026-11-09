@@ -96,12 +96,14 @@ const MILESTONE_TYPE_ID := 5
 const FINAL_TYPE_ID := 6
 
 ## CreatedQuest.QuestType (plus MILESTONE_TYPE_ID) -> display name, writ name
-## (the Assign Party scroll), seal colour, short tag.
+## (the Assign Party scroll), seal colour, short tag, and the icon (an
+## ICON_FILES name) drawn on its seal. A type with no "icon" shows its tag
+## on the seal instead; the tag is also used where there's no seal.
 const QUEST_TYPES := {
-	1: {"name": "Clear Dungeon", "writ": "Writ of Clearing", "color": Color("#4A5E32"), "tag": "DUN"},
-	2: {"name": "Escort", "writ": "Writ of Escort", "color": Color("#7A5236"), "tag": "ESC"},
-	3: {"name": "Scout Terrain", "writ": "Writ of Scouting", "color": Color("#3F5A74"), "tag": "SCT"},
-	4: {"name": "Gather Intel", "writ": "Writ of Intelligence", "color": Color("#5B4A7A"), "tag": "INT"},
+	1: {"name": "Clear Dungeon", "writ": "Writ of Clearing", "color": Color("#4A5E32"), "tag": "DUN", "icon": "gate"},
+	2: {"name": "Escort", "writ": "Writ of Escort", "color": Color("#7A5236"), "tag": "ESC", "icon": "escort"},
+	3: {"name": "Scout Terrain", "writ": "Writ of Scouting", "color": Color("#3F5A74"), "tag": "SCT", "icon": "flag"},
+	4: {"name": "Gather Intel", "writ": "Writ of Intelligence", "color": Color("#5B4A7A"), "tag": "INT", "icon": "eye"},
 	MILESTONE_TYPE_ID: {"name": "Milestone", "writ": "Writ of the Drake", "color": Color("#7D2A26"), "tag": "BOSS"},
 	FINAL_TYPE_ID: {"name": "Final Battle", "writ": "Writ of the Last Stand", "color": Color("#3A1F3D"), "tag": "FINAL"},
 }
@@ -392,6 +394,11 @@ const ICON_FILES := {
 	"skull": "uid://dv4aeys4diph4",  # MobileHall/Art/Icons/skull.tres
 	"heart": "uid://dbq8w0d0gocej",  # MobileHall/Art/Icons/heart.tres
 	"stall": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.tres
+	# quest type seals (QUEST_TYPES)
+	"gate": "uid://13yirvv2nrwk",  # MobileHall/Art/Icons/gate.tres
+	"escort": "uid://bkk0x60yoyngi",  # MobileHall/Art/Icons/escort.tres
+	"flag": "uid://h5m6winn3vrf",  # MobileHall/Art/Icons/flag.tres
+	"eye": "uid://2203hgt8y6l4",  # MobileHall/Art/Icons/eye.tres
 	"nav_settings": "uid://ysb0ogcuiwff",  # MobileHall/Art/Icons/gear.tres
 	"nav_quests": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.tres
 	"nav_characters": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.tres
@@ -466,6 +473,20 @@ static func style_tag(tag_panel: Control, tag_label: Label, text: String, fill: 
 	tint_art(tag_panel, fill)
 	tag_label.text = text
 	tag_label.theme_type_variation = &"SealLabel"
+
+
+## A coloured seal with an icon on it (quest type, building), or its short tag
+## when `icon_name` has no file in ICON_FILES.
+## tag_icon = the TextureRect inside the seal, beside tag_label; the icon is
+## inked CREAM, the same colour as the seal's text.
+static func style_icon_tag(tag_panel: Control, tag_label: Label, tag_icon: TextureRect, text: String,
+		icon_name: String, fill: Color) -> void:
+	style_tag(tag_panel, tag_label, text, fill)
+	tag_icon.texture = icon_texture(icon_name)
+	tag_icon.modulate = CREAM
+	var has_icon := tag_icon.texture != null
+	tag_icon.visible = has_icon
+	tag_label.visible = not has_icon
 
 
 ## Card state colours: the panel keeps (or gets) its parchment look and the

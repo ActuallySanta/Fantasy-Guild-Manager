@@ -71,6 +71,7 @@ const TEXT_NOBODY_CAME_BACK := "Nobody came back to write this letter."
 # Head
 @onready var _type_seal: PanelContainer = %TypeSeal
 @onready var _type_tag: Label = %TypeTag
+@onready var _type_icon: TextureRect = %TypeIcon
 @onready var _title: Label = %Title
 @onready var _from_line: Label = %From
 @onready var _result_stamp: Control = %Stamp
@@ -93,7 +94,7 @@ var _bbcode_tags := RegEx.create_from_string("\\[[^\\]]*\\]")
 func setup(result: Dictionary) -> void:
 	var succeeded: bool = result.succeeded
 	var type_info := HallStyle.quest_type_info(result)
-	HallStyle.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
+	HallStyle.style_icon_tag(_type_seal, _type_tag, _type_icon, type_info.tag, type_info.get("icon", ""), type_info.color)
 	_title.text = result.quest.questTitle
 	_from_line.text = TEXT_FROM % [HallStyle.join_names(result.party), mini(int(result.chance), 100)]
 
