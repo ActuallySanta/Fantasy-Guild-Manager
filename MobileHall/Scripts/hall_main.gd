@@ -276,6 +276,9 @@ var color_filter := 0
 var reduce_motion := false
 ## Text size: index into HallSettings.TEXT_SIZES (HallFontScale applies it). Saved by HallSettings.
 var text_size := HallSettings.DEFAULT_TEXT_SIZE
+## Dev switch (Menu's "Save runs (debug)" checkbox): when false the run is
+## neither loaded at start-up nor saved. Saved by HallSettings.
+var is_save_enabled := HallSettings.DEFAULT_SAVE_ENABLED
 
 # ---- the save file (HallSave)
 
@@ -398,7 +401,9 @@ func _ready() -> void:
 
 	# a saved run comes back before Pip's setup, which picks its script from the day
 	uses_save_file = get_parent() == get_tree().root
-	if uses_save_file:
+	# read here, not in _load_settings below: the dev switch decides whether to load at all
+	is_save_enabled = HallSettings.load_settings().save_enabled
+	if uses_save_file and is_save_enabled:
 		HallSave.request_persistent_storage()
 		is_resumed_run = HallSave.load_run(self)
 
@@ -1144,10 +1149,20 @@ func set_reduce_motion(is_on: bool) -> void:
 	queue_refresh()
 
 
+## Menu's "Save runs (debug)" checkbox. Turning it on saves the current run on
+## the refresh this queues (overwriting the old save); turning it off leaves
+## the save file on disk untouched.
+func set_save_enabled(is_on: bool) -> void:
+	is_save_enabled = is_on
+	HallSettings.save_value(HallSettings.KEY_SAVE_ENABLED, is_on, HallSettings.SECTION_DEV)
+	queue_refresh()
+
+
 func _load_settings() -> void:
 	var settings := HallSettings.load_settings()
 	color_filter = settings.color_filter
 	reduce_motion = settings.reduce_motion
+	is_save_enabled = settings.save_enabled
 	HallFx.reduce_motion = reduce_motion
 	_apply_color_filter()
 
@@ -1402,9 +1417,10 @@ func refresh() -> void:
 
 
 ## Write the run to the save file now (HallSave.save_run skips it if nothing
-## changed). Does nothing for a playtest scenario (see uses_save_file).
+## changed). Does nothing for a playtest scenario (see uses_save_file) or
+## while the dev switch is off (is_save_enabled).
 func save_now() -> void:
-	if uses_save_file and is_inside_tree():
+	if uses_save_file and is_save_enabled and is_inside_tree():
 		HallSave.save_run(self)
 
 
