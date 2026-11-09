@@ -171,6 +171,7 @@ theme_override_font_sizes/font_size = 25
 text = "ailed as a child prophet, Juan escaped a cult and now dreams of taking it down."
 autowrap_mode = 3
 max_lines_visible = 3
+text_overrun_behavior = 3
 
 [node name="Buttons" type="HBoxContainer" parent="Col"]
 layout_mode = 2

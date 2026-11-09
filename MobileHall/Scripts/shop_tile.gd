@@ -8,6 +8,10 @@ extends Button
 
 ## Sold-out tags fade back.
 const SOLD_OPACITY := 0.7
+## The tag's size (design px; width 0 = share the grid row). Grown with the
+## font scale: the seal, name and price sit in an anchored column inside it,
+## so the tag has to get taller for them to keep fitting.
+const TILE_SIZE := Vector2(0, 222)
 
 # ---- TEXT
 const PRICE := "%dg"
@@ -27,6 +31,7 @@ const SOLD_NOTE := "Back tomorrow"
 ## good: one entry of tab_shop.gd's PLACEHOLDER_GOODS.
 func setup(good: Dictionary, is_selected: bool, on_pick: Callable) -> void:
 	var is_sold: bool = good.get("sold", false)
+	custom_minimum_size = HallFontScale.px_vec(TILE_SIZE)
 	_name.text = good.name
 	_price_text.text = PRICE % good.price
 	_sold_note.text = SOLD_NOTE

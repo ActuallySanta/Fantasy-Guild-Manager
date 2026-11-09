@@ -44,6 +44,8 @@ theme_type_variation = &"HeadingLight"
 theme_override_font_sizes/font_size = 62
 text = "The Guild Has Fallen"
 horizontal_alignment = 1
+custom_minimum_size = Vector2(40, 0)
+autowrap_mode = 3
 
 [node name="Sub" type="Label" parent="Layout/HeadMargin/Head"]
 layout_mode = 2
@@ -51,6 +53,8 @@ theme_type_variation = &"ItalicLight"
 theme_override_font_sizes/font_size = 28
 text = "No heroes left to send, and none to hire"
 horizontal_alignment = 1
+custom_minimum_size = Vector2(40, 0)
+autowrap_mode = 3
 
 [node name="Scroll" type="ScrollContainer" parent="Layout"]
 unique_name_in_owner = true
@@ -171,3 +175,4 @@ focus_mode = 0
 theme_type_variation = &"GoldButton"
 theme_override_font_sizes/font_size = 46
 text = "Found a New Guild"
+autowrap_mode = 3

@@ -508,6 +508,8 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 func _set_compact(is_compact: bool) -> void:
 	_text.visible = not is_compact
 	_counter.visible = not is_compact
+	# the chip keeps only what gets you through the step
+	_skip_button.visible = not is_compact
 	_hint.text = "Tap me to read" if is_compact else "Tap me to move"
 
 
@@ -626,6 +628,9 @@ func _build() -> void:
 	name_label.text = "Pip · Guild Clerk"
 	name_label.theme_type_variation = &"TitleLabel"
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# trims to "Pip · Guild…" before it pushes the step counter off the bubble
+	name_label.custom_minimum_size.x = 40
+	name_label.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	HallFontScale.set_size(name_label, "font_size", NAME_FONT_SIZE)
 	head.add_child(name_label)
 	_counter = Label.new()
@@ -647,18 +652,23 @@ func _build() -> void:
 	_text.add_theme_color_override("default_color", HallStyle.TEXT_MAIN)
 	col.add_child(_text)
 
-	var foot := HBoxContainer.new()
-	foot.add_theme_constant_override("separation", 10)
-	col.add_child(foot)
+	# the instruction gets its own full-width line, so the buttons beside it
+	# never squeeze it into a word per line when the text is scaled up
 	_do_label = Label.new()
 	_do_label.theme_type_variation = &"CapsLabel"
+	_do_label.custom_minimum_size.x = 40
 	_do_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_do_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_do_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	HallFontScale.set_size(_do_label, "font_size", INSTRUCTION_FONT_SIZE)
 	HallStyle.set_font_color(_do_label, HallStyle.BLUE_TEXT)
-	# the instruction takes all the room left of Skip / Next, so it doesn't wrap early
-	foot.add_child(_do_label)
+	col.add_child(_do_label)
+
+	# Skip on the left, Back / Next on the right; at the biggest text sizes
+	# Back / Next drop to a line of their own instead of widening the bubble
+	var foot := HFlowContainer.new()
+	foot.add_theme_constant_override("h_separation", 10)
+	foot.add_theme_constant_override("v_separation", 8)
+	col.add_child(foot)
 	_skip_button = Button.new()
 	_skip_button.text = "Skip tutorial"
 	_skip_button.flat = true
@@ -667,6 +677,10 @@ func _build() -> void:
 	_skip_button.add_theme_color_override("font_color", HallStyle.TEXT_SOFT)
 	_skip_button.pressed.connect(skip_tutorial)
 	foot.add_child(_skip_button)
+	var foot_spacer := Control.new()
+	foot_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	foot_spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	foot.add_child(foot_spacer)
 	_back_button = Button.new()
 	_back_button.text = "Back"
 	_back_button.custom_minimum_size = Vector2(110, 64)

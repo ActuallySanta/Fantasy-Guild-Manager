@@ -54,14 +54,15 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 28
 text = "ReportButton"
+autowrap_mode = 3
 
-[node name="ColorButton" type="Button" parent="Center/Sheet/Col"]
+[node name="AccessibilityButton" type="Button" parent="Center/Sheet/Col"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 88)
 layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 28
-text = "ColorButton"
+text = "AccessibilityButton"
 
 [node name="ResetButton" type="Button" parent="Center/Sheet/Col" unique_id=1210881435]
 unique_name_in_owner = true
@@ -70,6 +71,7 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 28
 text = "ResetButton"
+autowrap_mode = 3
 
 [node name="AbandonButton" type="Button" parent="Center/Sheet/Col"]
 unique_name_in_owner = true
@@ -78,6 +80,7 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 28
 text = "AbandonButton"
+autowrap_mode = 3
 
 [node name="CloseButton" type="Button" parent="Center/Sheet/Col" unique_id=2045574900]
 unique_name_in_owner = true

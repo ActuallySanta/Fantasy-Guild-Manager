@@ -38,6 +38,7 @@ theme_override_font_sizes/font_size = 22
 text = "Day"
 horizontal_alignment = 1
 uppercase = true
+metadata/font_max_factor = 1.5
 
 [node name="DayValue" type="Label" parent="Bar/Row/DayTile/Col" unique_id=1686422736]
 unique_name_in_owner = true
@@ -46,13 +47,15 @@ theme_type_variation = &"HeadingLight"
 theme_override_font_sizes/font_size = 58
 text = "1"
 horizontal_alignment = 1
+metadata/font_max_factor = 1.5
 
 [node name="DrakeNote" type="PanelContainer" parent="Bar/Row" unique_id=697254746]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(200, 0)
+custom_minimum_size = Vector2(140, 0)
 layout_mode = 2
 size_flags_vertical = 4
 theme_type_variation = &"TornNote"
+size_flags_horizontal = 3
 
 [node name="DrakeValue" type="RichTextLabel" parent="Bar/Row/DrakeNote" unique_id=171466036]
 unique_name_in_owner = true
@@ -67,11 +70,6 @@ bbcode_enabled = true
 text = "Bone Drake in [color=#8B2E2A]9 days[/color]"
 fit_content = true
 scroll_active = false
-
-[node name="Spacer" type="Control" parent="Bar/Row" unique_id=620168366]
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
 
 [node name="GoldValueBox" type="HBoxContainer" parent="Bar/Row" unique_id=1970020752]
 unique_name_in_owner = true
@@ -94,6 +92,7 @@ layout_mode = 2
 theme_type_variation = &"TitleLight"
 theme_override_font_sizes/font_size = 42
 text = "600"
+metadata/font_max_factor = 1.5
 
 [node name="StandingValueBox" type="Control" parent="Bar/Row" unique_id=1310514565]
 unique_name_in_owner = true
@@ -128,6 +127,7 @@ theme_override_font_sizes/font_size = 32
 text = "1"
 horizontal_alignment = 1
 vertical_alignment = 1
+metadata/font_max_factor = 1.5
 
 [node name="MenuButton" type="Button" parent="Bar/Row" unique_id=1168904313]
 unique_name_in_owner = true

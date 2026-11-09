@@ -14,6 +14,13 @@ const NAV_HEIGHT := 100
 const NAV_HEIGHT_OPEN := 114
 ## How big a nav badge grows when its count changes (1 = no pop).
 const BADGE_POP := 1.4
+## Tab label and badge sizes (design px; the same as NavTab / NavTabActive in
+## hall_theme and the badges' Text in the scene), and the most they grow with
+## the font scale. Four tabs share one row and their words can't wrap, so past
+## this they'd push the screen wider; the icons carry them at bigger sizes.
+const TAB_FONT_SIZE := 26
+const BADGE_FONT_SIZE := 26
+const MAX_FONT_FACTOR := 1.5
 
 
 # ============================================================ TEXT
@@ -38,7 +45,10 @@ var _shown_badges := {}
 func setup(main: HallMain) -> void:
 	hall = main
 	for tab_id in HallMain.TAB_IDS:
-		button(tab_id).pressed.connect(hall.open_tab.bind(tab_id))
+		var nav_button := button(tab_id)
+		nav_button.pressed.connect(hall.open_tab.bind(tab_id))
+		HallFontScale.set_size(nav_button, "font_size", TAB_FONT_SIZE, MAX_FONT_FACTOR)
+		HallFontScale.set_size(nav_button.get_node("Badge/Text"), "font_size", BADGE_FONT_SIZE, MAX_FONT_FACTOR)
 
 
 ## The nav button for a tab id (one of HallMain.TAB_IDS).

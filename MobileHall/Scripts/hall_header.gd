@@ -21,10 +21,18 @@ const COUNTER_POP := 1.22
 const COUNTER_GAIN_INK := Color("#B5E08F")
 const COUNTER_LOSS_INK := Color("#FF9C8A")
 ## Floating "+40" / "-2" under a counter: inks (dark, to read on paper and wood
-## with their light outline) and how far under the counter they start (pixels).
+## with their light outline) and how far under the counter they start (design
+## px; grown with the font scale, since the number under it grows too).
 const DELTA_GAIN_INK := Color("#3D5A2A")
 const DELTA_LOSS_INK := Color("#8B2E2A")
 const DELTA_OFFSET := Vector2(0, 58)
+## The standing shield's box, in design px. Grown with the font scale so the
+## number keeps fitting inside the shield art.
+const STANDING_BOX_SIZE := Vector2(62, 72)
+## The header's counters (day, gold, standing) grow no more than this with the
+## font scale (metadata/font_max_factor in the scene): the header is one row
+## that can't wrap, so its numbers stop growing before it runs off screen.
+const STANDING_MAX_FACTOR := 1.5
 ## Coins / shields that fly between a counter and what you tapped: size (pixels),
 ## flight time (seconds), and how many fly in when the night's earnings land.
 const FLY_ICON_SIZE := 44.0
@@ -97,6 +105,8 @@ func setup(main: HallMain) -> void:
 
 ## Redraw the day, the countdown, the counters and the danger strip.
 func refresh() -> void:
+	# grows with the font scale (here, not in setup, so a Text size change follows)
+	_standing_box.custom_minimum_size = HallFontScale.px_vec(STANDING_BOX_SIZE, STANDING_MAX_FACTOR)
 	_refresh_day_tile()
 
 	# the days left are always in red ink; in the last days the whole note is
@@ -222,7 +232,7 @@ func _update_counter(kind: String) -> void:
 	HallFx.count(label, old_value, value, COUNTER_ROLL_SECONDS)
 	HallFx.pop(_counter_box(kind), COUNTER_POP)
 	HallFx.flash_text(label, COUNTER_GAIN_INK if is_gain else COUNTER_LOSS_INK, COUNTER_ROLL_SECONDS + 0.3)
-	var delta_at := _counter_box(kind).get_global_rect().get_center() + DELTA_OFFSET
+	var delta_at := _counter_box(kind).get_global_rect().get_center() + HallFontScale.px_vec(DELTA_OFFSET)
 	HallFx.float_text(hall.fx_layer, delta_at, (DELTA_GAIN if is_gain else DELTA_LOSS) % change,
 			DELTA_GAIN_INK if is_gain else DELTA_LOSS_INK)
 

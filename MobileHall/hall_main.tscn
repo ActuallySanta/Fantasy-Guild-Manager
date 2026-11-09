@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://chlxegiqwwtoa" path="res://MobileHall/Scenes/Screens/screen_character.tscn" id="18_c5uvo"]
 [ext_resource type="PackedScene" uid="uid://4icacknba0fh" path="res://MobileHall/Scenes/Overlays/overlay_end_day.tscn" id="30_cwf4i"]
 [ext_resource type="PackedScene" uid="uid://farw7bcfj0fq" path="res://MobileHall/Scenes/Overlays/overlay_menu.tscn" id="32_kg28u"]
+[ext_resource type="PackedScene" uid="uid://ddcn2l6d4kiqp" path="res://MobileHall/Scenes/Overlays/overlay_accessibility.tscn" id="33_access"]
 [ext_resource type="PackedScene" uid="uid://3cdpykowgja4" path="res://MobileHall/Scenes/Overlays/overlay_report.tscn" id="34_6fy20"]
 [ext_resource type="PackedScene" uid="uid://bgwxd653pjox8" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
 [ext_resource type="PackedScene" uid="uid://cdmw3mrmuept3" path="res://MobileHall/Scenes/Overlays/overlay_game_over.tscn" id="37_gameover"]
@@ -124,6 +125,15 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="OverlayMenu" parent="." unique_id=1395998418 instance=ExtResource("32_kg28u")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OverlayAccessibility" parent="." instance=ExtResource("33_access")]
 unique_name_in_owner = true
 visible = false
 z_index = 10
