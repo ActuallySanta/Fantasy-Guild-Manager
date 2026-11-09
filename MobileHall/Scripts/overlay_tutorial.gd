@@ -82,6 +82,18 @@ const LOCK_INTERVAL := 0.1
 ## ghost copies of Pip and cropped slices.) Alpha = how dark it gets, 0..1.
 const DIM_COLOR := Color(0.0, 0.0, 0.0, 0.55)
 
+# ---- bubble text sizes, in design px (HallFontScale grows them for the screen)
+## "Tap me" hint under Pip's face.
+const HINT_FONT_SIZE := 19
+## "Pip · Guild Clerk" title.
+const NAME_FONT_SIZE := 32
+## The "2 / 7" step counter.
+const COUNTER_FONT_SIZE := 20
+## What Pip says.
+const BODY_FONT_SIZE := 25
+## The blue "do this" line and the Skip tutorial button.
+const INSTRUCTION_FONT_SIZE := 22
+
 # ---- coloured words (the stat inks in HallStyle.STATS, and HallStyle.GOLD_TEXT)
 const POW := "[color=#8B2E2A]Power[/color]"
 const DEF := "[color=#2F4A66]Defense[/color]"
@@ -600,7 +612,7 @@ func _build() -> void:
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_hint.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_hint.custom_minimum_size.x = 84
-	_hint.add_theme_font_size_override("font_size", 19)
+	HallFontScale.set_size(_hint, "font_size", HINT_FONT_SIZE)
 	face_col.add_child(_hint)
 
 	var col := VBoxContainer.new()
@@ -614,13 +626,13 @@ func _build() -> void:
 	name_label.text = "Pip · Guild Clerk"
 	name_label.theme_type_variation = &"TitleLabel"
 	name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_label.add_theme_font_size_override("font_size", 32)
+	HallFontScale.set_size(name_label, "font_size", NAME_FONT_SIZE)
 	head.add_child(name_label)
 	_counter = Label.new()
 	_counter.theme_type_variation = &"CapsLabel"
 	_counter.uppercase = true
 	_counter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_counter.add_theme_font_size_override("font_size", 20)
+	HallFontScale.set_size(_counter, "font_size", COUNTER_FONT_SIZE)
 	head.add_child(_counter)
 
 	_text = RichTextLabel.new()
@@ -630,8 +642,8 @@ func _build() -> void:
 	_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_text.add_theme_font_size_override("normal_font_size", 25)
-	_text.add_theme_font_size_override("bold_font_size", 25)
+	HallFontScale.set_size(_text, "normal_font_size", BODY_FONT_SIZE)
+	HallFontScale.set_size(_text, "bold_font_size", BODY_FONT_SIZE)
 	_text.add_theme_color_override("default_color", HallStyle.TEXT_MAIN)
 	col.add_child(_text)
 
@@ -643,7 +655,7 @@ func _build() -> void:
 	_do_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_do_label.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_do_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_do_label.add_theme_font_size_override("font_size", 22)
+	HallFontScale.set_size(_do_label, "font_size", INSTRUCTION_FONT_SIZE)
 	HallStyle.set_font_color(_do_label, HallStyle.BLUE_TEXT)
 	# the instruction takes all the room left of Skip / Next, so it doesn't wrap early
 	foot.add_child(_do_label)
@@ -651,7 +663,7 @@ func _build() -> void:
 	_skip_button.text = "Skip tutorial"
 	_skip_button.flat = true
 	_skip_button.add_theme_font_override("font", load("uid://dvhjw1533s75"))  # MobileHall/Art/Fonts/font_italic.tres
-	_skip_button.add_theme_font_size_override("font_size", 22)
+	HallFontScale.set_size(_skip_button, "font_size", INSTRUCTION_FONT_SIZE)
 	_skip_button.add_theme_color_override("font_color", HallStyle.TEXT_SOFT)
 	_skip_button.pressed.connect(skip_tutorial)
 	foot.add_child(_skip_button)

@@ -80,7 +80,7 @@ func setup(main: HallMain) -> void:
 	_action_button.pressed.connect(hall.close_report)
 	for chip in [_succeeded_chip, _gold_chip, _injured_chip, _dead_chip]:
 		var chip_text: Label = chip.get_node("Row/Text")
-		chip_text.add_theme_font_size_override("font_size", TOTALS_FONT_SIZE)
+		HallFontScale.set_size(chip_text, "font_size", TOTALS_FONT_SIZE)
 		chip_text.theme_type_variation = &"TitleLabel"
 
 
