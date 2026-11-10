@@ -7,3 +7,13 @@
 
 # Written by the web deploy workflow (shown in the Menu by HallBuildInfo)
 External Content/build_info.txt
+
+# Run saves, settings and run logs (normally in user://, never commit them)
+run_save.dat
+run_save.tmp
+run_save.bak
+settings.cfg
+run_log.csv
+
+# Godot editor scene-save temp files
+*.tscn*.tmp

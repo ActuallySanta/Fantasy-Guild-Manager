@@ -17,4 +17,4 @@ func setup(value_text: String, caption_text: String, ink: Color, value_font_size
 	HallStyle.set_font_color(_value, ink)
 	HallStyle.tint_art(self, ink)
 	if value_font_size > 0:
-		_value.add_theme_font_size_override("font_size", value_font_size)
+		HallFontScale.set_size(_value, "font_size", value_font_size)
