@@ -3,4 +3,8 @@
 0|2|2|0|150|2|Survey the Sinister Sanctuary
 1|3|3|0|200|1|Escort a Scholar to the Shrine of Silence
 1|2|4|1|150|3|Escort a Client to Siltbottom
+2|2|5|1|250|4|Investigate a Mystery in Cooncove
+2|3|6|2|300|1|Attempt a Kidnapping in Cooncove
+3|2|7|1|300|2|Defend Cooncove from the Living Dead
+3|2|8|0|300|2|Escort a Prisoner to the Capital City
 diff|maxAd|qNum|rNum|gold|favStat|title
