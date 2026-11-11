@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://gugxpsc75su" path="res://MobileHall/Scripts/report_entry.gd" id="1_entry"]
 [ext_resource type="PackedScene" uid="uid://0ruw74gtfe6k" path="res://MobileHall/Scenes/Components/divider.tscn" id="2_divider"]
 [ext_resource type="Texture2D" uid="uid://dv4aeys4diph4" path="res://MobileHall/Art/Icons/skull.tres" id="3_skull"]
+[ext_resource type="Texture2D" uid="uid://h5m6winn3vrf" path="res://MobileHall/Art/Icons/flag.tres" id="9_seal_icon"]
 
 [node name="ReportEntry" type="PanelContainer"]
 mouse_filter = 1
@@ -26,12 +27,25 @@ theme_type_variation = &"TypeSeal"
 
 [node name="TypeTag" type="Label" parent="Col/Head/TypeSeal"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_type_variation = &"SealLabel"
 theme_override_font_sizes/font_size = 24
 text = "SCT"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="TypeIcon" type="TextureRect" parent="Col/Head/TypeSeal"]
+unique_name_in_owner = true
+modulate = Color(0.9294, 0.8902, 0.7961, 1)
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("9_seal_icon")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="HeadText" type="VBoxContainer" parent="Col/Head"]
 layout_mode = 2

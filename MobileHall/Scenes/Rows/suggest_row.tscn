@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bdmft4ngc6x70"]
 
 [ext_resource type="Script" uid="uid://b1dtmiwfdxjtv" path="res://MobileHall/Scripts/suggest_row.gd" id="1_q0b3u"]
+[ext_resource type="Texture2D" uid="uid://ce33qlc0iebc7" path="res://MobileHall/Art/Icons/swords.tres" id="9_seal_icon"]
 
 [node name="SuggestRow" type="HBoxContainer" unique_id=1551691532]
 theme_override_constants/separation = 12
@@ -16,12 +17,25 @@ theme_type_variation = &"TypeSeal"
 
 [node name="Tag" type="Label" parent="TagBox" unique_id=1591168572]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_type_variation = &"SealLabel"
 theme_override_font_sizes/font_size = 17
 text = "DUN"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="TagIcon" type="TextureRect" parent="TagBox" unique_id=1100976636]
+unique_name_in_owner = true
+modulate = Color(0.9294, 0.8902, 0.7961, 1)
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("9_seal_icon")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Info" type="VBoxContainer" parent="." unique_id=400624901]
 layout_mode = 2
