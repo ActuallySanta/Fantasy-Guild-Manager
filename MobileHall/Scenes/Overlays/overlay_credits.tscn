@@ -84,6 +84,8 @@ theme_override_font_sizes/font_size = 28
 text = "The Battle"
 horizontal_alignment = 1
 uppercase = true
+custom_minimum_size = Vector2(40, 0)
+autowrap_mode = 3
 
 [node name="Story" type="VBoxContainer" parent="Scroll/Margin/Roll"]
 unique_name_in_owner = true
@@ -103,6 +105,8 @@ theme_override_font_sizes/font_size = 28
 text = "Who Stood at the End"
 horizontal_alignment = 1
 uppercase = true
+custom_minimum_size = Vector2(40, 0)
+autowrap_mode = 3
 
 [node name="Party" type="VBoxContainer" parent="Scroll/Margin/Roll"]
 unique_name_in_owner = true
@@ -322,3 +326,4 @@ focus_mode = 0
 theme_type_variation = &"GoldButton"
 theme_override_font_sizes/font_size = 46
 text = "Begin Freeplay"
+autowrap_mode = 3

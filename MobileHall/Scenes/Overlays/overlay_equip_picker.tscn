@@ -1,0 +1,126 @@
+[gd_scene format=3 uid="uid://flyjj7sxlpwa"]
+
+[ext_resource type="Script" uid="uid://pdeowk8cyfpz" path="res://MobileHall/Scripts/overlay_equip_picker.gd" id="1_picker"]
+[ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_dim"]
+
+[node name="OverlayEquipPicker" type="Control"]
+visible = false
+top_level = true
+z_index = 10
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_picker")
+
+[node name="Dim" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("2_dim")
+
+[node name="Sheet" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="Sheet"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Head" type="HBoxContainer" parent="Sheet/Col"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Tag" type="PanelContainer" parent="Sheet/Col/Head"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(76, 76)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_type_variation = &"TypeSeal"
+
+[node name="TagText" type="Label" parent="Sheet/Col/Head/Tag"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SealLabel"
+theme_override_font_sizes/font_size = 22
+text = "MYT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Text" type="VBoxContainer" parent="Sheet/Col/Head"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+alignment = 1
+
+[node name="Title" type="Label" parent="Sheet/Col/Head/Text"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 40
+text = "Equip the Mythic Cloak"
+autowrap_mode = 3
+
+[node name="Effect" type="Label" parent="Sheet/Col/Head/Text"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "+30 Sleaziness · Pathfinders only"
+autowrap_mode = 3
+
+[node name="CanWear" type="Label" parent="Sheet/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 22
+text = "Can wear it"
+uppercase = true
+
+[node name="Fits" type="VBoxContainer" parent="Sheet/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="NoneNote" type="Label" parent="Sheet/Col"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "No living Pathfinder on the roster to wear it."
+autowrap_mode = 3
+
+[node name="WrongRole" type="Label" parent="Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
+text = "Wrong role: Gwen, Ilsa, Mara"
+autowrap_mode = 3
+
+[node name="CancelButton" type="Button" parent="Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"WoodButton"
+theme_override_font_sizes/font_size = 28
+text = "Cancel"

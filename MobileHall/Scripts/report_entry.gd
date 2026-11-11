@@ -20,6 +20,11 @@ const REVEAL_DEATH_SHAKE := 9.0
 const REVEAL_BEAT_GAP := 0.06
 const REVEAL_BEATS_MAX := 0.7
 
+# ---- LAYOUT
+## Room (design px) kept clear right of the title for the Success / Failed
+## stamp. Grown with the font scale, since the stamp grows with its word.
+const STAMP_ROOM_SIZE := Vector2(150, 0)
+
 ## CreatedQuest.generateResults writes bright BBCode colours meant for a dark
 ## screen; these swap them for inks that read on parchment.
 const STORY_RECOLORS := {
@@ -75,6 +80,7 @@ const TEXT_NOBODY_CAME_BACK := "Nobody came back to write this letter."
 @onready var _from_line: Label = %From
 @onready var _result_stamp: Control = %Stamp
 @onready var _stamp_text: Label = %StampText
+@onready var _stamp_room: Control = %StampRoom
 @onready var _injured_tag: Control = %HurtTag
 @onready var _injured_text: Label = %HurtText
 @onready var _died_tag: Control = %DiedTag
@@ -92,6 +98,7 @@ var _bbcode_tags := RegEx.create_from_string("\\[[^\\]]*\\]")
 ## result = one quest result from hall_main._run_quest.
 func setup(result: Dictionary) -> void:
 	var succeeded: bool = result.succeeded
+	_stamp_room.custom_minimum_size = HallFontScale.px_vec(STAMP_ROOM_SIZE)
 	var type_info := HallStyle.quest_type_info(result)
 	HallStyle.style_tag(_type_seal, _type_tag, type_info.tag, type_info.color)
 	_title.text = result.quest.questTitle

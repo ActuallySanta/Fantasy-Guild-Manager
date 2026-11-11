@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://ddcn2l6d4kiqp"]
+
+[ext_resource type="Script" uid="uid://r7t50kjsl53e7" path="res://MobileHall/Scripts/overlay_accessibility.gd" id="1_access"]
+[ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_dim"]
+
+[node name="OverlayAccessibility" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_access")
+
+[node name="Dim" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = ExtResource("2_dim")
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Sheet" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="Center/Sheet"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Sheet/Col"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 46
+text = "Accessibility"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Note" type="Label" parent="Center/Sheet/Col"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
+text = "Tap a setting to change it. Changes apply right away."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TextSizeButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "TextSizeButton"
+autowrap_mode = 3
+
+[node name="ColorButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "ColorButton"
+autowrap_mode = 3
+
+[node name="MotionButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "MotionButton"
+autowrap_mode = 3
+
+[node name="BackButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "BackButton"

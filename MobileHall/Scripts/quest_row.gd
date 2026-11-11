@@ -15,6 +15,14 @@ const DENIED_OPACITY := 0.7
 const SENT_STAMP_AT := Vector2(0.56, 0.5)
 const SENT_STAMP_FONT_SIZE := 34
 const SENT_STAMP_TILT := -0.14
+## Boxes that hold text, in design px, grown with the font scale
+## (HallFontScale.px_vec) so the text keeps fitting: the round type seal, and
+## the state column's width (so "Pick a party" wraps between words, not inside them).
+const TYPE_SEAL_SIZE := Vector2(76, 76)
+const STATE_COLUMN_SIZE := Vector2(104, 0)
+## The most those two boxes (and the seal's tag, metadata/font_max_factor in
+## the scene) grow: past it they'd squeeze the title to a word per line.
+const SIDE_BOX_MAX_FACTOR := 1.5
 
 # ---- TEXT
 # Quest facts (left)
@@ -39,6 +47,7 @@ const TEXT_ODDS := "%d%%"
 @onready var _party_size_chip = %SlotsChip    # chip.gd
 @onready var _favored_chip = %FavChip         # chip.gd
 # State (right)
+@onready var _state_column: VBoxContainer = %StateCol
 @onready var _state_label: Label = %StateLabel
 @onready var _odds_label: Label = %OddsLabel
 @onready var _party_portraits: HBoxContainer = %Party
@@ -47,6 +56,8 @@ const TEXT_ODDS := "%d%%"
 func setup(hall: HallMain, quest_index: int) -> void:
 	var entry: Dictionary = hall.quest_entries[quest_index]
 	pressed.connect(hall.open_assign.bind(quest_index))
+	_type_seal.custom_minimum_size = HallFontScale.px_vec(TYPE_SEAL_SIZE, SIDE_BOX_MAX_FACTOR)
+	_state_column.custom_minimum_size = HallFontScale.px_vec(STATE_COLUMN_SIZE, SIDE_BOX_MAX_FACTOR)
 	_show_quest_facts(hall, entry)
 	_show_party(hall, entry)
 	_show_state(entry)

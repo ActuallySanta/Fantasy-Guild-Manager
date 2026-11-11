@@ -99,6 +99,8 @@ theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 23
 text = "Back tomorrow"
 horizontal_alignment = 1
+custom_minimum_size = Vector2(40, 0)
+autowrap_mode = 2
 
 [node name="SoldStamp" type="PanelContainer" parent="."]
 unique_name_in_owner = true

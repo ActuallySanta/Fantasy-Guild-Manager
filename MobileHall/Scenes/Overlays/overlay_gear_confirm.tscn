@@ -1,0 +1,142 @@
+[gd_scene format=3 uid="uid://bm0aa64qy0h57"]
+
+[ext_resource type="Script" uid="uid://bvjmi9nrddow3" path="res://MobileHall/Scripts/overlay_gear_confirm.gd" id="1_confirm"]
+[ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_dim"]
+[ext_resource type="PackedScene" uid="uid://h87tubvsjwc3" path="res://MobileHall/Scenes/Components/portrait.tscn" id="3_portrait"]
+
+[node name="OverlayGearConfirm" type="Control"]
+visible = false
+top_level = true
+z_index = 10
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_confirm")
+
+[node name="Dim" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("2_dim")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_right = 32
+
+[node name="Center" type="CenterContainer" parent="Margin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Sheet" type="PanelContainer" parent="Margin/Center"]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="Margin/Center/Sheet"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Portrait" parent="Margin/Center/Sheet/Col" instance=ExtResource("3_portrait")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(112, 112)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+circle = true
+
+[node name="Title" type="Label" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 40
+text = "Take the Drakebone Blade off Gwen?"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="OnLine" type="Label" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2392, 0.3529, 0.1647, 1)
+theme_override_font_sizes/font_size = 26
+text = "The Mythic Cloak goes on (+30 Sleaziness)."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ChoiceHeading" type="Label" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 22
+text = "Which comes off?"
+uppercase = true
+
+[node name="Choices" type="VBoxContainer" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Changes" type="RichTextLabel" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 2
+theme_override_colors/default_color = Color(0.2039, 0.1608, 0.1255, 1)
+theme_override_font_sizes/normal_font_size = 28
+theme_override_font_sizes/bold_font_size = 28
+bbcode_enabled = true
+text = "[b]Power[/b]   40 → 18"
+fit_content = true
+scroll_active = false
+horizontal_alignment = 1
+
+[node name="Note" type="Label" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "It goes back in the pack, and Gwen gets a free gear slot."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Margin/Center/Sheet/Col"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="CancelButton" type="Button" parent="Margin/Center/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"WoodButton"
+theme_override_font_sizes/font_size = 28
+text = "Keep it on"
+
+[node name="ConfirmButton" type="Button" parent="Margin/Center/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"PaperButton"
+theme_override_font_sizes/font_size = 28
+text = "Take off"

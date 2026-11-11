@@ -7,11 +7,12 @@
 [ext_resource type="PackedScene" uid="uid://b5bqn48cqktg4" path="res://MobileHall/Scenes/Tabs/tab_board.tscn" id="10_mpynf"]
 [ext_resource type="PackedScene" uid="uid://diwdybd70ky7l" path="res://MobileHall/Scenes/Tabs/tab_guild.tscn" id="12_cbnp0"]
 [ext_resource type="PackedScene" uid="uid://dfn4ypcw71ayy" path="res://MobileHall/Scenes/Tabs/tab_upgrades.tscn" id="14_v8b36"]
-[ext_resource type="PackedScene" uid="uid://crrj07shkvbrv" path="res://MobileHall/Scenes/Tabs/tab_shop.tscn" id="15_shop1"]
+[ext_resource type="PackedScene" uid="uid://b3jxdbegsxbvg" path="res://MobileHall/Scenes/Tabs/tab_items.tscn" id="15_shop1"]
 [ext_resource type="PackedScene" uid="uid://bt1iwlgoqgjw0" path="res://MobileHall/Scenes/Screens/screen_assign.tscn" id="16_tj44p"]
 [ext_resource type="PackedScene" uid="uid://chlxegiqwwtoa" path="res://MobileHall/Scenes/Screens/screen_character.tscn" id="18_c5uvo"]
 [ext_resource type="PackedScene" uid="uid://4icacknba0fh" path="res://MobileHall/Scenes/Overlays/overlay_end_day.tscn" id="30_cwf4i"]
 [ext_resource type="PackedScene" uid="uid://farw7bcfj0fq" path="res://MobileHall/Scenes/Overlays/overlay_menu.tscn" id="32_kg28u"]
+[ext_resource type="PackedScene" uid="uid://ddcn2l6d4kiqp" path="res://MobileHall/Scenes/Overlays/overlay_accessibility.tscn" id="33_access"]
 [ext_resource type="PackedScene" uid="uid://3cdpykowgja4" path="res://MobileHall/Scenes/Overlays/overlay_report.tscn" id="34_6fy20"]
 [ext_resource type="PackedScene" uid="uid://bgwxd653pjox8" path="res://MobileHall/Scenes/Overlays/overlay_welcome.tscn" id="36_61m5h"]
 [ext_resource type="PackedScene" uid="uid://cdmw3mrmuept3" path="res://MobileHall/Scenes/Overlays/overlay_game_over.tscn" id="37_gameover"]
@@ -84,7 +85,7 @@ layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="TabShop" parent="Layout/Content" unique_id=1648591991 instance=ExtResource("15_shop1")]
+[node name="TabItems" parent="Layout/Content" unique_id=1648591991 instance=ExtResource("15_shop1")]
 unique_name_in_owner = true
 visible = false
 layout_mode = 0
@@ -124,6 +125,15 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="OverlayMenu" parent="." unique_id=1395998418 instance=ExtResource("32_kg28u")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OverlayAccessibility" parent="." instance=ExtResource("33_access")]
 unique_name_in_owner = true
 visible = false
 z_index = 10

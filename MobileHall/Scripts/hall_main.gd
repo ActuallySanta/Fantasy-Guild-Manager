@@ -4,12 +4,12 @@
 ##
 ## Shell, top to bottom:
 ##   header      - day, Bone Drake countdown, gold, standing, menu button
-##   content     - one of four tabs (Board, Members, Guild, Shop), or a screen
+##   content     - one of four tabs (Board, Members, Guild, Items), or a screen
 ##                 over them (Assign Party, Character)
 ##   action bar  - one big "what to do next" button (hidden on screens, which
-##                 have their own buttons in that spot, and on the Shop tab,
-##                 whose Buy bar sits there)
-##   nav         - Board / Members / Guild / Shop with badges, always visible
+##                 have their own buttons in that spot, and on the Items tab,
+##                 whose Pack item bar / Shop Buy bar sits there)
+##   nav         - Board / Members / Guild / Items with badges, always visible
 ##                 (ids: board / guild / upgrades / shop)
 ## Overlays over everything: End Day check, Day Report, Welcome, Menu,
 ## the Game Over ledger (when the guild is stuck with nobody left; see is_run_over),
@@ -77,8 +77,11 @@ const FINAL_DAY := 50
 const RELEASE_BASE_STANDING_COST := 1
 ## Bottom tabs, left to right (ids match the Nav_<id> buttons and Tab nodes in the scene).
 const TAB_IDS := ["board", "guild", "upgrades", "shop"]
-## The Shop tab (goods come from the ItemShop autoload).
+## The Items tab (Pack + Shop; the id stays "shop" for the tutorial and saves).
 const TAB_SHOP := "shop"
+## Halves of the Items tab: the guild's gear, and Grizzle's counter.
+const ITEMS_SECTION_PACK := "pack"
+const ITEMS_SECTION_SHOP := "shop"
 ## Screen kinds that can cover the tabs (see `active_screen`).
 const SCREEN_ASSIGN := "assign"
 const SCREEN_CHARACTER := "character"
@@ -161,6 +164,7 @@ const TOAST_BOUGHT := "Bought the %s!"
 const TOAST_CANT_BUY := "Not enough gold for that."
 const TOAST_EQUIPPED := "%s equipped the %s"
 const TOAST_UNEQUIPPED := "%s took off the %s"
+const TOAST_SWAPPED := "%s swapped the %s for the %s"
 const TOAST_WRONG_ROLE := "Only %ss can use the %s."
 const TOAST_HANDS_FULL := "%s's hands are full"
 const TOAST_GEAR_DEAD := "%s can't use gear anymore."
@@ -192,6 +196,11 @@ var active_tab := "board"
 var guild_section := GUILD_SECTION_ROSTER
 ## Which half of the Upgrades tab is showing (UPGRADES_SECTION_TONIGHT | _BUILD).
 var upgrades_section := UPGRADES_SECTION_TONIGHT
+## Which half of the Items tab is showing (ITEMS_SECTION_PACK | _SHOP).
+var items_section := ITEMS_SECTION_SHOP
+## The day the Items tab last opened on its own: the first visit each day
+## shows the Shop (fresh stock), later ones keep whichever half was left open.
+var shop_last_seen_day := 0
 ## Upgrades > Tonight: the "+ Add a hero" list under the Training Yard is open.
 var training_picker_open := false
 ## The screen covering the tabs, or {} for none:
@@ -222,6 +231,8 @@ var is_welcome_open := true
 ## How to Play was opened from the Menu (topic list, Close keeps the tab).
 var is_welcome_from_menu := false
 var is_menu_open := false
+## The Menu's Accessibility sheet (text size, colorblind filter, reduced motion).
+var is_accessibility_open := false
 ## The Game Over ledger's numbers, or {} while the run is still going.
 ## Filled once by _check_run_over (see build_run_over_stats for the keys).
 var run_over_stats := {}
@@ -272,6 +283,8 @@ var for_hire_last_seen_day := 0
 var color_filter := 0
 ## Reduced Motion: animations off (HallFx.reduce_motion mirrors it). Saved by HallSettings.
 var reduce_motion := false
+## Text size: index into HallSettings.TEXT_SIZES (HallFontScale applies it). Saved by HallSettings.
+var text_size := HallSettings.DEFAULT_TEXT_SIZE
 ## Dev switch (Menu's "Save runs (debug)" checkbox): when false the run is
 ## neither loaded at start-up nor saved. Saved by HallSettings.
 var is_save_enabled := HallSettings.DEFAULT_SAVE_ENABLED
@@ -328,7 +341,7 @@ var tutorial: Control
 @onready var _toast: HallToast = %Toast
 
 # ---- content
-@onready var _tabs := {"board": %TabBoard, "guild": %TabGuild, "upgrades": %TabUpgrades, "shop": %TabShop}
+@onready var _tabs := {"board": %TabBoard, "guild": %TabGuild, "upgrades": %TabUpgrades, "shop": %TabItems}
 @onready var _screens := {SCREEN_ASSIGN: %ScreenAssign, SCREEN_CHARACTER: %ScreenCharacter}
 
 # ---- overlays
@@ -336,6 +349,7 @@ var tutorial: Control
 @onready var _report_overlay: Control = %OverlayReport
 @onready var _welcome_overlay: Control = %OverlayWelcome
 @onready var _menu_overlay: Control = %OverlayMenu
+@onready var _accessibility_overlay: Control = %OverlayAccessibility
 @onready var _game_over_overlay: Control = %OverlayGameOver
 @onready var _credits_overlay: Control = %OverlayCredits
 
@@ -349,7 +363,9 @@ var tutorial: Control
 ## The theme is scaled now, and every node added after this gets its .tscn
 ## font-size overrides scaled as it enters the tree.
 func _enter_tree() -> void:
-	HallFontScale.init(get_window(), theme)
+	# the Text size setting is needed now, before any text is laid out
+	text_size = HallSettings.load_settings().text_size
+	HallFontScale.init(get_window(), theme, HallSettings.text_size_factor(text_size))
 	if not get_tree().node_added.is_connected(HallFontScale.scale_authored_overrides):
 		get_tree().node_added.connect(HallFontScale.scale_authored_overrides)
 
@@ -646,6 +662,12 @@ func open_tab(tab_id: String, section: String = "") -> void:
 		guild_section = section
 	elif section != "" and tab_id == "upgrades":
 		upgrades_section = section
+	elif tab_id == TAB_SHOP:
+		if section != "":
+			items_section = section
+		elif shop_last_seen_day != GameState.day:
+			items_section = ITEMS_SECTION_SHOP
+		shop_last_seen_day = GameState.day
 	if active_tab == "guild" and guild_section == GUILD_SECTION_HIRE:
 		for_hire_last_seen_day = GameState.day
 	active_screen = {}
@@ -661,6 +683,11 @@ func show_guild_section(section: String) -> void:
 ## The Upgrades tab's Tonight / Build buttons.
 func show_upgrades_section(section: String) -> void:
 	open_tab("upgrades", section)
+
+
+## The Items tab's Pack / Shop folder tabs.
+func show_items_section(section: String) -> void:
+	open_tab(TAB_SHOP, section)
 
 
 ## Open Assign Party on one quest.
@@ -710,6 +737,21 @@ func open_menu() -> void:
 
 func close_menu() -> void:
 	is_menu_open = false
+	queue_refresh()
+
+
+## The Menu's Accessibility button: its sheet replaces the Menu.
+func open_accessibility() -> void:
+	is_menu_open = false
+	is_accessibility_open = true
+	queue_refresh()
+
+
+## Back from Accessibility to the Menu (go_to_menu = false closes both, for a
+## tap on the dimmed background).
+func close_accessibility(go_to_menu: bool = true) -> void:
+	is_accessibility_open = false
+	is_menu_open = go_to_menu
 	queue_refresh()
 
 
@@ -1003,6 +1045,24 @@ func unequip_item(item: StandardItem) -> void:
 	queue_refresh()
 
 
+## Swap gear on a hero whose slots are full: item_off comes off (back to the
+## pack) and item_on goes on in its place. If item_on can't go on, item_off
+## goes back on, so a failed swap leaves the hero as they were.
+func swap_gear(item_on: StandardItem, item_off: StandardItem, character: GuildCharacter) -> void:
+	if item_off.curr_user != character:
+		equip_item(item_on, character)
+		return
+	ItemShop.unequip(item_off)
+	if ItemShop.equip(item_on, character) != ItemShop.EquipResult.OK:
+		ItemShop.equip(item_off, character)
+		equip_item(item_on, character)  # shows why it can't go on
+		return
+	pending_fx.gear_in = item_on
+	show_toast(TOAST_SWAPPED % [character.name, HallStyle.item_look(item_off).name, HallStyle.item_look(item_on).name])
+	tutorial_event.emit("equip", item_on)
+	queue_refresh()
+
+
 # ---- Upgrades > Tonight: Training Yard and Hospital
 
 
@@ -1103,6 +1163,20 @@ func set_color_filter(filter_index: int) -> void:
 ## Menu's Reduced Motion button: on <-> off.
 func toggle_reduce_motion() -> void:
 	set_reduce_motion(not reduce_motion)
+
+
+## Accessibility's Text size button: Small -> Normal -> Large -> Largest -> Small.
+func cycle_text_size() -> void:
+	set_text_size((text_size + 1) % HallSettings.TEXT_SIZES.size())
+
+
+## Text size: every font in the hall is re-sized right away (HallFontScale),
+## then everything redraws so boxes sized from the text follow.
+func set_text_size(size_index: int) -> void:
+	text_size = HallSettings.clamp_text_size(size_index)
+	HallFontScale.set_text_factor(HallSettings.text_size_factor(text_size), theme, self)
+	HallSettings.save_value(HallSettings.KEY_TEXT_SIZE, text_size)
+	queue_refresh()
 
 
 ## Reduced Motion: hall_fx.gd skips every animation and lands things in place.
@@ -1414,7 +1488,7 @@ func _refresh_content() -> void:
 	var view_key: String
 	if screen_kind == "":
 		shown_view = _tabs[active_tab]
-		view_key = "tab:%s:%s:%s" % [active_tab, guild_section, upgrades_section]
+		view_key = "tab:%s:%s:%s:%s" % [active_tab, guild_section, upgrades_section, items_section]
 	else:
 		shown_view = _screens[screen_kind]
 		view_key = "screen:%s:%d" % [screen_kind, active_screen.get("quest_index", 0)]
@@ -1454,6 +1528,7 @@ func _refresh_overlays() -> void:
 	_report_overlay.visible = not shown_report.is_empty() and not is_game_over and not is_credits_open
 	_end_check_overlay.visible = not is_report_open and is_end_check_open
 	_menu_overlay.visible = not is_report_open and is_menu_open
+	_accessibility_overlay.visible = not is_report_open and is_accessibility_open
 	_welcome_overlay.visible = not is_report_open and is_welcome_open
 	for overlay in _all_overlays():
 		if overlay.visible:
@@ -1461,7 +1536,7 @@ func _refresh_overlays() -> void:
 
 
 func _all_overlays() -> Array:
-	return [_report_overlay, _end_check_overlay, _menu_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay]
+	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay]
 
 
 # ============================================================ TOAST
