@@ -76,6 +76,10 @@ const BLUE_TEXT := Color("#2F4A66")       ## odds, to do, picked
 const BLUE_BG := Color("#DDE5EC")
 ## The navy ink for names on letters and sign-offs.
 const NAVY := Color("#26304A")
+## Story quests (milestones, the final battle): a warm gilt ink and paper tint,
+## so they stand out from everyday work on the Board and in the Day Report.
+const STORY_INK := Color("#9C7426")
+const STORY_BG := Color("#F6E3B0")
 
 # ---- the end-of-story roll (overlay_credits.gd): ink on a dark backdrop
 const CREDITS_BG := Color("#1B140F")      ## victory: a warm, near-black hall
@@ -242,6 +246,56 @@ static func quest_type_id(entry: Dictionary) -> int:
 	return MILESTONE_TYPE_ID if entry.get("milestone", false) else int(entry.quest.type)
 
 
+## True for a quest that moves the main story along: the milestone (Bone
+## Drake), the final battle, or any entry / result with "story_quest": true (for
+## story quests added later, e.g. the days 3/5/8 quests of each arc).
+## Story quests are promoted on the Board and in the Day Report.
+static func is_story_quest(entry: Dictionary) -> bool:
+	return entry.get("milestone", false) or entry.get("final", false) or entry.get("story_quest", false)
+
+
+## Which story-text rows a story quest's lines come from (see story_lines):
+## the opening, the failure ending and the success ending. Part 0 is the quest
+## type and part 2 is unused.
+const STORY_TEXT_PARTS := [1, 3, 4]
+## Story lines shorter than this (characters) are skipped, so a stray word
+## can't mark an unrelated line as story.
+const STORY_LINE_MIN_LENGTH := 12
+
+## Matches BBCode tags (see strip_bbcode).
+static var _bbcode_tags := RegEx.create_from_string("\\[[^\\]]*\\]")
+
+
+## `text` with its BBCode tags removed.
+static func strip_bbcode(text: String) -> String:
+	return _bbcode_tags.sub(text, "", true)
+
+
+## The written story of a story quest (its opening and endings from External
+## Content), as plain-text lines. The Day Report stars any line of the
+## played-out story that contains one of these (the rest is the random
+## fights and searches).
+## entry: a quest entry or a quest result (needs quest, milestone).
+static func story_lines(entry: Dictionary) -> PackedStringArray:
+	var lines := PackedStringArray()
+	var quest: CreatedQuest = entry.quest
+	var rows: Array = ExternalContentContainer.milestone_story if entry.get("milestone", false) \
+			else ExternalContentContainer.quest_story
+	if quest.questNum < 0 or quest.questNum >= rows.size():
+		return lines
+	var row: Array = rows[quest.questNum]
+	var data := {"location": quest.location}
+	for part in STORY_TEXT_PARTS:
+		if part >= row.size():
+			continue
+		var text := strip_bbcode(str(row[part]).c_unescape().format(data))
+		for line in text.split("\n"):
+			var plain_line := line.strip_edges()
+			if plain_line.length() >= STORY_LINE_MIN_LENGTH:
+				lines.append(plain_line)
+	return lines
+
+
 ## {name, writ, color, tag} for a quest entry's type (falls back to Clear Dungeon).
 static func quest_type_info(entry: Dictionary) -> Dictionary:
 	return QUEST_TYPES.get(quest_type_id(entry), QUEST_TYPES[1])
@@ -394,6 +448,8 @@ const ICON_FILES := {
 	"skull": "uid://dv4aeys4diph4",  # MobileHall/Art/Icons/skull.tres
 	"heart": "uid://dbq8w0d0gocej",  # MobileHall/Art/Icons/heart.tres
 	"stall": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.tres
+	# story quests: their ribbon and their story lines in the Day Report
+	"star": "res://MobileHall/Art/Icons/star.tres",
 	# quest type seals (QUEST_TYPES)
 	"gate": "uid://13yirvv2nrwk",  # MobileHall/Art/Icons/gate.tres
 	"escort": "uid://bkk0x60yoyngi",  # MobileHall/Art/Icons/escort.tres

@@ -288,4 +288,5 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 		"reward_items": reward_items,
 		"milestone": entry.milestone,
 		"final": entry.final,
+		"story_quest": entry.get("story_quest", false),
 	}
