@@ -143,10 +143,11 @@ are played out), and the tuning numbers sit at the top of that file.
   night. Slots stay filled from day to day. Heroes can be Healthy or Sore, but not in a bed.
   **Trainees can't be sent on quests**: take them out of their slot first. "Move here"
   pulls a hero out of a quest party and into a slot.
-- **Healing:** injuries now heal one level at a time. At home each level takes
-  `HOME_HEAL_NIGHTS` (Sore 2, Hurt 4, Gravely 6). In a Hospital bed it takes
-  `HOSPITAL_RECOVERY_REDUCTION` fewer nights (never less than 1). Heroes in a bed can't
-  go on quests, and they go home on their own once they're Healthy.
+- **Healing:** at home injuries heal one level at a time, each taking
+  `HOME_HEAL_NIGHTS` (Sore 2, Hurt 4, Gravely 6). In a Hospital bed a hero heals
+  `HOSPITAL_STAGES_PER_NIGHT` stages every night (level 1: one stage, level 2: two,
+  level 3+: all three). Heroes in a bed can't go on quests, and they go home on their
+  own once they're Healthy.
 - **Revive:** Hospital level 5 brings one fallen hero back per run, Gravely hurt and in a bed.
 - The Day Report's header has an "At home" line with who trained and who healed.
 
