@@ -31,6 +31,9 @@ const DENY_SHAKE := 12.0
 const WRIT_STAMP_AT := Vector2(0.74, 0.2)
 const WRIT_STAMP_FONT_SIZE := 60
 const WRIT_STAMP_TILT := -0.16
+## The odds circle's box (design px). Grown with the font scale so the big
+## "87%" stays inside the circle art.
+const ODDS_STACK_SIZE := Vector2(210, 100)
 
 # ---- TEXT
 # Quest writ
@@ -151,6 +154,8 @@ func scroll_to_top() -> void:
 
 
 func refresh() -> void:
+	# grows with the font scale (here, not in setup, so a Text size change follows)
+	_odds_stack.custom_minimum_size = HallFontScale.px_vec(ODDS_STACK_SIZE)
 	var entry: Dictionary = hall.current_quest_entry()
 	if entry.is_empty():
 		return

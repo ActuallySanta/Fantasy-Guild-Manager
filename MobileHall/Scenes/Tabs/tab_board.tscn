@@ -46,6 +46,8 @@ size_flags_horizontal = 3
 theme_type_variation = &"HeadingLight"
 theme_override_font_sizes/font_size = 50
 text = "Today's Quests"
+custom_minimum_size = Vector2(40, 0)
+autowrap_mode = 3
 
 [node name="QuestList" type="VBoxContainer" parent="Margin/Col"]
 unique_name_in_owner = true

@@ -66,7 +66,8 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story |
 | Final Battle credits | Day 50 only. **Victory**: on a warm, dark backdrop the night's story rolls up the screen line by line, then who fought, a parchment ledger (final stats without the Bone Drake, run records, roll call), the team credits, and **Begin Freeplay**. **Defeat**: the same roll in cold colours with an epitaph, and **Found a New Guild** |
 | Game Over | The guild ledger: days survived, a 2 x 3 grid (gold earned, quests won, heroes hired, fallen, final standing, Bone Drake), a roll call of every hero and their fate, and Found a New Guild |
-| Menu | How to play, last night's report, colorblind filter (tap to cycle Off / Red-weak / Green-weak / Blue-yellow, saved to `user://settings.cfg`), reset upgrades (debug) |
+| Menu | How to play, last night's report, Accessibility, reset upgrades (debug), abandon run |
+| Accessibility | Text size (Small / Normal / Large / Largest, applied live by `HallFontScale.set_text_factor`), colorblind filter (Off / Red-weak / Green-weak / Blue-yellow), reduced motion; each button taps to the next choice, saved to `user://settings.cfg` |
 
 ## Game Over
 

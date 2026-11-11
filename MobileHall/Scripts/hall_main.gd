@@ -222,6 +222,8 @@ var is_welcome_open := true
 ## How to Play was opened from the Menu (topic list, Close keeps the tab).
 var is_welcome_from_menu := false
 var is_menu_open := false
+## The Menu's Accessibility sheet (text size, colorblind filter, reduced motion).
+var is_accessibility_open := false
 ## The Game Over ledger's numbers, or {} while the run is still going.
 ## Filled once by _check_run_over (see build_run_over_stats for the keys).
 var run_over_stats := {}
@@ -272,6 +274,8 @@ var for_hire_last_seen_day := 0
 var color_filter := 0
 ## Reduced Motion: animations off (HallFx.reduce_motion mirrors it). Saved by HallSettings.
 var reduce_motion := false
+## Text size: index into HallSettings.TEXT_SIZES (HallFontScale applies it). Saved by HallSettings.
+var text_size := HallSettings.DEFAULT_TEXT_SIZE
 ## Dev switch (Menu's "Save runs (debug)" checkbox): when false the run is
 ## neither loaded at start-up nor saved. Saved by HallSettings.
 var is_save_enabled := HallSettings.DEFAULT_SAVE_ENABLED
@@ -336,6 +340,7 @@ var tutorial: Control
 @onready var _report_overlay: Control = %OverlayReport
 @onready var _welcome_overlay: Control = %OverlayWelcome
 @onready var _menu_overlay: Control = %OverlayMenu
+@onready var _accessibility_overlay: Control = %OverlayAccessibility
 @onready var _game_over_overlay: Control = %OverlayGameOver
 @onready var _credits_overlay: Control = %OverlayCredits
 
@@ -349,7 +354,9 @@ var tutorial: Control
 ## The theme is scaled now, and every node added after this gets its .tscn
 ## font-size overrides scaled as it enters the tree.
 func _enter_tree() -> void:
-	HallFontScale.init(get_window(), theme)
+	# the Text size setting is needed now, before any text is laid out
+	text_size = HallSettings.load_settings().text_size
+	HallFontScale.init(get_window(), theme, HallSettings.text_size_factor(text_size))
 	if not get_tree().node_added.is_connected(HallFontScale.scale_authored_overrides):
 		get_tree().node_added.connect(HallFontScale.scale_authored_overrides)
 
@@ -710,6 +717,21 @@ func open_menu() -> void:
 
 func close_menu() -> void:
 	is_menu_open = false
+	queue_refresh()
+
+
+## The Menu's Accessibility button: its sheet replaces the Menu.
+func open_accessibility() -> void:
+	is_menu_open = false
+	is_accessibility_open = true
+	queue_refresh()
+
+
+## Back from Accessibility to the Menu (go_to_menu = false closes both, for a
+## tap on the dimmed background).
+func close_accessibility(go_to_menu: bool = true) -> void:
+	is_accessibility_open = false
+	is_menu_open = go_to_menu
 	queue_refresh()
 
 
@@ -1105,6 +1127,20 @@ func toggle_reduce_motion() -> void:
 	set_reduce_motion(not reduce_motion)
 
 
+## Accessibility's Text size button: Small -> Normal -> Large -> Largest -> Small.
+func cycle_text_size() -> void:
+	set_text_size((text_size + 1) % HallSettings.TEXT_SIZES.size())
+
+
+## Text size: every font in the hall is re-sized right away (HallFontScale),
+## then everything redraws so boxes sized from the text follow.
+func set_text_size(size_index: int) -> void:
+	text_size = HallSettings.clamp_text_size(size_index)
+	HallFontScale.set_text_factor(HallSettings.text_size_factor(text_size), theme, self)
+	HallSettings.save_value(HallSettings.KEY_TEXT_SIZE, text_size)
+	queue_refresh()
+
+
 ## Reduced Motion: hall_fx.gd skips every animation and lands things in place.
 func set_reduce_motion(is_on: bool) -> void:
 	reduce_motion = is_on
@@ -1454,6 +1490,7 @@ func _refresh_overlays() -> void:
 	_report_overlay.visible = not shown_report.is_empty() and not is_game_over and not is_credits_open
 	_end_check_overlay.visible = not is_report_open and is_end_check_open
 	_menu_overlay.visible = not is_report_open and is_menu_open
+	_accessibility_overlay.visible = not is_report_open and is_accessibility_open
 	_welcome_overlay.visible = not is_report_open and is_welcome_open
 	for overlay in _all_overlays():
 		if overlay.visible:
@@ -1461,7 +1498,7 @@ func _refresh_overlays() -> void:
 
 
 func _all_overlays() -> Array:
-	return [_report_overlay, _end_check_overlay, _menu_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay]
+	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay]
 
 
 # ============================================================ TOAST
