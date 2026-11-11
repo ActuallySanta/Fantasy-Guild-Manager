@@ -1,0 +1,3 @@
+Skeleton Warrior|Zombie|Cultist
+Skeleton Archer|Zombie|Cultist
+Bone Hound|Zombie|Cultist

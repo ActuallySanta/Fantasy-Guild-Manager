@@ -7,4 +7,8 @@
 2|3|6|2|300|1|Attempt a Kidnapping in Cooncove
 3|2|7|1|300|2|Defend Cooncove from the Living Dead
 3|2|8|0|300|2|Escort a Prisoner to the Capital City
+3|3|9|2|300|4|Infiltrate the Monastery of the Blood Moon
+4|4|10|3|350|2|Defend the Temple of the Sun
+4|3|11|2|400|2|Defend Against Interdimensional Invaders
+4|3|12|2|400|3|Shut Down the Blood Moon Ritual
 diff|maxAd|qNum|rNum|gold|favStat|title

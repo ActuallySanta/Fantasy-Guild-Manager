@@ -4,6 +4,8 @@ var thisQuest = CreatedQuest
 var acceptedQuests: Array[CreatedQuest]
 var acceptedQuestResults: Array[String]
 
+@export var monsters_2D_test_path: String = "res://External Content/Quest Stuff (Test)/QuestMonsters.txt"
+
 var theWindsweptMeadows: Region = Region.new(0)
 var theBoglands: Region = Region.new(1)
 var theAshenWastes: Region = Region.new(2)
@@ -19,6 +21,10 @@ var testQuestNumber = 0:
 	get:
 		return testQuestNumber
 
+var questMonsters = [MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 0),
+ MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 1), MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 2)]
+	
+	
 #@onready var rich_text = $"../LogContents"
 
 # Called when the node enters the scene tree for the first time.
@@ -37,9 +43,11 @@ func _ready() -> void:
 	acceptedQuestResults.append(questResults)
 
 	testQuestNumber = testQuestNumber + 1
-
 	pass
 
+func _returnQuestMonster(col_idx: int) -> String:
+	print(col_idx)
+	return questMonsters[col_idx][randi_range(0, 1)]
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
