@@ -26,6 +26,7 @@ const BUTTON_FULL := "All slots are full"
 # ---- NODES
 @onready var _tag_box: PanelContainer = %TagBox
 @onready var _tag: Label = %Tag
+@onready var _tag_icon: TextureRect = %TagIcon
 @onready var _name: Label = %Name
 @onready var _level: Label = %Level
 @onready var _summary: Label = %Summary
@@ -42,7 +43,9 @@ func setup(main: HallMain, section_building: int) -> void:
 	hall = main
 	building = section_building
 	var tag_color: Color = GuildUpgrades.get_building_color(building).darkened(0.25)
-	HallStyle.style_tag(_tag_box, _tag, HallStyle.BUILDING_TAGS.get(building, "?"), tag_color)
+	# the same icon as the building's plan on the Build half
+	HallStyle.style_icon_tag(_tag_box, _tag, _tag_icon, HallStyle.BUILDING_TAGS.get(building, "?"),
+			HallStyle.BUILDING_ICONS.get(building, ""), tag_color)
 	_name.text = GuildUpgrades.get_building_name(building)
 	_add_button.pressed.connect(hall.toggle_training_picker)
 	HallStyle.style_panel(self, HallStyle.CARD_BG, HallStyle.BORDER, 2, 16)

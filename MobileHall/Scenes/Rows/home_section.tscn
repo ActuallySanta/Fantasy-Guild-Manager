@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cmeg8jo272bsp" path="res://MobileHall/Scripts/home_section.gd" id="2_sec"]
 [ext_resource type="Texture2D" uid="uid://djwbyqk4uhihw" path="res://MobileHall/Art/Textures/pin.png" id="3_pin"]
+[ext_resource type="Texture2D" uid="uid://c328bo4vnwlwo" path="res://MobileHall/Art/Icons/target.tres" id="9_seal_icon"]
 
 [node name="HomeSection" type="PanelContainer"]
 mouse_filter = 1
@@ -26,12 +27,25 @@ theme_type_variation = &"TypeSeal"
 
 [node name="Tag" type="Label" parent="Col/Top/TagBox"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_type_variation = &"SealLabel"
 theme_override_font_sizes/font_size = 22
 text = "TRN"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="TagIcon" type="TextureRect" parent="Col/Top/TagBox"]
+unique_name_in_owner = true
+modulate = Color(0.9294, 0.8902, 0.7961, 1)
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("9_seal_icon")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Names" type="VBoxContainer" parent="Col/Top"]
 layout_mode = 2
