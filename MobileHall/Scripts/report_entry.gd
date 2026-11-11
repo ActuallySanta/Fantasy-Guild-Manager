@@ -2,10 +2,16 @@
 ## who sent it and at what odds, a Success / Failed stamp, who got hurt or
 ## died, what equipment was found, the story one line per beat, and a closing
 ## line signed by whoever came back.
+##
+## Everyday letters start folded (just the head and its Hurt / Died / Found
+## tags); tap one to read the story and sign-off, tap again to fold it.
+## Story quests (HallStyle.is_story_quest) never fold: they get gilt paper, a
+## "Story Quest" ribbon, and a star beside the lines of the written story.
 ## Scene: MobileHall/Scenes/Rows/report_entry.tscn
-extends PanelContainer
+extends TapPanel
 
 const BeatRowScene := preload("uid://nm3rjurnk3x2")  # MobileHall/Scenes/Rows/beat_row.tscn
+const ChipScene := preload("uid://5khy5d8j40yo")  # MobileHall/Scenes/Components/chip.tscn
 
 # ---- MOTION (the reveal, see reveal())
 ## Seconds the letter takes to fade up, then before its stamp slams down.
@@ -51,6 +57,13 @@ const BEAT_ICON_RULES := [
 	{"text": "artifact", "icon": "chest"},
 ]
 const BEAT_ICON_DEFAULT := "scroll"
+## Icon for a line of a story quest's written story (HallStyle.story_lines).
+const BEAT_ICON_STORY := "star"
+
+## Text size of the "tap to read" hint on everyday letters.
+const FOLD_HINT_FONT_SIZE := 22
+## Seconds the story takes to fade in when a folded letter is opened.
+const UNFOLD_SECONDS := 0.18
 
 # ---- TEXT
 const TEXT_SUCCESS := "Success"
@@ -71,6 +84,9 @@ const TEXT_ITEMS_AND_GOLD := "%s, and %d gold"
 const TEXT_LOST_GOLD := "Sorry, master. No reward this time, but %s brought back %d gold. — %s."
 const TEXT_LOST := "Sorry, master. No reward this time. — %s."
 const TEXT_NOBODY_CAME_BACK := "Nobody came back to write this letter."
+const TEXT_STORY_RIBBON := "Story Quest"
+const TEXT_TAP_TO_READ := "Tap to read the letter"
+const TEXT_TAP_TO_FOLD := "Tap to fold the letter"
 
 # ---- NODES
 # Head
@@ -91,14 +107,25 @@ const TEXT_NOBODY_CAME_BACK := "Nobody came back to write this letter."
 # Story and sign-off
 @onready var _beat_list: VBoxContainer = %Beats
 @onready var _closing_line: Label = %Closing
+@onready var _head_text: VBoxContainer = %Title.get_parent()
+## What a folded letter hides: the story, the sign-off and their rules.
+@onready var _foldable: Array = [$Col/Divider, _beat_list, $Col/Divider2, _closing_line]
 
-## Matches BBCode tags, to test story lines on their plain text.
-var _bbcode_tags := RegEx.create_from_string("\\[[^\\]]*\\]")
+## True for a story quest's letter (never folds, see setup).
+var is_story := false
+## True while the story and sign-off are hidden.
+var is_folded := false
+## The "Story Quest" ribbon above a story letter's title (chip.gd), or null.
+var _story_ribbon: Control
+## The "Tap to read / fold" hint under an everyday letter's title, or null.
+var _fold_hint: Label
 
 
 ## result = one quest result from hall_main._run_quest.
-func setup(result: Dictionary) -> void:
+## start_folded = whether an everyday letter starts folded (story letters never fold).
+func setup(result: Dictionary, start_folded: bool = true) -> void:
 	var succeeded: bool = result.succeeded
+	is_story = HallStyle.is_story_quest(result)
 	_stamp_room.custom_minimum_size = HallFontScale.px_vec(STAMP_ROOM_SIZE)
 	var type_info := HallStyle.quest_type_info(result)
 	HallStyle.style_icon_tag(_type_seal, _type_tag, _type_icon, type_info.tag, type_info.get("icon", ""), type_info.color)
@@ -127,8 +154,55 @@ func setup(result: Dictionary) -> void:
 	_found_tag.visible = not found_items.is_empty()
 	_found_text.text = TEXT_FOUND % ", ".join(found_item_names)
 
-	_build_story_beats(result.story)
+	var story_lines := HallStyle.story_lines(result) if is_story else PackedStringArray()
+	_build_story_beats(result.story, story_lines)
 	_closing_line.text = _closing_text(result)
+
+	if is_story:
+		_show_story_look()
+	else:
+		_add_fold_hint()
+		pressed.connect(toggle_folded)
+		set_folded(start_folded)
+
+
+## Gilt paper and a "Story Quest" ribbon above the title.
+func _show_story_look() -> void:
+	HallStyle.style_panel(self, HallStyle.STORY_BG)
+	_story_ribbon = ChipScene.instantiate()
+	_story_ribbon.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_head_text.add_child(_story_ribbon)
+	_head_text.move_child(_story_ribbon, 0)
+	_story_ribbon.set_box(TEXT_STORY_RIBBON, HallStyle.STORY_INK, BEAT_ICON_STORY)
+
+
+## The soft "Tap to read the letter" line under the From line.
+func _add_fold_hint() -> void:
+	_fold_hint = Label.new()
+	_fold_hint.theme_type_variation = &"ItalicLabel"
+	_fold_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	HallFontScale.set_size(_fold_hint, "font_size", FOLD_HINT_FONT_SIZE)
+	HallStyle.set_font_color(_fold_hint, HallStyle.TEXT_SOFT)
+	_head_text.add_child(_fold_hint)
+
+
+## Fold (hide the story and sign-off) or unfold an everyday letter.
+## Story letters stay open.
+func set_folded(folded: bool) -> void:
+	if is_story:
+		folded = false
+	is_folded = folded
+	for node in _foldable:
+		node.visible = not folded
+	if _fold_hint:
+		_fold_hint.text = TEXT_TAP_TO_READ if folded else TEXT_TAP_TO_FOLD
+
+
+func toggle_folded() -> void:
+	set_folded(not is_folded)
+	if not is_folded:
+		for node in _foldable:
+			HallFx.fade_in(node, 0.0, UNFOLD_SECONDS)
 
 
 ## Play this letter in, starting `delay` seconds from now: it fades up, the
@@ -144,6 +218,9 @@ func reveal(delay: float) -> float:
 	at += REVEAL_STAMP_DELAY
 	HallFx.stamp_in(_result_stamp, 2.4, at)
 	at += REVEAL_LETTER_SECONDS
+	if _story_ribbon:
+		HallFx.stamp_in(_story_ribbon, 1.8, at)
+		at += REVEAL_TAG_GAP
 
 	for tag in [_injured_tag, _died_tag, _found_tag]:
 		if tag.visible:
@@ -153,6 +230,9 @@ func reveal(delay: float) -> float:
 		HallFx.shake(self, REVEAL_DEATH_SHAKE, at)
 		at += REVEAL_DEATH_PAUSE
 
+	# a folded letter stops at its head; the story waits for a tap
+	if is_folded:
+		return at - delay
 	var beats := _beat_list.get_children()
 	var beat_gap := REVEAL_BEAT_GAP
 	if not beats.is_empty():
@@ -165,15 +245,29 @@ func reveal(delay: float) -> float:
 
 
 ## One beat row per story line (summary lines are left to the sign-off).
-func _build_story_beats(story: String) -> void:
+## story_lines = a story quest's written story (HallStyle.story_lines); a line
+## containing one of them gets a gilt star instead of its usual icon.
+func _build_story_beats(story: String, story_lines: PackedStringArray = PackedStringArray()) -> void:
 	for bright_tag in STORY_RECOLORS:
 		story = story.replace(bright_tag, STORY_RECOLORS[bright_tag])
 	for line in story.split("\n"):
 		var beat_text := line.strip_edges()
-		var plain_text := _bbcode_tags.sub(beat_text, "", true).strip_edges()
+		var plain_text := HallStyle.strip_bbcode(beat_text).strip_edges()
 		if plain_text == "" or SKIPPED_LINE_STARTS.any(func(start): return plain_text.begins_with(start)):
 			continue
-		HallStyle.add_row(_beat_list, BeatRowScene).setup(_icon_for_beat(plain_text), HallStyle.TEXT_SOFT, beat_text)
+		var beat_row: Node = HallStyle.add_row(_beat_list, BeatRowScene)
+		if _is_story_line(plain_text, story_lines):
+			beat_row.setup(BEAT_ICON_STORY, HallStyle.STORY_INK, beat_text)
+		else:
+			beat_row.setup(_icon_for_beat(plain_text), HallStyle.TEXT_SOFT, beat_text)
+
+
+## True when a beat's plain text holds a line of the written story.
+func _is_story_line(plain_text: String, story_lines: PackedStringArray) -> bool:
+	for story_line in story_lines:
+		if plain_text.contains(story_line):
+			return true
+	return false
 
 
 func _icon_for_beat(plain_text: String) -> String:

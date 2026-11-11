@@ -105,5 +105,18 @@ func _show_quest_list() -> void:
 	else:
 		_heading.text = HEADING_MILESTONE if is_milestone_day else HEADING
 	HallStyle.clear_children(_quest_list)
-	for quest_index in hall.quest_entries.size():
+	for quest_index in _board_order():
 		HallStyle.add_row(_quest_list, QuestRowScene).setup(hall, quest_index)
+
+
+## Indexes into hall.quest_entries in the order the Board lists them: story
+## quests (HallStyle.is_story_quest) first, then the rest, each in day order.
+func _board_order() -> Array:
+	var story_indexes := []
+	var other_indexes := []
+	for quest_index in hall.quest_entries.size():
+		if HallStyle.is_story_quest(hall.quest_entries[quest_index]):
+			story_indexes.append(quest_index)
+		else:
+			other_indexes.append(quest_index)
+	return story_indexes + other_indexes

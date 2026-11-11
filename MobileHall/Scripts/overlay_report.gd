@@ -1,7 +1,8 @@
 ## Day Report: the night's results as letters home. A torn strip of totals,
 ## a line for what happened at home (training, healing), a line for anyone
 ## released that day, then one letter per quest (result stamp, who went, who
-## got hurt or died, the story, a closing line).
+## got hurt or died, the story, a closing line). Story quests' letters come
+## first and stay open; everyday letters start folded (see report_entry.gd).
 ## Scene: MobileHall/Scenes/Overlays/overlay_report.tscn
 extends Control
 
@@ -199,11 +200,14 @@ func _show_released(released: Array) -> void:
 	_released_note.visible = not parts.is_empty()
 
 
-## One letter per quest, or a note when nobody went out.
+## One letter per quest, or a note when nobody went out. Story quests'
+## letters go first (in their own order), then everyday ones, folded.
 func _show_entries(results: Array) -> void:
 	HallStyle.clear_children(_entry_list)
-	for result in results:
-		HallStyle.add_row(_entry_list, ReportEntryScene).setup(result)
+	var story_results := results.filter(HallStyle.is_story_quest)
+	var other_results := results.filter(func(result): return not HallStyle.is_story_quest(result))
+	for result in story_results + other_results:
+		HallStyle.add_row(_entry_list, ReportEntryScene).setup(result, true)
 	_empty_label.text = TEXT_NOBODY_WENT
 	_empty_label.visible = results.is_empty()
 	_scroll.scroll_vertical = 0
