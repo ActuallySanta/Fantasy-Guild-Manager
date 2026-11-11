@@ -432,6 +432,7 @@ func _ready() -> void:
 		show_toast(TOAST_WELCOME_BACK % GameState.day)
 		tutorial.resume_today()
 	else:
+		_add_starting_hero()
 		_generate_quests()
 	refresh()
 	# web: watch for a newer deploy turning up while the game is open
@@ -439,6 +440,16 @@ func _ready() -> void:
 	# a playtest scenario can start already stuck. Deferred: the scenario
 	# builds its roster in its own _ready, which runs after this one
 	_check_run_over.call_deferred()
+
+
+## A fresh run (Day 1, empty roster) starts with Uncle John in the guild
+## (HallRules.make_starting_hero). A saved run already has its roster, and a
+## playtest scenario replaces the roster in its own _ready.
+func _add_starting_hero() -> void:
+	if GameState.day != 1 or not CharacterContainer.active_characters.is_empty():
+		return
+	CharacterContainer.add_character_to_guild(HallRules.make_starting_hero())
+	GuildUpgrades.sync_characters()
 
 
 func _on_day_started(_day: int) -> void:

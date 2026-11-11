@@ -59,6 +59,40 @@ const FINAL_QUEST_RANK := CreatedQuest.QuestDifficulty.S
 const FREEPLAY_SCALE_PER_DAY := 0.02
 
 
+# ============================================================ STARTING HERO
+
+## Every new run starts with this hero already in the guild, so Day 1 can go
+## straight to questing (the tutorial no longer walks through hiring).
+## Average stats: a recruit's 17 points spread evenly, plus the Priest's +3
+## Wisdom (see GuildCharacter.generate_stat_spread).
+const STARTING_HERO_NAME := "Uncle John"
+const STARTING_HERO_ROLE := GuildCharacter.CharacterRole.PRIEST
+const STARTING_HERO_GENDER := GuildCharacter.CharacterGender.MALE
+const STARTING_HERO_STATS := {
+	GuildCharacter.StatType.STRENGTH: 4,
+	GuildCharacter.StatType.DEFENSE: 4,
+	GuildCharacter.StatType.WISDOM: 8,
+	GuildCharacter.StatType.SLEAZINESS: 4,
+}
+
+
+## A new Uncle John: a Priest with average stats, free, joined on Day 1.
+static func make_starting_hero() -> GuildCharacter:
+	var hero := GuildCharacter.new()
+	hero.gender = STARTING_HERO_GENDER
+	hero.role = STARTING_HERO_ROLE
+	hero.name = STARTING_HERO_NAME
+	hero.icon = ExternalContentContainer.get_character_icon(hero.role)
+	for stat in STARTING_HERO_STATS:
+		hero.stats[stat] = STARTING_HERO_STATS[stat]
+	hero.title = hero.name + " the " + str(GuildCharacter.CharacterRole.find_key(hero.role))
+	# the backstory is written for the role (and may use the name), so redo it
+	hero.description = hero.generate_description()
+	hero.cost = 0
+	hero.joined_on_day = 1
+	return hero
+
+
 # ============================================================ QUESTS
 
 ## A new quest entry for hall_main's quest_entries:

@@ -1,9 +1,13 @@
 ## Tutorial coach: Pip the guild clerk walks a new player through the real
 ## Mobile Hall UI on Days 1, 2, 3 and 5. Each step spotlights one control and
 ## waits for the player to use it (or press Next on explain-only steps), so
-## the player learns by doing instead of reading an intro screen.
-##   Day 1 - the core loop only: hiring, reading a quest, picking a party,
-##           Send, End Day, the Day Report
+## the player learns by doing instead of reading an intro screen. Every step
+## asks for an action (only Day 1's welcome is a plain Next card); what used
+## to be explain-only steps is folded into the text of the nearest action.
+##   Day 1 - the core loop only: meeting the guild's first member (Uncle
+##           John, HallRules.make_starting_hero; hiring is left to the
+##           player), reading a quest, picking a party, Send, End Day, the
+##           Day Report
 ##   Day 2 - a hero's page (stats, Pluck, gear), odds and what a win grows
 ##           (a trained stat or Pluck), Deny,
 ##           how the guild can fall (HallMain.is_run_over)
@@ -811,12 +815,6 @@ func _row(root: Node, script_file: String, unique_child := "", filter := Callabl
 	return null
 
 
-## The report's Quests won / Gold / Hurt chips row.
-func _report_totals() -> Control:
-	var chip := _u(hall.get_node("%OverlayReport"), "WinsChip")
-	return chip.get_parent() as Control if chip != null else null
-
-
 func _training_section() -> Node:
 	return _u(_tab("upgrades"), "TrainingSection")
 
@@ -839,18 +837,21 @@ func _pick_text() -> String:
 	return "Tap heroes to add them. Each row's number is the chance they add."
 
 
-## The Assign Party odds step: risk vs. reward. A win at good odds trains the
-## quest's or region's stat; a riskier win grows Pluck instead. The threshold is
-## the open quest's (HallRules.train_odds_for, an F quest's if none is open),
-## and the Pluck numbers and odds word come from HallRules.PLUCK_GAIN_BY_ODDS
-## and HallStyle.ODDS_BANDS, so the text follows the tuning.
-func _odds_text() -> String:
-	var entry: Dictionary = hall.current_quest_entry()
-	var rank: int = entry.quest.difficulty if not entry.is_empty() else 0
-	var riskiest: Dictionary = HallRules.PLUCK_GAIN_BY_ODDS[-1]
-	var riskiest_word: String = HallStyle.odds_look(riskiest.min).word
-	return "Win at %d%%+ to train the quest's or region's stat. Riskier wins grow %s instead, up to +%d on a %s." \
-			% [HallRules.train_odds_for(rank), PLK, riskiest.gain, riskiest_word]
+## Day 3's Tonight step: Training and Hospital in one line (their own steps
+## can be skipped), plus a note when nothing could be built.
+func _tonight_text() -> String:
+	var text := "Now [b]Tonight[/b]. The [b]Training Yard[/b] drills a stat; the [b]Hospital[/b] heals faster. Heroes there [b]can't quest[/b]."
+	if not _seen.get("upgrade", false):
+		text = "Nothing to build yet; the tab gets a badge when you can. " + text
+	return text
+
+
+## Day 5's first step, with a heads-up when nothing in the Shop is affordable.
+func _shop_open_text() -> String:
+	var text := "Day 5. A merchant's in town! Stock changes every morning. Open [b]Items[/b]."
+	if not _any_affordable():
+		text += " Nothing's in your price range yet: earn %s and check back." % GOLD
+	return text
 
 
 func _anyone_can_train() -> bool:
@@ -901,65 +902,46 @@ func _day_one() -> Array:
 	return [
 		{"text": "Welcome, Guildmaster! I'm [b]Pip[/b], your clerk. Tap whatever glows."},
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
-			"do": "Tap Members", "text": "First, heroes. Open [b]Members[/b]."},
-		{"target": func(): return _u(_tab("guild"), "SegHire"), "on": "tab", "when": func(d): return d.guild == "hire",
-			"skip": func(): return hall.guild_section == "hire",
-			"do": "Tap Applicants", "text": "Open [b]Applicants[/b]."},
-		{"target": func(): return _row(_tab("guild"), "hire_card.gd"),
-			"text": "Recruits have four stats: %s, %s, %s and %s." % [POW, DEF, WIS, SLZ]},
-		{"target": func(): return _row(_tab("guild"), "hire_card.gd", "HireButton"), "on": "hire",
-			"do": "Tap Hire", "deny": ["DetailsButton"], "text": "Hiring is free for two days. Hire one."},
-		# the applicants are a stack of letters (%Stack): the next one is on top now
-		{"target": func(): return _row(_tab("guild"), "hire_card.gd", "HireButton"), "on": "hire",
-			"skip": func(): return not hall.can_hire_anyone(),
-			"do": "Tap Hire", "deny": ["DetailsButton"], "text": "And one more. Two heroes beat one."},
+			"do": "Tap Members", "text": "First, your guild. Open [b]Members[/b]."},
+		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
+			"skip": func(): return hall.guild_section == "roster",
+			"do": "Tap Your Guild", "text": "Open [b]Your Guild[/b]."},
 		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
-			"do": "Tap Board", "text": "Now find them work. Open the [b]Board[/b]."},
+			"do": "Tap Board",
+			"text": "That's [b]%s[/b], a priest and your first member. More apply under Applicants. Now find him work: open the [b]Board[/b]." \
+					% HallRules.STARTING_HERO_NAME},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
 			"do": "Tap the quest card", "text": "A quest: its rank, %s, party size and favoured stat. Tap it." % GOLD},
 		{"target": func(): return _u(_screen("assign"), "PickList"), "on": "pick", "when": func(d): return _party_ready(d),
 			"do": "Tap a hero row to add them", "deny": ["InfoButton"], "text": func(): return _pick_text()},
-		{"target": func(): return _u(_screen("assign"), "PartyBox"),
-			"text": "Your odds. Low odds risk failure and injuries."},
 		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "send",
-			"do": "Tap Seal & send", "text": "Send them. They leave tonight."},
+			"do": "Tap Seal & send", "text": "Low odds risk failure and injuries. Send them; they leave tonight."},
 		{"target": func(): return hall.action_button(), "on": "end_check",
 			"do": "Tap End Day", "text": "This bar always shows your next step. Tap [b]End Day[/b]."},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
 			"do": "Tap End Day", "text": "Confirm tonight's plan."},
-		{"target": func(): return _u(hall.get_node("%OverlayReport"), "Entries"),
-			"text": "Morning! Here's how each party did."},
-		{"target": func(): return _report_totals(),
-			"text": "Wins, %s earned, and who got hurt." % GOLD},
 		{"target": func(): return _u(hall.get_node("%OverlayReport"), "ActionButton"), "on": "new_day",
-			"do": "Tap to start Day 2", "text": "On to Day 2."},
+			"do": "Tap to start Day 2", "text": "Morning! Each letter shows how a party did. On to Day 2."},
 	]
 
 
 func _day_two() -> Array:
 	return [
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
-			"do": "Tap Members", "text": "Day 2! Let's meet your heroes. Open [b]Members[/b]."},
+			"do": "Tap Members", "text": "Day 2! Let's look closer at a hero. Open [b]Members[/b]."},
 		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
 			"skip": func(): return hall.guild_section == "roster",
 			"do": "Tap Your Guild", "text": "Open [b]Your Guild[/b]."},
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"), "on": "character",
 			"do": "Tap a hero", "text": "Tap a hero to open their page."},
-		{"target": func(): return _u(_screen("character"), "StatLines"),
-			"text": "Quests lean on the favoured stat. Safe wins train a stat; risky wins grow %s, which boosts every other stat." % PLK},
-		{"target": func(): return _u(_screen("character"), "GearLines"),
-			"text": "Gear slots. Items are role-locked. The Shop opens on Day 5."},
 		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close",
-			"do": "Tap Back", "text": "Head back."},
+			"do": "Tap Back",
+			"text": "Safe wins train a stat; risky wins grow %s, which boosts every stat. Gear slots fill from the Shop on Day 5. Head back." % PLK},
 		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
 			"do": "Tap Board", "text": "Open the [b]Board[/b]."},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
-			"do": "Tap a quest card", "text": "Open a quest."},
-		{"target": func(): return _u(_screen("assign"), "PartyBox"),
-			"text": func(): return _odds_text()},
-		{"target": func(): return _u(_screen("assign"), "LeftButton"),
-			"text": "[b]Deny[/b] skips a quest for a little standing. You can Reconsider later today."},
-		{"text": "Heroes can [b]die[/b]. Lose them all with no gold to hire, and the guild falls. The rest of today is yours. See you on Day 3!"},
+			"do": "Tap a quest card",
+			"text": "Open a quest. [b]Deny[/b] skips one for a little standing. Heroes can [b]die[/b], so pick your odds with care. See you on Day 3!"},
 	]
 
 
@@ -970,18 +952,11 @@ func _day_three() -> Array:
 		{"target": func(): return _u(_tab("upgrades"), "SegBuild"), "on": "tab", "when": func(d): return d.upgrades == "build",
 			"skip": func(): return hall.upgrades_section == "build",
 			"do": "Tap Build", "text": "Open [b]Build[/b]."},
-		{"target": func(): return _row(_tab("upgrades"), "upgrade_card.gd"),
-			"text": "Buildings have five levels. Upgrades cost %s and standing." % GOLD},
 		{"target": func(): return _row(_tab("upgrades"), "upgrade_card.gd", "UpgradeButton", func(b): return _is_enabled(b)), "on": "upgrade",
 			"skip": func(): return hall.affordable_buildings().is_empty(),
-			"do": "Tap Build", "text": "You can afford this one. Build it."},
-		{"target": func(): return _u(_tab("upgrades"), "Wallet"),
-			"skip": func(): return _seen.get("upgrade", false),
-			"text": "Not enough yet. A badge on the tab shows when you can."},
+			"do": "Tap Build", "text": "Buildings have five levels, paid in %s and standing. You can afford this one. Build it." % GOLD},
 		{"target": func(): return _u(_tab("upgrades"), "SegTonight"), "on": "tab", "when": func(d): return d.upgrades == "tonight",
-			"do": "Tap Tonight", "text": "Now [b]Tonight[/b]: who stays home."},
-		{"target": func(): return _training_section(),
-			"text": "[b]Training Yard[/b]: a hero drills one stat overnight."},
+			"do": "Tap Tonight", "text": func(): return _tonight_text()},
 		{"target": func(): return _u(_training_section(), "AddButton"), "on": "training_picker",
 			"skip": func(): return not GuildUpgrades.has_free_training_slot() or not _anyone_can_train(),
 			"do": "Tap Add a hero", "text": "Pick a trainee."},
@@ -991,30 +966,26 @@ func _day_three() -> Array:
 		{"target": func(): return _row(_training_section(), "home_row.gd", "StatPicker"), "tap": true,
 			"skip": func(): return not _seen.get("train", false),
 			"do": "Tap a stat, then Next", "text": "Pick the stat to drill."},
-		{"target": func(): return _hospital_section(),
-			"text": "[b]Hospital[/b]: hurt heroes heal faster in a bed than at home."},
 		{"target": func(): return _row(_hospital_section(), "home_row.gd", "MainButton", func(b): return b.text.contains("dmit")), "on": "admit",
 			"skip": func(): return hall.hurt_waiting_count() == 0,
 			"do": "Tap Admit", "text": "Someone's hurt. [b]Admit[/b] them."},
-		{"text": "Heroes training or in bed [b]can't quest[/b]. Choose who works, rests and goes out. Back on Day 5!"},
 	]
 
 
 func _day_five() -> Array:
 	return [
 		{"target": func(): return _nav("shop"), "on": "tab", "when": func(d): return d.tab == "shop",
-			"do": "Tap Items", "text": "Day 5. A merchant's in town! Open [b]Items[/b]."},
-		{"target": func(): return _tab("shop").shop_view().get_node_or_null("Keeper"),
-			"text": "Stock changes every morning. Unbought items are gone."},
+			"do": "Tap Items", "text": func(): return _shop_open_text()},
 		{"target": func(): return _u(_tab("shop").shop_view(), "Grid"), "tap": true,
 			"skip": func(): return not _any_affordable(),
 			"do": "Tap items to compare, then Next", "text": "Items are role-locked. Tap one to see what it does and who can use it."},
 		{"target": func(): return _u(_tab("shop").shop_view(), "BuyButton"), "on": "buy",
 			"skip": func(): return not _any_affordable(),
 			"do": "Tap Buy", "text": "Buy it."},
-		{"target": func(): return _u(_tab("shop").shop_view(), "Grid"),
-			"skip": func(): return _seen.get("buy", false),
-			"text": "Nothing affordable yet. Earn %s and check back tomorrow." % GOLD},
+		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
+			"skip": func(): return not _seen.get("buy", false) or _someone_fits_bought(),
+			"do": "Tap Members",
+			"text": func(): return "Nobody can use the %s yet. Open [b]Members[/b] and hire a [b]%s[/b] from Applicants. That's everything. Good luck!" % [_bought_name(), _bought_role()]},
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
 			"skip": func(): return not _seen.get("buy", false) or not _someone_fits_bought(),
 			"do": "Tap Members", "text": "Gear goes on from a hero's page. Open [b]Members[/b]."},
@@ -1027,20 +998,13 @@ func _day_five() -> Array:
 			"do": "Tap a hero with the right role", "text": func(): return "Open a [b]%s[/b]." % _bought_role()},
 		{"target": func(): return _u(_screen("character"), "GearLines"), "tap": true, "on": "equip",
 			"skip": func(): return not _seen.get("buy", false) or not _someone_fits_bought(),
-			"do": "Tap Equip, then the item", "deny": ["SideButton"], "text": func(): return "Tap [b]Equip[/b], then the %s." % _bought_name()},
-		{"target": func(): return _u(_screen("character"), "StatLines"),
-			"skip": func(): return not _seen.get("equip", false),
-			"text": "Its bonus now counts on every quest."},
-		{"text": func(): return ("Hire a %s to use that gear." % _bought_role()) if (_seen.get("buy", false) and not _someone_fits_bought()) else "That's everything! More help is under Menu > How to play. Good luck, Guildmaster."},
+			"do": "Tap Equip, then the item", "deny": ["SideButton"],
+			"text": func(): return "Tap [b]Equip[/b], then the %s. Its bonus counts on every quest. That's everything! More help is under Menu > How to play." % _bought_name()},
 	]
 
 
-## After the final battle is won: what freeplay changes.
+## After the final battle is won: what freeplay changes (one card).
 func _freeplay() -> Array:
 	return [
-		{"text": "You did it, Guildmaster! The story's done, but the guild stays open: welcome to [b]freeplay[/b]."},
-		{"text": "Days never end now. Quests get harder each day, and pay more %s." % GOLD},
-		{"target": func(): return _row(_tab("board"), "quest_row.gd", "RankChip"),
-			"text": "Quests can now pass S rank, up to [b]S++[/b]."},
-		{"text": "Lose every hero with no gold to hire, and the guild still falls. How long can you last?"},
+		{"text": "You did it, Guildmaster! Welcome to [b]freeplay[/b]: days never end, quests climb past S to [b]S++[/b] and pay more %s. Lose every hero with no gold to hire and the guild still falls. How long can you last?" % GOLD},
 	]
