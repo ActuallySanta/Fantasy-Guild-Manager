@@ -123,9 +123,10 @@ var item_reward_count_per_rank: float = 0.5
 var trained_stat_quest_chance: float = 50.0
 
 func _init(diff := 0, dayNum := 0) -> void:
-	if (dayNum == 1 || dayNum == 2 ||dayNum == 4 ||dayNum == 7 ||dayNum == 9 ||dayNum == 10):
-		_initMilestoneVars(dayNum)
-		return
+	match(dayNum):
+		1, 2, 4, 7, 9, 10, 12, 15, 18, -18:
+			_initMilestoneVars(dayNum)
+			return
 
 	difficulty = diff
 	if (dayNum <= 5):
@@ -144,9 +145,12 @@ func _init(diff := 0, dayNum := 0) -> void:
 	if(maxAdventurers == 1):
 		startingGoldReward = 100 + (125 * difficulty)
 		goldReward = 100 + (125 * difficulty)
-	else:
+	elif(maxAdventurers == 2):
 		goldReward = 150 + (175 * difficulty)
 		startingGoldReward = 150 + (175 * difficulty)
+	elif(maxAdventurers == 3):
+		goldReward = 200 + (225 * difficulty)
+		startingGoldReward = 200 + (225 * difficulty)
 
 	# Some standard quests (dayNum 0) pay in equipment instead: the items replace
 	# the base gold. The final battle (HallMain.FINAL_DAY) always pays gold, like
@@ -230,6 +234,8 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 	var statHitNum = 60.0 + (20 * difficulty)
 	if (maxAdventurers == 1):
 		statHitNum = (statHitNum / 2)
+	elif(maxAdventurers == 3):
+		statHitNum *= 1.5
 	statHitNum *= requirement_multiplier
 	var statTotal = 0.0
 
@@ -803,6 +809,14 @@ func _initMilestoneVars(dayNum: int):
 					storyNum = 3
 				9:
 					storyNum = 4
+				12:
+					storyNum = 5
+				15:
+					storyNum = 6
+				18:
+					storyNum = 7
+				-18:
+					storyNum = 8
 					
 			difficulty = ExternalContentContainer.get_Minor_Story_Variables(storyNum, 0).to_int()
 			maxAdventurers = ExternalContentContainer.get_Minor_Story_Variables(storyNum, 1).to_int()
