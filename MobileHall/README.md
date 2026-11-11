@@ -173,11 +173,31 @@ Looks come from the theme, not from overrides: a label is `TitleLabel`, `CapsLab
 `PaperButton` or `SealButton`. Pick one in the inspector (*Theme > Type Variation*) rather
 than overriding colours or styles on the node, so a reskin reaches it.
 
+## Debug tools
+
+Menu > **Debug tools** (shown while `GuildUpgrades.SHOW_DEBUG_BUTTONS` is on) holds
+cheats for testing. The rules are in `Scripts/hall_debug.gd` (`HallDebug`), and the sheet
+is `overlay_debug`. The first time in a run it only shows a warning and **Enable debug
+tools**. Enabling makes the run a **debug run** (`HallMain.is_debug_run`): it is never
+saved again, so the last save on disk stays as it was before the tools were used. A new
+run starts with saving back on.
+
+- **Time:** skip to the next day (training and healing still run; no quests, no report;
+  blocked on the final battle day outside freeplay), or jump to day 10 / 50 (a skip
+  repeated, so For Hire and healing move on as usual).
+- **Wallet:** gold and standing steps (`HallDebug.GOLD_STEPS`, `STANDING_STEPS`).
+- **Guild:** add a free hero (needs a free bed), add a random item to the Pack, heal
+  everyone (the dead come back if there's a bed), max every building, reset upgrades.
+- **Run:** reroll today's quests and For Hire, skip the tutorial.
+
+None of it counts toward the Game Over ledger or the credits (`run_stats`).
+
 ## Saving and offline play
 
 **Dev switch:** saving is **off by default** (`HallSettings.DEFAULT_SAVE_ENABLED`), so
-every launch starts a fresh Day 1. Tick "Save runs (debug)" in the Menu (shown while
-`GuildUpgrades.SHOW_DEBUG_BUTTONS` is on) to turn it on; the choice is kept in
+every launch starts a fresh Day 1. Tick "Save runs" in Menu > Debug tools (shown while
+`GuildUpgrades.SHOW_DEBUG_BUTTONS` is on; it's there before you enable the tools, so
+turning saving on doesn't make a debug run) to turn it on; the choice is kept in
 `settings.cfg`. Off means the save is neither loaded nor written (the file on disk is
 left alone). Flip the default to `true` before a release.
 

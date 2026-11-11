@@ -1,0 +1,209 @@
+[gd_scene format=3 uid="uid://udfjprofj6ola"]
+
+[ext_resource type="Script" uid="uid://sytsocqqt6sam" path="res://MobileHall/Scripts/overlay_debug.gd" id="1_debug"]
+[ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_dim"]
+
+[node name="OverlayDebug" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_debug")
+
+[node name="Dim" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = ExtResource("2_dim")
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Sheet" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="Center/Sheet"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Sheet/Col"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 46
+text = "Debug tools"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Note" type="Label" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
+text = "Note"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SaveCheckBox" type="CheckBox" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "SaveCheckBox"
+autowrap_mode = 3
+
+[node name="EnableButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "EnableButton"
+autowrap_mode = 3
+
+[node name="Scroll" type="ScrollContainer" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 760)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Tools" type="VBoxContainer" parent="Center/Sheet/Col/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="TimeHeading" type="Label" parent="Center/Sheet/Col/Scroll/Tools"]
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 22
+text = "Time"
+
+[node name="SkipButton" type="Button" parent="Center/Sheet/Col/Scroll/Tools"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "SkipButton"
+autowrap_mode = 3
+
+[node name="JumpGrid" type="GridContainer" parent="Center/Sheet/Col/Scroll/Tools"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="WalletHeading" type="Label" parent="Center/Sheet/Col/Scroll/Tools"]
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 22
+text = "Wallet"
+
+[node name="WalletGrid" type="GridContainer" parent="Center/Sheet/Col/Scroll/Tools"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="GuildHeading" type="Label" parent="Center/Sheet/Col/Scroll/Tools"]
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 22
+text = "Guild"
+
+[node name="GuildGrid" type="GridContainer" parent="Center/Sheet/Col/Scroll/Tools"]
+layout_mode = 2
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="HeroButton" type="Button" parent="Center/Sheet/Col/Scroll/Tools/GuildGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "HeroButton"
+autowrap_mode = 3
+
+[node name="ItemButton" type="Button" parent="Center/Sheet/Col/Scroll/Tools/GuildGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "ItemButton"
+autowrap_mode = 3
+
+[node name="HealButton" type="Button" parent="Center/Sheet/Col/Scroll/Tools/GuildGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "HealButton"
+autowrap_mode = 3
+
+[node name="MaxButton" type="Button" parent="Center/Sheet/Col/Scroll/Tools/GuildGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "MaxButton"
+autowrap_mode = 3
+
+[node name="ResetButton" type="Button" parent="Center/Sheet/Col/Scroll/Tools"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "ResetButton"
+autowrap_mode = 3
+
+[node name="RunHeading" type="Label" parent="Center/Sheet/Col/Scroll/Tools"]
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+theme_override_font_sizes/font_size = 22
+text = "Run"
+
+[node name="RerollButton" type="Button" parent="Center/Sheet/Col/Scroll/Tools"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "RerollButton"
+autowrap_mode = 3
+
+[node name="TutorialButton" type="Button" parent="Center/Sheet/Col/Scroll/Tools"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "TutorialButton"
+autowrap_mode = 3
+
+[node name="BackButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "BackButton"

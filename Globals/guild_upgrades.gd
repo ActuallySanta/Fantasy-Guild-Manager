@@ -61,7 +61,8 @@ const STARTING_GOLD := 0
 const STARTING_STANDING := 1
 const MINIMUM_STANDING := -10
 
-## Show the +gold / +standing test buttons on the upgrades page.
+## Show the debug tools: the Menu's Debug tools button (overlay_debug.gd) and
+## the old prototype upgrades page's +gold / +standing test buttons.
 const SHOW_DEBUG_BUTTONS := true
 
 # ---- Training Yard / Hospital tuning
@@ -207,6 +208,17 @@ func try_upgrade(building: int) -> bool:
 	resources_changed.emit()
 	upgrades_changed.emit()
 	return true
+
+
+## Debug tools (HallDebug.max_buildings): every implemented building jumps to
+## MAX_LEVEL for free, and its effects (Barracks beds, Armory gear) apply now.
+func max_all_buildings() -> void:
+	for building in Building.values():
+		if is_implemented(building):
+			levels[building] = MAX_LEVEL
+	_apply_effects()
+	resources_changed.emit()
+	upgrades_changed.emit()
 
 
 func add_gold(amount: int) -> void:

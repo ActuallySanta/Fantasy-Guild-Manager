@@ -39,6 +39,7 @@
 ##   hall_rules.gd     HallRules       building the day's quests, playing one out
 ##   hall_ledger.gd    HallLedger      is the run over, the Game Over numbers
 ##   hall_settings.gd  HallSettings    accessibility settings on disk
+##   hall_debug.gd     HallDebug       the Menu's Debug tools (cheats for testing)
 ##   hall_header.gd    HallHeader      day, countdown, counters (and their motion), danger strip
 ##   hall_action_bar.gd HallActionBar  the "what to do next" banner
 ##   hall_nav.gd       HallNav         bottom tabs and their badges
@@ -170,6 +171,18 @@ const TOAST_HANDS_FULL := "%s's hands are full"
 const TOAST_GEAR_DEAD := "%s can't use gear anymore."
 const TOAST_TAB_LOCKED := "Pip will open this on Day %d."
 const TOAST_WELCOME_BACK := "Welcome back · Day %d"
+# ---- debug tools (overlay_debug.gd)
+const TOAST_DEBUG_ON := "Debug run: saving off"
+const TOAST_DEBUG_GOLD := "%+d gold"
+const TOAST_DEBUG_STANDING := "%+d standing"
+const TOAST_DEBUG_HERO := "%s joined the guild (debug)"
+const TOAST_DEBUG_ITEM := "%s added to the Pack"
+const TOAST_DEBUG_HEALED := "Healed %d, revived %d"
+const TOAST_DEBUG_LEFT_DEAD := "Healed %d, revived %d (%d dead: no free bed)"
+const TOAST_DEBUG_MAXED := "Every building is at level %d"
+const TOAST_DEBUG_REROLLED := "New quests and recruits for today"
+const TOAST_DEBUG_TUTORIAL := "Tutorial skipped"
+const TOAST_DEBUG_CANT_SKIP := "Can't skip the day right now"
 
 # ---- stamps (SENT is inked on the quest itself, see screen_assign / quest_row)
 const STAMP_DENIED := "DENIED"
@@ -233,6 +246,8 @@ var is_welcome_from_menu := false
 var is_menu_open := false
 ## The Menu's Accessibility sheet (text size, colorblind filter, reduced motion).
 var is_accessibility_open := false
+## The Menu's Debug tools sheet (overlay_debug.gd).
+var is_debug_open := false
 ## The Game Over ledger's numbers, or {} while the run is still going.
 ## Filled once by _check_run_over (see build_run_over_stats for the keys).
 var run_over_stats := {}
@@ -285,9 +300,13 @@ var color_filter := 0
 var reduce_motion := false
 ## Text size: index into HallSettings.TEXT_SIZES (HallFontScale applies it). Saved by HallSettings.
 var text_size := HallSettings.DEFAULT_TEXT_SIZE
-## Dev switch (Menu's "Save runs (debug)" checkbox): when false the run is
+## Dev switch (the "Save runs" checkbox in Menu > Debug tools): when false the run is
 ## neither loaded at start-up nor saved. Saved by HallSettings.
 var is_save_enabled := HallSettings.DEFAULT_SAVE_ENABLED
+## True once the Debug tools were turned on this run (enable_debug_tools):
+## the run is never saved again, so the last real save stays as it was.
+## Never saved itself; reloading the scene for a new run clears it.
+var is_debug_run := false
 
 # ---- the save file (HallSave)
 
@@ -350,6 +369,7 @@ var tutorial: Control
 @onready var _welcome_overlay: Control = %OverlayWelcome
 @onready var _menu_overlay: Control = %OverlayMenu
 @onready var _accessibility_overlay: Control = %OverlayAccessibility
+@onready var _debug_overlay: Control = %OverlayDebug
 @onready var _game_over_overlay: Control = %OverlayGameOver
 @onready var _credits_overlay: Control = %OverlayCredits
 
@@ -751,6 +771,22 @@ func open_accessibility() -> void:
 ## tap on the dimmed background).
 func close_accessibility(go_to_menu: bool = true) -> void:
 	is_accessibility_open = false
+	is_menu_open = go_to_menu
+	queue_refresh()
+
+
+## The Menu's Debug tools button: its sheet replaces the Menu. The first time
+## in a run it only asks to turn the tools on (see enable_debug_tools).
+func open_debug() -> void:
+	is_menu_open = false
+	is_debug_open = true
+	queue_refresh()
+
+
+## Back from Debug tools to the Menu (go_to_menu = false closes both, for a
+## tap on the dimmed background).
+func close_debug(go_to_menu: bool = true) -> void:
+	is_debug_open = false
 	is_menu_open = go_to_menu
 	queue_refresh()
 
@@ -1187,7 +1223,7 @@ func set_reduce_motion(is_on: bool) -> void:
 	queue_refresh()
 
 
-## Menu's "Save runs (debug)" checkbox. Turning it on saves the current run on
+## The "Save runs" checkbox (Menu > Debug tools). Turning it on saves the current run on
 ## the refresh this queues (overwriting the old save); turning it off leaves
 ## the save file on disk untouched.
 func set_save_enabled(is_on: bool) -> void:
@@ -1211,11 +1247,98 @@ func _apply_color_filter() -> void:
 	(_color_filter.material as ShaderMaterial).set_shader_parameter("mode", color_filter)
 
 
-## Menu's debug button.
+# ---- debug tools (the rules are in HallDebug)
+
+
+## Debug tools' confirm button: the tools show, and from now on this run is
+## never saved (is_debug_run). The save on disk keeps the run from before.
+func enable_debug_tools() -> void:
+	if is_debug_run:
+		return
+	is_debug_run = true
+	show_toast(TOAST_DEBUG_ON)
+	queue_refresh()
+
+
+## Debug tools' Reset upgrades button.
 func reset_upgrades() -> void:
 	GuildUpgrades.reset()
-	is_menu_open = false
 	show_toast(TOAST_RESET)
+
+
+## Debug tools' Skip day button (HallDebug.skip_day). start_new_day shows the new day's toast.
+func debug_skip_day() -> void:
+	if not HallDebug.skip_day(self):
+		show_toast(TOAST_DEBUG_CANT_SKIP)
+		queue_refresh()
+
+
+## Debug tools' Jump to day buttons (HallDebug.jump_to_day). day: the day to land on.
+func debug_jump_to_day(day: int) -> void:
+	if HallDebug.jump_to_day(self, day) == 0:
+		show_toast(TOAST_DEBUG_CANT_SKIP)
+		queue_refresh()
+
+
+## Debug tools' gold buttons. amount: gold to add (see HallDebug.GOLD_STEPS).
+func debug_add_gold(amount: int) -> void:
+	GuildUpgrades.add_gold(amount)
+	show_toast(TOAST_DEBUG_GOLD % amount)
+
+
+## Debug tools' standing buttons. amount: standing to add (see HallDebug.STANDING_STEPS).
+func debug_add_standing(amount: int) -> void:
+	GuildUpgrades.add_standing(amount)
+	show_toast(TOAST_DEBUG_STANDING % amount)
+
+
+## Debug tools' Add hero button: a free random hero, if there's a bed.
+func debug_add_hero() -> void:
+	var character := HallDebug.add_hero()
+	show_toast(TOAST_ROSTER_FULL if character == null else TOAST_DEBUG_HERO % character.name)
+	queue_refresh()
+
+
+## Debug tools' Add item button: a free random item in the Pack.
+func debug_add_item() -> void:
+	var item := HallDebug.add_random_item()
+	show_toast(TOAST_DEBUG_ITEM % item.name)
+	queue_refresh()
+
+
+## Debug tools' Heal everyone button (HallDebug.heal_everyone).
+func debug_heal_everyone() -> void:
+	var counts := HallDebug.heal_everyone()
+	if counts.left_dead > 0:
+		show_toast(TOAST_DEBUG_LEFT_DEAD % [counts.healed, counts.revived, counts.left_dead])
+	else:
+		show_toast(TOAST_DEBUG_HEALED % [counts.healed, counts.revived])
+	queue_refresh()
+
+
+## Debug tools' Max buildings button.
+func debug_max_buildings() -> void:
+	HallDebug.max_buildings()
+	show_toast(TOAST_DEBUG_MAXED % GuildUpgrades.MAX_LEVEL)
+
+
+## Debug tools' Reroll button: new quests for today (drafted parties are
+## dropped with them) and a new For Hire pool, without moving the day on.
+func debug_reroll_today() -> void:
+	_generate_quests()
+	HallDebug.reroll_hires()
+	# an open Assign Party screen points at a quest that's gone now
+	active_screen = {}
+	show_toast(TOAST_DEBUG_REROLLED)
+	queue_refresh()
+
+
+## Debug tools' Skip tutorial button.
+func debug_skip_tutorial() -> void:
+	if tutorial and tutorial.is_running():
+		tutorial.skip_tutorial()
+	show_toast(TOAST_DEBUG_TUTORIAL)
+	queue_refresh()
 
 # ---- end of day
 
@@ -1327,8 +1450,10 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 
 ## DaySummary's "New Day" button. Keeps tonight's report for the Menu and opens on the Board.
 func start_new_day() -> void:
-	previous_report = shown_report.duplicate()
-	previous_report.starts_next_day = false
+	# a skipped day (HallDebug.skip_day) has no report, so last night's is kept
+	if not shown_report.is_empty():
+		previous_report = shown_report.duplicate()
+		previous_report.starts_next_day = false
 	shown_report = {}
 	# today's releases are in the kept report now; tomorrow starts a fresh list
 	released_today.clear()
@@ -1455,10 +1580,10 @@ func refresh() -> void:
 
 
 ## Write the run to the save file now (HallSave.save_run skips it if nothing
-## changed). Does nothing for a playtest scenario (see uses_save_file) or
-## while the dev switch is off (is_save_enabled).
+## changed). Does nothing for a playtest scenario (see uses_save_file),
+## while the dev switch is off (is_save_enabled), or in a debug run (is_debug_run).
 func save_now() -> void:
-	if uses_save_file and is_save_enabled and is_inside_tree():
+	if uses_save_file and is_save_enabled and not is_debug_run and is_inside_tree():
 		HallSave.save_run(self)
 
 
@@ -1529,6 +1654,7 @@ func _refresh_overlays() -> void:
 	_end_check_overlay.visible = not is_report_open and is_end_check_open
 	_menu_overlay.visible = not is_report_open and is_menu_open
 	_accessibility_overlay.visible = not is_report_open and is_accessibility_open
+	_debug_overlay.visible = not is_report_open and is_debug_open
 	_welcome_overlay.visible = not is_report_open and is_welcome_open
 	for overlay in _all_overlays():
 		if overlay.visible:
@@ -1536,7 +1662,7 @@ func _refresh_overlays() -> void:
 
 
 func _all_overlays() -> Array:
-	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay]
+	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _debug_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay]
 
 
 # ============================================================ TOAST
