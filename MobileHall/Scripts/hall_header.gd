@@ -1,7 +1,10 @@
 ## Header: the DAY tile, the Bone Drake countdown, the gold and standing
 ## counters, the Menu button, and the red "last hero standing" strip under it.
 ## Also owns the counters' motion: numbers roll to new values, coins fly to
-## what you paid for, and the night's earnings land at dawn.
+## what you paid for, and the night's earnings land at dawn. Tapping the coin
+## or the shield drops a popup that explains gold (popup_gold.gd) or standing
+## (popup_standing.gd). The popup's backdrop covers the screen, so it closes
+## before anything else can be tapped.
 ## Scene: MobileHall/Scenes/Shell/hall_header.tscn
 class_name HallHeader
 extends VBoxContainer
@@ -94,6 +97,8 @@ var _shown_day := -1
 @onready var _danger_icon: TextureRect = %DangerIcon
 @onready var _danger_title: Label = %DangerTitle
 @onready var _danger_text: Label = %DangerText
+@onready var _gold_popup: HeaderPopup = %PopupGold
+@onready var _standing_popup: HeaderPopup = %PopupStanding
 
 
 # ============================================================ SETUP AND REFRESH
@@ -101,6 +106,10 @@ var _shown_day := -1
 func setup(main: HallMain) -> void:
 	hall = main
 	_menu_button.pressed.connect(hall.open_menu)
+	_gold_popup.setup(main)
+	_standing_popup.setup(main)
+	_gold_box.gui_input.connect(_on_counter_input.bind(_gold_popup, _gold_box))
+	_standing_box.gui_input.connect(_on_counter_input.bind(_standing_popup, _standing_box))
 
 
 ## Redraw the day, the countdown, the counters and the danger strip.
@@ -124,6 +133,20 @@ func refresh() -> void:
 	_update_counter("gold")
 	_update_counter("standing")
 	_refresh_danger_strip()
+	for popup in [_gold_popup, _standing_popup]:
+		if popup.is_open():
+			popup.refresh()
+
+
+## A tap on the coin or the shield drops its popup (and closes the other one).
+func _on_counter_input(event: InputEvent, popup: HeaderPopup, anchor: Control) -> void:
+	if not (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
+		return
+	for other in [_gold_popup, _standing_popup]:
+		if other != popup:
+			other.close()
+	popup.open(anchor)
+	anchor.accept_event()
 
 
 ## The red "last hero standing" strip under the header, only while the guild

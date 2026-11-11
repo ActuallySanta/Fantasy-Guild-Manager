@@ -87,6 +87,16 @@ in today's For Hire is affordable, and either tomorrow's recruit price is more t
 gold or standing is within `DANGER_STANDING_MARGIN` of the floor. The Welcome card's
 "Don't run out of heroes" row and Pip's Day 1 Day Report step explain the rule.
 
+Tapping the gold coin or the standing shield in the header drops a parchment card
+from it (`HeaderPopup`; tap anywhere else to close it). The **gold** card shows what
+the quests sent tonight pay if they all win and about how much at today's odds, then
+where gold goes (hiring, gear, building upgrades) with a price tag that turns green when
+you can pay it. The **standing** card shows the rank quests center on and a two-way
+meter: the red half fills as standing nears `MINIMUM_STANDING` (recruits stop coming),
+the green half fills toward the next milestone, a quest rank or a building level. The
+numbers come from `HallWallet` (static functions); the milestones are built from
+`HallRules` and `GuildUpgrades` tuning, so they follow it.
+
 ## Final battle, credits and freeplay
 
 `HallMain.FINAL_DAY` (50) has a single quest, the final battle (`entry.final`). It's a
@@ -247,8 +257,8 @@ holds the whole format:
 ## Files
 
 - `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, refresh
-- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`, `hall_save.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings, the saved run (static functions, no state)
-- `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip), action bar, nav and toast
+- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`, `hall_save.gd`, `hall_wallet.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings, the saved run, the gold and standing popups' numbers (static functions, no state)
+- `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip, gold and standing popups), action bar, nav and toast
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
 - `Scenes/Overlays/`: End Day check, Day Report, Welcome, Menu, Game Over, Final Battle credits
