@@ -49,9 +49,9 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 ```
 ┌ header ─ Day · Bone Drake countdown · gold · standing · menu ┐
 │ warning strip ─ "Last hero standing" (only when one death from falling) │
-│ content ─ Board | Guild | Upgrades | Shop  (or a screen over them) │
+│ content ─ Board | Guild | Upgrades | Items  (or a screen over them) │
 │ action bar ─ "what to do next" + one big button             │
-└ nav ─ Board (undecided) · Members (new recruits) · Guild (affordable) · Shop ┘
+└ nav ─ Board (undecided) · Members (new recruits) · Guild (affordable) · Items ┘
 ```
 
 | Screen | What's on it |
@@ -60,7 +60,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Assign Party | Quest strip; quest card; party seats (tap to remove) with live odds; picker sorted best fit first. Adventurers already in another quest's party are hidden unless **Show busy** is on; shown, they say "Picked for / Sent on #N" and move over when tapped. Footer: Deny / Send Party, or Recall / Next Quest, or Board / Reconsider |
 | Guild (tab, "Members" in the nav) | A folder with two tabs: Your Guild (roster with health, today's task, all five stats) / Applicants (a stack of letters of introduction; tap one peeking out to read it, Hire on the top one). Bed count links to the Barracks |
 | Upgrades (tab, "Guild" in the nav) | A folder with two tabs. **Tonight**: the Training Yard plan (heroes in a slot with a Pow / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital plan (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: the treasury ledger, a plan per building (affordable first) with level diamonds, now/next effect, cost or what's missing, and "coming soon" buildings as rolled-up scrolls. Badge = upgrades you can afford |
-| Shop (tab) | Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar where the action bar usually is. Groundwork only: nothing can be bought yet |
+| Items (tab, id "shop") | A folder with two tabs; the first visit each day opens on the Shop. **Pack**: every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar where the action bar usually is |
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
 | Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story |

@@ -1,4 +1,5 @@
-## Shop tab ("Counter" layout, picked by the team from the three Shop mockups).
+## Shop sub-tab of the Items tab (tab_items.gd): the "Counter" layout, picked
+## by the team from the three Shop mockups.
 ##   Keeper   - the shopkeeper behind his counter, with a speech bubble and
 ##              the shop's name tag (top ~40% of the tab)
 ##   Goods    - a 3 x 2 grid of today's goods with prices; sold-out items grey out
@@ -6,8 +7,8 @@
 ##              action bar normally is; hall_main hides the action bar here)
 ##
 ## The goods come from the ItemShop autoload (generated items, new stock every
-## dawn). Bought items go into the guild's pack; heroes equip them from their
-## own page (screen_character.gd, Gear section).
+## dawn). Bought items go into the guild's pack, and heroes put them on from
+## the Pack sub-tab (tab_pack.gd) or their own page (screen_character.gd).
 ## The keeper art is two layers in the scene: Sprites/Shop/shopBackground.png
 ## (Background) with Sprites/Shop/shopkeeper.png (ShopKeeper) drawn over it.
 ## Which item is picked is view state only, kept here.
@@ -25,7 +26,7 @@ const PACK_NOTE := "%s in your pack"
 const BUY_BUTTON := "Buy · %dg"
 const SOLD_BUTTON := "Sold"
 const NOTHING_PICKED := "Pick something"
-const SOLD_HINT := "Bought! Equip it from a hero's page."
+const SOLD_HINT := "Bought! Equip it from the Pack."
 const TOO_POOR_HINT := " · Not enough gold"
 
 # ---- NODES
