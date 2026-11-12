@@ -14,7 +14,7 @@
 ## Overlays over everything: End Day check, Day Report, Welcome, Menu,
 ## the Game Over ledger (when the guild is stuck with nobody left; see is_run_over),
 ## and the final battle's credits roll (FINAL_DAY; a victory or a defeat).
-## (The Training Yard and Hospital live on the Upgrades tab's Tonight half.)
+## (The Training Yard and Hospital live on the Upgrades tab's Facilities half.)
 ## On top of all of it: the colorblind filter (set from the Menu, saved to disk).
 ##
 ## What the feedback asked for, and where it lives:
@@ -176,7 +176,7 @@ const TOAST_DEBUG_ON := "Debug run: saving off"
 const TOAST_DEBUG_GOLD := "%+d gold"
 const TOAST_DEBUG_STANDING := "%+d standing"
 const TOAST_DEBUG_HERO := "%s joined the guild (debug)"
-const TOAST_DEBUG_ITEM := "%s added to the Pack"
+const TOAST_DEBUG_ITEM := "%s added to the Inventory"
 const TOAST_DEBUG_HEALED := "Healed %d, revived %d"
 const TOAST_DEBUG_LEFT_DEAD := "Healed %d, revived %d (%d dead: no free bed)"
 const TOAST_DEBUG_MAXED := "Every building is at level %d"
@@ -214,7 +214,7 @@ var items_section := ITEMS_SECTION_SHOP
 ## The day the Items tab last opened on its own: the first visit each day
 ## shows the Shop (fresh stock), later ones keep whichever half was left open.
 var shop_last_seen_day := 0
-## Upgrades > Tonight: the "+ Add a hero" list under the Training Yard is open.
+## Upgrades > Facilities: the "+ Add a hero" list under the Training Yard is open.
 var training_picker_open := false
 ## The screen covering the tabs, or {} for none:
 ##   {kind: SCREEN_ASSIGN, quest_index: int}
@@ -592,7 +592,7 @@ func can_go_on_quests(character: GuildCharacter) -> bool:
 			and not GuildUpgrades.is_training(character)
 
 
-## Hurt heroes who aren't in a Hospital bed (the Upgrades > Tonight badge).
+## Hurt heroes who aren't in a Hospital bed (the Upgrades > Facilities badge).
 func hurt_waiting_count() -> int:
 	return roster().filter(func(character):
 		return GuildUpgrades.needs_care(character) and not GuildUpgrades.is_patient(character)).size()
@@ -711,7 +711,7 @@ func show_guild_section(section: String) -> void:
 	open_tab("guild", section)
 
 
-## The Upgrades tab's Tonight / Build buttons.
+## The Upgrades tab's Facilities / Build buttons.
 func show_upgrades_section(section: String) -> void:
 	open_tab("upgrades", section)
 
@@ -1110,7 +1110,7 @@ func swap_gear(item_on: StandardItem, item_off: StandardItem, character: GuildCh
 	queue_refresh()
 
 
-# ---- Upgrades > Tonight: Training Yard and Hospital
+# ---- Upgrades > Facilities: Training Yard and Hospital
 
 
 ## "+ Add a hero" under the Training Yard: show / hide who can train.

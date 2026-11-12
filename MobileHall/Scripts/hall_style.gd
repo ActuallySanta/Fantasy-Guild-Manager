@@ -29,6 +29,9 @@ extends RefCounted
 
 ## Clips portrait art to its round or oval mask (see mask_to).
 const PORTRAIT_MASK_SHADER := preload("uid://bkumb84ipevs1")  # MobileHall/Styles/portrait_mask.gdshader
+## Outline shapes that fill_art() copies into a filled, coloured box.
+const PILL_STYLE := preload("uid://cels2rr0bev26")  # MobileHall/Styles/pill.tres
+const INK_BOX_STYLE := preload("uid://l4e4648hj2s1")  # MobileHall/Styles/ink_box.tres
 
 
 # ============================================================ QUEST STATES
@@ -135,12 +138,13 @@ const STATS := [
 # ---- health
 
 ## GuildCharacter.InjuryLevel -> label, ink (text) and a paper tint (bg).
+## icon = the hall_style ICON_FILES name drawn in the health chip.
 const INJURY_LOOKS := [
-	{"label": "Healthy", "bg": Color("#E0EBD3"), "text": Color("#3D5A2A")},
-	{"label": "Sore", "bg": Color("#F3E7C6"), "text": Color("#6E5410")},
-	{"label": "Hurt", "bg": Color("#F2E0CC"), "text": Color("#8A4A10")},
-	{"label": "Gravely hurt", "bg": Color("#F2DCD4"), "text": Color("#8B2E2A")},
-	{"label": "Dead", "bg": Color("#E2DDE3"), "text": Color("#4A3B4F")},
+	{"label": "Healthy", "bg": Color("#E0EBD3"), "text": Color("#3D5A2A"), "icon": "heart"},
+	{"label": "Sore", "bg": Color("#F3E7C6"), "text": Color("#6E5410"), "icon": "heart"},
+	{"label": "Hurt", "bg": Color("#F2E0CC"), "text": Color("#8A4A10"), "icon": "cross"},
+	{"label": "Gravely hurt", "bg": Color("#F2DCD4"), "text": Color("#8B2E2A"), "icon": "skull"},
+	{"label": "Dead", "bg": Color("#E2DDE3"), "text": Color("#4A3B4F"), "icon": "skull"},
 ]
 
 # ---- portraits
@@ -557,6 +561,27 @@ static func style_panel(panel: Control, fill: Color, _border_color: Color = BORD
 ## Swap a panel's look for another theme variation (PaperCard, PlanCard...).
 static func set_look(panel: Control, variation: StringName) -> void:
 	panel.theme_type_variation = variation
+
+
+## Give a panel a filled box in `fill` with an `ink` border, shaped like
+## `shape` (PILL_STYLE or INK_BOX_STYLE). Used where a stat or health needs to
+## read as a coloured tag (stat chips, the character page's stat lines, the
+## health chip). border_width in pixels; 0 hides the border. Undo with
+## clear_fill().
+static func fill_art(panel: Control, shape: StyleBoxFlat, fill: Color, ink: Color, border_width: int = 2) -> void:
+	var box: StyleBoxFlat = shape.duplicate()
+	box.draw_center = true
+	box.bg_color = fill
+	box.border_color = ink
+	box.set_border_width_all(border_width)
+	panel.add_theme_stylebox_override("panel", box)
+	# the box carries its own colours, so the white-art tint must be off
+	panel.self_modulate = WHITE
+
+
+## Drop a fill_art() box so the panel's theme look shows again.
+static func clear_fill(panel: Control) -> void:
+	panel.remove_theme_stylebox_override("panel")
 
 
 ## Ink a white piece of art (seal disc, stamp, outline box, icon) or tint

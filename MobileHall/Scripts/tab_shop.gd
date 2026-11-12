@@ -33,11 +33,11 @@ const SHOP_NAME := "Grizzle's Goods"
 const KEEPER_LINE := "Fresh stock every dawn!"
 const GOODS_TITLE := "TODAY'S GOODS"
 ## Only shown when the pack holds unworn items (a reminder to equip them).
-const PACK_NOTE := "%s in your pack"
+const PACK_NOTE := "%s in your inventory"
 const BUY_BUTTON := "Buy · %dg"
 const SOLD_BUTTON := "Sold"
 const NOTHING_PICKED := "Pick something"
-const SOLD_HINT := "Bought! Equip it from the Pack."
+const SOLD_HINT := "Bought! Equip it from the Inventory."
 const TOO_POOR_HINT := " · Not enough gold"
 
 # ---- NODES

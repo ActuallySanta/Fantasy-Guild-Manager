@@ -9,6 +9,14 @@ theme_override_constants/h_separation = 12
 theme_override_constants/v_separation = 2
 script = ExtResource("1_mh62l")
 
+[node name="Health" parent="." instance=ExtResource("2_d5pfk")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Text" parent="Health/Row" index="1"]
+theme_override_font_sizes/font_size = 28
+
 [node name="Stat0" parent="." instance=ExtResource("2_d5pfk")]
 layout_mode = 2
 

@@ -1,5 +1,5 @@
-## One adventurer in Assign Party's picker: portrait, the four quest stats
-## (favored one in a pill), health, how much they'd add to the odds, and which
+## One adventurer in Assign Party's picker: portrait, health and the four quest
+## stats on one line (favored stat with a heavy border), how much they'd add to the odds, and which
 ## quest (or training) they're already on. Tap to pin / unpin; "i" opens
 ## their details.
 ## Scene: MobileHall/Scenes/Rows/pick_row.tscn
@@ -31,7 +31,6 @@ const TEXT_TRAINING_SUB := "training"
 @onready var _portrait = %Portrait            # portrait.gd
 @onready var _name: Label = %Name
 @onready var _role: Label = %Role
-@onready var _health_chip = %Health           # chip.gd
 @onready var _stats = %Stats                  # stat_strip.gd
 @onready var _info_button: Button = %InfoButton
 # Where they already are
@@ -47,7 +46,7 @@ func setup(hall: HallMain, entry: Dictionary, character: GuildCharacter) -> void
 	_portrait.show_character(character)
 	_name.text = character.name
 	_role.text = TEXT_ROLE % HallStyle.role_name(character)
-	_health_chip.set_health(character)
+	_stats.show_health(character)
 	_stats.show_stats(character, HallStyle.favored_stat_index(entry.quest), false)
 	_show_elsewhere(hall, entry, character)
 	_show_pick_state(hall, entry, character)

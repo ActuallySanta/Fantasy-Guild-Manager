@@ -37,7 +37,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"HeadingLabel"
 theme_override_font_sizes/font_size = 40
-text = "The Guild Pack"
+text = "The Guild Inventory"
 text_overrun_behavior = 3
 
 [node name="HideWornToggle" type="CheckButton" parent="FolderMargin/Folder/Col/Head"]
@@ -132,7 +132,7 @@ custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 26
-text = "The pack is empty. Buy gear in the Shop, or win it on quests."
+text = "The inventory is empty. Buy gear in the Shop, or win it on quests."
 horizontal_alignment = 1
 autowrap_mode = 3
 

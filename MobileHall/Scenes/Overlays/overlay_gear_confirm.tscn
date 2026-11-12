@@ -113,7 +113,7 @@ custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 24
-text = "It goes back in the pack, and Gwen gets a free gear slot."
+text = "It goes back in the inventory, and Gwen gets a free gear slot."
 horizontal_alignment = 1
 autowrap_mode = 3
 

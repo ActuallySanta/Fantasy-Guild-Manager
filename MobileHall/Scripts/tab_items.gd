@@ -1,5 +1,5 @@
 ## Items tab: the guild's gear, split in two folder tabs.
-##   Pack - everything the guild owns and who wears what (tab_pack.gd)
+##   Inventory (internally "pack") - everything the guild owns and who wears what (tab_pack.gd)
 ##   Shop - Grizzle's counter, today's goods (tab_shop.gd)
 ## Which one is open is hall.items_section (HallMain.ITEMS_SECTION_*). The nav
 ## button and HallMain.TAB_SHOP keep the id "shop" so the tutorial's unlock day
@@ -13,7 +13,7 @@ const FOLDER_TAB_HEIGHT := 72
 const FOLDER_TAB_HEIGHT_OPEN := 80
 
 # ---- TEXT
-const BUTTON_PACK := "Pack · %d"
+const BUTTON_PACK := "Inventory · %d"
 const BUTTON_SHOP := "Shop · %d left"
 const BUTTON_SHOP_SOLD_OUT := "Shop · sold out"
 
