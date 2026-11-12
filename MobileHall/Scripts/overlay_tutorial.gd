@@ -833,8 +833,8 @@ func _party_ready(entry: Dictionary) -> bool:
 func _pick_text() -> String:
 	var entry: Dictionary = hall.current_quest_entry()
 	if not entry.is_empty() and hall.party_size_limit(entry) == 1:
-		return "One hero only. Each row's number is the chance they add."
-	return "Tap heroes to add them. Each row's number is the chance they add."
+		return "This quest requires one adventurer only."
+	return "Tap on one of the adventurers to assign them on the quest."
 
 
 ## Day 3's Tonight step: Training and Hospital in one line (their own steps
@@ -900,48 +900,48 @@ func _steps_for(script: int) -> Array:
 
 func _day_one() -> Array:
 	return [
-		{"text": "Welcome, Guildmaster! I'm [b]Pip[/b], your clerk. Tap whatever glows."},
+		{"text": "Welcome, Guildmaster! I'm [b]Pip[/b], your clerk. I'll show you around."},
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
-			"do": "Tap Members", "text": "First, your guild. Open [b]Members[/b]."},
+			"do": "Tap Members", "text": "First step, your guild. Open the [b]Members[/b] tab at the bottom of your screen."},
 		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
 			"skip": func(): return hall.guild_section == "roster",
 			"do": "Tap Your Guild", "text": "Open [b]Your Guild[/b]."},
 		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
 			"do": "Tap Board",
-			"text": "That's [b]%s[/b], a priest and your first member. More apply under Applicants. Now find him work: open the [b]Board[/b]." \
+			"text": "Look! Here is [b]%s[/b], a priest and your first member. More heroes will appear each day under the Applicants tab. Now find him work to do: open the [b]Board[/b] tab." \
 					% HallRules.STARTING_HERO_NAME},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
-			"do": "Tap the quest card", "text": "A quest: its rank, %s, party size and favoured stat. Tap it." % GOLD},
+			"do": "Tap the quest card", "text": "Here's a first quest! Quests show its rank, how much %s you will earn, party size, and the favoured stat for the quest. Tap it to send an adventurer!" % GOLD},
 		{"target": func(): return _u(_screen("assign"), "PickList"), "on": "pick", "when": func(d): return _party_ready(d),
-			"do": "Tap a hero row to add them", "deny": ["InfoButton"], "text": func(): return _pick_text()},
+			"do": "Tap an adventurer row to assign them on the quest", "deny": ["InfoButton"], "text": func(): return _pick_text()},
 		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "send",
-			"do": "Tap Seal & send", "text": "Low odds risk failure and injuries. Send them; they leave tonight."},
+			"do": "Tap Seal & Send", "text": "Low chances on quests give a risk failure and injuries. Click Send & Seal on the bottom of screen to confirm your choice."},
 		{"target": func(): return hall.action_button(), "on": "end_check",
-			"do": "Tap End Day", "text": "This bar always shows your next step. Tap [b]End Day[/b]."},
+			"do": "Tap End Day", "text": "Quick tip! This bar always shows your next step if you are ever stuck. Tap [b]End Day[/b] to send your quests off!"},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
-			"do": "Tap End Day", "text": "Confirm tonight's plan."},
+			"do": "Tap End Day", "text": "Here you can check what quests your denied and accepted as well as available upgrades! Tap on end day to finish your choices. "},
 		{"target": func(): return _u(hall.get_node("%OverlayReport"), "ActionButton"), "on": "new_day",
-			"do": "Tap to start Day 2", "text": "Morning! Each letter shows how a party did. On to Day 2."},
+			"do": "Tap to start Day 2", "text": "Good Morning! This screen lets you see how the parties did. Tap on Open the Doors to move on."},
 	]
 
 
 func _day_two() -> Array:
 	return [
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
-			"do": "Tap Members", "text": "Day 2! Let's look closer at a hero. Open [b]Members[/b]."},
+			"do": "Tap Members", "text": "Day 2! Let's look closer at an adventurer. Open the [b]Members[/b] tab."},
 		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
 			"skip": func(): return hall.guild_section == "roster",
 			"do": "Tap Your Guild", "text": "Open [b]Your Guild[/b]."},
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"), "on": "character",
-			"do": "Tap a hero", "text": "Tap a hero to open their page."},
+			"do": "Tap a hero", "text": "Tap an adventurer to see their info."},
 		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close",
 			"do": "Tap Back",
-			"text": "Safe wins train a stat; risky wins grow %s, which boosts every stat. Gear slots fill from the Shop on Day 5. Head back." % PLK},
+			"text": "Here are your characters stats, Sucessful quests with high odds increase a stat. However risky successes grow %s which increases every stat. Tap back on the bottom of the screen to return." % PLK},
 		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
 			"do": "Tap Board", "text": "Open the [b]Board[/b]."},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
 			"do": "Tap a quest card",
-			"text": "Open a quest. [b]Deny[/b] skips one for a little standing. Heroes can [b]die[/b], so pick your odds with care. See you on Day 3!"},
+			"text": "Open a quest card. Tapping [b]Deny[/b] skips a quest at a cost for standing. Another thing, Adventurers can [b]die[/b], so pick your odds with care. See you on Day 3!"},
 	]
 
 
