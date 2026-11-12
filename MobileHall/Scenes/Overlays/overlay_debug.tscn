@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://udfjprofj6ola"]
+[gd_scene format=3 uid="uid://1d6rh25p6bsg"]
 
 [ext_resource type="Script" uid="uid://sytsocqqt6sam" path="res://MobileHall/Scripts/overlay_debug.gd" id="1_debug"]
 [ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_dim"]
