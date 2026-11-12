@@ -537,6 +537,8 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 		match(questNum):
 			0:
 				monster = QuestManager._returnQuestMonster(0)
+			1, 2:
+				monster = QuestManager._returnQuestMonster(2)
 
 	if combatChance >= successDetermination:
 		var succComDet = randi_range(1, 100)
@@ -805,6 +807,28 @@ func _initMilestoneVars(dayNum: int):
 			goldReward = 300 + (150 * difficulty)
 			favStat = FavoredStat.Defense
 			questTitle = str("A Bone Drake is ATTACKING ", location, "! Save the town before it is DESTROYED!")
+			styleOfQuest = 2
+		20:
+			difficulty = 3
+			maxAdventurers = 3
+			questNum = 1
+			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
+			regionNum = 2
+			location = QuestManager.world_regions[regionNum].returnName(type)
+			goldReward = 300 + (150 * difficulty)
+			favStat = FavoredStat.Power
+			questTitle = str("Defeat the RESURRECTED BONE DRAKE!")
+			styleOfQuest = 2
+		-20:
+			difficulty = 3
+			maxAdventurers = 3
+			questNum = 2
+			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
+			regionNum = 3
+			location = QuestManager.world_regions[regionNum].returnName(type)
+			goldReward = 300 + (150 * difficulty)
+			favStat = FavoredStat.Wisdom
+			questTitle = str("Pursue a NECROMANCER and defeat him!")
 			styleOfQuest = 2
 		_:
 			var storyNum = 0

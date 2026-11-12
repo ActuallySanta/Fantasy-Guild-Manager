@@ -21,8 +21,8 @@ var testQuestNumber = 0:
 	get:
 		return testQuestNumber
 
-var questMonsters = [MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 0),
- MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 1), MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 2)]
+var questMonsters = [MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 0), MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 1), 
+MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 2), MultiColumnLoader._load_info_from_file(monsters_2D_test_path, 1, 3)]
 	
 	
 #@onready var rich_text = $"../LogContents"

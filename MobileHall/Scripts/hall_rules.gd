@@ -120,7 +120,7 @@ static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Arra
 		match(GameState.day): #set the boolean
 			2, 4, 7, 9, 12, 15:
 				noRepeatQuests = true
-			18:
+			18, 20:
 				quest = CreatedQuest.new(rank, GameState.day)
 				entries.append(new_entry(quest, false))
 				quest = CreatedQuest.new(rank, -1 * GameState.day)
