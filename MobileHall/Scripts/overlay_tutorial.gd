@@ -26,9 +26,11 @@
 ##     and swallows taps; every button outside the spotlight is disabled
 ##   - a gold ring and a bouncing arrow on the one thing to tap
 ##   - Pip's bubble docks at the top or bottom, whichever is clear of the
-##     spotlight, and glides there when the spotlight moves. Tap Pip to swap
-##     sides. If neither side is clear, Pip shrinks to a small chip (tap to
-##     read the full line).
+##     spotlight, and glides there when the spotlight moves. (Tapping Pip to
+##     swap sides is off: PIP_CAN_MOVE.) If neither side is clear, Pip shrinks
+##     to a small chip (tap to read the full line).
+##   - "bare" steps hide the bubble: just the ring and the arrow, for steps
+##     that only say "tap this".
 ##
 ## HOW IT WORKS
 ##   hall_main emits tutorial_event(event, data) from its actions:
@@ -47,6 +49,8 @@
 ##     tap     true = the spotlit control stays usable on a Next step
 ##     deny    node names inside the spotlight to keep disabled anyway
 ##             (e.g. a row's Info button that would leave the step)
+##     bare    true = no bubble, just the ring and arrow. The text is still
+##             kept: it shows (with Next) if the target goes missing.
 ##   If a step's target can't be found for a moment, Next appears so the
 ##   player can never get stuck.
 ##
@@ -63,6 +67,13 @@ const TUTORIAL_DAYS := [1, 2, 3, 5]
 ## "freeplay" event, whatever day that is).
 const FREEPLAY_SCRIPT := -1
 const UNLOCK_DAY := {"upgrades": 3, "shop": 5}
+
+# ---- SIMPLIFIED (Info-Chunking): set these back to true to restore
+## Tapping Pip swaps the bubble between the top and bottom of the screen,
+## with a "Tap me to move" hint under Pip's face.
+const PIP_CAN_MOVE := false
+## The Back button in Pip's bubble (re-reads the previous step).
+const SHOW_BACK_BUTTON := false
 
 ## Draw order: above the hall's overlays (z 10: Day Report, End Day sheet,
 ## toast) and the raised art inside tabs (applicant letters, scroll rollers),
@@ -405,6 +416,9 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 	var waits: bool = step.has("on") and not _is_reviewing()
 	var is_lost: bool = step.get("target") != null and target == null and _missing_for > MISSING_GRACE
 	var show_next: bool = not waits or is_lost
+	# bare steps: no bubble, just the ring and the arrow. The bubble comes back
+	# (with Next) if the target goes missing, so the player can't get stuck.
+	_bubble.visible = not step.get("bare", false) or is_lost
 
 	# ---- the spotlight hole and the dim around it
 	var hole := Rect2()
@@ -445,9 +459,9 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 	_do_label.text = ("▶  " + do_text.to_upper()) if do_text != "" else ""
 	_do_label.visible = do_text != ""
 	_next_button.visible = show_next
-	_back_button.visible = not _history.is_empty()
+	_back_button.visible = SHOW_BACK_BUTTON and not _history.is_empty()
 	_next_button.text = "Got it" if _index == _steps.size() - 1 else "Next"
-	_hint.text = "Tap me to move"
+	# (the "Tap me to move" / "Tap me to read" hint is set in _set_compact)
 
 	# ---- where Pip goes: the dock (top / bottom) that's clear of the hole
 	var width := full.x - BUBBLE_MARGIN * 2
@@ -515,6 +529,8 @@ func _set_compact(is_compact: bool) -> void:
 	# the chip keeps only what gets you through the step
 	_skip_button.visible = not is_compact
 	_hint.text = "Tap me to read" if is_compact else "Tap me to move"
+	# with moving off, the hint only shows on the chip (tap it to read the line)
+	_hint.visible = is_compact or PIP_CAN_MOVE
 
 
 func _measure_bubble(width: float) -> float:
@@ -550,17 +566,20 @@ func _on_blocked_input(event: InputEvent) -> void:
 		_shake_until = _time + 0.35
 
 
-## Tap Pip: open the chip if it's shrunk, otherwise swap top / bottom.
+## Tap Pip: open the chip if it's shrunk, otherwise swap top / bottom
+## (only while PIP_CAN_MOVE is on; otherwise it just closes an opened chip).
 func _on_face_input(event: InputEvent) -> void:
 	if not _is_press(event):
 		return
 	var is_compact := not _text.visible
 	if is_compact and not _expanded:
 		_expanded = true
-	else:
+	elif PIP_CAN_MOVE:
 		_expanded = false
 		_dock_forced = true
 		_dock_bottom = not _dock_bottom
+	else:
+		_expanded = false
 
 
 func _is_press(event: InputEvent) -> bool:
@@ -667,24 +686,16 @@ func _build() -> void:
 	HallStyle.set_font_color(_do_label, HallStyle.BLUE_TEXT)
 	col.add_child(_do_label)
 
-	# Skip on the left, Back / Next on the right; at the biggest text sizes
-	# Back / Next drop to a line of their own instead of widening the bubble
+	# Back / Next on the left, Skip all the way on the right (kept apart, so a
+	# tap meant for Next never skips the whole tutorial). Back is hidden while
+	# SHOW_BACK_BUTTON is off. At the biggest text sizes Skip drops to a line
+	# of its own instead of widening the bubble.
+	# (Was: Skip on the left, Back / Next on the right; to restore, add
+	# _skip_button first and the spacer before _back_button.)
 	var foot := HFlowContainer.new()
 	foot.add_theme_constant_override("h_separation", 10)
 	foot.add_theme_constant_override("v_separation", 8)
 	col.add_child(foot)
-	_skip_button = Button.new()
-	_skip_button.text = "Skip tutorial"
-	_skip_button.flat = true
-	_skip_button.add_theme_font_override("font", load("uid://dvhjw1533s75"))  # MobileHall/Art/Fonts/font_italic.tres
-	HallFontScale.set_size(_skip_button, "font_size", INSTRUCTION_FONT_SIZE)
-	_skip_button.add_theme_color_override("font_color", HallStyle.TEXT_SOFT)
-	_skip_button.pressed.connect(skip_tutorial)
-	foot.add_child(_skip_button)
-	var foot_spacer := Control.new()
-	foot_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	foot_spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	foot.add_child(foot_spacer)
 	_back_button = Button.new()
 	_back_button.text = "Back"
 	_back_button.custom_minimum_size = Vector2(110, 64)
@@ -697,6 +708,18 @@ func _build() -> void:
 	HallStyle.style_button(_next_button, "gold", 28)
 	_next_button.pressed.connect(_advance)
 	foot.add_child(_next_button)
+	var foot_spacer := Control.new()
+	foot_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	foot_spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	foot.add_child(foot_spacer)
+	_skip_button = Button.new()
+	_skip_button.text = "Skip tutorial"
+	_skip_button.flat = true
+	_skip_button.add_theme_font_override("font", load("uid://dvhjw1533s75"))  # MobileHall/Art/Fonts/font_italic.tres
+	HallFontScale.set_size(_skip_button, "font_size", INSTRUCTION_FONT_SIZE)
+	_skip_button.add_theme_color_override("font_color", HallStyle.TEXT_SOFT)
+	_skip_button.pressed.connect(skip_tutorial)
+	foot.add_child(_skip_button)
 
 
 ## Pip's portrait: the round portrait mask (parchment ground; its shape clips
@@ -840,7 +863,7 @@ func _pick_text() -> String:
 ## Day 3's Tonight step: Training and Hospital in one line (their own steps
 ## can be skipped), plus a note when nothing could be built.
 func _tonight_text() -> String:
-	var text := "Now [b]Tonight[/b]. The [b]Training Yard[/b] drills a stat; the [b]Hospital[/b] heals faster. Heroes there [b]can't quest[/b]."
+	var text := "Now the [b]Tonight[/b] tab. The [b]Training Yard[/b] increases a stat and the [b]Hospital[/b] heals an adventurer faster."
 	if not _seen.get("upgrade", false):
 		text = "Nothing to build yet; the tab gets a badge when you can. " + text
 	return text
@@ -904,22 +927,25 @@ func _day_one() -> Array:
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
 			"do": "Tap Members", "text": "First step, your guild. Open the [b]Members[/b] tab at the bottom of your screen."},
 		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
-			"skip": func(): return hall.guild_section == "roster",
+			"skip": func(): return hall.guild_section == "roster", "bare": true,
 			"do": "Tap Your Guild", "text": "Open [b]Your Guild[/b]."},
-		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
-			"do": "Tap Board",
-			"text": "Look! Here is [b]%s[/b], a priest and your first member. More heroes will appear each day under the Applicants tab. Now find him work to do: open the [b]Board[/b] tab." \
+		# Uncle John's card gets its own spotlight step (it used to be dimmed
+		# behind the Board step's spotlight, so the player couldn't see him)
+		{"target": func(): return _row(_tab("guild"), "member_card.gd"),
+			"text": "Look! Here is [b]%s[/b], a priest and your first member. More heroes will appear each day under the Applicants tab." \
 					% HallRules.STARTING_HERO_NAME},
+		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
+			"do": "Tap Board", "text": "Now find him work to do: open the [b]Board[/b] tab."},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
 			"do": "Tap the quest card", "text": "Here's a first quest! Quests show its rank, how much %s you will earn, party size, and the favoured stat for the quest. Tap it to send an adventurer!" % GOLD},
 		{"target": func(): return _u(_screen("assign"), "PickList"), "on": "pick", "when": func(d): return _party_ready(d),
 			"do": "Tap an adventurer row to assign them on the quest", "deny": ["InfoButton"], "text": func(): return _pick_text()},
 		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "send",
-			"do": "Tap Seal & Send", "text": "Low chances on quests give a risk failure and injuries. Click Send & Seal on the bottom of screen to confirm your choice."},
+			"do": "Tap Seal & Send", "text": "Low chances on quests give a risk failure and injuries. Click Seal & send on the bottom of screen to confirm your choice."},
 		{"target": func(): return hall.action_button(), "on": "end_check",
 			"do": "Tap End Day", "text": "Quick tip! This bar always shows your next step if you are ever stuck. Tap [b]End Day[/b] to send your quests off!"},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
-			"do": "Tap End Day", "text": "Here you can check what quests your denied and accepted as well as available upgrades! Tap on end day to finish your choices. "},
+			"do": "Tap End Day", "text": "Here you can check what quests you denied and accepted as well as available upgrades! Tap on end day to finish your choices. "},
 		{"target": func(): return _u(hall.get_node("%OverlayReport"), "ActionButton"), "on": "new_day",
 			"do": "Tap to start Day 2", "text": "Good Morning! This screen lets you see how the parties did. Tap on Open the Doors to move on."},
 	]
@@ -930,16 +956,18 @@ func _day_two() -> Array:
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
 			"do": "Tap Members", "text": "Day 2! Let's look closer at an adventurer. Open the [b]Members[/b] tab."},
 		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
-			"skip": func(): return hall.guild_section == "roster",
+			"skip": func(): return hall.guild_section == "roster", "bare": true,
 			"do": "Tap Your Guild", "text": "Open [b]Your Guild[/b]."},
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"), "on": "character",
 			"do": "Tap a hero", "text": "Tap an adventurer to see their info."},
-		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close",
-			"do": "Tap Back",
-			"text": "Here are your characters stats, Sucessful quests with high odds increase a stat. However risky successes grow %s which increases every stat. Tap back on the bottom of the screen to return." % PLK},
-		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
+		# the stats talk spotlights the stats themselves, then Back is its own step
+		{"target": func(): return _u(_screen("character"), "StatLines"),
+			"text": "Here are your character's stats. Successful quests with high odds increase a stat. However risky successes grow %s which increases every stat." % PLK},
+		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close", "bare": true,
+			"do": "Tap Back", "text": "Tap back on the bottom of the screen to return."},
+		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board", "bare": true,
 			"do": "Tap Board", "text": "Open the [b]Board[/b]."},
-		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
+		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign", "bare": true,
 			"do": "Tap a quest card",
 			"text": "Open a quest card. Tapping [b]Deny[/b] skips a quest at a cost for standing. Another thing, Adventurers can [b]die[/b], so pick your odds with care. See you on Day 3!"},
 	]
@@ -950,22 +978,24 @@ func _day_three() -> Array:
 		{"target": func(): return _nav("upgrades"), "on": "tab", "when": func(d): return d.tab == "upgrades",
 			"do": "Tap Guild", "text": "Day 3! The [b]Guild[/b] tab is open. Take a look."},
 		{"target": func(): return _u(_tab("upgrades"), "SegBuild"), "on": "tab", "when": func(d): return d.upgrades == "build",
-			"skip": func(): return hall.upgrades_section == "build",
+			"skip": func(): return hall.upgrades_section == "build", "bare": true,
 			"do": "Tap Build", "text": "Open [b]Build[/b]."},
 		{"target": func(): return _row(_tab("upgrades"), "upgrade_card.gd", "UpgradeButton", func(b): return _is_enabled(b)), "on": "upgrade",
 			"skip": func(): return hall.affordable_buildings().is_empty(),
 			"do": "Tap Build", "text": "Buildings have five levels, paid in %s and standing. You can afford this one. Build it." % GOLD},
 		{"target": func(): return _u(_tab("upgrades"), "SegTonight"), "on": "tab", "when": func(d): return d.upgrades == "tonight",
 			"do": "Tap Tonight", "text": func(): return _tonight_text()},
-		{"target": func(): return _u(_training_section(), "AddButton"), "on": "training_picker",
+		{"target": func(): return _u(_training_section(), "AddButton"), "on": "training_picker", "bare": true,
 			"skip": func(): return not GuildUpgrades.has_free_training_slot() or not _anyone_can_train(),
 			"do": "Tap Add a hero", "text": "Pick a trainee."},
-		{"target": func(): return _row(_training_section(), "home_row.gd", "MainButton", func(b): return _is_enabled(b)), "on": "train",
+		{"target": func(): return _row(_training_section(), "home_row.gd", "MainButton", func(b): return _is_enabled(b)), "on": "train", "bare": true,
 			"skip": func(): return not hall.training_picker_open,
 			"do": "Tap Add next to a hero", "deny": ["SideButton"], "text": "Choose someone free today."},
-		{"target": func(): return _row(_training_section(), "home_row.gd", "StatPicker"), "tap": true,
+		# tapping a stat moves on by itself (hall.train emits "train" on every stat tap).
+		# Was: "tap": true and "do": "Tap a stat, then Next" (wait for Next instead)
+		{"target": func(): return _row(_training_section(), "home_row.gd", "StatPicker"), "on": "train",
 			"skip": func(): return not _seen.get("train", false),
-			"do": "Tap a stat, then Next", "text": "Pick the stat to drill."},
+			"do": "Tap a stat", "text": "Pick the stat to drill."},
 		{"target": func(): return _row(_hospital_section(), "home_row.gd", "MainButton", func(b): return b.text.contains("dmit")), "on": "admit",
 			"skip": func(): return hall.hurt_waiting_count() == 0,
 			"do": "Tap Admit", "text": "Someone's hurt. [b]Admit[/b] them."},
@@ -979,7 +1009,7 @@ func _day_five() -> Array:
 		{"target": func(): return _u(_tab("shop").shop_view(), "Grid"), "tap": true,
 			"skip": func(): return not _any_affordable(),
 			"do": "Tap items to compare, then Next", "text": "Items are role-locked. Tap one to see what it does and who can use it."},
-		{"target": func(): return _u(_tab("shop").shop_view(), "BuyButton"), "on": "buy",
+		{"target": func(): return _u(_tab("shop").shop_view(), "BuyButton"), "on": "buy", "bare": true,
 			"skip": func(): return not _any_affordable(),
 			"do": "Tap Buy", "text": "Buy it."},
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
@@ -991,7 +1021,7 @@ func _day_five() -> Array:
 			"do": "Tap Members", "text": "Gear goes on from a hero's page. Open [b]Members[/b]."},
 		{"target": func(): return _u(_tab("guild"), "SegRoster"), "on": "tab", "when": func(d): return d.guild == "roster",
 			"skip": func(): return not _seen.get("buy", false) or not _someone_fits_bought() or hall.guild_section == "roster",
-			"do": "Tap Your Guild", "text": "Open [b]Your Guild[/b]."},
+			"bare": true, "do": "Tap Your Guild", "text": "Open [b]Your Guild[/b]."},
 		{"target": func(): return _u(_tab("guild"), "List"), "tap": true, "on": "character", "when": func(d): return _fits_bought(d),
 			"reject": func(): return "Only %ss can use the %s." % [_bought_role(), _bought_name()],
 			"skip": func(): return not _seen.get("buy", false) or not _someone_fits_bought(),

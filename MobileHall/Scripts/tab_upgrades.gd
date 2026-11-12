@@ -7,6 +7,10 @@
 ##             you can afford
 ## Buildings that don't do anything yet are shown as rolled-up scrolls on one
 ## line instead of full plans.
+## SIMPLIFIED (Info-Chunking): two nodes are hidden in the scene (visible off;
+## tick them back on in the editor to restore): Build's treasury ledger
+## (WalletBox, the header already shows gold and standing) and Tonight's
+## "Heroes training or in a bed can't go on quests." note (TonightNote).
 ## Scene: MobileHall/Scenes/Tabs/tab_upgrades.tscn
 extends VBoxContainer
 

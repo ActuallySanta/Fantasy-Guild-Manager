@@ -5,6 +5,11 @@
 extends PanelContainer
 
 
+## SIMPLIFIED: true = stat chips show the bonuses split out ("Pow 5+3"),
+## false = just the total ("Pow 8"). The split stays on the hero's own page
+## (screen_character.gd).
+const SHOW_STAT_BONUS := false
+
 # ---- NODES
 @onready var _icon: TextureRect = $Row/Icon
 @onready var _label: Label = $Row/Text
@@ -39,12 +44,15 @@ func set_health(character: GuildCharacter) -> void:
 	set_chip(look.label, look.bg, look.text)
 
 
-## One stat as "Pow 6", or "Pow 5+3" when Armory, gear or Pluck add to it
-## (quests use the sum). The favored stat gets a pill in its colour.
+## One stat as its total, "Pow 8" (base plus what Armory, gear and Pluck add;
+## quests use the sum). The favored stat gets a pill in its colour.
 func set_stat(character: GuildCharacter, stat_index: int, is_favored: bool = false) -> void:
 	var stat: Dictionary = HallStyle.STATS[stat_index]
-	var bonus := HallStyle.stat_bonus(character, stat_index)
-	var text := "%s %d" % [stat.short, HallStyle.quest_stat_value(character, stat_index) - bonus]
-	if bonus > 0:
-		text += "+%d" % bonus
+	var total := HallStyle.quest_stat_value(character, stat_index)
+	var text := "%s %d" % [stat.short, total]
+	if SHOW_STAT_BONUS:
+		var bonus := HallStyle.stat_bonus(character, stat_index)
+		text = "%s %d" % [stat.short, total - bonus]
+		if bonus > 0:
+			text += "+%d" % bonus
 	set_chip(text, stat.bg, stat.color if is_favored else HallStyle.TEXT_MAIN, "", is_favored)

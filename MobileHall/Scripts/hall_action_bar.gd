@@ -18,6 +18,10 @@ const ACTION_END_HINT := "%s going out tonight"
 const ACTION_END_HINT_NONE := "No parties going out tonight"
 const ACTION_END_BUTTON := "End Day"
 
+## SIMPLIFIED: the "2 parties going out tonight" hint under "Ready to end Day N"
+## (the "No parties going out tonight" warning shows either way).
+const SHOW_END_HINT := false
+
 
 # ============================================================ STATE
 
@@ -60,6 +64,8 @@ func refresh() -> void:
 	else:
 		var parties_going := hall.sent_entries().size()
 		var hint := ACTION_END_HINT % HallStyle.count_text(parties_going, "party", "parties") if parties_going > 0 else ACTION_END_HINT_NONE
+		if not SHOW_END_HINT and parties_going > 0:
+			hint = ""
 		_set_action(ACTION_END % GameState.day, hint, ACTION_END_BUTTON)
 
 

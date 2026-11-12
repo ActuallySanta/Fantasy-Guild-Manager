@@ -11,12 +11,23 @@
 theme_override_constants/separation = 0
 script = ExtResource("1_shop")
 
-[node name="Keeper" type="Control" parent="." unique_id=98998815]
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=399225791]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Body" type="VBoxContainer" parent="Scroll" unique_id=1730459812]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Keeper" type="Control" parent="Scroll/Body" unique_id=98998815]
 custom_minimum_size = Vector2(0, 440)
 clip_contents = true
 layout_mode = 2
 
-[node name="Background" type="TextureRect" parent="Keeper" unique_id=582199705]
+[node name="Background" type="TextureRect" parent="Scroll/Body/Keeper" unique_id=582199705]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,7 +39,7 @@ texture = ExtResource("2_aamue")
 expand_mode = 3
 stretch_mode = 2
 
-[node name="ShopKeeper" type="TextureRect" parent="Keeper/Background" unique_id=1191365807]
+[node name="ShopKeeper" type="TextureRect" parent="Scroll/Body/Keeper/Background" unique_id=1191365807]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -40,7 +51,7 @@ texture = ExtResource("3_tmxhf")
 expand_mode = 5
 stretch_mode = 6
 
-[node name="Awning" type="TextureRect" parent="Keeper" unique_id=1985896173]
+[node name="Awning" type="TextureRect" parent="Scroll/Body/Keeper" unique_id=1985896173]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -51,7 +62,7 @@ texture = ExtResource("4_awning")
 expand_mode = 1
 stretch_mode = 1
 
-[node name="Bubble" type="PanelContainer" parent="Keeper" unique_id=919371301]
+[node name="Bubble" type="PanelContainer" parent="Scroll/Body/Keeper" unique_id=919371301]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 84.0
@@ -60,7 +71,7 @@ offset_bottom = 124.0
 mouse_filter = 2
 theme_type_variation = &"SpeechBubble"
 
-[node name="BubbleText" type="Label" parent="Keeper/Bubble" unique_id=232128136]
+[node name="BubbleText" type="Label" parent="Scroll/Body/Keeper/Bubble" unique_id=232128136]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"TitleLabel"
@@ -69,7 +80,7 @@ theme_override_font_sizes/font_size = 28
 text = "Fresh stock every dawn!"
 autowrap_mode = 3
 
-[node name="NameTag" type="PanelContainer" parent="Keeper" unique_id=91531452]
+[node name="NameTag" type="PanelContainer" parent="Scroll/Body/Keeper" unique_id=91531452]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -82,7 +93,7 @@ grow_horizontal = 0
 mouse_filter = 2
 theme_type_variation = &"ShopSign"
 
-[node name="ShopName" type="Label" parent="Keeper/NameTag" unique_id=1596603630]
+[node name="ShopName" type="Label" parent="Scroll/Body/Keeper/NameTag" unique_id=1596603630]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"HeadingLight"
@@ -90,13 +101,7 @@ theme_override_font_sizes/font_size = 36
 text = "Grizzle's Goods"
 horizontal_alignment = 1
 
-[node name="Scroll" type="ScrollContainer" parent="." unique_id=399225791]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
-horizontal_scroll_mode = 0
-
-[node name="Margin" type="MarginContainer" parent="Scroll" unique_id=1208816686]
+[node name="Margin" type="MarginContainer" parent="Scroll/Body" unique_id=1208816686]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 16
@@ -104,14 +109,14 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="Goods" type="VBoxContainer" parent="Scroll/Margin" unique_id=778540148]
+[node name="Goods" type="VBoxContainer" parent="Scroll/Body/Margin" unique_id=778540148]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="Head" type="HBoxContainer" parent="Scroll/Margin/Goods" unique_id=1692315643]
+[node name="Head" type="HBoxContainer" parent="Scroll/Body/Margin/Goods" unique_id=1692315643]
 layout_mode = 2
 
-[node name="GoodsTitle" type="Label" parent="Scroll/Margin/Goods/Head" unique_id=920596196]
+[node name="GoodsTitle" type="Label" parent="Scroll/Body/Margin/Goods/Head" unique_id=920596196]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -120,14 +125,14 @@ theme_override_font_sizes/font_size = 22
 text = "Today's goods"
 uppercase = true
 
-[node name="RestockNote" type="Label" parent="Scroll/Margin/Goods/Head" unique_id=319025]
+[node name="RestockNote" type="Label" parent="Scroll/Body/Margin/Goods/Head" unique_id=319025]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"ItalicLight"
 theme_override_font_sizes/font_size = 24
 text = "2 items in your pack"
 
-[node name="Grid" type="GridContainer" parent="Scroll/Margin/Goods" unique_id=27907534]
+[node name="Grid" type="GridContainer" parent="Scroll/Body/Margin/Goods" unique_id=27907534]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 14

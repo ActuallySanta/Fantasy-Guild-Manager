@@ -1,7 +1,9 @@
 ## Shop sub-tab of the Items tab (tab_items.gd): the "Counter" layout, picked
 ## by the team from the three Shop mockups.
 ##   Keeper   - the shopkeeper behind his counter, with a speech bubble and
-##              the shop's name tag (top ~40% of the tab)
+##              the shop's name tag. It sits at the top of the scroll, so it
+##              scrolls away with the goods (it used to stay pinned above them
+##              and left only a small window for the grid)
 ##   Goods    - a 3 x 2 grid of today's goods with prices; sold-out items grey out
 ##   Buy bar  - the picked item's name, what it does, and Buy (sits where the
 ##              action bar normally is; hall_main hides the action bar here)
@@ -17,6 +19,10 @@ extends VBoxContainer
 
 const ShopTileScene := preload("uid://b25qy8uoil5du")  # MobileHall/Scenes/Rows/shop_tile.tscn
 
+## SIMPLIFIED (Info-Chunking): the "2 items in your pack" note beside
+## Today's Goods (a reminder that unworn items are waiting to be equipped).
+const SHOW_PACK_NOTE := false
+
 # ---- TEXT
 const SHOP_NAME := "Grizzle's Goods"
 const KEEPER_LINE := "Fresh stock every dawn!"
@@ -26,7 +32,8 @@ const PACK_NOTE := "%s in your pack"
 const BUY_BUTTON := "Buy · %dg"
 const SOLD_BUTTON := "Sold"
 const NOTHING_PICKED := "Pick something"
-const SOLD_HINT := "Bought! Equip it from the Pack."
+## (was "Bought! Equip it from the Pack." before the Pack became Equipment)
+const SOLD_HINT := "Bought! Equip it from Equipment."
 const TOO_POOR_HINT := " · Not enough gold"
 
 # ---- NODES
@@ -93,7 +100,7 @@ func _show_goods() -> void:
 
 func _show_restock_note() -> void:
 	var unworn := ItemShop.unworn_count()
-	_restock_note.visible = unworn > 0
+	_restock_note.visible = SHOW_PACK_NOTE and unworn > 0
 	_restock_note.text = PACK_NOTE % HallStyle.count_text(unworn, "item", "items")
 
 

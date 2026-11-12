@@ -1,13 +1,15 @@
-## Pack sub-tab of the Items tab ("Pack grid", picked by the team from the
-## inventory mockups): every item the guild owns, and who wears what.
-##   Head     - title, the "Hide equipped items" box and a count line
+## Pack sub-tab of the Items tab, shown to players as "Equipment" ("Pack grid",
+## picked by the team from the inventory mockups): every item the guild owns,
+## and who wears what.
+##   Head     - title (the "Hide equipped" box and count line are hidden, see
+##              SHOW_HIDE_WORN_TOGGLE / SHOW_COUNT_LINE)
 ##   Filters  - All / Knight / Priest / Pathfinder / Mage
 ##   Grid     - one pack_tile per item, grouped by role; a worn one carries its
 ##              hero's portrait and an "ON GWEN" ribbon
 ##   Item bar - the picked item: what it does, who wears it, and Take off or
-##              Equip on… (sits where the action bar normally is; hall_main
+##              Equip (sits where the action bar normally is; hall_main
 ##              hides the action bar on this tab)
-## Equip on… opens the hero picker (overlay_equip_picker.gd); Take off, and
+## Equip opens the hero picker (overlay_equip_picker.gd); Take off, and
 ## swapping onto a hero whose slots are full, ask first (overlay_gear_confirm.gd).
 ## Both are children of this scene drawn over the whole screen. The picked
 ## item, the filters and which overlay is open are view state only, kept here;
@@ -31,19 +33,30 @@ const ROLE_ORDER := [
 const FILTER_HEIGHT := 60
 const FILTER_FONT_SIZE := 24
 
+# ---- SIMPLIFIED (Info-Chunking): set to true to restore
+## The "Hide equipped" toggle beside the title.
+const SHOW_HIDE_WORN_TOGGLE := false
+## The "5 items · 0 worn · 5 spare" line under the title.
+const SHOW_COUNT_LINE := false
+## "Not worn · ready to equip" in the item bar for an item nobody wears (the
+## Equip button already says it). "Worn by Gwen" still shows.
+const SHOW_SPARE_NOTE := false
+
 # ---- TEXT
-const TITLE := "The Guild Pack"
+# (renamed from the Pack: was "The Guild Pack", "The pack is empty...",
+# "No %s gear in the pack.", "In the pack · ready to equip", "Equip on…")
+const TITLE := "Equipment"
 const HIDE_WORN := "Hide equipped"
 const COUNT_LINE := "%s · %d worn · %d spare"
-const EMPTY_PACK := "The pack is empty. Buy gear in the Shop, or win it on quests."
+const EMPTY_PACK := "No equipment yet. Buy gear in the Shop, or win it on quests."
 const ALL_WORN := "Every item here is being worn. Untick \"Hide equipped\" to see them."
-const NONE_FOR_ROLE := "No %s gear in the pack."
+const NONE_FOR_ROLE := "No %s gear yet."
 const FILTER_ALL_TEXT := "All"
 const NOTHING_PICKED := "Pick an item"
 const WORN_BY := "Worn by %s"
-const SPARE_NOTE := "In the pack · ready to equip"
+const SPARE_NOTE := "Not worn · ready to equip"
 const BUTTON_TAKE_OFF := "Take off"
-const BUTTON_EQUIP := "Equip on…"
+const BUTTON_EQUIP := "Equip"
 
 # ---- NODES
 @onready var _scroll: ScrollContainer = %Scroll
@@ -78,6 +91,8 @@ func setup(main: HallMain) -> void:
 	_title.text = TITLE
 	_hide_worn_toggle.text = HIDE_WORN
 	_hide_worn_toggle.toggled.connect(_on_hide_worn_toggled)
+	_hide_worn_toggle.visible = SHOW_HIDE_WORN_TOGGLE
+	_count_line.visible = SHOW_COUNT_LINE
 	# the filter buttons are authored in the scene: All, then one per role in ROLE_ORDER
 	var filter_values := [FILTER_ALL] + ROLE_ORDER
 	for index in _filters.get_child_count():
@@ -182,6 +197,7 @@ func _show_item_bar() -> void:
 		HallStyle.set_font_color(_action_button, HallStyle.RED)
 	else:
 		_item_status.text = SPARE_NOTE
+		_item_status.visible = SHOW_SPARE_NOTE
 		HallStyle.set_font_color(_item_status, HallStyle.GREEN_TEXT)
 		_action_button.text = BUTTON_EQUIP
 		HallStyle.style_button(_action_button, "gold")

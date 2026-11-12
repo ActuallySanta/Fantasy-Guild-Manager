@@ -17,6 +17,14 @@ const GearRowScene := preload("uid://5qr0450k1huj")  # MobileHall/Scenes/Rows/ge
 const STAT_CHANGE_INK := Color("#2F7A3A")
 const STAT_CHANGE_POP := 1.06
 
+# ---- SIMPLIFIED (Info-Chunking): set to true to restore
+## "No injuries yet" beside the health chip ("2 injuries taken" still shows).
+const SHOW_NO_INJURIES := false
+## The note under the stats explaining how Pluck grows (TEXT_PLUCK_NOTE).
+const SHOW_PLUCK_NOTE := false
+## "Knight gear only" under each empty gear slot.
+const SHOW_SLOT_HINT := false
+
 # ---- TEXT
 const TEXT_ROLE := "the %s"
 const TEXT_INJURIES := "%s taken"
@@ -115,6 +123,7 @@ func setup(main: HallMain) -> void:
 	_release_cancel_button.text = BUTTON_CANCEL
 	_release_confirm_button.text = BUTTON_RELEASE_CONFIRM
 	_pluck_note.text = TEXT_PLUCK_NOTE
+	_pluck_note.visible = SHOW_PLUCK_NOTE
 	HallStyle.style_button(_back_button, "wood")
 	HallStyle.style_button(_hire_button, "gold")
 	HallStyle.style_button(_release_button, "wood")
@@ -138,6 +147,7 @@ func refresh() -> void:
 		_injuries.text = TEXT_INJURIES % HallStyle.count_text(character.injury_count, "injury", "injuries")
 	else:
 		_injuries.text = TEXT_NO_INJURIES
+	_injuries.visible = character.injury_count > 0 or SHOW_NO_INJURIES
 	_show_task(character, is_recruit)
 	_show_stats(character)
 	_show_gear(character, is_recruit)
@@ -266,7 +276,8 @@ func _show_gear(character: GuildCharacter, is_recruit: bool) -> void:
 		if not is_dead and slot == 0:
 			button_text = BUTTON_CANCEL if _is_picking_gear else BUTTON_EQUIP
 		var empty_row: Control = HallStyle.add_row(_gear_lines, GearRowScene)
-		empty_row.setup_empty(TEXT_EMPTY_SLOT, TEXT_EMPTY_HINT % role_name, button_text,
+		var slot_hint := TEXT_EMPTY_HINT % role_name if SHOW_SLOT_HINT else ""
+		empty_row.setup_empty(TEXT_EMPTY_SLOT, slot_hint, button_text,
 				"paper" if _is_picking_gear else "blue", _toggle_gear_picker)
 		# just taken off: the freed slot fades back in
 		if slot == 0 and hall.pending_fx.get("gear_out", false):

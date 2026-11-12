@@ -16,6 +16,13 @@ const TEXT_UPGRADE_TITLE := "Upgrade first? · %d gold"
 const BUTTON_BACK := "Not yet"
 const BUTTON_END := "End Day"
 
+## SIMPLIFIED: the "2 parties going out tonight" line under the title
+## (the "Nobody is going out tonight" warning shows either way).
+const SHOW_SUBTITLE := false
+## SIMPLIFIED: "· 600 gold" after "Upgrade first?" (the header shows the gold).
+const SHOW_UPGRADE_GOLD := false
+const TEXT_UPGRADE_TITLE_PLAIN := "Upgrade first?"
+
 # ---- NODES
 @onready var _dim: Control = %Dim
 @onready var _title: Label = %Title
@@ -63,6 +70,8 @@ func _show_tonights_plan() -> void:
 		_subtitle.text = TEXT_SUBTITLE_NONE
 	else:
 		_subtitle.text = TEXT_SUBTITLE % HallStyle.count_text(sent.size(), "party", "parties")
+	# "Nobody is going out tonight" still shows: it warns about a wasted day
+	_subtitle.visible = SHOW_SUBTITLE or sent.is_empty()
 	HallStyle.clear_children(_plan_list)
 	for entry in sent:
 		HallStyle.add_row(_plan_list, PlanRowScene).setup(hall, entry)
@@ -79,7 +88,7 @@ func _show_tonights_plan() -> void:
 func _show_upgrade_suggestions() -> void:
 	var affordable: Array = hall.affordable_buildings()
 	_upgrade_box.visible = not affordable.is_empty()
-	_upgrade_title.text = TEXT_UPGRADE_TITLE % GameState.gold
+	_upgrade_title.text = TEXT_UPGRADE_TITLE % GameState.gold if SHOW_UPGRADE_GOLD else TEXT_UPGRADE_TITLE_PLAIN
 	HallStyle.clear_children(_suggest_list)
 	for building in affordable:
 		HallStyle.add_row(_suggest_list, SuggestRowScene).setup(hall, building)

@@ -8,6 +8,8 @@ extends TapPanel
 
 ## Adventurers who can't go fade back.
 const CANT_GO_OPACITY := 0.6
+## SIMPLIFIED: the "to odds" caption under the "+12%" each adventurer adds.
+const SHOW_ADDS_CAPTION := false
 
 # ---- TEXT
 # Who they are
@@ -98,4 +100,5 @@ func _show_pick_state(hall: HallMain, entry: Dictionary, character: GuildCharact
 		var chance_added := hall.chance_added_by(entry, character)
 		_adds_value.text = TEXT_ADDS % mini(chance_added, 100)
 		_adds_sub.text = TEXT_ADDS_SUB
+		_adds_sub.visible = SHOW_ADDS_CAPTION
 		HallStyle.set_font_color(_adds_value, HallStyle.odds_look(chance_added).text_color)

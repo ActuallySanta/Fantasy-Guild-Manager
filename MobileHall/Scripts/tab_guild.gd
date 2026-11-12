@@ -25,12 +25,20 @@ const FOLDER_TAB_HEIGHT_OPEN := 80
 ## Beds line ink when every bed is taken (light red, readable on the folder).
 const BEDS_FULL_COLOR := Color("#F2B8A8")
 
+# ---- SIMPLIFIED (Info-Chunking): set to true to restore
+## The "· 3/4" member count on the Your Guild folder tab.
+const SHOW_ROSTER_COUNT := false
+## "· Barracks Lv 1" on the beds line, and the Barracks button beside it.
+const SHOW_BARRACKS_LINK := false
+
 # ---- TEXT
 # Folder tabs
 const SECTION_ROSTER := "Your Guild · %d/%d"
+const SECTION_ROSTER_PLAIN := "Your Guild"
 const SECTION_HIRE := "Applicants"
 # Beds line
 const BEDS := "Beds %d of %d · Barracks Lv %d"
+const BEDS_PLAIN := "Beds %d of %d"
 const BEDS_FULL := "All %d beds full"
 const BEDS_BUTTON := "Barracks"
 # Lists
@@ -68,6 +76,7 @@ func setup(main: HallMain) -> void:
 	_hire_section_button.pressed.connect(func(): hall.show_guild_section(HallMain.GUILD_SECTION_HIRE))
 	_barracks_button.pressed.connect(func(): hall.open_tab("upgrades", HallMain.UPGRADES_SECTION_BUILD))
 	_barracks_button.text = BEDS_BUTTON
+	_barracks_button.visible = SHOW_BARRACKS_LINK
 
 
 func scroll_to_top() -> void:
@@ -95,7 +104,10 @@ func _is_hire_section() -> bool:
 ## Applicants gets a count badge while closed.
 func _show_section_buttons() -> void:
 	var on_hire := _is_hire_section()
-	_roster_section_button.text = SECTION_ROSTER % [CharacterContainer.living_count(), CharacterContainer.max_characters]
+	if SHOW_ROSTER_COUNT:
+		_roster_section_button.text = SECTION_ROSTER % [CharacterContainer.living_count(), CharacterContainer.max_characters]
+	else:
+		_roster_section_button.text = SECTION_ROSTER_PLAIN
 	_hire_section_button.text = SECTION_HIRE
 	_roster_section_button.theme_type_variation = &"FolderTab" if on_hire else &"FolderTabActive"
 	_hire_section_button.theme_type_variation = &"FolderTabActive" if on_hire else &"FolderTab"
@@ -107,16 +119,19 @@ func _show_section_buttons() -> void:
 	_hire_badge_text.text = str(recruit_count)
 
 
-## "Beds 3 of 5 · Barracks Lv 1", or a red warning when they're all taken.
+## "Beds 3 of 5" (plus "· Barracks Lv 1" with SHOW_BARRACKS_LINK), or a red
+## warning when they're all taken.
 func _show_beds() -> void:
 	var beds_used: int = CharacterContainer.living_count()
 	var bed_count := CharacterContainer.max_characters
 	var is_full := beds_used >= bed_count
 	if is_full:
 		_beds_label.text = BEDS_FULL % bed_count
-	else:
+	elif SHOW_BARRACKS_LINK:
 		var barracks_level := GuildUpgrades.get_level(GuildUpgrades.Building.BARRACKS)
 		_beds_label.text = BEDS % [beds_used, bed_count, barracks_level]
+	else:
+		_beds_label.text = BEDS_PLAIN % [beds_used, bed_count]
 	HallStyle.set_font_color(_beds_label, BEDS_FULL_COLOR if is_full else HallStyle.CREAM)
 
 

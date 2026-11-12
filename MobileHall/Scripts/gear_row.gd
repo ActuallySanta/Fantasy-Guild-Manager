@@ -35,11 +35,12 @@ func setup(look: Dictionary, button_text: String, button_kind: String, on_press:
 	_set_button(button_text, button_kind, on_press)
 
 
-## An empty gear slot.
+## An empty gear slot. hint "" hides the line under the label.
 func setup_empty(label: String, hint: String, button_text: String, button_kind: String, on_press: Callable) -> void:
 	HallStyle.style_tag(_tag, _tag_text, EMPTY_TAG, HallStyle.BORDER)
 	_name.text = label
 	_effect.text = hint
+	_effect.visible = hint != ""
 	HallStyle.set_font_color(_name, HallStyle.TEXT_SOFT)
 	HallStyle.style_panel(self, HallStyle.EMPTY_SEAT_BG, HallStyle.BORDER, 3)
 	_set_button(button_text, button_kind, on_press)

@@ -4,6 +4,11 @@
 extends TapPanel
 
 
+## SIMPLIFIED: the "Sent on #2" / "Picked for #2" chip for heroes in a quest's party.
+const SHOW_QUEST_TASK := false
+## SIMPLIFIED: the "Free today" chip (no chip already means free).
+const SHOW_FREE_TASK := false
+
 # ---- TEXT
 const TEXT_ROLE := "the %s"
 const TEXT_FREE := "Free today"
@@ -49,7 +54,10 @@ func _show_task(hall: HallMain, character: GuildCharacter) -> void:
 		_task_chip.set_chip(TEXT_TRAINING % stat.short, stat.bg, stat.color, "", true)
 	elif quest_index < 0:
 		_task_chip.set_chip(TEXT_FREE, HallStyle.NEUTRAL_BG, HallStyle.TEXT_SOFT)
+		_task_chip.visible = SHOW_FREE_TASK
 	elif hall.quest_entries[quest_index].state == HallStyle.QUEST_STATE_SENT:
 		_task_chip.set_chip(TEXT_SENT_ON % (quest_index + 1), HallStyle.GREEN_BG, HallStyle.GREEN_TEXT, "check")
+		_task_chip.visible = SHOW_QUEST_TASK
 	else:
 		_task_chip.set_chip(TEXT_PICKED_FOR % (quest_index + 1), HallStyle.BLUE_BG, HallStyle.BLUE_TEXT, "nav_quests")
+		_task_chip.visible = SHOW_QUEST_TASK

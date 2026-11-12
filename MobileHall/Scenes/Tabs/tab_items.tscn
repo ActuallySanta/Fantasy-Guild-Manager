@@ -27,7 +27,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 8
 focus_mode = 0
 theme_type_variation = &"FolderTabActive"
-text = "Pack · 9"
+text = "Equipment"
 
 [node name="SegShop" type="Button" parent="SegMargin/Seg"]
 unique_name_in_owner = true
@@ -37,7 +37,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 8
 focus_mode = 0
 theme_type_variation = &"FolderTab"
-text = "Shop · 4 left"
+text = "Shop"
 
 [node name="TabPack" parent="." instance=ExtResource("2_pack")]
 unique_name_in_owner = true

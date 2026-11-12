@@ -28,6 +28,12 @@ const SIGN_NAIL_Y := 9.0
 ## Chip text size on the totals strip.
 const TOTALS_FONT_SIZE := 28
 
+# ---- SIMPLIFIED (Info-Chunking): set to true to restore
+## "2 letters tonight" under the report's title.
+const SHOW_LETTERS_NOTE := false
+## "At home: Uncle John Sore → Healthy" (who trained or healed at home).
+const SHOW_HOME_NOTE := false
+
 # ---- TEXT
 const TEXT_TITLE := "Day %d Report"
 const TEXT_LETTERS := "%s tonight"
@@ -100,6 +106,7 @@ func refresh() -> void:
 	var results: Array = report.results
 	_title.text = TEXT_TITLE % report.day
 	_letters_note.text = TEXT_LETTERS % HallStyle.count_text(results.size(), "letter", "letters") if not results.is_empty() else TEXT_NO_LETTERS
+	_letters_note.visible = SHOW_LETTERS_NOTE
 	_show_totals(results)
 	_show_home(report.get("home", {}))
 	_show_released(report.get("released", []))
@@ -183,7 +190,7 @@ func _show_home(home: Dictionary) -> void:
 		var to_label: String = HallStyle.INJURY_LOOKS[healed.to].label
 		parts.append(TEXT_HEALED % [healed.character.name, from_label, to_label])
 	_home_note.text = TEXT_HOME % " · ".join(parts)
-	_home_note.visible = not parts.is_empty()
+	_home_note.visible = SHOW_HOME_NOTE and not parts.is_empty()
 
 
 ## One line for heroes released today (see HallMain.released_today), with the
