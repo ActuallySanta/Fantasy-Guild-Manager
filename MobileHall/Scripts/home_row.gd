@@ -1,4 +1,4 @@
-## One hero in a Training Yard or Hospital card (Upgrades > Tonight, see
+## One hero in a Training Yard or Hospital card (Upgrades > Facilities, see
 ## home_section.gd). The card picks one of the show_* functions; each fills
 ## the same row differently:
 ##   training slot  - stat picker (Str / Def / Wis / Slz) and Remove

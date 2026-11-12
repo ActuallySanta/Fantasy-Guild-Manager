@@ -32,16 +32,16 @@ const FILTER_HEIGHT := 60
 const FILTER_FONT_SIZE := 24
 
 # ---- TEXT
-const TITLE := "The Guild Pack"
+const TITLE := "The Guild Inventory"
 const HIDE_WORN := "Hide equipped"
 const COUNT_LINE := "%s · %d worn · %d spare"
-const EMPTY_PACK := "The pack is empty. Buy gear in the Shop, or win it on quests."
+const EMPTY_PACK := "The inventory is empty. Buy gear in the Shop, or win it on quests."
 const ALL_WORN := "Every item here is being worn. Untick \"Hide equipped\" to see them."
-const NONE_FOR_ROLE := "No %s gear in the pack."
+const NONE_FOR_ROLE := "No %s gear in the inventory."
 const FILTER_ALL_TEXT := "All"
 const NOTHING_PICKED := "Pick an item"
 const WORN_BY := "Worn by %s"
-const SPARE_NOTE := "In the pack · ready to equip"
+const SPARE_NOTE := "In the inventory · ready to equip"
 const BUTTON_TAKE_OFF := "Take off"
 const BUTTON_EQUIP := "Equip on…"
 

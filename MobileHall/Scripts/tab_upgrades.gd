@@ -1,5 +1,5 @@
 ## Upgrades tab (the "Guild" nav button): a folder with two tabs.
-##   Tonight - the Training Yard (who drills which stat) and the Hospital
+##   Facilities - the Training Yard (who drills which stat) and the Hospital
 ##             (who's in a bed), each a building plan; the badge counts hurt
 ##             heroes not in a bed
 ##   Build   - the treasury ledger, then a building plan for every working
@@ -18,7 +18,7 @@ const FOLDER_TAB_HEIGHT := 72
 const FOLDER_TAB_HEIGHT_OPEN := 80
 
 # ---- TEXT
-const SECTION_TONIGHT := "Tonight"
+const SECTION_TONIGHT := "Facilities"
 const SECTION_BUILD := "Build"
 const WALLET := "%d gold"
 const STANDING := "· Standing %d"

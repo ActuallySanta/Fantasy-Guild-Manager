@@ -27,7 +27,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 8
 focus_mode = 0
 theme_type_variation = &"FolderTabActive"
-text = "Tonight"
+text = "Facilities"
 
 [node name="TonightBadge" type="PanelContainer" parent="SegMargin/Seg/SegTonight"]
 unique_name_in_owner = true
