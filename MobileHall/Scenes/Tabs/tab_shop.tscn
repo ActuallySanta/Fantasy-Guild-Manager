@@ -6,17 +6,32 @@
 [ext_resource type="Texture2D" uid="uid://2pkjqgiqxtys" path="res://Sprites/Shop/shopkeeper.png" id="3_tmxhf"]
 [ext_resource type="Texture2D" uid="uid://4x4uklt6lg6v" path="res://MobileHall/Art/Textures/awning.png" id="4_awning"]
 [ext_resource type="Texture2D" uid="uid://baflbvuj3ew0p" path="res://MobileHall/Art/Icons/coins.tres" id="5_coins"]
+[ext_resource type="Texture2D" uid="uid://6sc4epkipif0" path="res://MobileHall/Art/Textures/wood.png" id="6_wood"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_sheet"]
 
 [node name="TabShop" type="VBoxContainer" unique_id=146077538]
 theme_override_constants/separation = 0
 script = ExtResource("1_shop")
 
-[node name="Keeper" type="Control" parent="." unique_id=98998815]
-custom_minimum_size = Vector2(0, 440)
+[node name="Body" type="Control" parent="." unique_id=640213377]
+unique_name_in_owner = true
 clip_contents = true
 layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
 
-[node name="Background" type="TextureRect" parent="Keeper" unique_id=582199705]
+[node name="Keeper" type="Control" parent="Body" unique_id=98998815]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 440.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="Background" type="TextureRect" parent="Body/Keeper" unique_id=582199705]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -28,7 +43,7 @@ texture = ExtResource("2_aamue")
 expand_mode = 3
 stretch_mode = 2
 
-[node name="ShopKeeper" type="TextureRect" parent="Keeper/Background" unique_id=1191365807]
+[node name="ShopKeeper" type="TextureRect" parent="Body/Keeper/Background" unique_id=1191365807]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -40,7 +55,7 @@ texture = ExtResource("3_tmxhf")
 expand_mode = 5
 stretch_mode = 6
 
-[node name="Awning" type="TextureRect" parent="Keeper" unique_id=1985896173]
+[node name="Awning" type="TextureRect" parent="Body/Keeper" unique_id=1985896173]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -51,7 +66,7 @@ texture = ExtResource("4_awning")
 expand_mode = 1
 stretch_mode = 1
 
-[node name="Bubble" type="PanelContainer" parent="Keeper" unique_id=919371301]
+[node name="Bubble" type="PanelContainer" parent="Body/Keeper" unique_id=919371301]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 84.0
@@ -60,7 +75,7 @@ offset_bottom = 124.0
 mouse_filter = 2
 theme_type_variation = &"SpeechBubble"
 
-[node name="BubbleText" type="Label" parent="Keeper/Bubble" unique_id=232128136]
+[node name="BubbleText" type="Label" parent="Body/Keeper/Bubble" unique_id=232128136]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"TitleLabel"
@@ -69,7 +84,7 @@ theme_override_font_sizes/font_size = 28
 text = "Fresh stock every dawn!"
 autowrap_mode = 3
 
-[node name="NameTag" type="PanelContainer" parent="Keeper" unique_id=91531452]
+[node name="NameTag" type="PanelContainer" parent="Body/Keeper" unique_id=91531452]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -82,7 +97,7 @@ grow_horizontal = 0
 mouse_filter = 2
 theme_type_variation = &"ShopSign"
 
-[node name="ShopName" type="Label" parent="Keeper/NameTag" unique_id=1596603630]
+[node name="ShopName" type="Label" parent="Body/Keeper/NameTag" unique_id=1596603630]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"HeadingLight"
@@ -90,13 +105,40 @@ theme_override_font_sizes/font_size = 36
 text = "Grizzle's Goods"
 horizontal_alignment = 1
 
-[node name="Scroll" type="ScrollContainer" parent="." unique_id=399225791]
+[node name="Scroll" type="ScrollContainer" parent="Body" unique_id=399225791]
 unique_name_in_owner = true
-layout_mode = 2
-size_flags_vertical = 3
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 horizontal_scroll_mode = 0
 
-[node name="Margin" type="MarginContainer" parent="Scroll" unique_id=1208816686]
+[node name="Content" type="VBoxContainer" parent="Body/Scroll" unique_id=1733904521]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="KeeperGap" type="Control" parent="Body/Scroll/Content" unique_id=1520336914]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 440)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="GoodsSheet" type="PanelContainer" parent="Body/Scroll/Content" unique_id=287719460]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_sheet")
+
+[node name="SheetBg" type="TextureRect" parent="Body/Scroll/Content/GoodsSheet" unique_id=1950642283]
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("6_wood")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Margin" type="MarginContainer" parent="Body/Scroll/Content/GoodsSheet" unique_id=1208816686]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 16
@@ -104,14 +146,14 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 16
 
-[node name="Goods" type="VBoxContainer" parent="Scroll/Margin" unique_id=778540148]
+[node name="Goods" type="VBoxContainer" parent="Body/Scroll/Content/GoodsSheet/Margin" unique_id=778540148]
 layout_mode = 2
 theme_override_constants/separation = 14
 
-[node name="Head" type="HBoxContainer" parent="Scroll/Margin/Goods" unique_id=1692315643]
+[node name="Head" type="HBoxContainer" parent="Body/Scroll/Content/GoodsSheet/Margin/Goods" unique_id=1692315643]
 layout_mode = 2
 
-[node name="GoodsTitle" type="Label" parent="Scroll/Margin/Goods/Head" unique_id=920596196]
+[node name="GoodsTitle" type="Label" parent="Body/Scroll/Content/GoodsSheet/Margin/Goods/Head" unique_id=920596196]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -120,14 +162,14 @@ theme_override_font_sizes/font_size = 22
 text = "Today's goods"
 uppercase = true
 
-[node name="RestockNote" type="Label" parent="Scroll/Margin/Goods/Head" unique_id=319025]
+[node name="RestockNote" type="Label" parent="Body/Scroll/Content/GoodsSheet/Margin/Goods/Head" unique_id=319025]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"ItalicLight"
 theme_override_font_sizes/font_size = 24
 text = "2 items in your pack"
 
-[node name="Grid" type="GridContainer" parent="Scroll/Margin/Goods" unique_id=27907534]
+[node name="Grid" type="GridContainer" parent="Body/Scroll/Content/GoodsSheet/Margin/Goods" unique_id=27907534]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/h_separation = 14
