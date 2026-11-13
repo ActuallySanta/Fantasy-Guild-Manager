@@ -11,6 +11,10 @@ extends RefCounted
 ## Written by the deploy workflow. Text data in External Content has no UID,
 ## so it stays on a res:// path (CLAUDE.md); the export presets ship it.
 const BUILD_INFO_PATH := "res://External Content/build_info.txt"
+## The same stamp on the live site, next to index.html (the deploy workflow's
+## "Publish the build stamp" step). HallWebUpdate fetches it to see whether a
+## newer deploy is out. Relative to the page's URL.
+const LATEST_WEB_FILE := "build_info.txt"
 
 # ---- TEXT
 ## Shown in front of the stamp.
@@ -29,7 +33,12 @@ static func label() -> String:
 static func stamp() -> String:
 	if not FileAccess.file_exists(BUILD_INFO_PATH):
 		return DEV_BUILD
-	var text := FileAccess.get_file_as_string(BUILD_INFO_PATH).strip_edges()
-	if text == "":
-		return DEV_BUILD
-	return text.get_slice("\n", 0).strip_edges()
+	var text := parse_stamp(FileAccess.get_file_as_string(BUILD_INFO_PATH))
+	return DEV_BUILD if text == "" else text
+
+
+## The stamp in a build_info.txt's text: its first line, trimmed ("" if empty).
+## Used for both the bundled stamp and the one fetched from the site, so the
+## two compare the same way.
+static func parse_stamp(text: String) -> String:
+	return text.strip_edges().get_slice("\n", 0).strip_edges()
