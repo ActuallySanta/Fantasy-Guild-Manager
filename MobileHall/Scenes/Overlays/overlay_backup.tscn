@@ -1,0 +1,95 @@
+[gd_scene format=3 uid="uid://bkp7backup2x"]
+
+[ext_resource type="Script" uid="uid://sjib2i6y8uih" path="res://MobileHall/Scripts/overlay_backup.gd" id="1_backup"]
+[ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_dim"]
+
+[node name="OverlayBackup" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_backup")
+
+[node name="Dim" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = ExtResource("2_dim")
+
+[node name="Center" type="CenterContainer" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Sheet" type="PanelContainer" parent="Center"]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="Center/Sheet"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Center/Sheet/Col"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 46
+text = "Backup save"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Note" type="Label" parent="Center/Sheet/Col"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
+text = "Browsers can clear saved games. Keep a copy of your guild in Files, Drive or your notes, and load it back any time."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SaveFileButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "SaveFileButton"
+autowrap_mode = 3
+
+[node name="CopyCodeButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "CopyCodeButton"
+autowrap_mode = 3
+
+[node name="LoadFileButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "LoadFileButton"
+autowrap_mode = 3
+
+[node name="PasteCodeButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "PasteCodeButton"
+autowrap_mode = 3
+
+[node name="BackButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "BackButton"
