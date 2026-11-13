@@ -24,6 +24,7 @@ GameState="*uid://bgm1h6mn7oiy0"
 QuestManager="*uid://blul1044ocxp2"
 ItemContainer="*uid://bqkjfqmo47xb6"
 ItemShop="*uid://coiyel5mrnesv"
+Sfx="*uid://gdrknn2u55lt"
 
 [display]
 

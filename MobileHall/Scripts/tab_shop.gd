@@ -124,10 +124,15 @@ func _show_buy_bar() -> void:
 	HallStyle.style_button(_buy_button, "gold")
 
 
+## A tile was tapped: pick it. The redraw is queued, not run here.
+## Why: this runs inside the tapped tile's own release event, and refresh()
+## frees that tile. Godot stops passing an event up once its control has left
+## the tree, so the Scroll never got the release, stayed stuck "dragging",
+## and every mouse move after that scrolled the page.
 func _pick(index: int) -> void:
 	_selected = index
 	_just_picked = true
-	refresh()
+	hall.queue_refresh()
 
 
 func _on_buy_pressed() -> void:

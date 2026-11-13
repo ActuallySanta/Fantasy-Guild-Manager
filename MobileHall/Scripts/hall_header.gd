@@ -130,9 +130,12 @@ func refresh() -> void:
 ## is one death from falling (and not once the Game Over ledger is up).
 func _refresh_danger_strip() -> void:
 	var hero := hall.last_living_hero()
+	var was_shown := _danger_strip.visible
 	_danger_strip.visible = hall.run_over_stats.is_empty() and hero != null and hall.is_one_death_from_falling()
 	if not _danger_strip.visible:
 		return
+	if not was_shown:
+		Sfx.play(&"danger_warning")
 	HallStyle.style_panel(_danger_strip, HallStyle.RED_BG)
 	_danger_icon.modulate = HallStyle.RED
 	_danger_title.text = DANGER_TITLE
@@ -177,7 +180,11 @@ func land_earnings() -> void:
 	var start := hall.fx_layer.get_global_rect().get_center()
 	for kind in ["gold", "standing"]:
 		var gained: int = _counter_value(kind) - int(_shown_counters[kind])
+		var land_sound := &"coin_land" if kind == "gold" else &"standing_land"
 		if gained <= 0 or HallFx.reduce_motion or _shown_counters[kind] < 0:
+			# no coins fly with Reduced Motion, but the gain still clinks once
+			if gained > 0 and _shown_counters[kind] >= 0:
+				Sfx.play(land_sound)
 			_release_counter(kind)
 			continue
 		var target := _counter_art(kind).get_global_rect().get_center()
@@ -186,6 +193,8 @@ func land_earnings() -> void:
 			var is_last := coin_index == coin_count - 1
 			var delay := EARNINGS_DELAY + coin_index * EARNINGS_COIN_GAP
 			var land := _release_counter.bind(kind) if is_last else Callable()
+			# each coin / shield clinks as it lands on the counter
+			Sfx.play_after(land_sound, delay + FLY_SECONDS)
 			HallFx.fly(hall.fx_layer, _counter_art(kind).texture, start, target, FLY_ICON_SIZE, delay, FLY_SECONDS, land)
 
 
@@ -193,6 +202,7 @@ func land_earnings() -> void:
 ## flies from the counter to the spot they tapped (the counter drops now).
 ## kind: "gold" or "standing".
 func pay_fx(kind: String) -> void:
+	Sfx.play(&"gold_spend" if kind == "gold" else &"standing_lose")
 	var art := _counter_art(kind)
 	HallFx.fly(hall.fx_layer, art.texture, art.get_global_rect().get_center(), hall.tap_point(), FLY_ICON_SIZE, 0.0, FLY_SECONDS)
 

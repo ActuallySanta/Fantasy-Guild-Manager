@@ -119,12 +119,15 @@ var is_folded := false
 var _story_ribbon: Control
 ## The "Tap to read / fold" hint under an everyday letter's title, or null.
 var _fold_hint: Label
+## Whether this letter's quest succeeded (picks its reveal sound).
+var _is_success := false
 
 
 ## result = one quest result from hall_main._run_quest.
 ## start_folded = whether an everyday letter starts folded (story letters never fold).
 func setup(result: Dictionary, start_folded: bool = true) -> void:
 	var succeeded: bool = result.succeeded
+	_is_success = succeeded
 	is_story = HallStyle.is_story_quest(result)
 	_stamp_room.custom_minimum_size = HallFontScale.px_vec(STAMP_ROOM_SIZE)
 	var type_info := HallStyle.quest_type_info(result)
@@ -217,14 +220,19 @@ func reveal(delay: float) -> float:
 	HallFx.fade_in(self, at, REVEAL_LETTER_SECONDS)
 	at += REVEAL_STAMP_DELAY
 	HallFx.stamp_in(_result_stamp, 2.4, at)
+	# the sounds land with their stamps (Sfx.cancel_scheduled drops any still
+	# waiting when the player skips ahead)
+	Sfx.play_after(&"letter_success" if _is_success else &"letter_fail", at)
 	at += REVEAL_LETTER_SECONDS
 	if _story_ribbon:
 		HallFx.stamp_in(_story_ribbon, 1.8, at)
 		at += REVEAL_TAG_GAP
 
+	var tag_sounds := {_injured_tag: &"hero_hurt", _died_tag: &"hero_died", _found_tag: &"item_found"}
 	for tag in [_injured_tag, _died_tag, _found_tag]:
 		if tag.visible:
 			HallFx.stamp_in(tag, 1.6, at)
+			Sfx.play_after(tag_sounds[tag], at)
 			at += REVEAL_TAG_GAP
 	if _died_tag.visible:
 		HallFx.shake(self, REVEAL_DEATH_SHAKE, at)

@@ -324,7 +324,7 @@ func _on_event(event: String, data: Variant = null) -> void:
 	var when = step.get("when")
 	if when is Callable and not when.call(data):
 		if step.has("reject"):
-			hall.show_toast(step["reject"].call() if step["reject"] is Callable else step["reject"])
+			hall.show_error_toast(step["reject"].call() if step["reject"] is Callable else step["reject"])
 			hall.close_screen.call_deferred()
 		return
 	_advance()
@@ -446,6 +446,9 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 	# ---- bubble text
 	var text: String = step["text"].call() if step["text"] is Callable else step["text"]
 	if text != _shown_text:
+		# a new step (not just its text updating): Pip pipes up
+		if _shown_text.is_empty():
+			Sfx.play(&"pip_talk")
 		_shown_text = text
 		_text.text = text
 	_counter.text = "Day %d · %d/%d" % [_day, _index + 1, _steps.size()]

@@ -204,20 +204,25 @@ func _show_item_bar() -> void:
 		_action_button.remove_theme_color_override("font_color")
 
 
+## A tile was tapped: pick it. These handlers queue the redraw instead of
+## running refresh() here: they fire inside the tapped control's own release
+## event, refresh() frees that control, and Godot then stops passing the
+## release up to the ScrollContainer, which stays stuck "dragging" and scrolls
+## on every mouse move after (see tab_shop.gd _pick).
 func _pick(item: StandardItem) -> void:
 	_selected = item
 	_just_picked = true
-	refresh()
+	hall.queue_refresh()
 
 
 func _set_filter(value: int) -> void:
 	_filter = value
-	refresh()
+	hall.queue_refresh()
 
 
 func _on_hide_worn_toggled(is_on: bool) -> void:
 	_hide_worn = is_on
-	refresh()
+	hall.queue_refresh()
 
 
 func _on_action_pressed() -> void:

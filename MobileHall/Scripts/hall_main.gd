@@ -686,8 +686,9 @@ func days_until_drake() -> int:
 ## `section` optionally picks the tab's half (GUILD_SECTION_* or UPGRADES_SECTION_*).
 func open_tab(tab_id: String, section: String = "") -> void:
 	if is_tab_locked(tab_id):
-		show_toast(TOAST_TAB_LOCKED % tab_unlock_day(tab_id))
+		show_error_toast(TOAST_TAB_LOCKED % tab_unlock_day(tab_id))
 		return
+	Sfx.play(&"tab_switch")
 	active_tab = tab_id
 	if section != "" and tab_id == "guild":
 		guild_section = section
@@ -727,6 +728,7 @@ func open_assign(quest_index: int) -> void:
 		return
 	active_screen = {"kind": SCREEN_ASSIGN, "quest_index": clampi(quest_index, 0, quest_entries.size() - 1)}
 	active_tab = "board"
+	Sfx.play(&"page_open")
 	queue_refresh()
 	tutorial_event.emit("assign", quest_index)
 
@@ -734,6 +736,7 @@ func open_assign(quest_index: int) -> void:
 ## Open a character's details over whatever is showing.
 func open_character(character: GuildCharacter) -> void:
 	active_screen = {"kind": SCREEN_CHARACTER, "character": character, "return_to": active_screen.duplicate()}
+	Sfx.play(&"page_open")
 	queue_refresh()
 	tutorial_event.emit("character", character)
 
@@ -744,6 +747,7 @@ func close_screen() -> void:
 		active_screen = active_screen.get("return_to", {})
 	else:
 		active_screen = {}
+	Sfx.play(&"page_close")
 	queue_refresh()
 	tutorial_event.emit("close", null)
 
@@ -763,11 +767,13 @@ func do_next_step() -> void:
 
 func open_menu() -> void:
 	is_menu_open = true
+	Sfx.play(&"page_open")
 	queue_refresh()
 
 
 func close_menu() -> void:
 	is_menu_open = false
+	Sfx.play(&"page_close")
 	queue_refresh()
 
 
@@ -775,6 +781,7 @@ func close_menu() -> void:
 func open_accessibility() -> void:
 	is_menu_open = false
 	is_accessibility_open = true
+	Sfx.play(&"page_open")
 	queue_refresh()
 
 
@@ -783,6 +790,7 @@ func open_accessibility() -> void:
 func close_accessibility(go_to_menu: bool = true) -> void:
 	is_accessibility_open = false
 	is_menu_open = go_to_menu
+	Sfx.play(&"page_close")
 	queue_refresh()
 
 
@@ -791,6 +799,7 @@ func close_accessibility(go_to_menu: bool = true) -> void:
 func open_debug() -> void:
 	is_menu_open = false
 	is_debug_open = true
+	Sfx.play(&"page_open")
 	queue_refresh()
 
 
@@ -799,6 +808,7 @@ func open_debug() -> void:
 func close_debug(go_to_menu: bool = true) -> void:
 	is_debug_open = false
 	is_menu_open = go_to_menu
+	Sfx.play(&"page_close")
 	queue_refresh()
 
 
@@ -806,6 +816,7 @@ func open_welcome() -> void:
 	is_menu_open = false
 	is_welcome_from_menu = true
 	is_welcome_open = true
+	Sfx.play(&"page_open")
 	queue_refresh()
 
 
@@ -815,8 +826,10 @@ func close_welcome() -> void:
 	is_welcome_open = false
 	if is_welcome_from_menu:
 		is_welcome_from_menu = false
+		Sfx.play(&"page_close")
 		queue_refresh()
 		return
+	# (open_tab plays the tab sound)
 	open_tab("board")
 
 # ---- quests
@@ -833,22 +846,23 @@ func toggle_in_party(character: GuildCharacter) -> void:
 	if entry.party.has(character):
 		_remove_from_party(entry, character)
 		pending_fx.seat_out = true
+		Sfx.play(&"party_leave")
 		queue_refresh()
 		return
 
 	# can't be added
 	if HallStyle.is_dead(character):
-		show_toast(TOAST_DEAD % character.name)
+		show_error_toast(TOAST_DEAD % character.name)
 		return
 	if GuildUpgrades.is_patient(character):
-		show_toast(TOAST_IN_HOSPITAL % character.name)
+		show_error_toast(TOAST_IN_HOSPITAL % character.name)
 		return
 	if GuildUpgrades.is_training(character):
-		show_toast(TOAST_IN_TRAINING % character.name)
+		show_error_toast(TOAST_IN_TRAINING % character.name)
 		return
 	var size_limit := party_size_limit(entry)
 	if entry.party.size() >= size_limit and size_limit > 1:
-		show_toast(TOAST_PARTY_FULL)
+		show_error_toast(TOAST_PARTY_FULL)
 		return
 
 	# solo quests just swap the one adventurer
@@ -864,6 +878,7 @@ func toggle_in_party(character: GuildCharacter) -> void:
 
 	entry.party.append(character)
 	pending_fx.seat_in = character
+	Sfx.play(&"party_join")
 	queue_refresh()
 	tutorial_event.emit("pick", entry)
 
@@ -888,6 +903,7 @@ func send_party() -> void:
 		return
 	entry.state = HallStyle.QUEST_STATE_SENT
 	show_toast(TOAST_SENT % entry.quest.questTitle)
+	Sfx.play(&"quest_send")
 	pending_fx.writ_stamp = true
 	_hold_then_move_on()
 	tutorial_event.emit("send", entry)
@@ -904,6 +920,7 @@ func deny_quest() -> void:
 	_header.pay_fx("standing")
 	GameState.reduce_standing(standing_cost)
 	show_toast(TOAST_DENIED % [entry.quest.questTitle, standing_cost])
+	Sfx.play(&"quest_deny")
 	_screens[SCREEN_ASSIGN].shake_writ()
 	HallFx.stamp_mark(fx_layer, _screens[SCREEN_ASSIGN].stamp_point(), STAMP_DENIED, HallStyle.RED, STAMP_HOLD_SECONDS)
 	_hold_then_move_on()
@@ -917,6 +934,7 @@ func recall_party() -> void:
 		return
 	entry.state = HallStyle.QUEST_STATE_OPEN
 	show_toast(TOAST_RECALLED)
+	Sfx.play(&"quest_undo")
 	queue_refresh()
 
 
@@ -927,6 +945,7 @@ func reconsider_quest() -> void:
 		return
 	entry.state = HallStyle.QUEST_STATE_OPEN
 	show_toast(TOAST_RECONSIDER % entry.quest.questTitle)
+	Sfx.play(&"quest_undo")
 	queue_refresh()
 
 
@@ -967,7 +986,7 @@ func _go_to_next_undecided() -> void:
 ## Returns true when they joined (hire_card.gd then flies its letter to the roster).
 func hire(character: GuildCharacter) -> bool:
 	if is_roster_full():
-		show_toast(TOAST_ROSTER_FULL)
+		show_error_toast(TOAST_ROSTER_FULL)
 		queue_refresh()
 		return false
 	var gold_before: int = GameState.gold
@@ -979,6 +998,7 @@ func hire(character: GuildCharacter) -> bool:
 			_header.pay_fx("gold")
 		pending_fx.hire_next = true
 		show_toast(TOAST_HIRED % character.name)
+		Sfx.play(&"hire")
 		tutorial_event.emit("hire", character)
 	queue_refresh()
 	return is_hired
@@ -1000,6 +1020,7 @@ func _fly_hired_letter(card: Control) -> void:
 	if not is_instance_valid(card):
 		return
 	var roster_button: Control = _tabs.guild.roster_button()
+	Sfx.play(&"hire_letter_fly")
 	HallFx.fly_away(card, fx_layer, roster_button.get_global_rect().get_center(), HIRE_FLY_SECONDS)
 	HallFx.pop(roster_button, HallNav.BADGE_POP, HIRE_FLY_SECONDS)
 
@@ -1021,6 +1042,7 @@ func release(character: GuildCharacter) -> void:
 		show_toast(TOAST_RELEASED_COST % [character.name, standing_cost])
 	else:
 		show_toast(TOAST_RELEASED % character.name)
+	Sfx.play(&"release")
 	released_today.append({"character": character, "standing": standing_cost, "fallen": is_fallen})
 	run_stats.released.append(character)
 	queue_refresh()
@@ -1031,12 +1053,13 @@ func release(character: GuildCharacter) -> void:
 func upgrade_building(building: int) -> void:
 	# buildings open with the Guild tab
 	if is_tab_locked("upgrades"):
-		show_toast(TOAST_TAB_LOCKED % tab_unlock_day("upgrades"))
+		show_error_toast(TOAST_TAB_LOCKED % tab_unlock_day("upgrades"))
 		return
 	var gold_before: int = GameState.gold
 	if GuildUpgrades.try_upgrade(building):
 		_count_spent(gold_before)
 		_header.pay_fx("gold")
+		Sfx.play(&"building_upgrade")
 		pending_fx.upgraded = building
 		show_toast(TOAST_UPGRADED % [GuildUpgrades.get_building_name(building), GuildUpgrades.get_level(building)])
 		tutorial_event.emit("upgrade", building)
@@ -1058,9 +1081,10 @@ func buy_item(index: int) -> void:
 			_header.pay_fx("gold")
 		pending_fx.bought = index
 		show_toast(TOAST_BOUGHT % HallStyle.item_look(item).name)
+		Sfx.play(&"shop_buy")
 		tutorial_event.emit("buy", item)
 	else:
-		show_toast(TOAST_CANT_BUY)
+		show_error_toast(TOAST_CANT_BUY)
 	queue_refresh()
 
 
@@ -1071,13 +1095,14 @@ func equip_item(item: StandardItem, character: GuildCharacter) -> void:
 	if result == ItemShop.EquipResult.OK:
 		pending_fx.gear_in = item
 		show_toast(TOAST_EQUIPPED % [character.name, item_name])
+		Sfx.play(&"equip")
 		tutorial_event.emit("equip", item)
 	elif result == ItemShop.EquipResult.WRONG_ROLE:
-		show_toast(TOAST_WRONG_ROLE % [HallStyle.item_role_name(item), item_name])
+		show_error_toast(TOAST_WRONG_ROLE % [HallStyle.item_role_name(item), item_name])
 	elif result == ItemShop.EquipResult.SLOTS_FULL:
-		show_toast(TOAST_HANDS_FULL % character.name)
+		show_error_toast(TOAST_HANDS_FULL % character.name)
 	elif result == ItemShop.EquipResult.DEAD:
-		show_toast(TOAST_GEAR_DEAD % character.name)
+		show_error_toast(TOAST_GEAR_DEAD % character.name)
 	queue_refresh()
 
 
@@ -1089,6 +1114,7 @@ func unequip_item(item: StandardItem) -> void:
 	ItemShop.unequip(item)
 	pending_fx.gear_out = true
 	show_toast(TOAST_UNEQUIPPED % [user.name, HallStyle.item_look(item).name])
+	Sfx.play(&"unequip")
 	queue_refresh()
 
 
@@ -1106,6 +1132,7 @@ func swap_gear(item_on: StandardItem, item_off: StandardItem, character: GuildCh
 		return
 	pending_fx.gear_in = item_on
 	show_toast(TOAST_SWAPPED % [character.name, HallStyle.item_look(item_off).name, HallStyle.item_look(item_on).name])
+	Sfx.play(&"equip")
 	tutorial_event.emit("equip", item_on)
 	queue_refresh()
 
@@ -1124,17 +1151,18 @@ func toggle_training_picker() -> void:
 ## Someone in a quest's party leaves it first.
 func train(character: GuildCharacter, stat: int) -> void:
 	if not GuildUpgrades.can_train(character):
-		show_toast(TOAST_TOO_HURT % character.name)
+		show_error_toast(TOAST_TOO_HURT % character.name)
 		return
 	var is_new := not GuildUpgrades.is_training(character)
 	if is_new and not GuildUpgrades.has_free_training_slot():
-		show_toast(TOAST_SLOTS_FULL)
+		show_error_toast(TOAST_SLOTS_FULL)
 		return
 	_leave_quest(character)
 	GuildUpgrades.set_training(character, stat)
 	pending_fx.home_row = character
 	if is_new:
 		show_toast(TOAST_TRAINING % [character.name, HallStyle.STATS[stat].name])
+		Sfx.play(&"training_start")
 	# the pick list closes itself once every slot is taken
 	if not GuildUpgrades.has_free_training_slot():
 		training_picker_open = false
@@ -1154,6 +1182,7 @@ func admit(character: GuildCharacter) -> void:
 	if GuildUpgrades.admit(character):
 		pending_fx.home_row = character
 		show_toast(TOAST_ADMITTED % character.name)
+		Sfx.play(&"hospital_admit")
 		tutorial_event.emit("admit", character)
 	queue_refresh()
 
@@ -1162,6 +1191,7 @@ func discharge(character: GuildCharacter) -> void:
 	GuildUpgrades.discharge(character)
 	pending_fx.home_row = character
 	show_toast(TOAST_DISCHARGED % character.name)
+	Sfx.play(&"hospital_discharge")
 	queue_refresh()
 
 
@@ -1171,8 +1201,9 @@ func revive(character: GuildCharacter) -> void:
 		_count_spent(gold_before)
 		pending_fx.home_row = character
 		show_toast(TOAST_REVIVED % character.name)
+		Sfx.play(&"revive")
 	elif is_roster_full():
-		show_toast(TOAST_REVIVE_NO_BED % character.name)
+		show_error_toast(TOAST_REVIVE_NO_BED % character.name)
 	queue_refresh()
 
 
@@ -1361,12 +1392,14 @@ func open_end_check() -> void:
 		open_assign(next_undecided_index(0))
 		return
 	is_end_check_open = true
+	Sfx.play(&"page_open")
 	queue_refresh()
 	tutorial_event.emit("end_check", null)
 
 
 func close_end_check() -> void:
 	is_end_check_open = false
+	Sfx.play(&"page_close")
 	queue_refresh()
 
 
@@ -1379,6 +1412,7 @@ func end_day() -> void:
 	if undecided_count() > 0 or is_night_falling:
 		return
 	is_night_falling = true
+	Sfx.play(&"night_fall")
 	_header.hold_counters()
 	# training and healing happen first, so nobody heals the night they're hurt
 	var home := GuildUpgrades.run_night()
@@ -1433,6 +1467,7 @@ func _show_final_credits(result: Dictionary, report: Dictionary) -> void:
 		night_save = {}
 		if tutorial and tutorial.is_running():
 			tutorial.skip_tutorial()
+		Sfx.play(&"victory" if credits.won else &"defeat")
 		queue_refresh()
 		tutorial_event.emit("end_day", report.results)
 	if credits.won:
@@ -1471,11 +1506,16 @@ func start_new_day() -> void:
 	active_tab = "board"
 	active_screen = {}
 	GameState.start_new_day()
+	# the Day Report's reveal may still have sounds waiting (the player skipped ahead)
+	Sfx.cancel_scheduled()
 	if GameState.day == MILESTONE_DAY:
 		show_toast(TOAST_MILESTONE_DAY % GameState.day)
+		Sfx.play(&"story_day")
 	elif GameState.day == FINAL_DAY and not GameState.is_freeplay:
 		show_toast(TOAST_FINAL_DAY % GameState.day)
+		Sfx.play(&"story_day")
 	else:
+		Sfx.play(&"day_start")
 		var quests_text := HallStyle.count_text(quest_entries.size(), "new quest", "new quests")
 		show_toast(TOAST_NEW_DAY % [GameState.day, quests_text, CharacterContainer.hireable_characters.size()])
 	queue_refresh()
@@ -1498,6 +1538,7 @@ func _check_run_over() -> void:
 	active_screen = {}
 	if tutorial and tutorial.is_running():
 		tutorial.skip_tutorial()
+	Sfx.play(&"game_over")
 	queue_refresh()
 	tutorial_event.emit("game_over", run_over_stats)
 
@@ -1545,6 +1586,8 @@ func close_report() -> void:
 		HallFx.curtain(fx_layer, DUSK_INK, start_new_day, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
 	else:
 		shown_report = {}
+		Sfx.cancel_scheduled()
+		Sfx.play(&"page_close")
 		queue_refresh()
 
 
@@ -1681,6 +1724,13 @@ func _all_overlays() -> Array:
 ## Short message just above the action bar that fades out (see hall_toast.gd).
 func show_toast(message: String) -> void:
 	_toast.show_message(message)
+
+
+## A toast for something the player tried that can't be done (locked tab,
+## party full, not enough gold...): same toast, plus the "ui_error" sound.
+func show_error_toast(message: String) -> void:
+	show_toast(message)
+	Sfx.play(&"ui_error")
 
 
 # ============================================================ MOTION
