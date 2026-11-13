@@ -191,7 +191,8 @@ cheats for testing. The rules are in `Scripts/hall_debug.gd` (`HallDebug`), and 
 is `overlay_debug`. The first time in a run it only shows a warning and **Enable debug
 tools**. Enabling makes the run a **debug run** (`HallMain.is_debug_run`): it is never
 saved again, so the last save on disk stays as it was before the tools were used. A new
-run starts with saving back on.
+run starts with saving back on. **Check for update** (see "Web updates and the build line")
+sits next to "Save runs" above the warning, so it doesn't need a debug run either.
 
 - **Time:** skip to the next day (training and healing still run; no quests, no report;
   blocked on the final battle day outside freeplay), or jump to day 10 / 50 (a skip
@@ -315,7 +316,16 @@ waiting deploy at start-up (the page reloads and the saved run comes back), or s
 toast if one turns up mid-game. The Menu's bottom line (`Scripts/hall_build_info.gd`)
 names the commit and time of the build that's running: the deploy workflow writes
 `External Content/build_info.txt` (gitignored), and without it the line says "Build dev".
-To check a phone, compare that line with the latest commit on `master`.
+To check a phone, compare that line with the latest commit on `master`, or tap
+**Check for update** in Menu > Debug tools. The workflow also publishes the stamp next to
+`index.html` (`build_info.txt` on the site), and the button fetches that one (cache-busted)
+and compares it with the build's own. If they match it toasts "You're on the newest
+version". If not, a popup (`overlay_update_confirm`) shows both stamps, warns when the run
+isn't being saved, and offers **Export save** (a backup file, as in Backup save),
+**Cancel** and **Update**. Update saves the run, then tells the service worker to fetch the
+new deploy and switches to it as soon as it's installed, falling back to a plain reload
+after 15 s (`HallWebUpdate.update_now`). Off the web, the button only toasts that checks
+need the web build.
 
 ## Known issues (in the game systems, not changed here)
 

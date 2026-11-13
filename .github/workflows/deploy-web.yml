@@ -76,6 +76,12 @@ jobs:
           ~/godot/godot --headless --export-release "Web" build/web/index.html
           test -f build/web/index.pck
 
+      - name: Publish the build stamp
+        # The same stamp, next to index.html, so a running game can fetch the
+        # live one and see whether it's on the newest deploy (Menu > Debug
+        # tools > Check for update; HallWebUpdate / HallBuildInfo).
+        run: cp "External Content/build_info.txt" build/web/build_info.txt
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: build/web
