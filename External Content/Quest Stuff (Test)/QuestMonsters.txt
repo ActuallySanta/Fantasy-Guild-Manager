@@ -1,4 +1,4 @@
-Skeleton Warrior|Zombie|Blood Moon Cultist|Burndog
-Skeleton Archer|Walking Corpse|Blood Moon Assassin|Flamerider
-Bone Hound|Undead Warrior|Blood Moon Cultist|Arbiter
-Skeleton|Zombie|Blood Moon Brutes|Demon
+Skeleton Warrior|Zombie|Blood Moon Cultist|Burndog|Brigand
+Skeleton Archer|Walking Corpse|Blood Moon Assassin|Flamerider|Marauder
+Bone Hound|Undead Warrior|Blood Moon Cultist|Arbiter|Bandit
+Skeleton|Zombie|Blood Moon Brute|Demon|Ravager
