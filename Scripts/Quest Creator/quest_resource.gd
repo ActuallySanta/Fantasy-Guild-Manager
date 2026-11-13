@@ -462,29 +462,29 @@ returnString, "[b]", _questingAdventurers[0].name, " ", ExternalContentContainer
 				match(styleOfQuest):
 					0:
 						returnString = str(
-					returnString, "[b]", _questingAdventurers[0].name, " ",
+					returnString, "[b]", _questingAdventurers[0].name, " [/b]",
 					ExternalContentContainer.get_Quest_Story(questNum, 5).c_unescape().format(data),)
 					1:
 						returnString = str(
-					returnString, "[b]", _questingAdventurers[0].name, " ",
+					returnString, "[b]", _questingAdventurers[0].name, " [/b]",
 					ExternalContentContainer.get_Minor_Story(questNum, 5).c_unescape().format(data),)
 					2:
 						returnString = str(
-					returnString, "[b]", _questingAdventurers[0].name, " ",
+					returnString, "[b]", _questingAdventurers[0].name, " [/b]",
 					ExternalContentContainer.get_Milestone_story(questNum, 5).c_unescape().format(data),)
 			else:
 				match(styleOfQuest):
 					0:
 						returnString = str(
-					returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, " ",
+					returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, " [/b]",
 					ExternalContentContainer.get_Quest_Story(questNum, 5).c_unescape().format(data),)
 					1:
 						returnString = str(
-					returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, " ",
+					returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, " [/b]",
 					ExternalContentContainer.get_Minor_Story(questNum, 5).c_unescape().format(data),)
 					2:
 						returnString = str(
-					returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, " ",
+					returnString, "[b]", _questingAdventurers[0].name, "[/b] and [b]", _questingAdventurers[1].name, " [/b]",
 					ExternalContentContainer.get_Milestone_story(questNum, 5).c_unescape().format(data),)
 			if(addGold && runMiddle):
 				goldReward += extraGold
