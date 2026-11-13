@@ -865,7 +865,7 @@ func _pick_text() -> String:
 func _tonight_text() -> String:
 	var text := "Now the [b]Tonight[/b] tab. The [b]Training Yard[/b] increases a stat and the [b]Hospital[/b] heals an adventurer faster."
 	if not _seen.get("upgrade", false):
-		text = "Nothing to build yet; the tab gets a badge when you can. " + text
+		text = "Nothing you can build yet! This tab will show you a notification when you can. " + text
 	return text
 
 
@@ -941,11 +941,11 @@ func _day_one() -> Array:
 		{"target": func(): return _u(_screen("assign"), "PickList"), "on": "pick", "when": func(d): return _party_ready(d),
 			"do": "Tap an adventurer row to assign them on the quest", "deny": ["InfoButton"], "text": func(): return _pick_text()},
 		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "send",
-			"do": "Tap Seal & Send", "text": "Low chances on quests give a risk failure and injuries. Click Seal & send on the bottom of screen to confirm your choice."},
+			"do": "Tap Seal & Send", "text": "Low chances on a quest give a risk of failure and injuries. Click Seal & send on the bottom of screen to confirm your choice."},
 		{"target": func(): return hall.action_button(), "on": "end_check",
 			"do": "Tap End Day", "text": "Quick tip! This bar always shows your next step if you are ever stuck. Tap [b]End Day[/b] to send your quests off!"},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
-			"do": "Tap End Day", "text": "Here you can check what quests you denied and accepted as well as available upgrades! Tap on end day to finish your choices. "},
+			"do": "Tap End Day", "text": "Here you can check what quests you denied and accepted, as well as any available upgrades! Tap on end day to finish your choices. "},
 		{"target": func(): return _u(hall.get_node("%OverlayReport"), "ActionButton"), "on": "new_day",
 			"do": "Tap to start Day 2", "text": "Good Morning! This screen lets you see how the parties did. Tap on Open the Doors to move on."},
 	]
