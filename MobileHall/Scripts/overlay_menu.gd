@@ -1,5 +1,6 @@
 ## Menu (header button): how to play, last night's report, Accessibility (text
-## size, colorblind filter, reduced motion: overlay_accessibility.gd), Debug
+## size, colorblind filter, reduced motion: overlay_accessibility.gd), Backup
+## save (keep a copy of the run outside the browser: overlay_backup.gd), Debug
 ## tools (cheats for testing, only when GuildUpgrades.SHOW_DEBUG_BUTTONS:
 ## overlay_debug.gd), and Abandon run (two taps: the first asks, the second
 ## deletes the saved run and starts a new guild).
@@ -15,6 +16,7 @@ const BUILD_FONT_SIZE := 20
 const BUTTON_HOW_TO_PLAY := "How to play"
 const BUTTON_REPORT := "Last night's report"
 const BUTTON_ACCESSIBILITY := "Accessibility"
+const BUTTON_BACKUP := "Backup save"
 const BUTTON_DEBUG := "Debug tools"
 const BUTTON_CLOSE := "Close"
 const BUTTON_ABANDON := "Abandon run"
@@ -25,6 +27,7 @@ const BUTTON_ABANDON_CONFIRM := "Tap again to abandon this guild"
 @onready var _how_to_play_button: Button = %HowButton
 @onready var _report_button: Button = %ReportButton
 @onready var _accessibility_button: Button = %AccessibilityButton
+@onready var _backup_button: Button = %BackupButton
 @onready var _debug_button: Button = %DebugButton
 @onready var _abandon_button: Button = %AbandonButton
 @onready var _close_button: Button = %CloseButton
@@ -43,6 +46,7 @@ func setup(main: HallMain) -> void:
 	_how_to_play_button.pressed.connect(hall.open_welcome)
 	_report_button.pressed.connect(hall.open_previous_report)
 	_accessibility_button.pressed.connect(hall.open_accessibility)
+	_backup_button.pressed.connect(hall.open_backup)
 	_debug_button.pressed.connect(hall.open_debug)
 	_build_label = Label.new()
 	_build_label.name = "BuildLabel"
@@ -62,9 +66,10 @@ func setup(main: HallMain) -> void:
 	_how_to_play_button.text = BUTTON_HOW_TO_PLAY
 	_report_button.text = BUTTON_REPORT
 	_accessibility_button.text = BUTTON_ACCESSIBILITY
+	_backup_button.text = BUTTON_BACKUP
 	_debug_button.text = BUTTON_DEBUG
 	_close_button.text = BUTTON_CLOSE
-	for button in [_how_to_play_button, _report_button, _accessibility_button, _debug_button]:
+	for button in [_how_to_play_button, _report_button, _accessibility_button, _backup_button, _debug_button]:
 		HallStyle.style_button(button, "paper", 28)
 	HallStyle.style_button(_abandon_button, "red", 28)
 	HallStyle.style_button(_close_button, "wood", 28)
