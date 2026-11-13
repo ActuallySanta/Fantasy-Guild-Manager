@@ -51,8 +51,8 @@ const BUTTON_HIRE_COST := "Hire · %dg"
 const BUTTON_RELEASE := "Release"
 # Release confirm sheet
 const TEXT_RELEASE_TITLE := "Release %s?"
-const TEXT_RELEASE_COST := "Gone for good. Gear returns to your pack. Costs %d standing."
-const TEXT_RELEASE_FALLEN := "Their gear returns to your pack."
+const TEXT_RELEASE_COST := "Gone for good. Gear returns to your inventory. Costs %d standing."
+const TEXT_RELEASE_FALLEN := "Their gear returns to your inventory."
 const TEXT_RELEASE_QUEST := " They'll leave %s."
 const BUTTON_RELEASE_CONFIRM := "Release"
 
@@ -227,7 +227,8 @@ func _show_stats(character: GuildCharacter) -> void:
 			value_label.text += TEXT_PLUCK_BONUS % pluck_bonus
 		HallStyle.set_font_color(name_label, stat.color)
 		HallStyle.set_font_color(value_label, stat.color)
-		HallStyle.tint_art(line, stat.color)
+		# the stat's ink on its paper tint, like the Training Yard's stat buttons
+		HallStyle.fill_art(line, HallStyle.INK_BOX_STYLE, stat.bg, stat.color)
 
 		# a number that changed for the same hero (gear on / off) pops and flashes
 		if is_same_hero and _shown_stat_texts.get(stat_index, value_label.text) != value_label.text:

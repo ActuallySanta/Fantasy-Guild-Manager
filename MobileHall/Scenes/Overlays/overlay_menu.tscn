@@ -64,22 +64,13 @@ focus_mode = 0
 theme_override_font_sizes/font_size = 28
 text = "AccessibilityButton"
 
-[node name="ResetButton" type="Button" parent="Center/Sheet/Col" unique_id=1210881435]
+[node name="DebugButton" type="Button" parent="Center/Sheet/Col" unique_id=1210881435]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 88)
 layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 28
-text = "ResetButton"
-autowrap_mode = 3
-
-[node name="SaveCheckBox" type="CheckBox" parent="Center/Sheet/Col"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 88)
-layout_mode = 2
-focus_mode = 0
-theme_override_font_sizes/font_size = 28
-text = "SaveCheckBox"
+text = "DebugButton"
 autowrap_mode = 3
 
 [node name="AbandonButton" type="Button" parent="Center/Sheet/Col"]

@@ -45,7 +45,9 @@ const OFFICE_REROLLS_PER_DAY := [0, 1, 1, 2, 3]
 const OFFICE_HIGHEST_RANK := ["D", "C", "B", "A", "S"]
 const TRAINING_SLOTS := [1, 2, 3, 4, 5]
 const TRAINING_STAT_GAIN := [1, 1, 2, 2, 3]
-const HOSPITAL_RECOVERY_REDUCTION := [2, 2, 3, 4, 4]
+## Injury stages (Sore, Hurt, Gravely hurt) a patient heals each night.
+## There are only 3 stages, so level 3+ heals anyone in one night.
+const HOSPITAL_STAGES_PER_NIGHT := [1, 2, 3, 3, 3]
 ## x = STRENGTH (ATK) bonus, y = DEFENSE bonus
 const ARMORY_BONUS := [Vector2i(1, 1), Vector2i(2, 1), Vector2i(2, 2), Vector2i(3, 2), Vector2i(3, 3)]
 const BARRACKS_MAX_HEROES := [4, 6, 8, 10, 12]
@@ -61,15 +63,14 @@ const STARTING_GOLD := 0
 const STARTING_STANDING := 1
 const MINIMUM_STANDING := -10
 
-## Show the +gold / +standing test buttons on the upgrades page.
+## Show the debug tools: the Menu's Debug tools button (overlay_debug.gd) and
+## the old prototype upgrades page's +gold / +standing test buttons.
 const SHOW_DEBUG_BUTTONS := true
 
 # ---- Training Yard / Hospital tuning
 ## Nights at home to heal one injury level, indexed by GuildCharacter.InjuryLevel
 ## (Healthy, Sore, Hurt, Gravely hurt, Dead).
 const HOME_HEAL_NIGHTS := [0, 2, 4, 6, 0]
-## A Hospital bed never takes fewer nights than this per level.
-const HOSPITAL_MIN_NIGHTS := 1
 ## Worst injury a hero can still train with.
 const TRAINING_MAX_INJURY := GuildCharacter.InjuryLevel.SORE
 ## Hospital level that unlocks reviving, and how many revives a run gets.
@@ -174,7 +175,8 @@ func get_effect_text(building: int, level: int) -> String:
 		Building.TRAINING_YARD:
 			return "%d training slots, +%d stat/day" % [TRAINING_SLOTS[i], TRAINING_STAT_GAIN[i]]
 		Building.HOSPITAL:
-			var text := "Injuries heal %d days faster" % HOSPITAL_RECOVERY_REDUCTION[i]
+			var stages: int = HOSPITAL_STAGES_PER_NIGHT[i]
+			var text := "Heals %d injury stage%s per night" % [stages, "" if stages == 1 else "s"]
 			if level >= MAX_LEVEL:
 				text += " + revive 1 hero"
 			return text
@@ -207,6 +209,17 @@ func try_upgrade(building: int) -> bool:
 	resources_changed.emit()
 	upgrades_changed.emit()
 	return true
+
+
+## Debug tools (HallDebug.max_buildings): every implemented building jumps to
+## MAX_LEVEL for free, and its effects (Barracks beds, Armory gear) apply now.
+func max_all_buildings() -> void:
+	for building in Building.values():
+		if is_implemented(building):
+			levels[building] = MAX_LEVEL
+	_apply_effects()
+	resources_changed.emit()
+	upgrades_changed.emit()
 
 
 func add_gold(amount: int) -> void:
@@ -288,14 +301,15 @@ func stop_training(character: GuildCharacter) -> void:
 		home_changed.emit()
 
 # ---------------------------------------------------------------- hospital
-# Injuries heal one level at a time. At home a level takes HOME_HEAL_NIGHTS;
-# in the Hospital it takes HOSPITAL_RECOVERY_REDUCTION fewer (never below
-# HOSPITAL_MIN_NIGHTS). Patients can't go on quests. Healthy patients are sent
-# home automatically. Progress on the current level is kept as metadata.
+# At home injuries heal one level at a time, each taking HOME_HEAL_NIGHTS
+# (progress on the current level is kept as metadata). In the Hospital a
+# patient heals HOSPITAL_STAGES_PER_NIGHT stages every night instead.
+# Patients can't go on quests. Healthy patients are sent home automatically.
 
 
-func get_hospital_reduction() -> int:
-	return HOSPITAL_RECOVERY_REDUCTION[get_level(Building.HOSPITAL) - 1]
+## Injury stages a patient heals tonight at the Hospital's current level.
+func get_hospital_stages() -> int:
+	return HOSPITAL_STAGES_PER_NIGHT[get_level(Building.HOSPITAL) - 1]
 
 
 func is_patient(character: GuildCharacter) -> bool:
@@ -308,21 +322,20 @@ func needs_care(character: GuildCharacter) -> bool:
 			and character.injury_level < GuildCharacter.InjuryLevel.DEAD
 
 
-## Nights it takes to heal one level down from `level`.
-func get_heal_nights(level: int, in_hospital: bool) -> int:
-	var nights: int = HOME_HEAL_NIGHTS[clampi(level, 0, HOME_HEAL_NIGHTS.size() - 1)]
-	if in_hospital and nights > 0:
-		nights = maxi(nights - get_hospital_reduction(), HOSPITAL_MIN_NIGHTS)
-	return nights
+## Nights at home to heal one level down from `level`.
+func get_heal_nights(level: int) -> int:
+	return HOME_HEAL_NIGHTS[clampi(level, 0, HOME_HEAL_NIGHTS.size() - 1)]
 
 
 ## Nights until a hero is Healthy again, counting progress already made.
 func get_nights_until_healthy(character: GuildCharacter, in_hospital: bool) -> int:
 	if not needs_care(character):
 		return 0
+	if in_hospital:
+		return ceili(float(character.injury_level) / get_hospital_stages())
 	var total := 0
 	for level in range(int(character.injury_level), 0, -1):
-		total += get_heal_nights(level, in_hospital)
+		total += get_heal_nights(level)
 	return maxi(total - _recovery_progress(character), 1)
 
 
@@ -384,13 +397,19 @@ func run_night() -> Dictionary:
 	for character in CharacterContainer.active_characters:
 		if character == null or not needs_care(character):
 			continue
-		var in_hospital := is_patient(character)
-		var nights := _recovery_progress(character) + 1
 		var level := int(character.injury_level)
-		if nights >= get_heal_nights(level, in_hospital):
+		if is_patient(character):
+			# a bed heals whole stages every night
+			var healed_to := maxi(level - get_hospital_stages(), int(GuildCharacter.InjuryLevel.HEALTHY))
+			character.injury_level = healed_to as GuildCharacter.InjuryLevel
+			character.set_meta(RECOVERY_META, Vector2i(healed_to, 0))
+			healed.append({"character": character, "from": level, "to": healed_to, "in_hospital": true})
+			continue
+		var nights := _recovery_progress(character) + 1
+		if nights >= get_heal_nights(level):
 			character.injury_level = (level - 1) as GuildCharacter.InjuryLevel
 			nights = 0
-			healed.append({"character": character, "from": level, "to": level - 1, "in_hospital": in_hospital})
+			healed.append({"character": character, "from": level, "to": level - 1, "in_hospital": false})
 		character.set_meta(RECOVERY_META, Vector2i(int(character.injury_level), nights))
 
 	# healed patients go home

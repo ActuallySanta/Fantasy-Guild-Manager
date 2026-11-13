@@ -59,8 +59,8 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Board (tab) | Today checklist (Recruits / Quests / Upgrades, each tappable), then all quests. Rows show *Pick a party*, *Party picked*, *Sent* or *Denied* with odds and mini portraits |
 | Assign Party | Quest strip; quest card; party seats (tap to remove) with live odds; picker sorted best fit first. Adventurers already in another quest's party are hidden unless **Show busy** is on; shown, they say "Picked for / Sent on #N" and move over when tapped. Footer: Deny / Send Party, or Recall / Next Quest, or Board / Reconsider |
 | Guild (tab, "Members" in the nav) | A folder with two tabs: Your Guild (roster with health, today's task, all five stats) / Applicants (a stack of letters of introduction; tap one peeking out to read it, Hire on the top one). Bed count links to the Barracks |
-| Upgrades (tab, "Guild" in the nav) | A folder with two tabs. **Tonight**: the Training Yard plan (heroes in a slot with a Pow / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital plan (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: the treasury ledger, a plan per building (affordable first) with level diamonds, now/next effect, cost or what's missing, and "coming soon" buildings as rolled-up scrolls. Badge = upgrades you can afford |
-| Items (tab, id "shop") | A folder with two tabs; the first visit each day opens on the Shop. **Pack**: every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar where the action bar usually is |
+| Upgrades (tab, "Guild" in the nav) | A folder with two tabs. **Facilities**: the Training Yard plan (heroes in a slot with a Pow / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital plan (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: the treasury ledger, a plan per building (affordable first) with level diamonds, now/next effect, cost or what's missing, and "coming soon" buildings as rolled-up scrolls. Badge = upgrades you can afford |
+| Items (tab, id "shop") | A folder with two tabs; the first visit each day opens on the Shop. **Inventory** (the "pack" section in code): every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar where the action bar usually is |
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
 | Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story |
@@ -86,6 +86,16 @@ from falling (`HallMain.is_one_death_from_falling`). That means one hero is aliv
 in today's For Hire is affordable, and either tomorrow's recruit price is more than your
 gold or standing is within `DANGER_STANDING_MARGIN` of the floor. The Welcome card's
 "Don't run out of heroes" row and Pip's Day 1 Day Report step explain the rule.
+
+Tapping the gold coin or the standing shield in the header drops a parchment card
+from it (`HeaderPopup`; tap anywhere else to close it). The **gold** card shows what
+the quests sent tonight pay if they all win and about how much at today's odds, then
+where gold goes (hiring, gear, building upgrades) with a price tag that turns green when
+you can pay it. The **standing** card shows the rank quests center on and a two-way
+meter: the red half fills as standing nears `MINIMUM_STANDING` (recruits stop coming),
+the green half fills toward the next milestone, a quest rank or a building level. The
+numbers come from `HallWallet` (static functions); the milestones are built from
+`HallRules` and `GuildUpgrades` tuning, so they follow it.
 
 ## Final battle, credits and freeplay
 
@@ -135,7 +145,7 @@ It doesn't fake colourblindness. When it's Off the rect is hidden and costs noth
 
 ## Training Yard and Hospital
 
-Both live on the Upgrades tab's **Tonight** half (`Scenes/Rows/home_section.tscn`, one building plan each). The rules
+Both live on the Upgrades tab's **Facilities** half (`Scenes/Rows/home_section.tscn`, one building plan each). The rules
 live in `Globals/guild_upgrades.gd` (`run_night()`, called by End Day before the quests
 are played out), and the tuning numbers sit at the top of that file.
 
@@ -143,10 +153,11 @@ are played out), and the tuning numbers sit at the top of that file.
   night. Slots stay filled from day to day. Heroes can be Healthy or Sore, but not in a bed.
   **Trainees can't be sent on quests**: take them out of their slot first. "Move here"
   pulls a hero out of a quest party and into a slot.
-- **Healing:** injuries now heal one level at a time. At home each level takes
-  `HOME_HEAL_NIGHTS` (Sore 2, Hurt 4, Gravely 6). In a Hospital bed it takes
-  `HOSPITAL_RECOVERY_REDUCTION` fewer nights (never less than 1). Heroes in a bed can't
-  go on quests, and they go home on their own once they're Healthy.
+- **Healing:** at home injuries heal one level at a time, each taking
+  `HOME_HEAL_NIGHTS` (Sore 2, Hurt 4, Gravely 6). In a Hospital bed a hero heals
+  `HOSPITAL_STAGES_PER_NIGHT` stages every night (level 1: one stage, level 2: two,
+  level 3+: all three). Heroes in a bed can't go on quests, and they go home on their
+  own once they're Healthy.
 - **Revive:** Hospital level 5 brings one fallen hero back per run, Gravely hurt and in a bed.
 - The Day Report's header has an "At home" line with who trained and who healed.
 
@@ -173,11 +184,31 @@ Looks come from the theme, not from overrides: a label is `TitleLabel`, `CapsLab
 `PaperButton` or `SealButton`. Pick one in the inspector (*Theme > Type Variation*) rather
 than overriding colours or styles on the node, so a reskin reaches it.
 
+## Debug tools
+
+Menu > **Debug tools** (shown while `GuildUpgrades.SHOW_DEBUG_BUTTONS` is on) holds
+cheats for testing. The rules are in `Scripts/hall_debug.gd` (`HallDebug`), and the sheet
+is `overlay_debug`. The first time in a run it only shows a warning and **Enable debug
+tools**. Enabling makes the run a **debug run** (`HallMain.is_debug_run`): it is never
+saved again, so the last save on disk stays as it was before the tools were used. A new
+run starts with saving back on.
+
+- **Time:** skip to the next day (training and healing still run; no quests, no report;
+  blocked on the final battle day outside freeplay), or jump to day 10 / 50 (a skip
+  repeated, so For Hire and healing move on as usual).
+- **Wallet:** gold and standing steps (`HallDebug.GOLD_STEPS`, `STANDING_STEPS`).
+- **Guild:** add a free hero (needs a free bed), add a random item to the Inventory, heal
+  everyone (the dead come back if there's a bed), max every building, reset upgrades.
+- **Run:** reroll today's quests and For Hire, skip the tutorial.
+
+None of it counts toward the Game Over ledger or the credits (`run_stats`).
+
 ## Saving and offline play
 
 **Dev switch:** saving is **off by default** (`HallSettings.DEFAULT_SAVE_ENABLED`), so
-every launch starts a fresh Day 1. Tick "Save runs (debug)" in the Menu (shown while
-`GuildUpgrades.SHOW_DEBUG_BUTTONS` is on) to turn it on; the choice is kept in
+every launch starts a fresh Day 1. Tick "Save runs" in Menu > Debug tools (shown while
+`GuildUpgrades.SHOW_DEBUG_BUTTONS` is on; it's there before you enable the tools, so
+turning saving on doesn't make a debug run) to turn it on; the choice is kept in
 `settings.cfg`. Off means the save is neither loaded nor written (the file on disk is
 left alone). Flip the default to `true` before a release.
 
@@ -226,8 +257,8 @@ holds the whole format:
 ## Files
 
 - `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, refresh
-- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`, `hall_save.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings, the saved run (static functions, no state)
-- `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip), action bar, nav and toast
+- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`, `hall_save.gd`, `hall_wallet.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings, the saved run, the gold and standing popups' numbers (static functions, no state)
+- `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip, gold and standing popups), action bar, nav and toast
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
 - `Scenes/Overlays/`: End Day check, Day Report, Welcome, Menu, Game Over, Final Battle credits

@@ -1,8 +1,8 @@
 ## Menu (header button): how to play, last night's report, Accessibility (text
-## size, colorblind filter, reduced motion: overlay_accessibility.gd), the debug
-## reset, the "Save runs" dev checkbox (HallMain.is_save_enabled), and Abandon
-## run (two taps: the first asks, the second deletes the saved run and starts a
-## new guild).
+## size, colorblind filter, reduced motion: overlay_accessibility.gd), Debug
+## tools (cheats for testing, only when GuildUpgrades.SHOW_DEBUG_BUTTONS:
+## overlay_debug.gd), and Abandon run (two taps: the first asks, the second
+## deletes the saved run and starts a new guild).
 ## A small line under Close says which build is running (HallBuildInfo), so a
 ## phone can tell whether it's on the latest web deploy.
 ## Scene: MobileHall/Scenes/Overlays/overlay_menu.tscn
@@ -14,9 +14,8 @@ const BUILD_FONT_SIZE := 20
 # ---- TEXT
 const BUTTON_HOW_TO_PLAY := "How to play"
 const BUTTON_REPORT := "Last night's report"
-const BUTTON_RESET := "Reset upgrades (debug)"
 const BUTTON_ACCESSIBILITY := "Accessibility"
-const CHECK_SAVE := "Save runs (debug)"
+const BUTTON_DEBUG := "Debug tools"
 const BUTTON_CLOSE := "Close"
 const BUTTON_ABANDON := "Abandon run"
 const BUTTON_ABANDON_CONFIRM := "Tap again to abandon this guild"
@@ -26,8 +25,7 @@ const BUTTON_ABANDON_CONFIRM := "Tap again to abandon this guild"
 @onready var _how_to_play_button: Button = %HowButton
 @onready var _report_button: Button = %ReportButton
 @onready var _accessibility_button: Button = %AccessibilityButton
-@onready var _reset_button: Button = %ResetButton
-@onready var _save_check: CheckBox = %SaveCheckBox
+@onready var _debug_button: Button = %DebugButton
 @onready var _abandon_button: Button = %AbandonButton
 @onready var _close_button: Button = %CloseButton
 
@@ -44,9 +42,8 @@ func setup(main: HallMain) -> void:
 	hall = main
 	_how_to_play_button.pressed.connect(hall.open_welcome)
 	_report_button.pressed.connect(hall.open_previous_report)
-	_reset_button.pressed.connect(hall.reset_upgrades)
 	_accessibility_button.pressed.connect(hall.open_accessibility)
-	_save_check.toggled.connect(hall.set_save_enabled)
+	_debug_button.pressed.connect(hall.open_debug)
 	_build_label = Label.new()
 	_build_label.name = "BuildLabel"
 	_build_label.theme_type_variation = &"ItalicLabel"
@@ -65,10 +62,9 @@ func setup(main: HallMain) -> void:
 	_how_to_play_button.text = BUTTON_HOW_TO_PLAY
 	_report_button.text = BUTTON_REPORT
 	_accessibility_button.text = BUTTON_ACCESSIBILITY
-	_reset_button.text = BUTTON_RESET
-	_save_check.text = CHECK_SAVE
+	_debug_button.text = BUTTON_DEBUG
 	_close_button.text = BUTTON_CLOSE
-	for button in [_how_to_play_button, _report_button, _accessibility_button, _reset_button, _save_check]:
+	for button in [_how_to_play_button, _report_button, _accessibility_button, _debug_button]:
 		HallStyle.style_button(button, "paper", 28)
 	HallStyle.style_button(_abandon_button, "red", 28)
 	HallStyle.style_button(_close_button, "wood", 28)
@@ -77,10 +73,7 @@ func setup(main: HallMain) -> void:
 func refresh() -> void:
 	# no report until the first day has ended
 	_report_button.disabled = hall.previous_report.is_empty()
-	_reset_button.visible = GuildUpgrades.SHOW_DEBUG_BUTTONS
-	_save_check.visible = GuildUpgrades.SHOW_DEBUG_BUTTONS
-	# no signal: this only mirrors the state, it mustn't write settings.cfg again
-	_save_check.set_pressed_no_signal(hall.is_save_enabled)
+	_debug_button.visible = GuildUpgrades.SHOW_DEBUG_BUTTONS
 	_abandon_button.text = BUTTON_ABANDON_CONFIRM if _is_abandon_armed else BUTTON_ABANDON
 
 

@@ -29,6 +29,9 @@ extends RefCounted
 
 ## Clips portrait art to its round or oval mask (see mask_to).
 const PORTRAIT_MASK_SHADER := preload("uid://bkumb84ipevs1")  # MobileHall/Styles/portrait_mask.gdshader
+## Outline shapes that fill_art() copies into a filled, coloured box.
+const PILL_STYLE := preload("uid://cels2rr0bev26")  # MobileHall/Styles/pill.tres
+const INK_BOX_STYLE := preload("uid://l4e4648hj2s1")  # MobileHall/Styles/ink_box.tres
 
 
 # ============================================================ QUEST STATES
@@ -76,6 +79,10 @@ const BLUE_TEXT := Color("#2F4A66")       ## odds, to do, picked
 const BLUE_BG := Color("#DDE5EC")
 ## The navy ink for names on letters and sign-offs.
 const NAVY := Color("#26304A")
+## Story quests (milestones, the final battle): a warm gilt ink and paper tint,
+## so they stand out from everyday work on the Board and in the Day Report.
+const STORY_INK := Color("#9C7426")
+const STORY_BG := Color("#F6E3B0")
 
 # ---- the end-of-story roll (overlay_credits.gd): ink on a dark backdrop
 const CREDITS_BG := Color("#1B140F")      ## victory: a warm, near-black hall
@@ -131,12 +138,13 @@ const STATS := [
 # ---- health
 
 ## GuildCharacter.InjuryLevel -> label, ink (text) and a paper tint (bg).
+## icon = the hall_style ICON_FILES name drawn in the health chip.
 const INJURY_LOOKS := [
-	{"label": "Healthy", "bg": Color("#E0EBD3"), "text": Color("#3D5A2A")},
-	{"label": "Sore", "bg": Color("#F3E7C6"), "text": Color("#6E5410")},
-	{"label": "Hurt", "bg": Color("#F2E0CC"), "text": Color("#8A4A10")},
-	{"label": "Gravely hurt", "bg": Color("#F2DCD4"), "text": Color("#8B2E2A")},
-	{"label": "Dead", "bg": Color("#E2DDE3"), "text": Color("#4A3B4F")},
+	{"label": "Healthy", "bg": Color("#E0EBD3"), "text": Color("#3D5A2A"), "icon": "heart"},
+	{"label": "Sore", "bg": Color("#F3E7C6"), "text": Color("#6E5410"), "icon": "heart"},
+	{"label": "Hurt", "bg": Color("#F2E0CC"), "text": Color("#8A4A10"), "icon": "cross"},
+	{"label": "Gravely hurt", "bg": Color("#F2DCD4"), "text": Color("#8B2E2A"), "icon": "skull"},
+	{"label": "Dead", "bg": Color("#E2DDE3"), "text": Color("#4A3B4F"), "icon": "skull"},
 ]
 
 # ---- portraits
@@ -240,6 +248,56 @@ static func quest_type_id(entry: Dictionary) -> int:
 	if entry.get("final", false):
 		return FINAL_TYPE_ID
 	return MILESTONE_TYPE_ID if entry.get("milestone", false) else int(entry.quest.type)
+
+
+## True for a quest that moves the main story along: the milestone (Bone
+## Drake), the final battle, or any entry / result with "story_quest": true (for
+## story quests added later, e.g. the days 3/5/8 quests of each arc).
+## Story quests are promoted on the Board and in the Day Report.
+static func is_story_quest(entry: Dictionary) -> bool:
+	return entry.get("milestone", false) or entry.get("final", false) or entry.get("story_quest", false)
+
+
+## Which story-text rows a story quest's lines come from (see story_lines):
+## the opening, the failure ending and the success ending. Part 0 is the quest
+## type and part 2 is unused.
+const STORY_TEXT_PARTS := [1, 3, 4]
+## Story lines shorter than this (characters) are skipped, so a stray word
+## can't mark an unrelated line as story.
+const STORY_LINE_MIN_LENGTH := 12
+
+## Matches BBCode tags (see strip_bbcode).
+static var _bbcode_tags := RegEx.create_from_string("\\[[^\\]]*\\]")
+
+
+## `text` with its BBCode tags removed.
+static func strip_bbcode(text: String) -> String:
+	return _bbcode_tags.sub(text, "", true)
+
+
+## The written story of a story quest (its opening and endings from External
+## Content), as plain-text lines. The Day Report stars any line of the
+## played-out story that contains one of these (the rest is the random
+## fights and searches).
+## entry: a quest entry or a quest result (needs quest, milestone).
+static func story_lines(entry: Dictionary) -> PackedStringArray:
+	var lines := PackedStringArray()
+	var quest: CreatedQuest = entry.quest
+	var rows: Array = ExternalContentContainer.milestone_story if entry.get("milestone", false) \
+			else ExternalContentContainer.quest_story
+	if quest.questNum < 0 or quest.questNum >= rows.size():
+		return lines
+	var row: Array = rows[quest.questNum]
+	var data := {"location": quest.location}
+	for part in STORY_TEXT_PARTS:
+		if part >= row.size():
+			continue
+		var text := strip_bbcode(str(row[part]).c_unescape().format(data))
+		for line in text.split("\n"):
+			var plain_line := line.strip_edges()
+			if plain_line.length() >= STORY_LINE_MIN_LENGTH:
+				lines.append(plain_line)
+	return lines
 
 
 ## {name, writ, color, tag} for a quest entry's type (falls back to Clear Dungeon).
@@ -394,6 +452,8 @@ const ICON_FILES := {
 	"skull": "uid://dv4aeys4diph4",  # MobileHall/Art/Icons/skull.tres
 	"heart": "uid://dbq8w0d0gocej",  # MobileHall/Art/Icons/heart.tres
 	"stall": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.tres
+	# story quests: their ribbon and their story lines in the Day Report
+	"star": "res://MobileHall/Art/Icons/star.tres",
 	# quest type seals (QUEST_TYPES)
 	"gate": "uid://13yirvv2nrwk",  # MobileHall/Art/Icons/gate.tres
 	"escort": "uid://bkk0x60yoyngi",  # MobileHall/Art/Icons/escort.tres
@@ -501,6 +561,27 @@ static func style_panel(panel: Control, fill: Color, _border_color: Color = BORD
 ## Swap a panel's look for another theme variation (PaperCard, PlanCard...).
 static func set_look(panel: Control, variation: StringName) -> void:
 	panel.theme_type_variation = variation
+
+
+## Give a panel a filled box in `fill` with an `ink` border, shaped like
+## `shape` (PILL_STYLE or INK_BOX_STYLE). Used where a stat or health needs to
+## read as a coloured tag (stat chips, the character page's stat lines, the
+## health chip). border_width in pixels; 0 hides the border. Undo with
+## clear_fill().
+static func fill_art(panel: Control, shape: StyleBoxFlat, fill: Color, ink: Color, border_width: int = 2) -> void:
+	var box: StyleBoxFlat = shape.duplicate()
+	box.draw_center = true
+	box.bg_color = fill
+	box.border_color = ink
+	box.set_border_width_all(border_width)
+	panel.add_theme_stylebox_override("panel", box)
+	# the box carries its own colours, so the white-art tint must be off
+	panel.self_modulate = WHITE
+
+
+## Drop a fill_art() box so the panel's theme look shows again.
+static func clear_fill(panel: Control) -> void:
+	panel.remove_theme_stylebox_override("panel")
 
 
 ## Ink a white piece of art (seal disc, stamp, outline box, icon) or tint

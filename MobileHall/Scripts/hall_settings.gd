@@ -31,7 +31,7 @@ const KEY_TEXT_SIZE := "text_size"
 const KEY_SAVE_ENABLED := "save_enabled"
 ## Save runs when settings.cfg doesn't say otherwise. Off while developing, so
 ## every launch starts a fresh Day 1; flip to true before a release so players
-## keep their runs (the Menu's "Save runs (debug)" checkbox overrides it).
+## keep their runs (the "Save runs" checkbox in Menu > Debug tools overrides it).
 const DEFAULT_SAVE_ENABLED := false
 
 

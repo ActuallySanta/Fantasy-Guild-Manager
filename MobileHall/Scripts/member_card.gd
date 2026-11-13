@@ -1,5 +1,6 @@
 ## One adventurer in the Guild tab's roster (a parchment card): portrait,
-## health, what they're doing today, and all five stats. Tap for details.
+## what they're doing today, and health with their two strongest stats.
+## Tap for details (the character page shows every stat).
 ## Scene: MobileHall/Scenes/Rows/member_card.tscn
 extends TapPanel
 
@@ -13,11 +14,13 @@ const TEXT_TRAINING := "Training %s"
 const TEXT_IN_BED := "In a Hospital bed"
 const TEXT_DIED_ON := "Died on Day %d"
 
+## How many stats a roster card shows (the strongest ones).
+const SHOWN_STAT_COUNT := 2
+
 # ---- NODES
 @onready var _portrait = %Portrait            # portrait.gd
 @onready var _name: Label = %Name
 @onready var _role: Label = %Role
-@onready var _health_chip = %HealthChip       # chip.gd
 @onready var _task_chip = %TaskChip           # chip.gd
 @onready var _stats = %Stats                  # stat_strip.gd
 
@@ -27,8 +30,8 @@ func setup(hall: HallMain, character: GuildCharacter) -> void:
 	_portrait.show_character(character)
 	_name.text = character.name
 	_role.text = TEXT_ROLE % HallStyle.role_name(character)
-	_health_chip.set_health(character)
-	_stats.show_stats(character)
+	_stats.show_health(character)
+	_stats.show_stats(character, -1, false, SHOWN_STAT_COUNT)
 	_show_task(hall, character)
 
 
