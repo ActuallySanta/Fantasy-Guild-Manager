@@ -98,4 +98,5 @@ static func _did_succeed(story: String) -> bool:
 static func _get_gold_earned(quest: CreatedQuest, succeeded: bool) -> int:
 	if succeeded:
 		return quest.goldReward
-	return maxi(quest.goldReward - 200, 0)
+	return quest.goldReward - quest.startingGoldReward
+	#return maxi(quest.goldReward - 200, 0)
