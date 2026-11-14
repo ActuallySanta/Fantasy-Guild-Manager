@@ -34,6 +34,12 @@ enum FavoredStat {
 	Wisdom = 2,
 	Sleaze = 3,
 	Pluck = 4,
+	PowerAndDefense = 10,
+	PowerAndWisdom = 20,
+	PowerAndSleaze = 30,
+	DefenseAndWisdom = 12,
+	DefenseAndSleaze = 13,
+	WisdomAndSleaze = 23,
 }
 
 enum QuestStyle {
@@ -257,6 +263,27 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 				statTotal += adventurer.get_quest_stat(2)
 			3:
 				statTotal += adventurer.get_quest_stat(3)
+			10:
+				statTotal += adventurer.get_quest_stat(0)
+				statTotal += adventurer.get_quest_stat(1)
+			20:
+				statTotal += adventurer.get_quest_stat(0)
+				statTotal += adventurer.get_quest_stat(2)
+			30:
+				statTotal += adventurer.get_quest_stat(0)
+				statTotal += adventurer.get_quest_stat(3)
+			12:
+				statTotal += adventurer.get_quest_stat(1)
+				statTotal += adventurer.get_quest_stat(2)
+			13:
+				statTotal += adventurer.get_quest_stat(1)
+				statTotal += adventurer.get_quest_stat(3)
+			23:
+				statTotal += adventurer.get_quest_stat(2)
+				statTotal += adventurer.get_quest_stat(3)
+			4:
+				statTotal += adventurer.get_quest_stat(4)
+				statTotal += adventurer.get_quest_stat(4)
 
 	return (snapped((statTotal / statHitNum), 0.01) * 100)
 
