@@ -52,7 +52,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 - Tabs, screens, overlays, shell pieces, and rows get `setup(hall)`, then read queries and call actions on `hall`. They never change game state themselves. After a change, `hall_main` calls `refresh()` on whatever is showing.
 - Every widget is an authored scene. Each script has a header naming its scene, a `TEXT` section of string constants, and a `NODES` section of `@onready var _x = %X` unique names.
 - All colors and tables live in `MobileHall/Scripts/hall_style.gd`. Story BBCode colors are bright, meant for dark backgrounds. `report_entry.gd` `STORY_RECOLORS` swaps them for colors that read on the light cards, so a new story color needs an entry there.
-- `MobileHall/README.md` covers the UI's design and rules (training, hospital, revive).
+- `MobileHall/README.md` covers the UI's design and rules (training, hospital, revive). The root `README.md` is the GitHub front page: what the game is and how to run it. Keep both current (see Conventions).
 
 The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still borrows its scoring helpers: it uses `Scripts/UI/day_bar.gd` (`class_name DayBar`) for `_get_success_chance`, `_did_succeed`, and `_get_gold_earned`. Changes to quest payout or results need to keep `day_bar.gd` working too.
 
@@ -78,3 +78,7 @@ The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still b
   - Text data in `External Content/` (`.txt`, `.csv`) has no UID, so it stays on `res://` paths.
   - Move files in the Godot FileSystem dock. If you move one outside the editor, move its `.uid` or `.import` file along with it, and commit the `.uid` files.
   - Hand-written `.tscn`/`.tres` files need a `uid="uid://…"` in their header, and each `ext_resource` line needs a `uid=` as well as its `path=`. Saving the file in the editor fills these in.
+- Keep the READMEs current in the same change that makes them wrong. Before committing, check whether the change touches something either one describes, and update only the affected lines (no rewrites).
+  - `README.md` (repo root) is what players and newcomers see on GitHub: the game's pitch and daily loop, the play link, running from source (Godot version, main scene, F5/F6), playtest scenarios, the "Save runs" switch and Debug tools, builds and deploy, and the folder layout table. Update it when any of those change: a new or renamed tab or major feature, a different Godot version or main scene, a new top-level folder, a changed deploy URL or workflow, or a new player-facing setting.
+  - `MobileHall/README.md` covers the UI's design and rules. Update it when you change a screen, an overlay, a game rule it explains (training, hospital, revive, Game Over, freeplay), saving, or the Debug tools.
+  - If a fact in this file changes too (for example the Godot version or the main scene), update it here as well.
