@@ -84,6 +84,7 @@ func _show_goods() -> void:
 			"name": look.short,
 			"tag": look.tag,
 			"color": look.color,
+			"icon": look.icon,
 			"price": item.cost,
 			"sold": ItemShop.is_sold(index),
 		}

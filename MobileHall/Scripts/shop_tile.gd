@@ -1,5 +1,6 @@
 ## One item on the Shop tab's goods grid, drawn as a parchment price tag:
-## a coloured seal with the item's short tag, its name and price.
+## a rarity-coloured seal with the item's icon (or its rarity tag when the
+## item has no icon), its name and price.
 ## A sold item (bought today) is faded, stamped "Sold" and can't be picked.
 ## The picked one gets the gold-edged tag (GoodsTagSelected in hall_theme).
 ## Scene: MobileHall/Scenes/Rows/shop_tile.tscn
@@ -21,6 +22,7 @@ const SOLD_NOTE := "Back tomorrow"
 # ---- NODES
 @onready var _tag: PanelContainer = %Tag
 @onready var _tag_text: Label = %TagText
+@onready var _tag_icon: TextureRect = %TagIcon
 @onready var _name: Label = %ItemName
 @onready var _price: Control = %Price
 @onready var _price_text: Label = %PriceText
@@ -28,7 +30,8 @@ const SOLD_NOTE := "Back tomorrow"
 @onready var _sold_stamp: Control = %SoldStamp
 
 
-## good: one entry of tab_shop.gd's PLACEHOLDER_GOODS.
+## good: {name, tag, color, icon, price, sold} built by tab_shop.gd from
+## HallStyle.item_look (icon = an ICON_FILES name, "" for none).
 func setup(good: Dictionary, is_selected: bool, on_pick: Callable) -> void:
 	var is_sold: bool = good.get("sold", false)
 	custom_minimum_size = HallFontScale.px_vec(TILE_SIZE)
@@ -40,10 +43,11 @@ func setup(good: Dictionary, is_selected: bool, on_pick: Callable) -> void:
 	_sold_stamp.visible = is_sold
 	disabled = is_sold
 	if is_sold:
-		HallStyle.style_tag(_tag, _tag_text, SOLD_TAG, HallStyle.LINE)
+		# no icon: the seal just says SOLD
+		HallStyle.style_icon_tag(_tag, _tag_text, _tag_icon, SOLD_TAG, "", HallStyle.LINE)
 		HallStyle.set_font_color(_name, HallStyle.TEXT_SOFT)
 		modulate = Color(1, 1, 1, SOLD_OPACITY)
 	else:
-		HallStyle.style_tag(_tag, _tag_text, good.tag, good.color)
+		HallStyle.style_icon_tag(_tag, _tag_text, _tag_icon, good.tag, good.get("icon", ""), good.color)
 		pressed.connect(on_pick)
 	theme_type_variation = &"GoodsTagSelected" if is_selected and not is_sold else &"GoodsTag"

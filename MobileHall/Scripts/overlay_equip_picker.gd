@@ -30,6 +30,7 @@ const BUTTON_CANCEL := "Cancel"
 @onready var _dim: Control = %Dim
 @onready var _tag: PanelContainer = %Tag
 @onready var _tag_text: Label = %TagText
+@onready var _tag_icon: TextureRect = %TagIcon
 @onready var _title: Label = %Title
 @onready var _effect: Label = %Effect
 @onready var _can_wear: Label = %CanWear
@@ -67,7 +68,7 @@ func refresh() -> void:
 	if _item == null:
 		return
 	var look := HallStyle.item_look(_item)
-	HallStyle.style_tag(_tag, _tag_text, look.tag, look.color)
+	HallStyle.style_icon_tag(_tag, _tag_text, _tag_icon, look.tag, look.icon, look.color)
 	_title.text = TITLE % look.name
 	_effect.text = look.effect
 

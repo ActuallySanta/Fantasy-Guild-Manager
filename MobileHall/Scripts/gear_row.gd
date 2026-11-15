@@ -2,7 +2,8 @@
 ##   - an equipped item, with Take off
 ##   - an empty slot, with Equip (opens the pick list) / Cancel
 ##   - an owned item in the pick list, with Equip / Take (if someone else has it)
-## Rarity tag on the left, name and what it does, one button on the right.
+## Rarity-coloured seal with the item's icon on the left, name and what it
+## does, one button on the right.
 ## Scene: MobileHall/Scenes/Rows/gear_row.tscn
 extends PanelContainer
 
@@ -16,6 +17,7 @@ const PICK_BG := Color("#EAF2FA")
 # ---- NODES
 @onready var _tag: PanelContainer = %Tag
 @onready var _tag_text: Label = %TagText
+@onready var _tag_icon: TextureRect = %TagIcon
 @onready var _name: Label = %ItemName
 @onready var _effect: Label = %Effect
 @onready var _button: Button = %ActionButton
@@ -24,7 +26,7 @@ const PICK_BG := Color("#EAF2FA")
 ## look: HallStyle.item_look(item). button_text "" hides the button.
 ## is_choice: a row in the pick list (tinted blue).
 func setup(look: Dictionary, button_text: String, button_kind: String, on_press: Callable, is_choice := false) -> void:
-	HallStyle.style_tag(_tag, _tag_text, look.tag, look.color)
+	HallStyle.style_icon_tag(_tag, _tag_text, _tag_icon, look.tag, look.get("icon", ""), look.color)
 	_name.text = look.name
 	_effect.text = look.effect
 	HallStyle.set_font_color(_name, HallStyle.TEXT_MAIN)
@@ -37,7 +39,8 @@ func setup(look: Dictionary, button_text: String, button_kind: String, on_press:
 
 ## An empty gear slot. hint "" hides the line under the label.
 func setup_empty(label: String, hint: String, button_text: String, button_kind: String, on_press: Callable) -> void:
-	HallStyle.style_tag(_tag, _tag_text, EMPTY_TAG, HallStyle.BORDER)
+	# no icon: the seal just shows "+"
+	HallStyle.style_icon_tag(_tag, _tag_text, _tag_icon, EMPTY_TAG, "", HallStyle.BORDER)
 	_name.text = label
 	_effect.text = hint
 	_effect.visible = hint != ""

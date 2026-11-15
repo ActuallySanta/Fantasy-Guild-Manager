@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://pdeowk8cyfpz" path="res://MobileHall/Scripts/overlay_equip_picker.gd" id="1_picker"]
 [ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_dim"]
+[ext_resource type="Texture2D" uid="uid://cfmenvuyddpqu" path="res://Sprites/Item Icons/sword_icon.png" id="9_seal_icon"]
 
 [node name="OverlayEquipPicker" type="Control"]
 visible = false
@@ -53,12 +54,25 @@ theme_type_variation = &"TypeSeal"
 
 [node name="TagText" type="Label" parent="Sheet/Col/Head/Tag"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_type_variation = &"SealLabel"
 theme_override_font_sizes/font_size = 22
 text = "MYT"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="TagIcon" type="TextureRect" parent="Sheet/Col/Head/Tag"]
+unique_name_in_owner = true
+modulate = Color(0.9294, 0.8902, 0.7961, 1)
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("9_seal_icon")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Text" type="VBoxContainer" parent="Sheet/Col/Head"]
 layout_mode = 2

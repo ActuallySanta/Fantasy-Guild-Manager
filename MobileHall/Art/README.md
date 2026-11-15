@@ -77,6 +77,15 @@ FileSystem dock as `name.tres` and set its *Source* to the new PNG, then add a r
 `ICON_FILES` in `Scripts/hall_style.gd`. Buildings pick their icon in `BUILDING_ICONS` in
 the same file. `stall` is the Shop tab.
 
+### Item icons: `Sprites/Item Icons` (outside this folder)
+
+The item seals (Shop goods, Equipment tiles, a hero's Gear rows, the Equip picker) show one
+icon per item kind, on a seal in the item's rarity colour. These are full-size **96 x 96 PNGs**
+with the drawing centred, so `ICON_FILES` points at the PNG itself (no `PixelIcon` `.tres`).
+Each item kind ("Sword", "Pointy Hat"...) picks its icon in `ITEM_ICONS` in
+`Scripts/hall_style.gd`, and a kind with no icon shows its rarity tag (COM, RAR...) instead.
+Like the line icons they're tinted cream on the seal, so keep them light with a dark outline.
+
 ## Fonts: `Art/Fonts`
 
 | Wrapper | File now | Used for |

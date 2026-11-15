@@ -175,6 +175,29 @@ const BUILDING_ICONS := {0: "quill", 1: "target", 2: "cross", 3: "swords", 4: "b
 
 # ---- items
 
+## Item kind -> icon (an ICON_FILES name) drawn on its seal, keyed by the kind
+## part of the item's name ("Rare Pointy Hat" -> "Pointy Hat"). The kinds come
+## from ExternalContentContainer's *_item_names lists; a kind missing here
+## shows its rarity tag on the seal instead.
+const ITEM_ICONS := {
+	# Knight
+	"Sword": "item_sword",
+	"Axe": "item_axe",
+	"Claymore": "item_claymore",
+	# Pathfinder
+	"Dagger": "item_dagger",
+	"Mask": "item_mask",
+	"Disguise": "item_cowl",
+	# Mage
+	"Staff": "item_staff",
+	"Orb": "item_orb",
+	"Pointy Hat": "item_pointy_hat",
+	# Priest
+	"Sigil": "item_priest_charm",
+	"Incense": "item_incense",
+	"Idol": "item_priest_book",
+}
+
 ## StandardItem.Rarity name -> short tag and seal ink (shop tags, gear rows).
 const ITEM_RARITY_LOOKS := {
 	"COMMON": {"tag": "COM", "color": Color("#6B6358")},
@@ -366,18 +389,22 @@ static func is_dead(character: GuildCharacter) -> bool:
 # ---- items
 
 
-## {name, short, tag, color, effect} for a StandardItem, e.g.
-## name "Rare Sword", short "Sword", tag "RAR", effect "+16 Power · Knights only".
+## {name, short, tag, color, icon, effect} for a StandardItem, e.g.
+## name "Rare Sword", short "Sword", tag "RAR", icon "item_sword",
+## effect "+16 Power · Knights only". icon is an ICON_FILES name for the seal
+## (see ITEM_ICONS), or "" when the kind has none.
 static func item_look(item: StandardItem) -> Dictionary:
 	var rarity_name := str(StandardItem.Rarity.find_key(item.rarity))
 	var rarity_look: Dictionary = ITEM_RARITY_LOOKS.get(rarity_name, ITEM_RARITY_LOOKS.COMMON)
 	var full_name := item.name.capitalize()
 	var space := full_name.find(" ")
+	var short_name := full_name.substr(space + 1) if space >= 0 else full_name
 	return {
 		"name": full_name,
-		"short": full_name.substr(space + 1) if space >= 0 else full_name,
+		"short": short_name,
 		"tag": rarity_look.tag,
 		"color": rarity_look.color,
+		"icon": ITEM_ICONS.get(short_name, ""),
 		"effect": item_effect(item),
 	}
 
@@ -459,6 +486,20 @@ const ICON_FILES := {
 	"escort": "uid://bkk0x60yoyngi",  # MobileHall/Art/Icons/escort.tres
 	"flag": "uid://h5m6winn3vrf",  # MobileHall/Art/Icons/flag.tres
 	"eye": "uid://2203hgt8y6l4",  # MobileHall/Art/Icons/eye.tres
+	# item seals (ITEM_ICONS). Full-size art (96 x 96 PNGs with the drawing
+	# centred), not 16 x 16 PixelIcons, so they point at the PNG itself.
+	"item_sword": "uid://cfmenvuyddpqu",  # Sprites/Item Icons/sword_icon.png
+	"item_axe": "uid://c6p5crsip6bfu",  # Sprites/Item Icons/axe_icon.png
+	"item_claymore": "uid://dipwgk3wcoggn",  # Sprites/Item Icons/claymore_icon.png
+	"item_dagger": "uid://bxa35obhdiwn5",  # Sprites/Item Icons/dagger_icon.png
+	"item_mask": "uid://b2a3ycdmkgfx0",  # Sprites/Item Icons/mask_icon.png
+	"item_cowl": "uid://yruuk72g3kj6",  # Sprites/Item Icons/cowl_icon.png
+	"item_staff": "uid://c8idiywck0qom",  # Sprites/Item Icons/staff_icon.png
+	"item_orb": "uid://dj2b6bondew6k",  # Sprites/Item Icons/orb_icon.png
+	"item_pointy_hat": "uid://b4ukfhichdx2d",  # Sprites/Item Icons/pointyHat_icon.png
+	"item_priest_charm": "uid://drkpxwhqq2642",  # Sprites/Item Icons/priestItem_icon.png
+	"item_incense": "uid://cg7gjg5y3gcm5",  # Sprites/Item Icons/incense_icon.png
+	"item_priest_book": "uid://spl6gpjgucet",  # Sprites/Item Icons/priestBook_icon.png
 	"nav_settings": "uid://ysb0ogcuiwff",  # MobileHall/Art/Icons/gear.tres
 	"nav_quests": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.tres
 	"nav_characters": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.tres
@@ -535,7 +576,7 @@ static func style_tag(tag_panel: Control, tag_label: Label, text: String, fill: 
 	tag_label.theme_type_variation = &"SealLabel"
 
 
-## A coloured seal with an icon on it (quest type, building), or its short tag
+## A coloured seal with an icon on it (quest type, building, item), or its short tag
 ## when `icon_name` has no file in ICON_FILES.
 ## tag_icon = the TextureRect inside the seal, beside tag_label; the icon is
 ## inked CREAM, the same colour as the seal's text.

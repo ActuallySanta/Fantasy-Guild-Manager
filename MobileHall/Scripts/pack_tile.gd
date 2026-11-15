@@ -1,5 +1,5 @@
 ## One item on the Pack grid (tab_pack.gd), drawn as a goods tag like the
-## Shop's: rarity seal, name and what it adds.
+## Shop's: rarity-coloured seal with the item's icon, name and what it adds.
 ## A worn item shows who wears it twice over: the hero's round portrait pinned
 ## to the tag's corner, and a navy "ON GWEN" ribbon along its foot. A spare
 ## item says "SPARE" there instead.
@@ -20,6 +20,7 @@ const SPARE_NOTE := "Spare"
 # ---- NODES
 @onready var _tag: PanelContainer = %Tag
 @onready var _tag_text: Label = %TagText
+@onready var _tag_icon: TextureRect = %TagIcon
 @onready var _name: Label = %ItemName
 @onready var _bonus: Label = %Bonus
 @onready var _ribbon: PanelContainer = %Ribbon
@@ -33,7 +34,7 @@ const SPARE_NOTE := "Spare"
 func setup(item: StandardItem, is_selected: bool, on_pick: Callable) -> void:
 	custom_minimum_size = HallFontScale.px_vec(TILE_SIZE)
 	var look := HallStyle.item_look(item)
-	HallStyle.style_tag(_tag, _tag_text, look.tag, look.color)
+	HallStyle.style_icon_tag(_tag, _tag_text, _tag_icon, look.tag, look.icon, look.color)
 	_name.text = look.short
 	var bonus := HallGear.item_bonus(item)
 	_bonus.visible = bonus.x >= 0

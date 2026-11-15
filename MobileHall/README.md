@@ -285,7 +285,7 @@ holds the whole format:
 - `Scenes/Components/`: chip, portrait, stat strip, odds bar, divider, seal button, rolled-up scroll tag
 - `Art/`: every image, icon and font (placeholders; see `Art/README.md`)
 - `Styles/` + `hall_theme.tres`: one StyleBox per surface, and the theme with every named look
-- `Scripts/hall_style.gd`: ink colours, stat / injury / odds tables, quest-type and building tables, icon table, text helpers, restyles
+- `Scripts/hall_style.gd`: ink colours, stat / injury / odds tables, quest-type, building and item-icon tables, icon table, text helpers, restyles
 
 ### Editing
 

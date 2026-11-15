@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bldrufw82je85" path="res://MobileHall/Scripts/pack_tile.gd" id="1_tile"]
 [ext_resource type="PackedScene" uid="uid://h87tubvsjwc3" path="res://MobileHall/Scenes/Components/portrait.tscn" id="2_portrait"]
+[ext_resource type="Texture2D" uid="uid://dj2b6bondew6k" path="res://Sprites/Item Icons/orb_icon.png" id="9_seal_icon"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ribbon"]
 content_margin_left = 4.0
@@ -42,12 +43,25 @@ theme_type_variation = &"TypeSeal"
 
 [node name="TagText" type="Label" parent="Col/Tag"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 theme_type_variation = &"SealLabel"
 theme_override_font_sizes/font_size = 20
 text = "LEG"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="TagIcon" type="TextureRect" parent="Col/Tag"]
+unique_name_in_owner = true
+modulate = Color(0.9294, 0.8902, 0.7961, 1)
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("9_seal_icon")
+expand_mode = 1
+stretch_mode = 5
 
 [node name="ItemName" type="Label" parent="Col"]
 unique_name_in_owner = true
