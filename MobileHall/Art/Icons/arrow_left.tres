@@ -4,5 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://8o1oi6gm4rsw" path="res://MobileHall/Art/Icons/arrow_left.png" id="2_art"]
 
 [resource]
+resource_local_to_scene = false
+resource_name = ""
 script = ExtResource("1_icon")
 source = ExtResource("2_art")
