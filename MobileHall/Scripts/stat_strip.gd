@@ -1,6 +1,7 @@
-## A row of stat chips ("Pow 6", "Def 4+2", ...) that wraps when it runs out of
-## room, led by an optional health chip. The quest's favored stat gets a heavy
-## outline so you can see who fits without reading numbers.
+## A row of stat chips ("Pow 6", "Def 6", ... totals; see chip.gd SHOW_STAT_BONUS)
+## that wraps when it runs out of room, led by an optional health chip. The
+## quest's favored stat gets a heavy outline so you can see who fits without
+## reading numbers.
 ## Scene: MobileHall/Scenes/Components/stat_strip.tscn
 ## (The scene has a Health chip, then one chip child per stat named Stat0..Stat4
 ## in hall_style STATS order.)

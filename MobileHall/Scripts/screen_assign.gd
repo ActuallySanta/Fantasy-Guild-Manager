@@ -35,6 +35,11 @@ const WRIT_STAMP_TILT := -0.16
 ## "87%" stays inside the circle art.
 const ODDS_STACK_SIZE := Vector2(210, 100)
 
+## SIMPLIFIED: true = adventurers busy on another quest are hidden unless the
+## "Show busy" toggle is on (with a "2 busy hidden" note). false = they're
+## always listed, at the bottom, and the toggle and note are hidden.
+const HIDE_BUSY_OPTION := false
+
 # ---- TEXT
 # Quest writ
 const TEXT_TYPE := "%s · Rank %s"
@@ -300,8 +305,9 @@ func shake_writ() -> void:
 # ---- picker
 
 ## Every living adventurer, best fit for this quest first (the dead are left out).
-## Adventurers in another quest's party (sent or picked) are left out unless
-## "Show busy" is on; when shown they still say which quest they're on.
+## Adventurers in another quest's party (sent or picked) go at the bottom and
+## say which quest they're on. (With HIDE_BUSY_OPTION on, they're left out
+## unless "Show busy" is on.)
 func _show_picker(entry: Dictionary) -> void:
 	# split the roster into shown / hidden
 	var shown_adventurers: Array = []
@@ -309,15 +315,16 @@ func _show_picker(entry: Dictionary) -> void:
 	for character in hall.roster():
 		if HallStyle.is_dead(character):
 			continue
-		var quest_index: int = hall.quest_index_of(character)
-		var is_busy_elsewhere: bool = quest_index >= 0 and hall.quest_entries[quest_index] != entry
-		if is_busy_elsewhere and not hall.show_busy_adventurers:
+		if _is_busy_elsewhere(entry, character) and HIDE_BUSY_OPTION and not hall.show_busy_adventurers:
 			hidden_busy_count += 1
 		else:
 			shown_adventurers.append(character)
 
-	# most chance added first
+	# free adventurers first, those on another quest last; most chance added first within each
 	shown_adventurers.sort_custom(func(first, second):
+		var is_first_busy := _is_busy_elsewhere(entry, first)
+		if is_first_busy != _is_busy_elsewhere(entry, second):
+			return not is_first_busy
 		return hall.chance_added_by(entry, first) > hall.chance_added_by(entry, second))
 
 	HallStyle.clear_children(_pick_list)
@@ -330,11 +337,19 @@ func _show_picker(entry: Dictionary) -> void:
 	_pick_heading.text = PICK_HEADING
 	_pick_hint.visible = hidden_busy_count > 0
 	_pick_hint.text = PICK_HINT_HIDDEN % hidden_busy_count
+	_show_busy_toggle.visible = HIDE_BUSY_OPTION
 	_show_busy_toggle.set_pressed_no_signal(hall.show_busy_adventurers)
 	_pick_header.visible = can_pick and has_roster
 	_pick_list.visible = can_pick
 	_all_busy_label.visible = can_pick and shown_adventurers.is_empty() and hidden_busy_count > 0
 	_no_roster_box.visible = not has_roster
+
+
+## True when `character` is in a party for a quest other than `entry`'s
+## (picked or sent). entry: the quest being assigned.
+func _is_busy_elsewhere(entry: Dictionary, character: GuildCharacter) -> bool:
+	var quest_index: int = hall.quest_index_of(character)
+	return quest_index >= 0 and hall.quest_entries[quest_index] != entry
 
 
 # ---- footer

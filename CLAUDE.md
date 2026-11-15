@@ -33,6 +33,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 - `GameState`: the day counter. `start_new_day()` emits `day_started`, which other systems listen to (ItemShop restock, hire refresh). `gold` and `standing` just forward to `GuildUpgrades`.
 - `QuestManager`: holds the `world_regions` (`Region` from `region_resource.gd`) that quests pull locations and monsters from. It also prints debug quests in `_ready`.
 - `ItemContainer` (owned items, equip/unequip) and `ItemShop` (daily stock, buying, role-locked equipping with a slot cap).
+- `Sfx` (`sound_effects.gd`): sound effects. It plays `Sfx.play(&"name")` from whatever file named `name` is dropped into `Audio/SFX/` (missing files are silent). Every button plays `ui_tap` unless its action played its own sound that frame. The names are in `SOUNDS`, and `Audio/SFX/README.md` lists them for whoever finds the sounds.
 
 **Domain resources** live in `Scripts/`:
 - `GuildCharacter` (`Character Generator/character_resource.gd`): role, injury level, `stats` plus `temp_stats`. Quests read `temp_stats`, which `reset_temp_stats()` rebuilds from the base stats, pluck, and gear. Gear never writes to `stats`.

@@ -1,11 +1,10 @@
 ## Shop sub-tab of the Items tab (tab_items.gd): the "Counter" layout, picked
 ## by the team from the three Shop mockups.
 ##   Keeper   - the shopkeeper behind his counter, with a speech bubble and
-##              the shop's name tag (top ~40% of the tab). It stays pinned
-##              behind the goods while the tab scrolls.
-##   Goods    - a 3 x 2 grid of today's goods with prices; sold-out items grey
-##              out. It sits on a wood sheet that slides up over the keeper as
-##              the player scrolls, and sticks at the top of the tab.
+##              the shop's name tag. It sits at the top of the scroll, so it
+##              scrolls away with the goods (it used to stay pinned above them
+##              and left only a small window for the grid)
+##   Goods    - a 3 x 2 grid of today's goods with prices; sold-out items grey out
 ##   Buy bar  - the picked item's name, what it does, and Buy (sits where the
 ##              action bar normally is; hall_main hides the action bar here)
 ##
@@ -20,34 +19,27 @@ extends VBoxContainer
 
 const ShopTileScene := preload("uid://b25qy8uoil5du")  # MobileHall/Scenes/Rows/shop_tile.tscn
 
-## Height of the keeper art in px. The see-through gap at the top of the
-## scroll content matches it, so at rest the goods sheet starts right below
-## the keeper.
-const KEEPER_HEIGHT := 440.0
-## How fast the keeper drifts up compared to the goods sheet as the tab
-## scrolls (0 = stays put, 1 = moves with the sheet). A little drift adds depth.
-const KEEPER_PARALLAX := 0.35
+## SIMPLIFIED (Info-Chunking): the "2 items in your pack" note beside
+## Today's Goods (a reminder that unworn items are waiting to be equipped).
+const SHOW_PACK_NOTE := false
 
 # ---- TEXT
 const SHOP_NAME := "Grizzle's Goods"
 const KEEPER_LINE := "Fresh stock every dawn!"
 const GOODS_TITLE := "TODAY'S GOODS"
 ## Only shown when the pack holds unworn items (a reminder to equip them).
-const PACK_NOTE := "%s in your inventory"
+const PACK_NOTE := "%s in your pack"
 const BUY_BUTTON := "Buy · %dg"
 const SOLD_BUTTON := "Sold"
 const NOTHING_PICKED := "Pick something"
-const SOLD_HINT := "Bought! Equip it from the Inventory."
+## (was "Bought! Equip it from the Pack." before the Pack became Equipment)
+const SOLD_HINT := "Bought! Equip it from Equipment."
 const TOO_POOR_HINT := " · Not enough gold"
 
 # ---- NODES
 @onready var _bubble_text: Label = %BubbleText
 @onready var _shop_name: Label = %ShopName
-@onready var _body: Control = %Body
-@onready var _keeper: Control = %Keeper
 @onready var _scroll: ScrollContainer = %Scroll
-@onready var _keeper_gap: Control = %KeeperGap
-@onready var _goods_sheet: Control = %GoodsSheet
 @onready var _goods_title: Label = %GoodsTitle
 @onready var _restock_note: Label = %RestockNote
 @onready var _grid: GridContainer = %Grid
@@ -69,29 +61,10 @@ func setup(main: HallMain) -> void:
 	_shop_name.text = SHOP_NAME
 	_goods_title.text = GOODS_TITLE
 	_buy_button.pressed.connect(_on_buy_pressed)
-	_keeper.offset_bottom = _keeper.offset_top + KEEPER_HEIGHT
-	_keeper_gap.custom_minimum_size.y = KEEPER_HEIGHT
-	_body.resized.connect(_fit_goods_sheet)
-	_scroll.get_v_scroll_bar().value_changed.connect(_drift_keeper)
-	_fit_goods_sheet()
 
 
 func scroll_to_top() -> void:
 	_scroll.scroll_vertical = 0
-	_drift_keeper(0.0)
-
-
-## Makes the goods sheet at least as tall as the visible area, so even a short
-## list of goods can scroll all the way over the keeper. The furthest scroll is
-## then KEEPER_HEIGHT, with the goods header stuck at the top of the tab.
-func _fit_goods_sheet() -> void:
-	_goods_sheet.custom_minimum_size.y = _body.size.y
-
-
-## Moves the keeper up a little as the goods sheet slides over it.
-## scroll: the scroll container's current vertical offset in px.
-func _drift_keeper(scroll: float) -> void:
-	_keeper.position.y = -scroll * KEEPER_PARALLAX
 
 
 func refresh() -> void:
@@ -127,7 +100,7 @@ func _show_goods() -> void:
 
 func _show_restock_note() -> void:
 	var unworn := ItemShop.unworn_count()
-	_restock_note.visible = unworn > 0
+	_restock_note.visible = SHOW_PACK_NOTE and unworn > 0
 	_restock_note.text = PACK_NOTE % HallStyle.count_text(unworn, "item", "items")
 
 
@@ -151,10 +124,15 @@ func _show_buy_bar() -> void:
 	HallStyle.style_button(_buy_button, "gold")
 
 
+## A tile was tapped: pick it. The redraw is queued, not run here.
+## Why: this runs inside the tapped tile's own release event, and refresh()
+## frees that tile. Godot stops passing an event up once its control has left
+## the tree, so the Scroll never got the release, stayed stuck "dragging",
+## and every mouse move after that scrolled the page.
 func _pick(index: int) -> void:
 	_selected = index
 	_just_picked = true
-	refresh()
+	hall.queue_refresh()
 
 
 func _on_buy_pressed() -> void:

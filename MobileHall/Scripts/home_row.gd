@@ -17,6 +17,8 @@ const FADED_OPACITY := 0.6
 const TRAINING_CARD_BG := Color("#E8F5E9")
 const HOSPITAL_CARD_BG := Color("#FBE7CF")
 const HOSPITAL_BORDER := Color("#E09A4F")
+## SIMPLIFIED: the "Free today" chip (no chip already means free).
+const SHOW_FREE_TASK := false
 
 # ---- TEXT
 const TEXT_ROLE := "the %s"
@@ -86,6 +88,7 @@ func _show_task_chip() -> void:
 	var quest_index := hall.quest_index_of(character)
 	if quest_index < 0:
 		_task_chip.set_chip(TEXT_FREE, HallStyle.NEUTRAL_BG, HallStyle.TEXT_SOFT)
+		_task_chip.visible = SHOW_FREE_TASK
 	elif hall.quest_entries[quest_index].state == HallStyle.QUEST_STATE_SENT:
 		_task_chip.set_chip(TEXT_SENT_ON % (quest_index + 1), HallStyle.GREEN_BG, HallStyle.GREEN_TEXT, "check")
 	else:

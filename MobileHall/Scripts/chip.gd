@@ -6,6 +6,11 @@
 extends PanelContainer
 
 
+## SIMPLIFIED: true = stat chips show the bonuses split out ("Pow 5+3"),
+## false = just the total ("Pow 8"). The split stays on the hero's own page
+## (screen_character.gd).
+const SHOW_STAT_BONUS := false
+
 ## Border of a filled pill, in pixels: the quest's favored stat gets a heavy
 ## one, every other filled chip a thin one.
 const FILLED_BORDER := 2
@@ -54,13 +59,16 @@ func set_health(character: GuildCharacter) -> void:
 	set_filled(look.label, look.bg, look.text, look.icon)
 
 
-## One stat as "Pow 6", or "Pow 5+3" when Armory, gear or Pluck add to it
-## (quests use the sum), in the stat's ink on its paper tint (the same look as
+## One stat as its total, "Pow 8" (base plus what Armory, gear and Pluck add;
+## quests use the sum), in the stat's ink on its paper tint (the same look as
 ## the Training Yard's stat buttons). The favored stat gets a heavy border.
 func set_stat(character: GuildCharacter, stat_index: int, is_favored: bool = false) -> void:
 	var stat: Dictionary = HallStyle.STATS[stat_index]
-	var bonus := HallStyle.stat_bonus(character, stat_index)
-	var text := "%s %d" % [stat.short, HallStyle.quest_stat_value(character, stat_index) - bonus]
-	if bonus > 0:
-		text += "+%d" % bonus
+	var total := HallStyle.quest_stat_value(character, stat_index)
+	var text := "%s %d" % [stat.short, total]
+	if SHOW_STAT_BONUS:
+		var bonus := HallStyle.stat_bonus(character, stat_index)
+		text = "%s %d" % [stat.short, total - bonus]
+		if bonus > 0:
+			text += "+%d" % bonus
 	set_filled(text, stat.bg, stat.color, "", FAVORED_BORDER if is_favored else FILLED_BORDER)

@@ -7,6 +7,15 @@ extends PanelContainer
 const HomeRowScene := preload("uid://br273xs77xnj3")  # MobileHall/Scenes/Rows/home_row.tscn
 const HeadingScene := preload("uid://bve0dglxrk3x4")  # MobileHall/Scenes/Rows/home_heading.tscn
 
+# ---- SIMPLIFIED (Info-Chunking): set to true to restore
+## The Training Yard's "0 of 1 slot · +1 a night" line under its name.
+const SHOW_TRAINING_SUMMARY := false
+## The Hospital's "2 in a bed" / "Nobody is hurt" line under its name. The red
+## "1 hurt, not in a bed" warning shows either way.
+const SHOW_HOSPITAL_CALM_SUMMARY := false
+## "Trainees gain a stat each night." in an empty Training Yard.
+const SHOW_EMPTY_TRAINING_NOTE := false
+
 # ---- TEXT
 const TEXT_LEVEL := "Lv %d"
 const TEXT_TRAINING_SUMMARY := "%d of %d %s · +%d a night"
@@ -75,6 +84,7 @@ func _show_training() -> void:
 	var roster: Array = hall.roster()
 	var trainees := roster.filter(func(character): return GuildUpgrades.is_training(character))
 	_summary.text = TEXT_TRAINING_SUMMARY % [trainees.size(), slots, HallStyle.pick_plural(slots, "slot", "slots"), GuildUpgrades.get_training_gain()]
+	_summary.visible = SHOW_TRAINING_SUMMARY
 	HallStyle.set_font_color(_summary, HallStyle.BLUE_TEXT if GuildUpgrades.has_free_training_slot() else HallStyle.TEXT_SOFT)
 
 	for character in trainees:
@@ -95,7 +105,7 @@ func _show_training() -> void:
 				_add_row().show_cant_train(hall, character)
 
 	_empty_label.text = TEXT_EMPTY_TRAINING
-	_empty_label.visible = trainees.is_empty() and not is_picking
+	_empty_label.visible = SHOW_EMPTY_TRAINING_NOTE and trainees.is_empty() and not is_picking
 
 	_add_button.visible = not roster.is_empty()
 	if not GuildUpgrades.has_free_training_slot():
@@ -118,15 +128,18 @@ func _show_hospital() -> void:
 		return GuildUpgrades.needs_care(character) and not GuildUpgrades.is_patient(character))
 	var fallen := roster.filter(func(character): return HallStyle.is_dead(character))
 
+	_summary.visible = true
 	if not waiting.is_empty():
 		_summary.text = TEXT_HOSPITAL_WAITING % waiting.size()
 		HallStyle.set_font_color(_summary, HallStyle.RED)
 	elif not patients.is_empty():
 		_summary.text = TEXT_HOSPITAL_IN_BED % patients.size()
 		HallStyle.set_font_color(_summary, HallStyle.TEXT_SOFT)
+		_summary.visible = SHOW_HOSPITAL_CALM_SUMMARY
 	else:
 		_summary.text = TEXT_HOSPITAL_CALM
 		HallStyle.set_font_color(_summary, HallStyle.TEXT_SOFT)
+		_summary.visible = SHOW_HOSPITAL_CALM_SUMMARY
 
 	if not patients.is_empty():
 		_add_heading(HEADING_IN_BED)

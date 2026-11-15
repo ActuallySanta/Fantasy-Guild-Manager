@@ -10,6 +10,13 @@ extends PanelContainer
 ## building squash first).
 const NEW_PIP_DELAY := 0.15
 
+# ---- SIMPLIFIED (Info-Chunking): set to true to restore
+## "Level 2 / 5" beside the level diamonds (the diamonds already show it).
+const SHOW_LEVEL_TEXT := false
+## "ready to build" beside an enabled Build button. The "need 40 more gold" /
+## "needs standing 3" reasons still show on a disabled one.
+const SHOW_READY_STATUS := false
+
 # ---- TEXT
 # Level and effect
 const TEXT_LEVEL := "Level %d / %d"
@@ -64,6 +71,7 @@ func _show_name_and_level(building: int, level: int) -> void:
 	_icon.texture = HallStyle.icon_texture(HallStyle.BUILDING_ICONS.get(building, ""))
 	_name.text = GuildUpgrades.get_building_name(building)
 	_level.text = TEXT_LEVEL % [level, GuildUpgrades.MAX_LEVEL]
+	_level.visible = SHOW_LEVEL_TEXT
 	# one diamond per level, authored in the scene
 	for pip_index in _pips.get_child_count():
 		var pip: TextureRect = _pips.get_child(pip_index)
@@ -92,7 +100,8 @@ func _show_status(building: int, is_maxed: bool) -> void:
 
 	match status:
 		GuildUpgrades.UpgradeStatus.READY:
-			_status.text = TEXT_READY
+			# blank rather than hidden, so the Build button keeps its place
+			_status.text = TEXT_READY if SHOW_READY_STATUS else ""
 			HallStyle.set_font_color(_status, HallStyle.GREEN_TEXT)
 		GuildUpgrades.UpgradeStatus.NOT_ENOUGH_GOLD:
 			_status.text = TEXT_NEED_GOLD % (GuildUpgrades.get_next_gold_cost(building) - GameState.gold)
