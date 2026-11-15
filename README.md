@@ -71,10 +71,9 @@ build.
 |---|---|
 | `MobileHall/` | The current game UI: the hall scene, tabs, overlays, styles and art. Its [README](MobileHall/README.md) covers the UI's design and rules. |
 | `Globals/` | Autoloads that hold the game state: roster, wallet and buildings, day counter, quests, items and shop. |
-| `Scripts/` | Game logic: characters, quest generation and results, items. Also the older prototype UI. |
+| `Scripts/` | Game logic: characters, quest generation, scoring and results, items, credits data. |
 | `External Content/` | Text data: names, backstories, locations, monsters, quest story parts. |
-| `Scenes/` | The older prototype UI's scenes. |
-| `Sprites/`, `Tilemaps/` | Art. |
+| `Sprites/` | Character and item icons, and the Shop tab's art. |
 | `Builds/` | Committed desktop builds from earlier iterations. |
 
 [CLAUDE.md](CLAUDE.md) has more detail on the architecture and code conventions.

@@ -38,11 +38,12 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 **Domain resources** live in `Scripts/`:
 - `GuildCharacter` (`Character Generator/character_resource.gd`): role, injury level, `stats` plus `temp_stats`. Quests read `temp_stats`, which `reset_temp_stats()` rebuilds from the base stats, pluck, and gear. Gear never writes to `stats`.
 - `CreatedQuest` (`Quest Creator/quest_resource.gd`): generating a quest, `calcSuccessChance`, and playing it out. `generateResults` (or `generateMilestoneResults`) returns BBCode story text and changes the quest's `goldReward` and the party's injuries as it goes.
-  - Success is detected by searching the text: `DayBar._did_succeed` checks for "NOT SUCCESSFUL".
+  - Success is detected by searching the text: `QuestScoring.did_succeed` checks for "NOT SUCCESSFUL".
+- `QuestScoring` (`Quest Creator/quest_scoring.gd`): static scoring rules: `get_success_chance`, `did_succeed`, `get_gold_earned`, and `get_slot_count` (party size).
   - Quest story text comes from pipe-delimited rows in `External Content/Quest Stuff (Test)/Story Parts.txt` (`type|intro|middle|fail|success`), read with `get_Quest_Story(questNum, column)`. `{location}` is filled in with `String.format`.
 - Items (`Item System/`): `StandardItem` (abstract: rarity weights in the `Rarity` enum values, cost) → `PassiveItem` (a stat bonus) and `ActiveItem`.
 
-**There are two UIs.** `MobileHall/` is the current one:
+**The UI** lives in `MobileHall/`:
 - `hall_main.gd` owns all of the day's state and every game action: drafting parties, `end_day()` → `_run_quest()` → the Day Report. Everything else is split out:
   - `hall_rules.gd` (`HallRules`): static functions for building the day's quests and playing one out (`build_day_quests`, `play_quest`, `pluck_gain_for`). The quest-count and rank tuning tables live here, plus the final battle (`HallMain.FINAL_DAY`) and freeplay scaling (`freeplay_scale`, the S++ rank).
   - `hall_ledger.gd` (`HallLedger`): static functions for whether the run is over, the danger checks, the Game Over numbers, and the final battle's credits (`build_credits`, `build_run_records`). They take `run_stats` and the roster as parameters.
@@ -54,8 +55,6 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 - Every widget is an authored scene. Each script has a header naming its scene, a `TEXT` section of string constants, and a `NODES` section of `@onready var _x = %X` unique names.
 - All colors and tables live in `MobileHall/Scripts/hall_style.gd`. Story BBCode colors are bright, meant for dark backgrounds. `report_entry.gd` `STORY_RECOLORS` swaps them for colors that read on the light cards, so a new story color needs an entry there.
 - `MobileHall/README.md` covers the UI's design and rules (training, hospital, revive). The root `README.md` is the GitHub front page: what the game is and how to run it. Keep both current (see Conventions).
-
-The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still borrows its scoring helpers: it uses `Scripts/UI/day_bar.gd` (`class_name DayBar`) for `_get_success_chance`, `_did_succeed`, and `_get_gold_earned`. Changes to quest payout or results need to keep `day_bar.gd` working too.
 
 ## Conventions
 
@@ -74,7 +73,7 @@ The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still b
     - When a change would break old saves, tell Santi before making it, then bump `SAVE_VERSION` and add a `_migrate_N_to_N+1` step to `HallSave._migration_steps()`.
   - Run state that has to reset on a new run stays in instance variables on `HallMain`. Never put it in a `static var` or a new autoload: `start_new_run` resets by reloading the scene, and those survive the reload.
 - File references should survive files being moved:
-  - Reach scripts through their `class_name` (`HallStyle`, `HallMain`, `HallFx`, `TapPanel`, `DayBar`, …), not `preload("res://….gd")`. Name them directly (`HallStyle.X`, `HallFx.X`): GDScript rejects `const Style := HallStyle` as "not a constant expression" here.
+  - Reach scripts through their `class_name` (`HallStyle`, `HallMain`, `HallFx`, `TapPanel`, `QuestScoring`, …), not `preload("res://….gd")`. Name them directly (`HallStyle.X`, `HallFx.X`): GDScript rejects `const Style := HallStyle` as "not a constant expression" here.
   - Load scenes and assets by uid with the path in a trailing comment: `preload("uid://…")  # MobileHall/Scenes/Rows/quest_row.tscn`. Look up a file's uid in its header (`.tscn`/`.tres`), its `.import` file, or its `.gd.uid` file.
   - Text data in `External Content/` (`.txt`, `.csv`) has no UID, so it stays on `res://` paths.
   - Move files in the Godot FileSystem dock. If you move one outside the editor, move its `.uid` or `.import` file along with it, and commit the `.uid` files.

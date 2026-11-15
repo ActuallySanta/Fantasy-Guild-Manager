@@ -11,7 +11,6 @@ class_name HallRules
 
 ## How many quests the board gets, by day: the first row whose `max_day` the
 ## day is at or under is used. Days past the last row get QUESTS_PER_DAY_LATE.
-## (Same ramp as QuestList.quests_per_day.)
 const QUESTS_PER_DAY_BY_DAY := [
 	{"max_day": 2, "count": 1},
 	{"max_day": 6, "count": 2},
@@ -102,7 +101,7 @@ static func new_entry(quest: CreatedQuest, is_milestone: bool) -> Dictionary:
 	return {"quest": quest, "state": HallStyle.QUEST_STATE_OPEN, "party": [], "milestone": is_milestone, "final": false}
 
 
-## Today's quest entries. Mirrors QuestList.populate / _generate_quests:
+## Today's quest entries:
 ## the milestone day has only the Bone Drake, HallMain.FINAL_DAY has only the
 ## final battle, every other day has quests_per_day(day). In freeplay (after
 ## FINAL_DAY) ranks can roll past S into S++, and every quest scales up a
@@ -235,7 +234,7 @@ static func trains_stat(chance: float, rank: int) -> bool:
 
 # ============================================================ PLAYING A QUEST
 
-## Play out one quest with DayBar's helpers and pay its gold and standing into
+## Play out one quest with QuestScoring and pay its gold and standing into
 ## GameState. On a win the party trains a stat (good odds, see trains_stat) or
 ## gains Pluck (riskier odds), found equipment goes into the pack, and the
 ## fallen remember where they fell. The run's tallies are left to the caller
@@ -260,7 +259,7 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 		injury_before[character] = character.injury_level
 
 	# play it out
-	var chance: float = DayBar._get_success_chance(entry.quest, party)
+	var chance: float = QuestScoring.get_success_chance(entry.quest, party)
 	# only play the quest out once, or its loot and injuries would be rolled twice
 	var story: String
 	# ==== FINAL QUEST STORY ==================================================
@@ -268,11 +267,11 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 	# When it has its own story, add a branch here, for example:
 	#   elif entry.final:
 	#       story = entry.quest.generateFinalResults(party, chance)
-	# A loss must still contain "NOT SUCCESSFUL" (DayBar._did_succeed).
+	# A loss must still contain "NOT SUCCESSFUL" (QuestScoring.FAIL_MARKER).
 	# ==== END FINAL QUEST STORY ==============================================
 	story = entry.quest.generateResults(party, chance)
-	var succeeded: bool = DayBar._did_succeed(story)
-	var gold_earned: int = DayBar._get_gold_earned(entry.quest, succeeded)
+	var succeeded: bool = QuestScoring.did_succeed(story)
+	var gold_earned: int = QuestScoring.get_gold_earned(entry.quest, succeeded)
 	var standing_earned: int = standing_for_win(entry.quest) if succeeded else 0
 	GameState.add_gold(gold_earned)
 	GameState.add_standing(standing_earned)

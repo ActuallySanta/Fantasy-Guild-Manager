@@ -109,9 +109,9 @@ static func tonight_earnings(entries: Array) -> Dictionary:
 		var party: Array[GuildCharacter] = []
 		party.assign(entry.party)
 		# calcSuccessChance can run past 100 (a sure thing)
-		var chance := clampf(DayBar._get_success_chance(quest, party) / 100.0, 0.0, 1.0) if not party.is_empty() else 0.0
-		# a loss still pays what DayBar says it does (gold found along the way)
-		expected += chance * DayBar._get_gold_earned(quest, true) + (1.0 - chance) * DayBar._get_gold_earned(quest, false)
+		var chance := clampf(QuestScoring.get_success_chance(quest, party) / 100.0, 0.0, 1.0) if not party.is_empty() else 0.0
+		# a loss still pays what QuestScoring says it does (gold found along the way)
+		expected += chance * QuestScoring.get_gold_earned(quest, true) + (1.0 - chance) * QuestScoring.get_gold_earned(quest, false)
 	result.expected = roundi(expected)
 	return result
 

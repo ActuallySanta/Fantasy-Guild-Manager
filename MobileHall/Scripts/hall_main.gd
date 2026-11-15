@@ -47,8 +47,8 @@
 ##   hall_style.gd / hall_fx.gd         colors and tables / animations
 ##
 ## UI only: every rule comes from the existing systems (CharacterContainer,
-## GuildCharacter, CreatedQuest, GameState, GuildUpgrades, DayBar's scoring
-## helpers). Training and healing rules live in GuildUpgrades (run_night).
+## GuildCharacter, CreatedQuest, GameState, GuildUpgrades, QuestScoring).
+## Training and healing rules live in GuildUpgrades (run_night).
 ##
 ## Sections:
 ##   SETTINGS · TEXT · STATE · NODES · SETUP · QUERIES ·
@@ -67,7 +67,7 @@ signal tutorial_event(event: String, data: Variant)
 
 # ============================================================ SETTINGS
 
-## The day QuestList swaps the board for the milestone (Bone Drake) quest.
+## The day the board is swapped for the milestone (Bone Drake) quest.
 const MILESTONE_DAY := 10
 ## The day of the main story's final battle: the board holds only that quest,
 ## a win rolls the credits and offers freeplay, a loss ends the run.
@@ -562,7 +562,7 @@ func build_credits(result: Dictionary) -> Dictionary:
 # ---- quests
 
 
-## Quests still needing Send or Deny. Same rule as QuestCard.is_outstanding.
+## Quests still needing Send or Deny.
 func undecided_count() -> int:
 	return quest_entries.filter(func(entry): return entry.state == HallStyle.QUEST_STATE_OPEN).size()
 
@@ -603,7 +603,7 @@ func hurt_waiting_count() -> int:
 
 ## How many adventurers a quest takes at most.
 func party_size_limit(entry: Dictionary) -> int:
-	return QuestCard.get_slot_count(entry.quest)
+	return QuestScoring.get_slot_count(entry.quest)
 
 
 ## Success chance (0-100+) as the quest computes it, or -1 for an empty party.
@@ -1421,7 +1421,7 @@ func close_end_check() -> void:
 	queue_refresh()
 
 
-## Mirrors DayBar.end_day: run every quest that has a party, pay out, show the report.
+## Run every quest that has a party, pay out, show the report.
 ## Dusk washes over the screen while the night plays out; the report shows
 ## under it. The gold / standing counters hold still until dawn (start_new_day),
 ## so the night's earnings land when the doors open.
@@ -1512,7 +1512,7 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 	return result
 
 
-## DaySummary's "New Day" button. Keeps tonight's report for the Menu and opens on the Board.
+## The Day Report's "New Day" button. Keeps tonight's report for the Menu and opens on the Board.
 func start_new_day() -> void:
 	# a skipped day (HallDebug.skip_day) has no report, so last night's is kept
 	if not shown_report.is_empty():

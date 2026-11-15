@@ -110,7 +110,7 @@ var styleOfQuest = QuestStyle
 
 ## The equipment this quest pays instead of gold, rolled when the quest is made
 ## so the Board can show it. Empty for a normal gold quest. Only paid out when
-## the quest succeeds (HallRules.play_quest / DayBar add it to ItemContainer).
+## the quest succeeds (HallRules.play_quest adds it to ItemContainer).
 var reward_items: Array[StandardItem]
 
 ## Chance (percent) on day 1 that a standard quest pays in items instead of gold.

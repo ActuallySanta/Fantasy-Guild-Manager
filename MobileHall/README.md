@@ -5,7 +5,7 @@ Flow and Ledger prototypes. It keeps Flow's structure (one clear next step, stat
 while picking a party), adds Ledger's navigation aids (tab badges, a home summary), and
 changes the things all three were criticized for.
 It is **UI only**: it runs on the existing systems (`CharacterContainer`, `GuildCharacter`,
-`CreatedQuest`, `GameState`, `GuildUpgrades`, `DayBar`'s scoring helpers) and changes none of them.
+`CreatedQuest`, `GameState`, `GuildUpgrades`, `QuestScoring`) and changes none of them.
 
 - **Run it:** open `MobileHall/hall_main.tscn` and press *Run Current Scene* (F6).
   The project's main scene is unchanged.

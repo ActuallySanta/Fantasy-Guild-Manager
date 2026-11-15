@@ -6,12 +6,6 @@
 ##   - Training Yard -> heroes in a training slot gain a stat each night
 ##   - Hospital -> injuries heal over the nights, faster for patients
 ##     (run_night() applies both; the MobileHall UI calls it at End Day)
-## Other UI is kept in sync without editing it: hiring-page totals are refreshed
-## after an upgrade, and character cards show boosted stats as "5 (+1)".
-## It also wires itself to the "UpgrButton" on the nav bar at runtime, so no
-## other scene has to be edited to open the upgrades page. The Characters tab
-## ("CharButton") gets the same tab behaviour: it hides the quest list while
-## open and is closed by the other nav tabs (the page has no close button).
 extends Node
 
 signal upgrades_changed
@@ -24,10 +18,7 @@ enum Building { OFFICE, TRAINING_YARD, HOSPITAL, ARMORY, BARRACKS }
 enum UpgradeStatus { READY, STANDING_TOO_LOW, NOT_ENOUGH_GOLD, MAX_LEVEL, NOT_IMPLEMENTED }
 
 const MAX_LEVEL := 5
-const UPGRADES_PAGE_PATH := "uid://d28mfgqtx1wvr"  # Scenes/UI/Upgrades/upgrades_page.tscn
 const ARMORY_META := "armory_bonus_applied"
-const HOOKED_META := "guild_upgrades_hooked"
-const CHARACTER_PAGE_NAME := "Guild Character Page"
 
 ## Display info for each building. "implemented" = its effect actually does
 ## something in the game yet.
@@ -89,9 +80,6 @@ var patients: Array[GuildCharacter] = []
 ## Revives used this run (Hospital level 5).
 var revives_used := 0
 
-var _page: Control
-var _character_page: Control
-var _hidden_content: Array[CanvasItem] = []
 var _last_character_count := -1
 
 
@@ -99,10 +87,6 @@ func _ready() -> void:
 	for b in Building.values():
 		levels[b] = 1
 
-	# Hook nodes added later, and (deferred) everything already in the tree,
-	# since the main scene may be in the tree before this autoload is ready.
-	get_tree().node_added.connect(_on_node_added)
-	_scan_tree.call_deferred(get_tree().root)
 	CharacterContainer.on_character_added.connect(sync_characters)
 	_apply_effects()
 
@@ -444,22 +428,6 @@ func _forget_missing_heroes() -> void:
 func _apply_effects() -> void:
 	CharacterContainer.max_characters = get_max_heroes()
 	sync_characters()
-	_refresh_other_ui()
-
-
-## Re-runs other pages' own refresh functions that depend on upgrade effects,
-## e.g. the hiring page's "TOTAL: x / max" label.
-func _refresh_other_ui() -> void:
-	if not is_inside_tree():
-		return
-	_call_on_tree(get_tree().root, "update_character_total")
-
-
-func _call_on_tree(node: Node, method: StringName) -> void:
-	if node != self and node.is_node_ready() and node.has_method(method):
-		node.call(method)
-	for child in node.get_children():
-		_call_on_tree(child, method)
 
 
 ## Makes every hero's stats include exactly the current Armory bonus. The amount
@@ -488,119 +456,3 @@ func get_stat_bonus(character: GuildCharacter, stat: GuildCharacter.StatType) ->
 		GuildCharacter.StatType.DEFENSE:
 			return applied.y
 	return 0
-
-
-## "Power: 5 (+1)" — base stat with the upgrade bonus shown separately.
-## character.stats already includes the bonus, so quests use the boosted value.
-func format_stat(character: GuildCharacter, stat: GuildCharacter.StatType, label: String) -> String:
-	var total: int = character.stats[stat]
-	var bonus := get_stat_bonus(character, stat)
-	if bonus == 0:
-		return "%s: %d" % [label, total]
-	return "%s: %d (+%d)" % [label, total - bonus, bonus]
-
-
-func _patch_character_card(card: Node) -> void:
-	if not is_instance_valid(card) or card.loaded_character == null:
-		return
-	var character: GuildCharacter = card.loaded_character
-	sync_characters()
-	card.strength_label.text = format_stat(character, GuildCharacter.StatType.STRENGTH, "Power")
-	card.defense_label.text = format_stat(character, GuildCharacter.StatType.DEFENSE, "Defense")
-
-# ---------------------------------------------------------------- nav bar hookup
-
-
-func _on_node_added(node: Node) -> void:
-	if node is Button and _is_nav_button(node):
-		if node.has_meta(HOOKED_META):
-			return
-		node.set_meta(HOOKED_META, true)
-		if node.name == "UpgrButton":
-			node.pressed.connect(open_page.bind(node))
-		elif node.name == "CharButton":
-			node.pressed.connect(open_character_page.bind(node))
-		else:
-			# Any other nav tab closes the upgrades / characters pages.
-			node.pressed.connect(close_page)
-	elif node is CharacterUICard:
-		# Runs after the card's own _ready has filled in its labels.
-		_patch_character_card.call_deferred(node)
-
-
-func _scan_tree(node: Node) -> void:
-	_on_node_added(node)
-	for child in node.get_children():
-		_scan_tree(child)
-
-
-func _is_nav_button(node: Node) -> bool:
-	var parent := node.get_parent()
-	return parent != null and parent.get_parent() != null and parent.get_parent().name == "NavBar"
-
-
-func open_page(from_button: Node = null) -> void:
-	if _page == null or not is_instance_valid(_page):
-		_page = load(UPGRADES_PAGE_PATH).instantiate()
-		_get_page_host(from_button).add_child(_page)
-	_show_tab(_page)
-
-
-## The page lives inside the home screen's "Content" panel (same spot as the
-## Characters page) so the top bar and nav bar stay visible. Falls back to the
-## scene root if no Content panel is found.
-func _get_page_host(from_button: Node) -> Node:
-	var root: Node = get_tree().current_scene
-	if from_button != null and from_button.owner != null:
-		root = from_button.owner
-	var content: Node = root.find_child("Content", true, false)
-	return content if content != null else root
-
-
-## Characters tab. The home screen's own CharButton handler also shows the
-## page; this just makes it behave like a tab (hides the quest list / upgrades).
-func open_character_page(from_button: Node = null) -> void:
-	if _character_page == null or not is_instance_valid(_character_page):
-		var root: Node = get_tree().current_scene
-		if from_button != null and from_button.owner != null:
-			root = from_button.owner
-		_character_page = root.find_child(CHARACTER_PAGE_NAME, true, false) as Control
-	if _character_page != null:
-		_show_tab(_character_page)
-
-
-func close_page() -> void:
-	for tab in [_page, _character_page]:
-		if tab != null and is_instance_valid(tab):
-			tab.hide()
-	_restore_other_content()
-
-
-func _is_tab_page(node: Node) -> bool:
-	return node != null and (node == _page or node == _character_page)
-
-
-## Tab pages have no background of their own (the Content panel's blue shows
-## through), so hide whatever else is showing in the panel while one is open
-## and bring it back when the tabs close. Other tab pages are just hidden,
-## not remembered, so switching tabs never brings the old one back.
-func _show_tab(tab: Control) -> void:
-	var host := tab.get_parent()
-	if host != null and host != get_tree().current_scene:
-		for child in host.get_children():
-			if child == tab or not (child is CanvasItem) or not child.visible:
-				continue
-			if _is_tab_page(child):
-				child.hide()
-			elif not _hidden_content.has(child):
-				_hidden_content.append(child)
-				child.hide()
-	tab.move_to_front()
-	tab.show()
-
-
-func _restore_other_content() -> void:
-	for node in _hidden_content:
-		if is_instance_valid(node):
-			node.show()
-	_hidden_content.clear()
