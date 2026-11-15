@@ -47,13 +47,13 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
   - `hall_rules.gd` (`HallRules`): static functions for building the day's quests and playing one out (`build_day_quests`, `play_quest`, `pluck_gain_for`). The quest-count and rank tuning tables live here, plus the final battle (`HallMain.FINAL_DAY`) and freeplay scaling (`freeplay_scale`, the S++ rank).
   - `hall_ledger.gd` (`HallLedger`): static functions for whether the run is over, the danger checks, the Game Over numbers, and the final battle's credits (`build_credits`, `build_run_records`). They take `run_stats` and the roster as parameters.
   - `hall_settings.gd` (`HallSettings`): loading and saving the accessibility settings.
-  - `hall_save.gd` (`HallSave`): the run's save file (`user://run_save.dat`, IndexedDB on the web). `hall_main` saves after every refresh and loads in `_ready`. New run state has to be added to `build_snapshot`/`apply_snapshot` (or the `*_FIELDS` lists for heroes, items and quests), and `SAVE_VERSION` bumped when old saves can't be read. See `MobileHall/README.md` "Saving and offline play".
+  - `hall_save.gd` (`HallSave`): the run's save file (`user://run_save.dat`, IndexedDB on the web). `hall_main` saves after every refresh and loads in `_ready`. New run state has to be added to `build_snapshot`/`apply_snapshot` (or the `*_FIELDS` lists for heroes, items and quests). Old saves are brought up to date by `HallSave.migrate` (see "Save compatibility" below). `hall_save_transfer.gd` (`HallSaveTransfer`) turns a run into a backup code and back, and `hall_web_files.gd` (`HallWebFiles`) moves it on and off the device (share sheet, clipboard, file picker; JavaScript on the web), for the Menu's Backup save sheet. See `MobileHall/README.md` "Saving and offline play".
   - The shell pieces are scenes in `MobileHall/Scenes/Shell/`: `hall_header` (the day tile, Bone Drake countdown, gold/standing counters and their motion, danger strip), `hall_action_bar`, `hall_nav`, and `hall_toast`.
   - `hall_main` keeps one-line query wrappers (`is_run_over()`, `build_run_over_stats()`, …) so views still only talk to `hall`.
 - Tabs, screens, overlays, shell pieces, and rows get `setup(hall)`, then read queries and call actions on `hall`. They never change game state themselves. After a change, `hall_main` calls `refresh()` on whatever is showing.
 - Every widget is an authored scene. Each script has a header naming its scene, a `TEXT` section of string constants, and a `NODES` section of `@onready var _x = %X` unique names.
 - All colors and tables live in `MobileHall/Scripts/hall_style.gd`. Story BBCode colors are bright, meant for dark backgrounds. `report_entry.gd` `STORY_RECOLORS` swaps them for colors that read on the light cards, so a new story color needs an entry there.
-- `MobileHall/README.md` covers the UI's design and rules (training, hospital, revive).
+- `MobileHall/README.md` covers the UI's design and rules (training, hospital, revive). The root `README.md` is the GitHub front page: what the game is and how to run it. Keep both current (see Conventions).
 
 The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still borrows its scoring helpers: it uses `Scripts/UI/day_bar.gd` (`class_name DayBar`) for `_get_success_chance`, `_did_succeed`, and `_get_gold_earned`. Changes to quest payout or results need to keep `day_bar.gd` working too.
 
@@ -68,6 +68,10 @@ The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still b
   - Game rules that don't touch nodes (quest generation, payouts, run-over checks) go in a script of static functions with a `class_name`, like `HallRules` and `HallLedger`. They take what they need as parameters.
   - A part of the screen with its own nodes and refresh code becomes its own authored scene with `setup(hall)` and `refresh()`, like the tabs, overlays, and `Scenes/Shell/` pieces. Don't add inline nodes to `hall_main.tscn` for `hall_main.gd` to draw.
   - `hall_main.gd` keeps only the day's state, the actions that change it, thin query wrappers, and refresh orchestration.
+  - **Save compatibility:** saves and backup codes from older versions must keep loading (`HallSave.migrate`).
+    - Safe: adding a saved field, building, or run-state value. Old saves get the default, as long as `apply_snapshot` reads it with `.get(key, default)`.
+    - Breaks old saves: renaming or removing a saved field (`*_FIELDS`, `build_snapshot` keys), changing what a saved value means or its units, reordering a saved enum (`Rarity`, roles, stats, injury levels), or changing the `REF_*` / item `kind` handling.
+    - When a change would break old saves, tell Santi before making it, then bump `SAVE_VERSION` and add a `_migrate_N_to_N+1` step to `HallSave._migration_steps()`.
   - Run state that has to reset on a new run stays in instance variables on `HallMain`. Never put it in a `static var` or a new autoload: `start_new_run` resets by reloading the scene, and those survive the reload.
 - File references should survive files being moved:
   - Reach scripts through their `class_name` (`HallStyle`, `HallMain`, `HallFx`, `TapPanel`, `DayBar`, …), not `preload("res://….gd")`. Name them directly (`HallStyle.X`, `HallFx.X`): GDScript rejects `const Style := HallStyle` as "not a constant expression" here.
@@ -75,3 +79,7 @@ The older prototype UI lives in `Scenes/` and `Scripts/UI/`. `hall_main` still b
   - Text data in `External Content/` (`.txt`, `.csv`) has no UID, so it stays on `res://` paths.
   - Move files in the Godot FileSystem dock. If you move one outside the editor, move its `.uid` or `.import` file along with it, and commit the `.uid` files.
   - Hand-written `.tscn`/`.tres` files need a `uid="uid://…"` in their header, and each `ext_resource` line needs a `uid=` as well as its `path=`. Saving the file in the editor fills these in.
+- Keep the READMEs current in the same change that makes them wrong. Before committing, check whether the change touches something either one describes, and update only the affected lines (no rewrites).
+  - `README.md` (repo root) is what players and newcomers see on GitHub: the game's pitch and daily loop, the play link, running from source (Godot version, main scene, F5/F6), playtest scenarios, the "Save runs" switch and Debug tools, builds and deploy, and the folder layout table. Update it when any of those change: a new or renamed tab or major feature, a different Godot version or main scene, a new top-level folder, a changed deploy URL or workflow, or a new player-facing setting.
+  - `MobileHall/README.md` covers the UI's design and rules. Update it when you change a screen, an overlay, a game rule it explains (training, hospital, revive, Game Over, freeplay), saving, or the Debug tools.
+  - If a fact in this file changes too (for example the Godot version or the main scene), update it here as well.

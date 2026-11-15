@@ -14,7 +14,7 @@
 ## Overlays over everything: End Day check, Day Report, Welcome, Menu,
 ## the Game Over ledger (when the guild is stuck with nobody left; see is_run_over),
 ## and the final battle's credits roll (FINAL_DAY; a victory or a defeat).
-## (The Training Yard and Hospital live on the Upgrades tab's Tonight half.)
+## (The Training Yard and Hospital live on the Upgrades tab's Facilities half.)
 ## On top of all of it: the colorblind filter (set from the Menu, saved to disk).
 ##
 ## What the feedback asked for, and where it lives:
@@ -176,7 +176,7 @@ const TOAST_DEBUG_ON := "Debug run: saving off"
 const TOAST_DEBUG_GOLD := "%+d gold"
 const TOAST_DEBUG_STANDING := "%+d standing"
 const TOAST_DEBUG_HERO := "%s joined the guild (debug)"
-const TOAST_DEBUG_ITEM := "%s added to the Pack"
+const TOAST_DEBUG_ITEM := "%s added to Equipment"
 const TOAST_DEBUG_HEALED := "Healed %d, revived %d"
 const TOAST_DEBUG_LEFT_DEAD := "Healed %d, revived %d (%d dead: no free bed)"
 const TOAST_DEBUG_MAXED := "Every building is at level %d"
@@ -214,7 +214,7 @@ var items_section := ITEMS_SECTION_SHOP
 ## The day the Items tab last opened on its own: the first visit each day
 ## shows the Shop (fresh stock), later ones keep whichever half was left open.
 var shop_last_seen_day := 0
-## Upgrades > Tonight: the "+ Add a hero" list under the Training Yard is open.
+## Upgrades > Facilities: the "+ Add a hero" list under the Training Yard is open.
 var training_picker_open := false
 ## The screen covering the tabs, or {} for none:
 ##   {kind: SCREEN_ASSIGN, quest_index: int}
@@ -246,6 +246,8 @@ var is_welcome_from_menu := false
 var is_menu_open := false
 ## The Menu's Accessibility sheet (text size, colorblind filter, reduced motion).
 var is_accessibility_open := false
+## The Menu's Backup save sheet (export / import a save code: overlay_backup.gd).
+var is_backup_open := false
 ## The Menu's Debug tools sheet (overlay_debug.gd).
 var is_debug_open := false
 ## The Game Over ledger's numbers, or {} while the run is still going.
@@ -369,6 +371,7 @@ var tutorial: Control
 @onready var _welcome_overlay: Control = %OverlayWelcome
 @onready var _menu_overlay: Control = %OverlayMenu
 @onready var _accessibility_overlay: Control = %OverlayAccessibility
+@onready var _backup_overlay: Control = %OverlayBackup
 @onready var _debug_overlay: Control = %OverlayDebug
 @onready var _game_over_overlay: Control = %OverlayGameOver
 @onready var _credits_overlay: Control = %OverlayCredits
@@ -592,7 +595,7 @@ func can_go_on_quests(character: GuildCharacter) -> bool:
 			and not GuildUpgrades.is_training(character)
 
 
-## Hurt heroes who aren't in a Hospital bed (the Upgrades > Tonight badge).
+## Hurt heroes who aren't in a Hospital bed (the Upgrades > Facilities badge).
 func hurt_waiting_count() -> int:
 	return roster().filter(func(character):
 		return GuildUpgrades.needs_care(character) and not GuildUpgrades.is_patient(character)).size()
@@ -712,7 +715,7 @@ func show_guild_section(section: String) -> void:
 	open_tab("guild", section)
 
 
-## The Upgrades tab's Tonight / Build buttons.
+## The Upgrades tab's Facilities / Build buttons.
 func show_upgrades_section(section: String) -> void:
 	open_tab("upgrades", section)
 
@@ -791,6 +794,21 @@ func close_accessibility(go_to_menu: bool = true) -> void:
 	is_accessibility_open = false
 	is_menu_open = go_to_menu
 	Sfx.play(&"page_close")
+	queue_refresh()
+
+
+## The Menu's Backup save button: its sheet replaces the Menu.
+func open_backup() -> void:
+	is_menu_open = false
+	is_backup_open = true
+	queue_refresh()
+
+
+## Back from Backup save to the Menu (go_to_menu = false closes both, for a
+## tap on the dimmed background).
+func close_backup(go_to_menu: bool = true) -> void:
+	is_backup_open = false
+	is_menu_open = go_to_menu
 	queue_refresh()
 
 
@@ -1137,7 +1155,7 @@ func swap_gear(item_on: StandardItem, item_off: StandardItem, character: GuildCh
 	queue_refresh()
 
 
-# ---- Upgrades > Tonight: Training Yard and Hospital
+# ---- Upgrades > Facilities: Training Yard and Hospital
 
 
 ## "+ Add a hero" under the Training Yard: show / hide who can train.
@@ -1552,13 +1570,26 @@ func start_new_run() -> void:
 		HallSave.delete_save()
 		# this hall is on its way out: the refresh its resets queue mustn't save a half-reset run
 		uses_save_file = false
+	reset_autoloads()
+	get_tree().change_scene_to_file(MAIN_SCENE_PATH)
+
+
+## Every autoload back to a fresh Day 1 (start_new_run, and importing a backup
+## in HallSaveTransfer). Set uses_save_file = false first: the refreshes the
+## resets queue mustn't save a half-reset run.
+func reset_autoloads() -> void:
 	GameState.reset()
 	GuildUpgrades.reset()
 	ItemContainer.owned_items.clear()
 	ItemShop.restock()
 	# after GameState.reset, so For Hire is sized for Day 1
 	CharacterContainer.reset()
-	get_tree().change_scene_to_file(MAIN_SCENE_PATH)
+
+
+## The Backup sheet's import: replace this run with snapshot (from
+## HallSaveTransfer.parse_code). Returns false if it couldn't be written.
+func import_run(snapshot: Dictionary) -> bool:
+	return HallSaveTransfer.import_snapshot(self, snapshot)
 
 
 ## The victory credits' "Begin Freeplay" button: the story is over, so the
@@ -1708,6 +1739,7 @@ func _refresh_overlays() -> void:
 	_end_check_overlay.visible = not is_report_open and is_end_check_open
 	_menu_overlay.visible = not is_report_open and is_menu_open
 	_accessibility_overlay.visible = not is_report_open and is_accessibility_open
+	_backup_overlay.visible = not is_report_open and is_backup_open
 	_debug_overlay.visible = not is_report_open and is_debug_open
 	_welcome_overlay.visible = not is_report_open and is_welcome_open
 	for overlay in _all_overlays():
@@ -1716,7 +1748,7 @@ func _refresh_overlays() -> void:
 
 
 func _all_overlays() -> Array:
-	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _debug_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay]
+	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _backup_overlay, _debug_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay]
 
 
 # ============================================================ TOAST

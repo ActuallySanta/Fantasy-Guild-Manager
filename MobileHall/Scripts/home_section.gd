@@ -1,4 +1,4 @@
-## One building's card on the Upgrades tab's Tonight half: the Training Yard
+## One building's card on the Upgrades tab's Facilities half: the Training Yard
 ## (heroes in a slot, plus "+ Add a hero" to pick more) or the Hospital
 ## (heroes in a bed, hurt heroes, fallen heroes). Rows are home_row.tscn.
 ## Scene: MobileHall/Scenes/Rows/home_section.tscn

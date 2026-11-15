@@ -59,8 +59,8 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Board (tab) | Today checklist (Recruits / Quests / Upgrades, each tappable), then all quests. Rows show *Pick a party*, *Party picked*, *Sent* or *Denied* with odds and mini portraits |
 | Assign Party | Quest strip; quest card; party seats (tap to remove) with live odds; picker sorted best fit first. Adventurers already in another quest's party are hidden unless **Show busy** is on; shown, they say "Picked for / Sent on #N" and move over when tapped. Footer: Deny / Send Party, or Recall / Next Quest, or Board / Reconsider |
 | Guild (tab, "Members" in the nav) | A folder with two tabs: Your Guild (roster with health, today's task, all five stats) / Applicants (a stack of letters of introduction; tap one peeking out to read it, Hire on the top one). Bed count links to the Barracks |
-| Upgrades (tab, "Guild" in the nav) | A folder with two tabs. **Tonight**: the Training Yard plan (heroes in a slot with a Pow / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital plan (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: the treasury ledger, a plan per building (affordable first) with level diamonds, now/next effect, cost or what's missing, and "coming soon" buildings as rolled-up scrolls. Badge = upgrades you can afford |
-| Items (tab, id "shop") | A folder with two tabs; the first visit each day opens on the Shop. **Pack**: every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar where the action bar usually is |
+| Upgrades (tab, "Guild" in the nav) | A folder with two tabs. **Facilities**: the Training Yard plan (heroes in a slot with a Pow / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital plan (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: the treasury ledger, a plan per building (affordable first) with level diamonds, now/next effect, cost or what's missing, and "coming soon" buildings as rolled-up scrolls. Badge = upgrades you can afford |
+| Items (tab, id "shop") | A folder with two tabs; the first visit each day opens on the Shop. **Inventory** (the "pack" section in code): every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar where the action bar usually is |
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
 | Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story |
@@ -86,6 +86,16 @@ from falling (`HallMain.is_one_death_from_falling`). That means one hero is aliv
 in today's For Hire is affordable, and either tomorrow's recruit price is more than your
 gold or standing is within `DANGER_STANDING_MARGIN` of the floor. The Welcome card's
 "Don't run out of heroes" row and Pip's Day 1 Day Report step explain the rule.
+
+Tapping the gold coin or the standing shield in the header drops a parchment card
+from it (`HeaderPopup`; tap anywhere else to close it). The **gold** card shows what
+the quests sent tonight pay if they all win and about how much at today's odds, then
+where gold goes (hiring, gear, building upgrades) with a price tag that turns green when
+you can pay it. The **standing** card shows the rank quests center on and a two-way
+meter: the red half fills as standing nears `MINIMUM_STANDING` (recruits stop coming),
+the green half fills toward the next milestone, a quest rank or a building level. The
+numbers come from `HallWallet` (static functions); the milestones are built from
+`HallRules` and `GuildUpgrades` tuning, so they follow it.
 
 ## Final battle, credits and freeplay
 
@@ -135,7 +145,7 @@ It doesn't fake colourblindness. When it's Off the rect is hidden and costs noth
 
 ## Training Yard and Hospital
 
-Both live on the Upgrades tab's **Tonight** half (`Scenes/Rows/home_section.tscn`, one building plan each). The rules
+Both live on the Upgrades tab's **Facilities** half (`Scenes/Rows/home_section.tscn`, one building plan each). The rules
 live in `Globals/guild_upgrades.gd` (`run_night()`, called by End Day before the quests
 are played out), and the tuning numbers sit at the top of that file.
 
@@ -181,13 +191,14 @@ cheats for testing. The rules are in `Scripts/hall_debug.gd` (`HallDebug`), and 
 is `overlay_debug`. The first time in a run it only shows a warning and **Enable debug
 tools**. Enabling makes the run a **debug run** (`HallMain.is_debug_run`): it is never
 saved again, so the last save on disk stays as it was before the tools were used. A new
-run starts with saving back on.
+run starts with saving back on. **Check for update** (see "Web updates and the build line")
+sits next to "Save runs" above the warning, so it doesn't need a debug run either.
 
 - **Time:** skip to the next day (training and healing still run; no quests, no report;
   blocked on the final battle day outside freeplay), or jump to day 10 / 50 (a skip
   repeated, so For Hire and healing move on as usual).
 - **Wallet:** gold and standing steps (`HallDebug.GOLD_STEPS`, `STANDING_STEPS`).
-- **Guild:** add a free hero (needs a free bed), add a random item to the Pack, heal
+- **Guild:** add a free hero (needs a free bed), add a random item to the Inventory, heal
   everyone (the dead come back if there's a bed), max every building, reset upgrades.
 - **Run:** reroll today's quests and For Hire, skip the tutorial.
 
@@ -224,8 +235,25 @@ holds the whole format:
 - **New fields:** a new `GuildCharacter`, item or `CreatedQuest` property that matters
   between sessions goes in `CHARACTER_FIELDS` / `ITEM_FIELDS` / `QUEST_FIELDS`. A new
   piece of run state on `HallMain` or an autoload goes in `build_snapshot` and
-  `apply_snapshot`. Bump `SAVE_VERSION` when old saves can't be read with the new
-  layout: saves with another version are ignored and the player starts fresh.
+  `apply_snapshot`, read there with `.get(key, <fresh-run value>)`.
+- **Old saves keep loading:** additions need nothing. Each object is built fresh and only
+  the saved fields overwrite it, and `apply_snapshot` falls back to the fresh value for
+  anything missing, so an old save just gets defaults for new things. A breaking change
+  needs a step: renaming or removing a saved field, changing a saved value's meaning or
+  units, or reordering a saved enum. Bump `SAVE_VERSION` and add a `_migrate_N_to_N+1` step
+  to `HallSave._migration_steps()`; `HallSave.migrate` runs the steps in order on load (the
+  how-to is in its doc comment). Only a save from a *newer* version is turned away.
+- **Backup (Menu > Backup save):** the browser can clear its storage, so players can
+  keep a copy themselves. **Save backup file** opens the phone's share sheet (Save to
+  Files, Drive, email…) or downloads a `.txt` on a desktop. **Copy save code** puts the
+  same text on the clipboard. **Load backup file** / **Paste save code** (two taps: they
+  replace the run) bring one back. A code is `FGMSAVE1:` + base64(gzip(the snapshot
+  bytes)), about 5 KB of text on day 4 (`HallSaveTransfer`). The device side
+  (`HallWebFiles`) uses JavaScript on the web: the Web Share API, a download link,
+  `window.prompt` for pasting, and a hidden file input. Off the web it uses
+  `user://backups`, the clipboard, and a native file dialog. Export works with saving
+  off; an import turns "Save runs" on, writes the save, and reloads the hall into it.
+  Old backup codes migrate the same way old saves do.
 - **Starting over:** Game Over's "Found a New Guild" and the Menu's **Abandon run** (two
   taps) delete the save. Playtest scenarios never load or write it (`uses_save_file` is
   only true when the hall is the scene root).
@@ -247,8 +275,8 @@ holds the whole format:
 ## Files
 
 - `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, refresh
-- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`, `hall_save.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings, the saved run (static functions, no state)
-- `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip), action bar, nav and toast
+- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`, `hall_save.gd`, `hall_wallet.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings, the saved run, the gold and standing popups' numbers (static functions, no state)
+- `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip, gold and standing popups), action bar, nav and toast
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
 - `Scenes/Overlays/`: End Day check, Day Report, Welcome, Menu, Game Over, Final Battle credits
@@ -288,7 +316,16 @@ waiting deploy at start-up (the page reloads and the saved run comes back), or s
 toast if one turns up mid-game. The Menu's bottom line (`Scripts/hall_build_info.gd`)
 names the commit and time of the build that's running: the deploy workflow writes
 `External Content/build_info.txt` (gitignored), and without it the line says "Build dev".
-To check a phone, compare that line with the latest commit on `master`.
+To check a phone, compare that line with the latest commit on `master`, or tap
+**Check for update** in Menu > Debug tools. The workflow also publishes the stamp next to
+`index.html` (`build_info.txt` on the site), and the button fetches that one (cache-busted)
+and compares it with the build's own. If they match it toasts "You're on the newest
+version". If not, a popup (`overlay_update_confirm`) shows both stamps, warns when the run
+isn't being saved, and offers **Export save** (a backup file, as in Backup save),
+**Cancel** and **Update**. Update saves the run, then tells the service worker to fetch the
+new deploy and switches to it as soon as it's installed, falling back to a plain reload
+after 15 s (`HallWebUpdate.update_now`). Off the web, the button only toasts that checks
+need the web build.
 
 ## Known issues (in the game systems, not changed here)
 

@@ -1,0 +1,272 @@
+[gd_scene format=3 uid="uid://hvk7r4jsygh5"]
+
+[ext_resource type="Script" uid="uid://cfgbsdt1brq5y" path="res://MobileHall/Scripts/popup_gold.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://ckv2l6r1wpg1p" path="res://MobileHall/Art/Textures/coin.png" id="2_coin"]
+
+[node name="PopupGold" type="Control"]
+visible = false
+top_level = true
+z_index = 10
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Catch" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.2)
+
+[node name="Pointer" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 30.0
+offset_bottom = 30.0
+mouse_filter = 2
+theme_type_variation = &"Sheet"
+
+[node name="Layout" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 140
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 28
+
+[node name="Card" type="PanelContainer" parent="Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="Layout/Card"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Layout/Card/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+text = "GOLD"
+horizontal_alignment = 1
+
+[node name="ValueRow" type="HBoxContainer" parent="Layout/Card/Col"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 14
+
+[node name="Coin" type="TextureRect" parent="Layout/Card/Col/ValueRow"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("2_coin")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Value" type="Label" parent="Layout/Card/Col/ValueRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 84
+text = "340"
+metadata/font_max_factor = 1.2
+
+[node name="Description" type="Label" parent="Layout/Card/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "Description"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="EarnBox" type="PanelContainer" parent="Layout/Card/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="EarnCol" type="VBoxContainer" parent="Layout/Card/Col/EarnBox"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EarnTop" type="HBoxContainer" parent="Layout/Card/Col/EarnBox/EarnCol"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="EarnLabel" type="Label" parent="Layout/Card/Col/EarnBox/EarnCol/EarnTop"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"ItalicLabel"
+text = "Tonight, if every quest wins"
+autowrap_mode = 3
+
+[node name="EarnValue" type="Label" parent="Layout/Card/Col/EarnBox/EarnCol/EarnTop"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 1
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 40
+text = "+460"
+vertical_alignment = 1
+metadata/font_max_factor = 1.2
+
+[node name="EarnDetail" type="Label" parent="Layout/Card/Col/EarnBox/EarnCol"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
+text = "2 quests sent"
+autowrap_mode = 3
+
+[node name="Warning" type="PanelContainer" parent="Layout/Card/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="WarningText" type="Label" parent="Layout/Card/Col/Warning"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Warning"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SpendHeading" type="Label" parent="Layout/Card/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+text = "WHERE TO SPEND IT"
+
+[node name="HireRow" type="HBoxContainer" parent="Layout/Card/Col"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Words" type="VBoxContainer" parent="Layout/Card/Col/HireRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="HireName" type="Label" parent="Layout/Card/Col/HireRow/Words"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 30
+text = "Hire a hero"
+autowrap_mode = 3
+metadata/font_max_factor = 1.25
+
+[node name="HireWhere" type="Label" parent="Layout/Card/Col/HireRow/Words"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
+text = "Guild tab"
+autowrap_mode = 3
+
+[node name="HireTag" type="PanelContainer" parent="Layout/Card/Col/HireRow"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="HirePrice" type="Label" parent="Layout/Card/Col/HireRow/HireTag"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "200"
+horizontal_alignment = 1
+
+[node name="GearRow" type="HBoxContainer" parent="Layout/Card/Col"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Words" type="VBoxContainer" parent="Layout/Card/Col/GearRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="GearName" type="Label" parent="Layout/Card/Col/GearRow/Words"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 30
+text = "Buy gear"
+autowrap_mode = 3
+metadata/font_max_factor = 1.25
+
+[node name="GearWhere" type="Label" parent="Layout/Card/Col/GearRow/Words"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
+text = "Shop tab"
+autowrap_mode = 3
+
+[node name="GearTag" type="PanelContainer" parent="Layout/Card/Col/GearRow"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="GearPrice" type="Label" parent="Layout/Card/Col/GearRow/GearTag"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "from 60"
+horizontal_alignment = 1
+
+[node name="UpgradeRow" type="HBoxContainer" parent="Layout/Card/Col"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Words" type="VBoxContainer" parent="Layout/Card/Col/UpgradeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="UpgradeName" type="Label" parent="Layout/Card/Col/UpgradeRow/Words"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 30
+text = "Upgrade a building"
+autowrap_mode = 3
+metadata/font_max_factor = 1.25
+
+[node name="UpgradeWhere" type="Label" parent="Layout/Card/Col/UpgradeRow/Words"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 22
+text = "Upgrades tab"
+autowrap_mode = 3
+
+[node name="UpgradeTag" type="PanelContainer" parent="Layout/Card/Col/UpgradeRow"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="UpgradePrice" type="Label" parent="Layout/Card/Col/UpgradeRow/UpgradeTag"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "from 150"
+horizontal_alignment = 1

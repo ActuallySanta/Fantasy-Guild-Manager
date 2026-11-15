@@ -1,0 +1,113 @@
+[gd_scene format=3 uid="uid://n8xeckwojiox7"]
+
+[ext_resource type="Script" uid="uid://26ert5kie6qw0" path="res://MobileHall/Scripts/overlay_update_confirm.gd" id="1_update"]
+[ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_dim"]
+
+[node name="OverlayUpdateConfirm" type="Control"]
+visible = false
+top_level = true
+z_index = 10
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_update")
+
+[node name="Dim" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("2_dim")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_right = 32
+
+[node name="Center" type="CenterContainer" parent="Margin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Sheet" type="PanelContainer" parent="Margin/Center"]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="Margin/Center/Sheet"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 40
+text = "A new version is ready"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Builds" type="Label" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "This build: ab12cd3
+Newest: ef45gh6"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Note" type="Label" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "Your run is saved and loads back after the update."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ExportButton" type="Button" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"PaperButton"
+theme_override_font_sizes/font_size = 28
+text = "Export save"
+
+[node name="Buttons" type="HBoxContainer" parent="Margin/Center/Sheet/Col"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="CancelButton" type="Button" parent="Margin/Center/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"WoodButton"
+theme_override_font_sizes/font_size = 28
+text = "Cancel"
+
+[node name="UpdateButton" type="Button" parent="Margin/Center/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"PaperButton"
+theme_override_font_sizes/font_size = 28
+text = "Update"

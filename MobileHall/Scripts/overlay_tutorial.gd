@@ -863,10 +863,10 @@ func _pick_text() -> String:
 	return "Tap on one of the adventurers to assign them on the quest."
 
 
-## Day 3's Tonight step: Training and Hospital in one line (their own steps
+## Day 3's Facilities step: Training and Hospital in one line (their own steps
 ## can be skipped), plus a note when nothing could be built.
 func _tonight_text() -> String:
-	var text := "Now the [b]Tonight[/b] tab. The [b]Training Yard[/b] increases a stat and the [b]Hospital[/b] heals an adventurer faster."
+	var text := "Now the [b]Facilities[/b] tab. The [b]Training Yard[/b] increases a stat and the [b]Hospital[/b] heals an adventurer faster."
 	if not _seen.get("upgrade", false):
 		text = "Nothing you can build yet! This tab will show you a notification when you can. " + text
 	return text
@@ -987,7 +987,7 @@ func _day_three() -> Array:
 			"skip": func(): return hall.affordable_buildings().is_empty(),
 			"do": "Tap Build", "text": "Buildings have five levels, paid in %s and standing. You can afford this one. Build it." % GOLD},
 		{"target": func(): return _u(_tab("upgrades"), "SegTonight"), "on": "tab", "when": func(d): return d.upgrades == "tonight",
-			"do": "Tap Tonight", "text": func(): return _tonight_text()},
+			"do": "Tap Facilities", "text": func(): return _tonight_text()},
 		{"target": func(): return _u(_training_section(), "AddButton"), "on": "training_picker", "bare": true,
 			"skip": func(): return not GuildUpgrades.has_free_training_slot() or not _anyone_can_train(),
 			"do": "Tap Add a hero", "text": "Pick a trainee."},

@@ -6,6 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://ckv2l6r1wpg1p" path="res://MobileHall/Art/Textures/coin.png" id="6_coin"]
 [ext_resource type="Texture2D" uid="uid://dq7yxvfputc03" path="res://MobileHall/Art/Textures/shield.png" id="7_shield"]
 [ext_resource type="Texture2D" uid="uid://ysb0ogcuiwff" path="res://MobileHall/Art/Icons/gear.tres" id="8_gear"]
+[ext_resource type="PackedScene" uid="uid://hvk7r4jsygh5" path="res://MobileHall/Scenes/Shell/popup_gold.tscn" id="9_gold_popup"]
+[ext_resource type="PackedScene" uid="uid://dl44t7dat5dee" path="res://MobileHall/Scenes/Shell/popup_standing.tscn" id="10_standing_popup"]
 
 [node name="Header" type="VBoxContainer" unique_id=1201068063]
 layout_mode = 2
@@ -74,6 +76,7 @@ scroll_active = false
 [node name="GoldValueBox" type="HBoxContainer" parent="Bar/Row" unique_id=1970020752]
 unique_name_in_owner = true
 layout_mode = 2
+mouse_filter = 0
 theme_override_constants/separation = 8
 
 [node name="Coin" type="TextureRect" parent="Bar/Row/GoldValueBox" unique_id=2146979068]
@@ -99,7 +102,7 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(62, 72)
 layout_mode = 2
 size_flags_vertical = 4
-mouse_filter = 2
+mouse_filter = 0
 
 [node name="Shield" type="TextureRect" parent="Bar/Row/StandingValueBox" unique_id=477325811]
 unique_name_in_owner = true
@@ -184,3 +187,11 @@ theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 22
 text = "Recruits cost 200 gold and you have 40. Lose Brena and the guild falls."
 autowrap_mode = 3
+
+[node name="PopupGold" parent="." instance=ExtResource("9_gold_popup")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="PopupStanding" parent="." instance=ExtResource("10_standing_popup")]
+unique_name_in_owner = true
+layout_mode = 1

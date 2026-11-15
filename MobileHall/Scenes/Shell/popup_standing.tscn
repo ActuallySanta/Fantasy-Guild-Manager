@@ -1,0 +1,206 @@
+[gd_scene format=3 uid="uid://dl44t7dat5dee"]
+
+[ext_resource type="Script" uid="uid://ctea7sihkdpok" path="res://MobileHall/Scripts/popup_standing.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dq7yxvfputc03" path="res://MobileHall/Art/Textures/shield.png" id="2_shield"]
+
+[node name="PopupStanding" type="Control" unique_id=1006813707]
+visible = false
+top_level = true
+z_index = 10
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="Catch" type="ColorRect" parent="." unique_id=1954229161]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.2)
+
+[node name="Pointer" type="Panel" parent="." unique_id=2012835945]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 30.0
+offset_bottom = 30.0
+mouse_filter = 2
+theme_type_variation = &"Sheet"
+
+[node name="Layout" type="MarginContainer" parent="." unique_id=12874643]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 140
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 28
+
+[node name="Card" type="PanelContainer" parent="Layout" unique_id=1311743334]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="Layout/Card" unique_id=84077135]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Layout/Card/Col" unique_id=225645664]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"CapsLabel"
+text = "STANDING"
+horizontal_alignment = 1
+
+[node name="ValueRow" type="HBoxContainer" parent="Layout/Card/Col" unique_id=1331488759]
+layout_mode = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="Shield" type="TextureRect" parent="Layout/Card/Col/ValueRow" unique_id=413530433]
+custom_minimum_size = Vector2(56, 66)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("2_shield")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Value" type="Label" parent="Layout/Card/Col/ValueRow" unique_id=1115395258]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 84
+text = "7"
+metadata/font_max_factor = 1.2
+
+[node name="Rank" type="Label" parent="Layout/Card/Col" unique_id=1749199581]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 26
+text = "Quests center on rank F"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Description" type="Label" parent="Layout/Card/Col" unique_id=613818645]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "Description"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Space" type="Control" parent="Layout/Card/Col" unique_id=54568095]
+custom_minimum_size = Vector2(0, 6)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Meter" type="HBoxContainer" parent="Layout/Card/Col" unique_id=2007229314]
+layout_mode = 2
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="LossBar" type="ProgressBar" parent="Layout/Card/Col/Meter" unique_id=1427651738]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+max_value = 1.0
+fill_mode = 1
+show_percentage = false
+
+[node name="Mark" type="ColorRect" parent="Layout/Card/Col/Meter" unique_id=1887963676]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(8, 46)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.2039, 0.1608, 0.1255, 1)
+
+[node name="GainBar" type="ProgressBar" parent="Layout/Card/Col/Meter" unique_id=1092479883]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 28)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+max_value = 1.0
+show_percentage = false
+
+[node name="Ends" type="HBoxContainer" parent="Layout/Card/Col" unique_id=1960087112]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="LossCol" type="VBoxContainer" parent="Layout/Card/Col/Ends" unique_id=51036815]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_constants/separation = 0
+
+[node name="LossAmount" type="Label" parent="Layout/Card/Col/Ends/LossCol" unique_id=1220707322]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 36
+text = "-17"
+metadata/font_max_factor = 1.2
+
+[node name="LossText" type="Label" parent="Layout/Card/Col/Ends/LossCol" unique_id=217326426]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "until recruits stop"
+autowrap_mode = 3
+
+[node name="GainCol" type="VBoxContainer" parent="Layout/Card/Col/Ends" unique_id=273790418]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+theme_override_constants/separation = 0
+
+[node name="GainAmount" type="Label" parent="Layout/Card/Col/Ends/GainCol" unique_id=2047871420]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 36
+text = "+3"
+horizontal_alignment = 2
+metadata/font_max_factor = 1.2
+
+[node name="GainText" type="Label" parent="Layout/Card/Col/Ends/GainCol" unique_id=1150652950]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Level 3 upgrades"
+horizontal_alignment = 2
+autowrap_mode = 3
+
+[node name="Warning" type="PanelContainer" parent="Layout/Card/Col" unique_id=1367501350]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="WarningText" type="Label" parent="Layout/Card/Col/Warning" unique_id=512302448]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Warning"
+horizontal_alignment = 1
+autowrap_mode = 3
