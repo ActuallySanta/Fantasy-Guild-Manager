@@ -191,7 +191,8 @@ cheats for testing. The rules are in `Scripts/hall_debug.gd` (`HallDebug`), and 
 is `overlay_debug`. The first time in a run it only shows a warning and **Enable debug
 tools**. Enabling makes the run a **debug run** (`HallMain.is_debug_run`): it is never
 saved again, so the last save on disk stays as it was before the tools were used. A new
-run starts with saving back on.
+run starts with saving back on. **Check for update** (see "Web updates and the build line")
+sits next to "Save runs" above the warning, so it doesn't need a debug run either.
 
 - **Time:** skip to the next day (training and healing still run; no quests, no report;
   blocked on the final battle day outside freeplay), or jump to day 10 / 50 (a skip
@@ -234,8 +235,25 @@ holds the whole format:
 - **New fields:** a new `GuildCharacter`, item or `CreatedQuest` property that matters
   between sessions goes in `CHARACTER_FIELDS` / `ITEM_FIELDS` / `QUEST_FIELDS`. A new
   piece of run state on `HallMain` or an autoload goes in `build_snapshot` and
-  `apply_snapshot`. Bump `SAVE_VERSION` when old saves can't be read with the new
-  layout: saves with another version are ignored and the player starts fresh.
+  `apply_snapshot`, read there with `.get(key, <fresh-run value>)`.
+- **Old saves keep loading:** additions need nothing. Each object is built fresh and only
+  the saved fields overwrite it, and `apply_snapshot` falls back to the fresh value for
+  anything missing, so an old save just gets defaults for new things. A breaking change
+  needs a step: renaming or removing a saved field, changing a saved value's meaning or
+  units, or reordering a saved enum. Bump `SAVE_VERSION` and add a `_migrate_N_to_N+1` step
+  to `HallSave._migration_steps()`; `HallSave.migrate` runs the steps in order on load (the
+  how-to is in its doc comment). Only a save from a *newer* version is turned away.
+- **Backup (Menu > Backup save):** the browser can clear its storage, so players can
+  keep a copy themselves. **Save backup file** opens the phone's share sheet (Save to
+  Files, Drive, email…) or downloads a `.txt` on a desktop. **Copy save code** puts the
+  same text on the clipboard. **Load backup file** / **Paste save code** (two taps: they
+  replace the run) bring one back. A code is `FGMSAVE1:` + base64(gzip(the snapshot
+  bytes)), about 5 KB of text on day 4 (`HallSaveTransfer`). The device side
+  (`HallWebFiles`) uses JavaScript on the web: the Web Share API, a download link,
+  `window.prompt` for pasting, and a hidden file input. Off the web it uses
+  `user://backups`, the clipboard, and a native file dialog. Export works with saving
+  off; an import turns "Save runs" on, writes the save, and reloads the hall into it.
+  Old backup codes migrate the same way old saves do.
 - **Starting over:** Game Over's "Found a New Guild" and the Menu's **Abandon run** (two
   taps) delete the save. Playtest scenarios never load or write it (`uses_save_file` is
   only true when the hall is the scene root).
@@ -298,7 +316,16 @@ waiting deploy at start-up (the page reloads and the saved run comes back), or s
 toast if one turns up mid-game. The Menu's bottom line (`Scripts/hall_build_info.gd`)
 names the commit and time of the build that's running: the deploy workflow writes
 `External Content/build_info.txt` (gitignored), and without it the line says "Build dev".
-To check a phone, compare that line with the latest commit on `master`.
+To check a phone, compare that line with the latest commit on `master`, or tap
+**Check for update** in Menu > Debug tools. The workflow also publishes the stamp next to
+`index.html` (`build_info.txt` on the site), and the button fetches that one (cache-busted)
+and compares it with the build's own. If they match it toasts "You're on the newest
+version". If not, a popup (`overlay_update_confirm`) shows both stamps, warns when the run
+isn't being saved, and offers **Export save** (a backup file, as in Backup save),
+**Cancel** and **Update**. Update saves the run, then tells the service worker to fetch the
+new deploy and switches to it as soon as it's installed, falling back to a plain reload
+after 15 s (`HallWebUpdate.update_now`). Off the web, the button only toasts that checks
+need the web build.
 
 ## Known issues (in the game systems, not changed here)
 

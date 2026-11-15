@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://sytsocqqt6sam" path="res://MobileHall/Scripts/overlay_debug.gd" id="1_debug"]
 [ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://MobileHall/Styles/dim.tres" id="2_dim"]
+[ext_resource type="PackedScene" uid="uid://n8xeckwojiox7" path="res://MobileHall/Scenes/Overlays/overlay_update_confirm.tscn" id="3_update"]
 
 [node name="OverlayDebug" type="Control"]
 layout_mode = 3
@@ -58,6 +59,15 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 26
 text = "SaveCheckBox"
+autowrap_mode = 3
+
+[node name="UpdateButton" type="Button" parent="Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "UpdateButton"
 autowrap_mode = 3
 
 [node name="EnableButton" type="Button" parent="Center/Sheet/Col"]
@@ -207,3 +217,6 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 26
 text = "BackButton"
+
+[node name="UpdateConfirm" parent="." instance=ExtResource("3_update")]
+unique_name_in_owner = true

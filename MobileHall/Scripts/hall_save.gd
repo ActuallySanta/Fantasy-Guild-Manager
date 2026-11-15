@@ -22,9 +22,18 @@
 ## temporary file first and is then renamed over the real one, so a game closed
 ## mid-write never leaves half a save. The save before it is kept as a backup.
 ##
-## Bump SAVE_VERSION whenever the layout changes in a way old saves can't be
-## read with: a save with another version is ignored and the player starts a
-## fresh run.
+## OLD SAVES IN NEWER VERSIONS
+## Saves (and backup codes, HallSaveTransfer) from older versions keep loading:
+##   - Additions need nothing: load builds each object with .new() (fresh
+##     defaults) and only overwrites the fields the save has, and
+##     apply_snapshot reads every value with .get(key, <fresh-run value>). A
+##     new field, building or piece of run state just gets its default.
+##   - A breaking change (renaming or removing a saved field, changing what a
+##     saved value means or its units, reordering a saved enum) bumps
+##     SAVE_VERSION and adds a migration step (see migrate), which rewrites
+##     an older snapshot's plain data into the new layout.
+## A save from a NEWER version than the game is ignored: it may hold things
+## this build doesn't know about.
 class_name HallSave
 
 
@@ -34,8 +43,11 @@ class_name HallSave
 const PATH := "user://run_save.dat"
 const TEMP_PATH := "user://run_save.tmp"
 const BACKUP_PATH := "user://run_save.bak"
-## The layout of the save file. Bump it when the layout changes (see the header).
+## The layout of the save file. Bump it only for a breaking change, and add a
+## migration step for it (see the header and migrate).
 const SAVE_VERSION := 1
+## The top-level sections every snapshot has (has_snapshot_shape checks them).
+const SNAPSHOT_KEYS := ["game", "upgrades", "roster", "gear", "hall", "tutorial", "characters", "items", "quests"]
 
 ## GuildCharacter properties written to the save. temp_stats is left out: it's
 ## rebuilt from the base stats, pluck and gear on load (reset_temp_stats).
@@ -85,7 +97,7 @@ static func save_run(hall: HallMain) -> void:
 	var bytes := var_to_bytes(build_snapshot(hall))
 	if bytes == _last_saved_bytes:
 		return
-	if _write_file(bytes):
+	if write_bytes(bytes):
 		_last_saved_bytes = bytes
 
 
@@ -145,8 +157,9 @@ static func build_snapshot(hall: HallMain) -> Dictionary:
 
 
 ## Write bytes to TEMP_PATH, keep the old save as BACKUP_PATH, then rename the
-## temporary file over PATH. Returns false (with a warning) if it couldn't.
-static func _write_file(bytes: PackedByteArray) -> bool:
+## temporary file over PATH. HallSaveTransfer also uses it to put an imported
+## run in place. Returns false (with a warning) if it couldn't.
+static func write_bytes(bytes: PackedByteArray) -> bool:
 	var file := FileAccess.open(TEMP_PATH, FileAccess.WRITE)
 	if file == null:
 		push_warning("HallSave: can't write %s (error %d)" % [TEMP_PATH, FileAccess.get_open_error()])
@@ -175,6 +188,12 @@ static func delete_save() -> void:
 	for path in [PATH, TEMP_PATH, BACKUP_PATH]:
 		if FileAccess.file_exists(path):
 			DirAccess.remove_absolute(path)
+	forget_cache()
+
+
+## Forget which bytes were last written, so the next save_run writes even if
+## the run looks unchanged (after HallSaveTransfer replaces the file).
+static func forget_cache() -> void:
 	_last_saved_bytes = PackedByteArray()
 
 
@@ -195,61 +214,128 @@ static func load_run(hall: HallMain) -> bool:
 	return false
 
 
-## The snapshot in the file at path, or {} if it's missing, unreadable or
-## from another SAVE_VERSION.
+## The snapshot in the file at path (migrated up to SAVE_VERSION), or {} if
+## it's missing, unreadable or from a newer version.
 static func _read_file(path: String) -> Dictionary:
 	if not FileAccess.file_exists(path):
 		return {}
 	var bytes := FileAccess.get_file_as_bytes(path)
 	if bytes.is_empty():
 		return {}
-	var snapshot: Variant = bytes_to_var(bytes)
-	if not (snapshot is Dictionary) or snapshot.get("version", -1) != SAVE_VERSION:
-		push_warning("HallSave: ignoring %s (unreadable or another save version)" % path)
-		return {}
+	# bytes_to_var (not _with_objects): a save only ever holds plain values
+	var snapshot := migrate(bytes_to_var(bytes))
+	if snapshot.is_empty():
+		push_warning("HallSave: ignoring %s (unreadable or from a newer version)" % path)
 	return snapshot
+
+
+## True when snapshot is a Dictionary with an int version and every section in
+## SNAPSHOT_KEYS, so apply_snapshot can read it. Doesn't check the version number.
+## snapshot: any value (e.g. straight from bytes_to_var).
+static func has_snapshot_shape(snapshot: Variant) -> bool:
+	if not (snapshot is Dictionary) or not (snapshot.get("version") is int):
+		return false
+	for key: String in SNAPSHOT_KEYS:
+		var section: Variant = snapshot.get(key)
+		if not (section is Dictionary or section is Array):
+			return false
+	return true
+
+
+## True when snapshot's version is newer than this game knows (an older,
+## cached build opening a newer backup). snapshot: any value.
+static func is_from_newer_version(snapshot: Variant) -> bool:
+	return snapshot is Dictionary and snapshot.get("version") is int and snapshot.version > SAVE_VERSION
+
+
+# ============================================================ MIGRATION
+
+## snapshot brought up to SAVE_VERSION by running each migration step in turn
+## (1 -> 2, 2 -> 3, ...). snapshot: a value read with bytes_to_var.
+## Returns the migrated snapshot, ready for apply_snapshot, or {} if it isn't a
+## snapshot, is from a newer version, or a step is missing.
+##
+## HOW TO ADD A STEP, for a breaking change (see the header):
+##   1. Bump SAVE_VERSION (say to 2).
+##   2. Write a function that rewrites the plain data in place, e.g. renaming
+##      a hero field:
+##          static func _migrate_1_to_2(snapshot: Dictionary) -> void:
+##              for entry: Dictionary in snapshot.characters:
+##                  if entry.fields.has("old_name"):
+##                      entry.fields.new_name = entry.fields.old_name
+##                      entry.fields.erase("old_name")
+##   3. List it in _migration_steps(): {1: _migrate_1_to_2}.
+##   Each step only has to know the layout just before and just after it.
+static func migrate(snapshot: Variant) -> Dictionary:
+	if not has_snapshot_shape(snapshot) or is_from_newer_version(snapshot):
+		return {}
+	var migrated: Dictionary = snapshot
+	var steps := _migration_steps()
+	while migrated.version < SAVE_VERSION:
+		var step: Variant = steps.get(migrated.version)
+		if not (step is Callable):
+			push_warning("HallSave: no migration from save version %d" % migrated.version)
+			return {}
+		step.call(migrated)
+		migrated.version += 1
+	return migrated
+
+
+## The migration steps: the version each one upgrades FROM -> a Callable
+## (snapshot: Dictionary) that rewrites a snapshot of that version into the
+## next one. Empty for now: the save layout is still at version 1.
+static func _migration_steps() -> Dictionary:
+	return {}
 
 
 ## Put a snapshot from build_snapshot back into the autoloads and the hall.
 ## hall: the HallMain to fill (its tutorial must exist). snapshot: see build_snapshot.
 static func apply_snapshot(hall: HallMain, snapshot: Dictionary) -> void:
 	var reader := RefReader.new(snapshot)
+	# every read falls back to what's there now (a fresh run's value), so a save
+	# from before a value existed still loads (see the header)
 
-	GameState.day = snapshot.game.day
-	GameState.is_freeplay = snapshot.game.is_freeplay
+	var game: Dictionary = snapshot.game
+	GameState.day = game.get("day", GameState.day)
+	GameState.is_freeplay = game.get("is_freeplay", GameState.is_freeplay)
 
 	var upgrades: Dictionary = snapshot.upgrades
-	GuildUpgrades.gold = upgrades.gold
-	GuildUpgrades.standing = upgrades.standing
-	GuildUpgrades.levels = upgrades.levels.duplicate()
-	GuildUpgrades.training = reader.decode(upgrades.training)
-	GuildUpgrades.patients.assign(reader.decode(upgrades.patients))
-	GuildUpgrades.revives_used = upgrades.revives_used
+	GuildUpgrades.gold = upgrades.get("gold", GuildUpgrades.gold)
+	GuildUpgrades.standing = upgrades.get("standing", GuildUpgrades.standing)
+	# merged over the fresh levels, so a building added since the save starts at its first level
+	var levels: Dictionary = upgrades.get("levels", {})
+	for building in levels:
+		GuildUpgrades.levels[building] = levels[building]
+	GuildUpgrades.training = reader.decode(upgrades.get("training", {}))
+	GuildUpgrades.patients.assign(reader.decode(upgrades.get("patients", [])))
+	GuildUpgrades.revives_used = upgrades.get("revives_used", GuildUpgrades.revives_used)
 
 	var roster: Dictionary = snapshot.roster
-	CharacterContainer.active_characters.assign(reader.decode(roster.active))
-	CharacterContainer.hireable_characters.assign(reader.decode(roster.hireable))
-	CharacterContainer.released_characters.assign(reader.decode(roster.released))
-	CharacterContainer.max_hireable_characters = roster.max_hireable
+	CharacterContainer.active_characters.assign(reader.decode(roster.get("active", [])))
+	CharacterContainer.hireable_characters.assign(reader.decode(roster.get("hireable", [])))
+	CharacterContainer.released_characters.assign(reader.decode(roster.get("released", [])))
+	CharacterContainer.max_hireable_characters = roster.get("max_hireable", CharacterContainer.max_hireable_characters)
 
-	ItemContainer.owned_items.assign(reader.decode(snapshot.gear.owned))
-	ItemShop.stock.assign(reader.decode(snapshot.gear.stock))
+	var gear: Dictionary = snapshot.gear
+	ItemContainer.owned_items.assign(reader.decode(gear.get("owned", [])))
+	ItemShop.stock.assign(reader.decode(gear.get("stock", [])))
 
 	var hall_state: Dictionary = snapshot.hall
-	hall.quest_entries = reader.decode(hall_state.quest_entries)
-	hall.run_stats = reader.decode(hall_state.run_stats)
-	hall.released_today = reader.decode(hall_state.released_today)
-	hall.previous_report = reader.decode(hall_state.previous_report)
-	hall.shown_report = reader.decode(hall_state.shown_report)
-	hall.shown_credits = reader.decode(hall_state.shown_credits)
-	hall.run_over_stats = reader.decode(hall_state.run_over_stats)
-	hall.final_battle_lost = hall_state.final_battle_lost
-	hall.for_hire_last_seen_day = hall_state.for_hire_last_seen_day
-	hall.show_busy_adventurers = hall_state.show_busy_adventurers
+	hall.quest_entries = reader.decode(hall_state.get("quest_entries", hall.quest_entries))
+	hall.run_stats = reader.decode(hall_state.get("run_stats", hall.run_stats))
+	hall.released_today = reader.decode(hall_state.get("released_today", hall.released_today))
+	hall.previous_report = reader.decode(hall_state.get("previous_report", hall.previous_report))
+	hall.shown_report = reader.decode(hall_state.get("shown_report", hall.shown_report))
+	hall.shown_credits = reader.decode(hall_state.get("shown_credits", hall.shown_credits))
+	hall.run_over_stats = reader.decode(hall_state.get("run_over_stats", hall.run_over_stats))
+	hall.final_battle_lost = hall_state.get("final_battle_lost", hall.final_battle_lost)
+	hall.for_hire_last_seen_day = hall_state.get("for_hire_last_seen_day", hall.for_hire_last_seen_day)
+	hall.show_busy_adventurers = hall_state.get("show_busy_adventurers", hall.show_busy_adventurers)
 
-	if hall.tutorial and not snapshot.tutorial.is_empty():
-		hall.tutorial.is_skipped = snapshot.tutorial.is_skipped
-		hall.tutorial.done = snapshot.tutorial.done.duplicate()
+	var tutorial_state: Dictionary = snapshot.tutorial
+	if hall.tutorial and not tutorial_state.is_empty():
+		hall.tutorial.is_skipped = tutorial_state.get("is_skipped", hall.tutorial.is_skipped)
+		hall.tutorial.done = tutorial_state.get("done", hall.tutorial.done).duplicate()
 
 	# quest stats come from the base stats, pluck and gear; the Barracks sets the bed count
 	for character: GuildCharacter in reader.characters:
@@ -372,7 +458,7 @@ class RefReader:
 		for _entry in snapshot.characters:
 			characters.append(GuildCharacter.new())
 		for entry: Dictionary in snapshot.items:
-			items.append(PassiveItem.new(entry.fields.role))
+			items.append(PassiveItem.new(entry.get("fields", {}).get("role", 0)))
 		for _entry in snapshot.quests:
 			quests.append(CreatedQuest.new())
 		for index in characters.size():
@@ -417,8 +503,9 @@ class RefReader:
 	## Typed Arrays and Dictionaries (equipped_items, stats) are filled in
 	## place with assign(), so they keep their element types.
 	func _apply_fields(object: Object, entry: Dictionary) -> void:
-		for field_name: String in entry.fields:
-			var value: Variant = decode(entry.fields[field_name])
+		var fields: Dictionary = entry.get("fields", {})
+		for field_name: String in fields:
+			var value: Variant = decode(fields[field_name])
 			var current: Variant = object.get(field_name)
 			if current is Array and value is Array:
 				current.assign(value)
@@ -427,5 +514,6 @@ class RefReader:
 				current.assign(value)
 			else:
 				object.set(field_name, value)
-		for meta_name: String in entry.meta:
-			object.set_meta(meta_name, decode(entry.meta[meta_name]))
+		var meta: Dictionary = entry.get("meta", {})
+		for meta_name: String in meta:
+			object.set_meta(meta_name, decode(meta[meta_name]))
