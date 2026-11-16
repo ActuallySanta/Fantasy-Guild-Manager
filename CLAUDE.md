@@ -41,7 +41,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
   - Success is detected by searching the text: `QuestScoring.did_succeed` checks for "NOT SUCCESSFUL".
 - `QuestScoring` (`Quest Creator/quest_scoring.gd`): static scoring rules: `get_success_chance`, `did_succeed`, `get_gold_earned`, and `get_slot_count` (party size).
   - Quest story text comes from pipe-delimited rows in `External Content/Quest Stuff (Test)/Story Parts.txt` (`type|intro|middle|fail|success`), read with `get_Quest_Story(questNum, column)`. `{location}` is filled in with `String.format`.
-- Items (`Item System/`): `StandardItem` (abstract: rarity weights in the `Rarity` enum values, cost) → `PassiveItem` (a stat bonus) and `ActiveItem`.
+- Items (`Item System/`): `StandardItem` (abstract: rarity roll and cost; Legendary/Mythic odds come from the guild's standing rank, see `Docs/hall_design.md` "Gear rarity"; the `Rarity` enum values are saved, so don't change them) → `PassiveItem` (a stat bonus) and `ActiveItem`.
 
 **The UI** (the "Mobile Hall") is split by file type, and the same subfolder names are used on both sides, so a scene and its script sit at matching paths (`Scenes/Rows/Quests/quest_row.tscn` ↔ `Scripts/UI/Rows/Quests/quest_row.gd`):
 - `Scenes/`: `hall_main.tscn`, then `Tabs/`, `Screens/`, `Components/`, `Shell/` (and `Shell/Header/`), `Overlays/{Day,Run End,Menu,Items}/`, `Rows/{Quests,Heroes,Buildings,Items,Day End}/`, and `Playtest/`.
