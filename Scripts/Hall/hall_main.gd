@@ -1,6 +1,6 @@
 ## Mobile Hall: a phone-first UI for the guild game, built from the
 ## playtest feedback on the Deck, Flow and Ledger prototypes.
-## Scene: MobileHall/hall_main.tscn
+## Scene: Scenes/hall_main.tscn
 ##
 ## Shell, top to bottom:
 ##   header      - day, Bone Drake countdown, gold, standing, menu button
@@ -93,7 +93,7 @@ const GUILD_SECTION_HIRE := "hire"
 const UPGRADES_SECTION_TONIGHT := "tonight"
 const UPGRADES_SECTION_BUILD := "build"
 ## The scene a new run starts in (not a playtest scenario, so its preset isn't re-applied).
-const MAIN_SCENE_PATH := "uid://dtw7iu2s1gibm"  # MobileHall/hall_main.tscn
+const MAIN_SCENE_PATH := "uid://dtw7iu2s1gibm"  # Scenes/hall_main.tscn
 ## run_stats.drake_result values (the Bone Drake milestone quest).
 const DRAKE_RESULT_NONE := ""
 const DRAKE_RESULT_SLAIN := "Slain"
@@ -355,7 +355,7 @@ var tutorial: Control
 
 # ============================================================ NODES
 
-# ---- shell (each is its own scene in MobileHall/Scenes/Shell/)
+# ---- shell (each is its own scene in Scenes/Shell/)
 @onready var _header: HallHeader = %Header
 @onready var _action_bar: HallActionBar = %ActionBar
 @onready var _nav: HallNav = %Nav

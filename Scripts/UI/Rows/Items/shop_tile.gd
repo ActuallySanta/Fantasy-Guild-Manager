@@ -3,7 +3,7 @@
 ## item has no icon), its name and price.
 ## A sold item (bought today) is faded, stamped "Sold" and can't be picked.
 ## The picked one gets the gold-edged tag (GoodsTagSelected in hall_theme).
-## Scene: MobileHall/Scenes/Rows/shop_tile.tscn
+## Scene: Scenes/Rows/Items/shop_tile.tscn
 extends Button
 
 

@@ -1,7 +1,7 @@
 ## One applicant on the Guild tab, written as a letter of introduction: who they
 ## are, all five stats in boxes, the first line of their backstory, Details and
 ## a wax-sealed Hire button with their price.
-## Scene: MobileHall/Scenes/Rows/hire_card.tscn
+## Scene: Scenes/Rows/Heroes/hire_card.tscn
 extends PanelContainer
 
 

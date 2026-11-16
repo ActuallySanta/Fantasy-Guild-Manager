@@ -1,6 +1,6 @@
 ## One number in an ink box with a caption under it ("1240" / "gold earned").
 ## Used on the Game Over ledger's stat grid and for its big Days tile.
-## Scene: MobileHall/Scenes/Components/stat_tile.tscn
+## Scene: Scenes/Components/stat_tile.tscn
 extends PanelContainer
 
 

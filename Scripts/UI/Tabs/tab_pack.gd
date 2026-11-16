@@ -14,11 +14,11 @@
 ## Both are children of this scene drawn over the whole screen. The picked
 ## item, the filters and which overlay is open are view state only, kept here;
 ## gear only changes through hall (equip_item / unequip_item / swap_gear).
-## Scene: MobileHall/Scenes/Tabs/tab_pack.tscn
+## Scene: Scenes/Tabs/tab_pack.tscn
 extends VBoxContainer
 
 
-const PackTileScene := preload("uid://g3ntvsh05abd")  # MobileHall/Scenes/Rows/pack_tile.tscn
+const PackTileScene := preload("uid://g3ntvsh05abd")  # Scenes/Rows/Items/pack_tile.tscn
 
 ## Filter value for "every role" (otherwise a GuildCharacter.CharacterRole).
 const FILTER_ALL := -1

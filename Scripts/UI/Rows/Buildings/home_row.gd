@@ -7,7 +7,7 @@
 ##   patient        - recovery bar and Discharge
 ##   needs care     - nights at home vs in a bed, and Admit
 ##   fallen         - Revive at Hospital level 5
-## Scene: MobileHall/Scenes/Rows/home_row.tscn
+## Scene: Scenes/Rows/Buildings/home_row.tscn
 extends PanelContainer
 
 

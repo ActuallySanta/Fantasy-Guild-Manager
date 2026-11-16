@@ -3,10 +3,10 @@
 ## released that day, then one letter per quest (result stamp, who went, who
 ## got hurt or died, the story, a closing line). Story quests' letters come
 ## first and stay open; everyday letters start folded (see report_entry.gd).
-## Scene: MobileHall/Scenes/Overlays/overlay_report.tscn
+## Scene: Scenes/Overlays/Day/overlay_report.tscn
 extends Control
 
-const ReportEntryScene := preload("uid://di7qjsfr530p5")  # MobileHall/Scenes/Rows/report_entry.tscn
+const ReportEntryScene := preload("uid://di7qjsfr530p5")  # Scenes/Rows/Day End/report_entry.tscn
 
 # ---- MOTION (only for the report that opens after End Day)
 ## Seconds after the report opens (under the dusk wash's peak) before the
@@ -21,7 +21,7 @@ const REVEAL_LETTER_OVERLAP := 0.55
 ## The sign (the button and the strings it hangs from) swings in by this many
 ## seconds at the latest, however long the night was.
 const REVEAL_BUTTON_LATEST := 1.6
-## How far below the top of the strings (Art/Textures/connector.png) their
+## How far below the top of the strings (Sprites/UI Textures/connector.png) their
 ## nail sits, in pixels. The sign swings on it.
 const SIGN_NAIL_Y := 9.0
 

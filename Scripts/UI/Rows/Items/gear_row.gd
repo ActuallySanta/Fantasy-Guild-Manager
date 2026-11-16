@@ -4,7 +4,7 @@
 ##   - an owned item in the pick list, with Equip / Take (if someone else has it)
 ## Rarity-coloured seal with the item's icon on the left, name and what it
 ## does, one button on the right.
-## Scene: MobileHall/Scenes/Rows/gear_row.tscn
+## Scene: Scenes/Rows/Items/gear_row.tscn
 extends PanelContainer
 
 

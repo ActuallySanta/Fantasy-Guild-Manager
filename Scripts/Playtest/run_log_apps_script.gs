@@ -1,4 +1,4 @@
-// Run log receiver for MobileHall/Scripts/run_logger.gd (standalone script).
+// Run log receiver for Scripts/Hall/Debug/run_logger.gd (standalone script).
 // Deployed from Daniel's personal Google account (school accounts can't
 // publish a web app to "Anyone"), writing to the "Guild Manager Run Log" sheet.
 //

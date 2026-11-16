@@ -40,13 +40,13 @@ the first few days.
    ```
 
 3. Open Godot, choose **Import**, and select `project.godot` in the cloned folder.
-4. Press **F5** (Run Project). The main scene is `MobileHall/hall_main.tscn`.
+4. Press **F5** (Run Project). The main scene is `Scenes/hall_main.tscn`.
 
 The window starts in portrait (720 × 1280), like a phone. You can resize it.
 
 ### Playtest scenarios
 
-`MobileHall/Playtest/` has scenes that start a run partway in, with a preset day, gold,
+`Scenes/Playtest/` has scenes that start a run partway in, with a preset day, gold,
 standing and roster (for example, right before the Bone Drake, or on the Game Over
 screen). Open one and press **F6** (Run Current Scene).
 
@@ -69,11 +69,15 @@ build.
 
 | Folder | What's in it |
 |---|---|
-| `MobileHall/` | The current game UI: the hall scene, tabs, overlays, styles and art. Its [README](MobileHall/README.md) covers the UI's design and rules. |
+| `Scenes/` | Every scene: the hall (`hall_main.tscn`), tabs, screens, overlays, rows, components and playtest scenarios. |
+| `Scripts/` | `UI/`: each scene's script, in matching folders. `Hall/`: the hall's state, rules, saving and style. Plus the game logic: characters, quest generation and scoring, items, credits data. |
 | `Globals/` | Autoloads that hold the game state: roster, wallet and buildings, day counter, quests, items and shop. |
-| `Scripts/` | Game logic: characters, quest generation, scoring and results, items, credits data. |
 | `External Content/` | Text data: names, backstories, locations, monsters, quest story parts. |
-| `Sprites/` | Character and item icons, and the Shop tab's art. |
+| `Sprites/` | Every image: UI textures and icons, character and item icons, the Shop tab's art. Its [README](Sprites/README.md) covers swapping art. |
+| `Fonts/`, `Themes/` | The fonts, and the UI theme with one StyleBox per surface. |
+| `Data/` | The team credits shown in the credits roll. |
+| `Docs/` | [hall_design.md](Docs/hall_design.md): the UI's design and rules. |
+| `Audio/` | Sound effects (drop-in folder; see its README). |
 | `Builds/` | Committed desktop builds from earlier iterations. |
 
 [CLAUDE.md](CLAUDE.md) has more detail on the architecture and code conventions.

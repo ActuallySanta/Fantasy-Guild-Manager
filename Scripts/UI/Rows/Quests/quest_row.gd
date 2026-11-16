@@ -3,11 +3,11 @@
 ## denied) and odds on the right. Tap it to open Assign Party on that quest.
 ## Story quests (HallStyle.is_story_quest) get gilt paper and a "Story Quest"
 ## ribbon above the title (tab_board.gd also lists them first).
-## Scene: MobileHall/Scenes/Rows/quest_row.tscn
+## Scene: Scenes/Rows/Quests/quest_row.tscn
 extends TapPanel
 
-const PortraitScene := preload("uid://h87tubvsjwc3")  # MobileHall/Scenes/Components/portrait.tscn
-const ChipScene := preload("uid://5khy5d8j40yo")  # MobileHall/Scenes/Components/chip.tscn
+const PortraitScene := preload("uid://h87tubvsjwc3")  # Scenes/Components/portrait.tscn
+const ChipScene := preload("uid://5khy5d8j40yo")  # Scenes/Components/chip.tscn
 
 ## Size (pixels) of the little party portraits under the state.
 const MINI_PORTRAIT_SIZE := 40

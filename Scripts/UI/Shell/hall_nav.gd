@@ -2,7 +2,7 @@
 ## The open one is parchment (NavTabActive in hall_theme) and stands taller,
 ## the rest dark wood (NavTab); each has a badge when it needs a visit.
 ## Button ids match HallMain.TAB_IDS (Nav_<id> in the scene).
-## Scene: MobileHall/Scenes/Shell/hall_nav.tscn
+## Scene: Scenes/Shell/hall_nav.tscn
 class_name HallNav
 extends PanelContainer
 

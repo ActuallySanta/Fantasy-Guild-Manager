@@ -3,13 +3,13 @@
 ## of letters: the top one is read in full, the ones under it peek out and
 ## come to the top when tapped. The Applicants tab shows how many are waiting.
 ## A line at the top shows beds used and links to the Barracks upgrade.
-## Scene: MobileHall/Scenes/Tabs/tab_guild.tscn
+## Scene: Scenes/Tabs/tab_guild.tscn
 extends VBoxContainer
 
-const MemberCardScene := preload("uid://dls1bjn8gt2fe")  # MobileHall/Scenes/Rows/member_card.tscn
-const HireCardScene := preload("uid://cy6d8ep8exxlt")  # MobileHall/Scenes/Rows/hire_card.tscn
-const HirePeekScene := preload("uid://3jfkcim0fo7x")  # MobileHall/Scenes/Rows/hire_peek.tscn
-const HeadingScene := preload("uid://bve0dglxrk3x4")  # MobileHall/Scenes/Rows/home_heading.tscn
+const MemberCardScene := preload("uid://dls1bjn8gt2fe")  # Scenes/Rows/Heroes/member_card.tscn
+const HireCardScene := preload("uid://cy6d8ep8exxlt")  # Scenes/Rows/Heroes/hire_card.tscn
+const HirePeekScene := preload("uid://3jfkcim0fo7x")  # Scenes/Rows/Heroes/hire_peek.tscn
+const HeadingScene := preload("uid://bve0dglxrk3x4")  # Scenes/Rows/Buildings/home_heading.tscn
 
 ## Cards of fallen heroes fade back, like faded rows elsewhere in the hall.
 const FALLEN_OPACITY := 0.6

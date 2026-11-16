@@ -1,10 +1,10 @@
 ## Board tab: the home screen. Three pinned "Today" notes (recruits,
 ## quests decided, upgrades), then every quest of the day as a scroll in one
 ## list so they can be compared at a glance. Tap a quest to pick its party.
-## Scene: MobileHall/Scenes/Tabs/tab_board.tscn
+## Scene: Scenes/Tabs/tab_board.tscn
 extends ScrollContainer
 
-const QuestRowScene := preload("uid://dxhtjf067jytf")  # MobileHall/Scenes/Rows/quest_row.tscn
+const QuestRowScene := preload("uid://dxhtjf067jytf")  # Scenes/Rows/Quests/quest_row.tscn
 
 # ---- TEXT
 # Today note titles

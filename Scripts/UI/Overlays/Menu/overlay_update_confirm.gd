@@ -8,7 +8,7 @@
 ##     new deploy)
 ## It belongs to overlay_debug.gd, which opens it; tapping the dim cancels.
 ## Drawn over the whole screen (top_level).
-## Scene: MobileHall/Scenes/Overlays/overlay_update_confirm.tscn
+## Scene: Scenes/Overlays/Menu/overlay_update_confirm.tscn
 extends Control
 
 ## Font size of the buttons (design px; HallFontScale grows them with everything else).

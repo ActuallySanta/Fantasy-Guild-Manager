@@ -1,11 +1,11 @@
 ## End Day check: a sheet over the screen before the day ends, showing who goes
 ## out tonight and, if you can afford any, the upgrades worth buying first.
 ## (Upgrades were easy to forget in every earlier prototype.)
-## Scene: MobileHall/Scenes/Overlays/overlay_end_day.tscn
+## Scene: Scenes/Overlays/Day/overlay_end_day.tscn
 extends Control
 
-const PlanRowScene := preload("uid://c2ca1up8vmmc6")  # MobileHall/Scenes/Rows/plan_row.tscn
-const SuggestRowScene := preload("uid://bdmft4ngc6x70")  # MobileHall/Scenes/Rows/suggest_row.tscn
+const PlanRowScene := preload("uid://c2ca1up8vmmc6")  # Scenes/Rows/Day End/plan_row.tscn
+const SuggestRowScene := preload("uid://bdmft4ngc6x70")  # Scenes/Rows/Day End/suggest_row.tscn
 
 # ---- TEXT
 const TEXT_TITLE := "End Day %d?"

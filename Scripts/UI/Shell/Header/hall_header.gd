@@ -5,7 +5,7 @@
 ## or the shield drops a popup that explains gold (popup_gold.gd) or standing
 ## (popup_standing.gd). The popup's backdrop covers the screen, so it closes
 ## before anything else can be tapped.
-## Scene: MobileHall/Scenes/Shell/hall_header.tscn
+## Scene: Scenes/Shell/Header/hall_header.tscn
 class_name HallHeader
 extends VBoxContainer
 

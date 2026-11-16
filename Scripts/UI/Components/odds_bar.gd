@@ -1,8 +1,8 @@
 ## Success-chance bar: hatched fill in the odds ink over a paper track, with
 ## quarter ticks on top.
-## Art: MobileHall/Art/Textures/odds_track.png (under), odds_fill.png (the fill,
+## Art: Sprites/UI Textures/odds_track.png (under), odds_fill.png (the fill,
 ## white so it can be tinted), odds_over.png (border and quarter ticks on top).
-## Scene: MobileHall/Scenes/Components/odds_bar.tscn
+## Scene: Scenes/Components/odds_bar.tscn
 extends TextureProgressBar
 
 

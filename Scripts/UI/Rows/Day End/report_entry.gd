@@ -7,11 +7,11 @@
 ## tags); tap one to read the story and sign-off, tap again to fold it.
 ## Story quests (HallStyle.is_story_quest) never fold: they get gilt paper, a
 ## "Story Quest" ribbon, and a star beside the lines of the written story.
-## Scene: MobileHall/Scenes/Rows/report_entry.tscn
+## Scene: Scenes/Rows/Day End/report_entry.tscn
 extends TapPanel
 
-const BeatRowScene := preload("uid://nm3rjurnk3x2")  # MobileHall/Scenes/Rows/beat_row.tscn
-const ChipScene := preload("uid://5khy5d8j40yo")  # MobileHall/Scenes/Components/chip.tscn
+const BeatRowScene := preload("uid://nm3rjurnk3x2")  # Scenes/Rows/Day End/beat_row.tscn
+const ChipScene := preload("uid://5khy5d8j40yo")  # Scenes/Components/chip.tscn
 
 # ---- MOTION (the reveal, see reveal())
 ## Seconds the letter takes to fade up, then before its stamp slams down.

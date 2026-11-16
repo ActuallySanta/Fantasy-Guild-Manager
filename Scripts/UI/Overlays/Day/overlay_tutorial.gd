@@ -79,7 +79,7 @@ const SHOW_BACK_BUTTON := false
 ## toast) and the raised art inside tabs (applicant letters, scroll rollers),
 ## so the dim, ring and Pip always sit on top of what they point at.
 const TUTORIAL_Z_INDEX := 20
-## The spotlight ring and the arrow are white art (Styles/stamp.tres, Art/Icons)
+## The spotlight ring and the arrow are white art (Themes/Styles/stamp.tres, Sprites/Hall Icons)
 ## tinted this gold.
 const RING_COLOR := Color("#F6B93B")
 const HOLE_PAD := 10.0
@@ -117,12 +117,12 @@ const SLZ := "[color=#3D5A2A]Sleaziness[/color]"
 const PLK := "[color=#7A4A1E]Pluck[/color]"
 const GOLD := "[color=#6B5A1E]gold[/color]"
 
-# ---- art reused from MobileHall/Art (swap the files to restyle the coach)
+# ---- art reused from Sprites/ (swap the files to restyle the coach)
 ## Pip sits in the same round portrait frame as the heroes on the Board.
-const PORTRAIT_MASK := preload("uid://buv1wa6etd3u3")  # MobileHall/Art/Textures/portrait_round_mask.png
-const PORTRAIT_FRAME := preload("uid://cscfv0x0mk446")  # MobileHall/Art/Textures/portrait_round_frame.png
+const PORTRAIT_MASK := preload("uid://buv1wa6etd3u3")  # Sprites/UI Textures/portrait_round_mask.png
+const PORTRAIT_FRAME := preload("uid://cscfv0x0mk446")  # Sprites/UI Textures/portrait_round_frame.png
 ## The pointer is the pixel arrow icon (it points left; it's turned to point up / down).
-const ARROW_ICON := preload("uid://c2nc04lk4jmw3")  # MobileHall/Art/Icons/arrow_left.tres
+const ARROW_ICON := preload("uid://c2nc04lk4jmw3")  # Sprites/Hall Icons/arrow_left.tres
 ## Ground behind Pip inside the frame (a parchment tint).
 const PIP_GROUND := Color("#E9DEC4")
 
@@ -607,7 +607,7 @@ func _build() -> void:
 	# the spotlight ring: the stamp's double border (white art) inked gold
 	_ring = Panel.new()
 	_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_ring.add_theme_stylebox_override("panel", load("uid://cov6qnc1bx421"))  # MobileHall/Styles/stamp.tres
+	_ring.add_theme_stylebox_override("panel", load("uid://cov6qnc1bx421"))  # Themes/Styles/stamp.tres
 	HallStyle.tint_art(_ring, RING_COLOR)
 	add_child(_ring)
 
@@ -718,7 +718,7 @@ func _build() -> void:
 	_skip_button = Button.new()
 	_skip_button.text = "Skip tutorial"
 	_skip_button.flat = true
-	_skip_button.add_theme_font_override("font", load("uid://dvhjw1533s75"))  # MobileHall/Art/Fonts/font_italic.tres
+	_skip_button.add_theme_font_override("font", load("uid://dvhjw1533s75"))  # Fonts/font_italic.tres
 	HallFontScale.set_size(_skip_button, "font_size", INSTRUCTION_FONT_SIZE)
 	_skip_button.add_theme_color_override("font_color", HallStyle.TEXT_SOFT)
 	_skip_button.pressed.connect(skip_tutorial)

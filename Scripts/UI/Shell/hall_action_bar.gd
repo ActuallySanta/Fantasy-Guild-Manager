@@ -2,7 +2,7 @@
 ## one big gold button for the next thing to do (hire someone -> decide the
 ## next quest -> end the day). Hidden on screens, which put their own buttons
 ## in this spot, and on the Shop tab, whose Buy bar sits here.
-## Scene: MobileHall/Scenes/Shell/hall_action_bar.tscn
+## Scene: Scenes/Shell/hall_action_bar.tscn
 class_name HallActionBar
 extends PanelContainer
 

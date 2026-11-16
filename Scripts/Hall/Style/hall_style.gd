@@ -9,12 +9,12 @@
 ## has its own ink, green = good / sent, red = bad / denied / hurt,
 ## blue = odds / to do, gold = money).
 ##
-## Where things live (see MobileHall/Art/README.md for how to swap the art):
-##   - Layout: every screen, row and widget is a .tscn under MobileHall/Scenes.
-##   - Art:    every image, icon and font is in MobileHall/Art. Replace a file
+## Where things live (see Sprites/README.md for how to swap the art):
+##   - Layout: every screen, row and widget is a .tscn under Scenes/.
+##   - Art:    every image, icon and font is in Sprites/ or Fonts/. Replace a file
 ##             with your own of the same name and the whole UI picks it up.
 ##   - Boxes:  one StyleBox per surface (paper card, gold button...) in
-##             MobileHall/Styles, and hall_theme.tres names the looks scenes use
+##             Themes/Styles, and hall_theme.tres names the looks scenes use
 ##             (theme_type_variation = TitleLabel, PaperCard, GoldButton...).
 ##   - This file: ink colours, display tables, the icon table, text helpers,
 ##     game lookups, and the restyles that change with game state. Restyles
@@ -28,10 +28,10 @@ extends RefCounted
 
 
 ## Clips portrait art to its round or oval mask (see mask_to).
-const PORTRAIT_MASK_SHADER := preload("uid://bkumb84ipevs1")  # MobileHall/Styles/portrait_mask.gdshader
+const PORTRAIT_MASK_SHADER := preload("uid://bkumb84ipevs1")  # Themes/Styles/portrait_mask.gdshader
 ## Outline shapes that fill_art() copies into a filled, coloured box.
-const PILL_STYLE := preload("uid://cels2rr0bev26")  # MobileHall/Styles/pill.tres
-const INK_BOX_STYLE := preload("uid://l4e4648hj2s1")  # MobileHall/Styles/ink_box.tres
+const PILL_STYLE := preload("uid://cels2rr0bev26")  # Themes/Styles/pill.tres
+const INK_BOX_STYLE := preload("uid://l4e4648hj2s1")  # Themes/Styles/ink_box.tres
 
 
 # ============================================================ QUEST STATES
@@ -461,31 +461,31 @@ static func buildings_in_order() -> Array:
 ## tinted; swap any file for your own art (keep it white to keep the tinting).
 ## Names not listed here have no icon, so it's hidden.
 const ICON_FILES := {
-	"coins": "uid://baflbvuj3ew0p",  # MobileHall/Art/Icons/coins.tres
-	"shield": "uid://b7f3ai3fc4j6r",  # MobileHall/Art/Icons/shield.tres
-	"person": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.tres
-	"bed": "uid://ih4xtkgfq1o8",  # MobileHall/Art/Icons/bed.tres
-	"swords": "uid://ce33qlc0iebc7",  # MobileHall/Art/Icons/swords.tres
-	"chest": "uid://dcn1cfg46tkrb",  # MobileHall/Art/Icons/chest.tres
-	"scroll": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.tres
-	"x": "uid://ealg7qhxhkmi",  # MobileHall/Art/Icons/x.tres
-	"back": "uid://c2nc04lk4jmw3",  # MobileHall/Art/Icons/arrow_left.tres
-	"check": "uid://xecbrm0mx34l",  # MobileHall/Art/Icons/check.tres
-	"diamond": "uid://b2bcm5mk7g15t",  # MobileHall/Art/Icons/diamond.tres
-	"diamond_empty": "uid://dkis35yrvae8t",  # MobileHall/Art/Icons/diamond_empty.tres
-	"target": "uid://c328bo4vnwlwo",  # MobileHall/Art/Icons/target.tres
-	"cross": "uid://d1p0h336y6eev",  # MobileHall/Art/Icons/cross.tres
-	"quill": "uid://bbkg4p4knjkde",  # MobileHall/Art/Icons/quill.tres
-	"skull": "uid://dv4aeys4diph4",  # MobileHall/Art/Icons/skull.tres
-	"heart": "uid://dbq8w0d0gocej",  # MobileHall/Art/Icons/heart.tres
-	"stall": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.tres
+	"coins": "uid://baflbvuj3ew0p",  # Sprites/Hall Icons/coins.tres
+	"shield": "uid://b7f3ai3fc4j6r",  # Sprites/Hall Icons/shield.tres
+	"person": "uid://cv5023acxlou6",  # Sprites/Hall Icons/person.tres
+	"bed": "uid://ih4xtkgfq1o8",  # Sprites/Hall Icons/bed.tres
+	"swords": "uid://ce33qlc0iebc7",  # Sprites/Hall Icons/swords.tres
+	"chest": "uid://dcn1cfg46tkrb",  # Sprites/Hall Icons/chest.tres
+	"scroll": "uid://cb420nxynjehg",  # Sprites/Hall Icons/scroll.tres
+	"x": "uid://ealg7qhxhkmi",  # Sprites/Hall Icons/x.tres
+	"back": "uid://c2nc04lk4jmw3",  # Sprites/Hall Icons/arrow_left.tres
+	"check": "uid://xecbrm0mx34l",  # Sprites/Hall Icons/check.tres
+	"diamond": "uid://b2bcm5mk7g15t",  # Sprites/Hall Icons/diamond.tres
+	"diamond_empty": "uid://dkis35yrvae8t",  # Sprites/Hall Icons/diamond_empty.tres
+	"target": "uid://c328bo4vnwlwo",  # Sprites/Hall Icons/target.tres
+	"cross": "uid://d1p0h336y6eev",  # Sprites/Hall Icons/cross.tres
+	"quill": "uid://bbkg4p4knjkde",  # Sprites/Hall Icons/quill.tres
+	"skull": "uid://dv4aeys4diph4",  # Sprites/Hall Icons/skull.tres
+	"heart": "uid://dbq8w0d0gocej",  # Sprites/Hall Icons/heart.tres
+	"stall": "uid://du8qg2ro1ddxi",  # Sprites/Hall Icons/stall.tres
 	# story quests: their ribbon and their story lines in the Day Report
 	"star": "res://Sprites/Hall Icons/star.tres",
 	# quest type seals (QUEST_TYPES)
-	"gate": "uid://13yirvv2nrwk",  # MobileHall/Art/Icons/gate.tres
-	"escort": "uid://bkk0x60yoyngi",  # MobileHall/Art/Icons/escort.tres
-	"flag": "uid://h5m6winn3vrf",  # MobileHall/Art/Icons/flag.tres
-	"eye": "uid://2203hgt8y6l4",  # MobileHall/Art/Icons/eye.tres
+	"gate": "uid://13yirvv2nrwk",  # Sprites/Hall Icons/gate.tres
+	"escort": "uid://bkk0x60yoyngi",  # Sprites/Hall Icons/escort.tres
+	"flag": "uid://h5m6winn3vrf",  # Sprites/Hall Icons/flag.tres
+	"eye": "uid://2203hgt8y6l4",  # Sprites/Hall Icons/eye.tres
 	# item seals (ITEM_ICONS). Full-size art (96 x 96 PNGs with the drawing
 	# centred), not 16 x 16 PixelIcons, so they point at the PNG itself.
 	"item_sword": "uid://cfmenvuyddpqu",  # Sprites/Item Icons/sword_icon.png
@@ -500,11 +500,11 @@ const ICON_FILES := {
 	"item_priest_charm": "uid://drkpxwhqq2642",  # Sprites/Item Icons/priestItem_icon.png
 	"item_incense": "uid://cg7gjg5y3gcm5",  # Sprites/Item Icons/incense_icon.png
 	"item_priest_book": "uid://spl6gpjgucet",  # Sprites/Item Icons/priestBook_icon.png
-	"nav_settings": "uid://ysb0ogcuiwff",  # MobileHall/Art/Icons/gear.tres
-	"nav_quests": "uid://cb420nxynjehg",  # MobileHall/Art/Icons/scroll.tres
-	"nav_characters": "uid://cv5023acxlou6",  # MobileHall/Art/Icons/person.tres
-	"nav_upgrades": "uid://cjywbau63ujgi",  # MobileHall/Art/Icons/hammer.tres
-	"nav_shop": "uid://du8qg2ro1ddxi",  # MobileHall/Art/Icons/stall.tres
+	"nav_settings": "uid://ysb0ogcuiwff",  # Sprites/Hall Icons/gear.tres
+	"nav_quests": "uid://cb420nxynjehg",  # Sprites/Hall Icons/scroll.tres
+	"nav_characters": "uid://cv5023acxlou6",  # Sprites/Hall Icons/person.tres
+	"nav_upgrades": "uid://cjywbau63ujgi",  # Sprites/Hall Icons/hammer.tres
+	"nav_shop": "uid://du8qg2ro1ddxi",  # Sprites/Hall Icons/stall.tres
 }
 
 ## Loaded icon textures by uid, so each file is only loaded once.

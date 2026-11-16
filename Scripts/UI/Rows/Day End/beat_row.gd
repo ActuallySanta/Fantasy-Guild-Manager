@@ -1,5 +1,5 @@
 ## One line of a quest's story in the Day Report: icon + text.
-## Scene: MobileHall/Scenes/Rows/beat_row.tscn
+## Scene: Scenes/Rows/Day End/beat_row.tscn
 extends HBoxContainer
 
 

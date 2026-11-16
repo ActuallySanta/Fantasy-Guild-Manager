@@ -2,7 +2,7 @@
 ## stats on one line (favored stat with a heavy border), how much they'd add to the odds, and which
 ## quest (or training) they're already on. Tap to pin / unpin; "i" opens
 ## their details.
-## Scene: MobileHall/Scenes/Rows/pick_row.tscn
+## Scene: Scenes/Rows/Quests/pick_row.tscn
 extends TapPanel
 
 

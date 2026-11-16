@@ -1,7 +1,7 @@
 ## One hero on the Game Over ledger's roll call: an icon for their fate
 ## (skull = fell, arrow = released, heart = still on the roster), their name
 ## and role, and a line saying what became of them.
-## Scene: MobileHall/Scenes/Rows/roll_call_row.tscn
+## Scene: Scenes/Rows/Day End/roll_call_row.tscn
 extends HBoxContainer
 
 

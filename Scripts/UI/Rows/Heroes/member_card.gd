@@ -1,7 +1,7 @@
 ## One adventurer in the Guild tab's roster (a parchment card): portrait,
 ## what they're doing today, and health with their two strongest stats.
 ## Tap for details (the character page shows every stat).
-## Scene: MobileHall/Scenes/Rows/member_card.tscn
+## Scene: Scenes/Rows/Heroes/member_card.tscn
 extends TapPanel
 
 

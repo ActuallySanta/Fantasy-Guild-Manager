@@ -1,7 +1,7 @@
 ## One hero in the Equip picker (overlay_equip_picker.gd): round portrait,
 ## name and role, how full their gear slots are, what the item would change
 ## ("Sleaziness 28 → 58"), and Equip (a free slot) or Swap… (slots full).
-## Scene: MobileHall/Scenes/Rows/equip_pick_row.tscn
+## Scene: Scenes/Rows/Items/equip_pick_row.tscn
 extends PanelContainer
 
 

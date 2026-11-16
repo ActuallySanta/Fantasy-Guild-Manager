@@ -4,7 +4,7 @@
 ## hiring, gear and building upgrades, each with a price tag that's green
 ## when the guild can pay it. A red note shows when tomorrow's recruits cost
 ## more than the gold in hand (HallLedger.is_short_of_recruit_gold).
-## Scene: MobileHall/Scenes/Shell/popup_gold.tscn
+## Scene: Scenes/Shell/Header/popup_gold.tscn
 extends HeaderPopup
 
 

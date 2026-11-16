@@ -1,7 +1,7 @@
 ## One seat in Assign Party's party: a pinned card with portrait, name, role and
 ## their value in the quest's favored stat (tap to take them out), or an empty
 ## seat waiting for someone.
-## Scene: MobileHall/Scenes/Rows/party_slot.tscn
+## Scene: Scenes/Rows/Quests/party_slot.tscn
 extends TapPanel
 
 

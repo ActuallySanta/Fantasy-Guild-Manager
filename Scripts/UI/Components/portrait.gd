@@ -2,13 +2,13 @@
 ## circle) on a soft ground, inside an ink frame. The clipping is the
 ## portrait_mask shader (HallStyle.mask_to). Set the size on each
 ## instance with custom_minimum_size.
-## Art: MobileHall/Art/Textures/portrait_<oval|round>_<mask|frame>.png
-## Scene: MobileHall/Scenes/Components/portrait.tscn
+## Art: Sprites/UI Textures/portrait_<oval|round>_<mask|frame>.png
+## Scene: Scenes/Components/portrait.tscn
 extends Control
 
 
-const ROUND_MASK := preload("uid://buv1wa6etd3u3")  # MobileHall/Art/Textures/portrait_round_mask.png
-const ROUND_FRAME := preload("uid://cscfv0x0mk446")  # MobileHall/Art/Textures/portrait_round_frame.png
+const ROUND_MASK := preload("uid://buv1wa6etd3u3")  # Sprites/UI Textures/portrait_round_mask.png
+const ROUND_FRAME := preload("uid://cscfv0x0mk446")  # Sprites/UI Textures/portrait_round_frame.png
 ## Multiplied over the art so white backgrounds read as old paper.
 const ART_TINT := Color("#F2EADB")
 ## Greys out the art of dead adventurers.

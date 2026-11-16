@@ -1,9 +1,9 @@
 ## One quest in Assign Party's strip: a little rolled scroll filled with its
 ## type colour (green = sent, red = denied), the quest number on it, and the
 ## type tag (or SENT / NO) under it. The quest showing now is parchment.
-## (The fill is the Band: Styles/quest_band.tres, rounded to sit inside the
-## scroll art, Art/Textures/strip_tab.png.)
-## Scene: MobileHall/Scenes/Rows/quest_tab.tscn
+## (The fill is the Band: Themes/Styles/quest_band.tres, rounded to sit inside the
+## scroll art, Sprites/UI Textures/strip_tab.png.)
+## Scene: Scenes/Rows/Quests/quest_tab.tscn
 extends VBoxContainer
 
 

@@ -1,5 +1,5 @@
 ## Assign Party: one quest at a time, with every other quest one tap away.
-## Scene: MobileHall/Scenes/Screens/screen_assign.tscn
+## Scene: Scenes/Screens/screen_assign.tscn
 ##
 ## Top to bottom:
 ##   strip   - back to the Board, then one little scroll per quest
@@ -11,9 +11,9 @@
 ##   footer  - Deny / Seal & send (or Recall / Reconsider once decided)
 extends VBoxContainer
 
-const QuestTabScene := preload("uid://cp5084mci60mt")  # MobileHall/Scenes/Rows/quest_tab.tscn
-const PartySlotScene := preload("uid://cisymsmond1")  # MobileHall/Scenes/Rows/party_slot.tscn
-const PickRowScene := preload("uid://cfnuyteanwwp5")  # MobileHall/Scenes/Rows/pick_row.tscn
+const QuestTabScene := preload("uid://cp5084mci60mt")  # Scenes/Rows/Quests/quest_tab.tscn
+const PartySlotScene := preload("uid://cisymsmond1")  # Scenes/Rows/Quests/party_slot.tscn
+const PickRowScene := preload("uid://cfnuyteanwwp5")  # Scenes/Rows/Quests/pick_row.tscn
 
 # ---- MOTION
 ## Seconds the odds number and bar take to move to a new chance.

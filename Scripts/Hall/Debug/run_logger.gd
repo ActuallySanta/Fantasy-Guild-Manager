@@ -1,7 +1,7 @@
 ## Run logger: one row per day (gold, standing, heroes, quest tallies) for
 ## balancing. Every row goes to a local CSV (user://run_log.csv) and, when
 ## SHEET_URL is set, to a Google Sheet through a small Apps Script web app
-## (MobileHall/Playtest/run_log_apps_script.gs has the script and setup).
+## (Scripts/Playtest/run_log_apps_script.gs has the script and setup).
 ##
 ## Cheap on purpose: it only wakes up on the hall's own tutorial_event
 ## (end_day / game_over), builds one small Dictionary, appends one CSV line,

@@ -2,7 +2,7 @@
 ## own rows (the text lives in the scene); the other topics are built here
 ## from TOPICS. Tapping a topic opens its page; Back returns to the list.
 ## On a fresh run with the tutorial off it opens straight on Basics.
-## Scene: MobileHall/Scenes/Overlays/overlay_welcome.tscn
+## Scene: Scenes/Overlays/Day/overlay_welcome.tscn
 extends Control
 
 

@@ -1,11 +1,11 @@
 ## One building's card on the Upgrades tab's Facilities half: the Training Yard
 ## (heroes in a slot, plus "+ Add a hero" to pick more) or the Hospital
 ## (heroes in a bed, hurt heroes, fallen heroes). Rows are home_row.tscn.
-## Scene: MobileHall/Scenes/Rows/home_section.tscn
+## Scene: Scenes/Rows/Buildings/home_section.tscn
 extends PanelContainer
 
-const HomeRowScene := preload("uid://br273xs77xnj3")  # MobileHall/Scenes/Rows/home_row.tscn
-const HeadingScene := preload("uid://bve0dglxrk3x4")  # MobileHall/Scenes/Rows/home_heading.tscn
+const HomeRowScene := preload("uid://br273xs77xnj3")  # Scenes/Rows/Buildings/home_row.tscn
+const HeadingScene := preload("uid://bve0dglxrk3x4")  # Scenes/Rows/Buildings/home_heading.tscn
 
 # ---- SIMPLIFIED (Info-Chunking): set to true to restore
 ## The Training Yard's "0 of 1 slot · +1 a night" line under its name.

@@ -3,10 +3,10 @@
 ## the run's numbers, a roll call of every hero and what became of them, and
 ## the "Found a New Guild" button (HallMain.start_new_run).
 ## Reads HallMain.run_over_stats (see HallMain.build_run_over_stats).
-## Scene: MobileHall/Scenes/Overlays/overlay_game_over.tscn
+## Scene: Scenes/Overlays/Run End/overlay_game_over.tscn
 extends Control
 
-const RollCallRowScene := preload("uid://bqn0i28l67um7")  # MobileHall/Scenes/Rows/roll_call_row.tscn
+const RollCallRowScene := preload("uid://bqn0i28l67um7")  # Scenes/Rows/Day End/roll_call_row.tscn
 
 ## Font size of the number on the big Days tile (the grid tiles keep the scene's).
 const DAYS_FONT_SIZE := 110

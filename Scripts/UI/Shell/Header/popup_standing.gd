@@ -4,7 +4,7 @@
 ## recruits stop coming (GuildUpgrades.MINIMUM_STANDING), the green half fills
 ## toward the next milestone (a quest rank or a building level, HallWallet).
 ## A red note shows once standing is close to that floor.
-## Scene: MobileHall/Scenes/Shell/popup_standing.tscn
+## Scene: Scenes/Shell/Header/popup_standing.tscn
 extends HeaderPopup
 
 

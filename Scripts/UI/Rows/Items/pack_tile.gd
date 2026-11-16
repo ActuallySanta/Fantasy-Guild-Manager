@@ -4,7 +4,7 @@
 ## to the tag's corner, and a navy "ON GWEN" ribbon along its foot. A spare
 ## item says "SPARE" there instead.
 ## The picked one gets the gold-edged tag (GoodsTagSelected in hall_theme).
-## Scene: MobileHall/Scenes/Rows/pack_tile.tscn
+## Scene: Scenes/Rows/Items/pack_tile.tscn
 extends Button
 
 

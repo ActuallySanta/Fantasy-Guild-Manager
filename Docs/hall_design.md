@@ -7,8 +7,7 @@ changes the things all three were criticized for.
 It is **UI only**: it runs on the existing systems (`CharacterContainer`, `GuildCharacter`,
 `CreatedQuest`, `GameState`, `GuildUpgrades`, `QuestScoring`) and changes none of them.
 
-- **Run it:** open `MobileHall/hall_main.tscn` and press *Run Current Scene* (F6).
-  The project's main scene is unchanged.
+- **Run it:** open `Scenes/hall_main.tscn` and press *Run Current Scene* (F6). It is also the project's main scene, so F5 runs it too.
 
 ## Look
 
@@ -20,9 +19,9 @@ Colour still carries meaning, now as ink: each stat has its own ink, green = goo
 red = bad / denied / hurt, blue = odds / to do, gold = money, and each quest type has a
 coloured seal (DUN, ESC, SCT, INT, BOSS).
 
-All art is a swappable placeholder. **See `Art/README.md`** for every file, what it's used
-for and how to replace it. In short: images and fonts are in `Art/`, each surface is a
-StyleBox in `Styles/`, and `hall_theme.tres` holds the named looks scenes use
+All art is a swappable placeholder. **See `Sprites/README.md`** for every file, what it's used
+for and how to replace it. In short: images are in `Sprites/` and fonts in `Fonts/`, each surface is a
+StyleBox in `Themes/Styles/`, and `Themes/hall_theme.tres` holds the named looks scenes use
 (`theme_type_variation` = `TitleLabel`, `PaperCard`, `GoldButton`...). Scripts never build
 boxes in code; they only pick a look or tint white art with an ink colour.
 
@@ -79,7 +78,7 @@ gold (prices never go down). Recruits are free on days 1-2, so it can't happen t
 checked when a new day starts (after the Day Report), after a release, and when the
 scene loads. The ledger's numbers come from `HallMain.run_stats`, tallied as you play.
 **Found a New Guild** resets the autoloads to Day 1 and loads `hall_main.tscn` again.
-`Playtest/scenario_game_over.tscn` opens straight onto the ledger.
+`Scenes/Playtest/scenario_game_over.tscn` opens straight onto the ledger.
 
 A red **Last hero standing** strip shows under the header when the guild is one death
 from falling (`HallMain.is_one_death_from_falling`). That means one hero is alive, nobody
@@ -104,7 +103,7 @@ random S-rank quest for now. The `FINAL QUEST CONTENT` / `FINAL QUEST STORY` com
 `hall_rules.gd` (`build_day_quests`, `play_quest`) and `FINAL QUEST DEFEAT TEXT` in
 `overlay_credits.gd` mark where the real quest goes.
 
-Ending Day 50 opens the credits roll (`Scenes/Overlays/overlay_credits.tscn`) instead of the
+Ending Day 50 opens the credits roll (`Scenes/Overlays/Run End/overlay_credits.tscn`) instead of the
 Day Report. The night's letters are still in the Menu's "Last night's report". The roll
 scrolls by itself after a moment. Any touch, drag or wheel hands it to the player, and
 Reduced Motion turns the auto-scroll off. The button appears once the bottom is first
@@ -119,14 +118,14 @@ reached and stays, so the player can scroll back up.
   Game Over ledger and ends on **Found a New Guild**.
 
 Run records (gold spent, items found, building levels, longest-serving hero) come from
-`HallLedger.build_run_records`. `Playtest/scenario_final_battle.tscn` starts on Day 50.
+`HallLedger.build_run_records`. `Scenes/Playtest/scenario_final_battle.tscn` starts on Day 50.
 
 ### Adding your team credits
 
-The "Made By" block near the end of the roll reads `MobileHall/Data/credits.tres`, a
+The "Made By" block near the end of the roll reads `Data/credits.tres`, a
 `CreditsList` (`Scripts/Credits/`). Edit it in the Godot editor:
 
-1. Double-click `MobileHall/Data/credits.tres` in the FileSystem dock.
+1. Double-click `Data/credits.tres` in the FileSystem dock.
 2. In the Inspector, expand **Entries** and click **Add Element**.
 3. Click the new empty slot and pick **New CreditEntry**.
 4. Fill in **Section** (the heading, e.g. "Art"), **Name**, and **Contribution**.
@@ -137,7 +136,7 @@ appears. Entries with an empty Name are skipped.
 
 ## Colorblind filter
 
-`Styles/colorblind_filter.gdshader` is a full-screen daltonize pass on a CanvasLayer
+`Themes/Styles/colorblind_filter.gdshader` is a full-screen daltonize pass on a CanvasLayer
 (layer 100) at the bottom of `hall_main.tscn`, so it recolours everything, overlays and
 art included. It moves the colour differences a player can't see into ones they can.
 It doesn't fake colourblindness. When it's Off the rect is hidden and costs nothing.
@@ -145,7 +144,7 @@ It doesn't fake colourblindness. When it's Off the rect is hidden and costs noth
 
 ## Training Yard and Hospital
 
-Both live on the Upgrades tab's **Facilities** half (`Scenes/Rows/home_section.tscn`, one building plan each). The rules
+Both live on the Upgrades tab's **Facilities** half (`Scenes/Rows/Buildings/home_section.tscn`, one building plan each). The rules
 live in `Globals/guild_upgrades.gd` (`run_night()`, called by End Day before the quests
 are played out), and the tuning numbers sit at the top of that file.
 
@@ -187,7 +186,7 @@ than overriding colours or styles on the node, so a reskin reaches it.
 ## Debug tools
 
 Menu > **Debug tools** (shown while `GuildUpgrades.SHOW_DEBUG_BUTTONS` is on) holds
-cheats for testing. The rules are in `Scripts/hall_debug.gd` (`HallDebug`), and the sheet
+cheats for testing. The rules are in `Scripts/Hall/Debug/hall_debug.gd` (`HallDebug`), and the sheet
 is `overlay_debug`. The first time in a run it only shows a warning and **Enable debug
 tools**. Enabling makes the run a **debug run** (`HallMain.is_debug_run`): it is never
 saved again, so the last save on disk stays as it was before the tools were used. A new
@@ -215,7 +214,7 @@ left alone). Flip the default to `true` before a release.
 
 With saving on, the run saves itself. Close the game at any point (the browser tab, the home-screen app,
 or the desktop window), open it again, and the hall picks up where it was with a
-"Welcome back" toast instead of the Welcome card. `Scripts/hall_save.gd` (`HallSave`)
+"Welcome back" toast instead of the Welcome card. `Scripts/Hall/Save/hall_save.gd` (`HallSave`)
 holds the whole format:
 
 - **When:** after every refresh (every action ends in one), when the app goes to the
@@ -274,18 +273,24 @@ holds the whole format:
 
 ## Files
 
-- `hall_main.tscn` + `Scripts/hall_main.gd`: state, every game action, refresh
-- `Scripts/hall_rules.gd`, `hall_ledger.gd`, `hall_settings.gd`, `hall_save.gd`, `hall_wallet.gd`: quest building and payout, run-over checks and the Game Over numbers, saved settings, the saved run, the gold and standing popups' numbers (static functions, no state)
-- `Scenes/Shell/`: the header (day, Bone Drake countdown, counters, danger strip, gold and standing popups), action bar, nav and toast
+Scenes and their scripts use the same folder names: a scene in `Scenes/X/` has its script
+in `Scripts/UI/X/`.
+
+- `Scenes/hall_main.tscn` + `Scripts/Hall/hall_main.gd`: state, every game action, refresh
+- `Scripts/Hall/Rules/`: `hall_rules.gd`, `hall_ledger.gd`, `hall_wallet.gd`, `hall_gear.gd`: quest building and payout, run-over checks and the Game Over numbers, the gold and standing popups' numbers, gear rules (static functions, no state)
+- `Scripts/Hall/Save/`: `hall_save.gd`, `hall_save_transfer.gd`, `hall_settings.gd`, `hall_web_files.gd`: the saved run, backup codes, saved settings, moving a code on and off the device
+- `Scripts/Hall/Style/`: `hall_style.gd` (ink colours, stat / injury / odds tables, quest-type, building and item-icon tables, icon table, text helpers, restyles), `hall_fx.gd` (animations), `hall_font_scale.gd`
+- `Scripts/Hall/Web/`: web update checks and the Menu's build line. `Scripts/Hall/Debug/`: the Debug tools and the run logger
+- `Scenes/Shell/`: action bar, nav and toast; `Shell/Header/`: the header (day, Bone Drake countdown, counters, danger strip) and its gold and standing popups
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
-- `Scenes/Overlays/`: End Day check, Day Report, Welcome, Menu, Game Over, Final Battle credits
-- `Data/credits.tres`: the team credits for the credits roll (see Adding your team credits)
-- `Scenes/Rows/`: list rows (quest row, quest tab, party seat, picker row, roster / hire cards, applicant peek, upgrade card, Today note, plan row, upgrade suggestion, report entry, story line, Training / Hospital card, row and heading, shop tile)
+- `Scenes/Overlays/`: `Day/` (End Day check, Day Report, Welcome; the tutorial coach is script-only), `Run End/` (Game Over, Final Battle credits), `Menu/` (Menu, Accessibility, Backup save, Debug, update prompt), `Items/` (equip picker, take-off confirm)
+- `Scenes/Rows/`: list rows. `Quests/` (quest row, Today note, quest tab, party seat, picker row), `Heroes/` (roster and hire cards, applicant peek), `Buildings/` (Training / Hospital card, row and heading, upgrade card), `Items/` (pack and shop tiles, equip picker row, gear row), `Day End/` (report entry, story line, plan row, upgrade suggestion, roll call)
 - `Scenes/Components/`: chip, portrait, stat strip, odds bar, divider, seal button, rolled-up scroll tag
-- `Art/`: every image, icon and font (placeholders; see `Art/README.md`)
-- `Styles/` + `hall_theme.tres`: one StyleBox per surface, and the theme with every named look
-- `Scripts/hall_style.gd`: ink colours, stat / injury / odds tables, quest-type, building and item-icon tables, icon table, text helpers, restyles
+- `Scenes/Playtest/` + `Scripts/Playtest/`: scenes that start a run partway in
+- `Data/credits.tres`: the team credits for the credits roll (see Adding your team credits)
+- `Sprites/` (`Hall Icons/`, `UI Textures/`) and `Fonts/`: every image, icon and font (placeholders; see `Sprites/README.md`)
+- `Themes/Styles/` + `Themes/hall_theme.tres`: one StyleBox per surface, and the theme with every named look
 
 ### Editing
 
@@ -301,19 +306,19 @@ game state themselves.
 Anything that sits inside a ScrollContainer must let touches through, or a drag that
 starts on it won't scroll on a phone. `PanelContainer` and `Button` default to Mouse
 Filter **Stop**, which swallows the drag. `hall_main.refresh()` ends with
-`DragScroll.fix_tree(self)` (`Scripts/drag_scroll.gd`), which sets every Stop control
+`DragScroll.fix_tree(self)` (`Scripts/UI/Components/drag_scroll.gd`), which sets every Stop control
 inside a scroll list to **Pass**. Buttons there also get a tap-vs-drag check, so a scroll
 that starts on a button scrolls instead of pressing it. A row you can tap extends
-`TapPanel` (`Scripts/tap_panel.gd`); a tap on a button inside it belongs to the button,
+`TapPanel` (`Scripts/UI/Components/tap_panel.gd`); a tap on a button inside it belongs to the button,
 not the row. Something built outside a refresh, inside a scroll list, needs its own
 `DragScroll.fix_tree(...)` call.
 
 ### Web updates and the build line
 
 The web build is a PWA, and its service worker serves the game files cache-first, so a
-plain reload can keep running an old deploy. `Scripts/hall_web_update.gd` switches to a
+plain reload can keep running an old deploy. `Scripts/Hall/Web/hall_web_update.gd` switches to a
 waiting deploy at start-up (the page reloads and the saved run comes back), or shows a
-toast if one turns up mid-game. The Menu's bottom line (`Scripts/hall_build_info.gd`)
+toast if one turns up mid-game. The Menu's bottom line (`Scripts/Hall/Web/hall_build_info.gd`)
 names the commit and time of the build that's running: the deploy workflow writes
 `External Content/build_info.txt` (gitignored), and without it the line says "Build dev".
 To check a phone, compare that line with the latest commit on `master`, or tap

@@ -4,7 +4,7 @@
 ## Which one is open is hall.items_section (HallMain.ITEMS_SECTION_*). The nav
 ## button and HallMain.TAB_SHOP keep the id "shop" so the tutorial's unlock day
 ## and old saves still line up.
-## Scene: MobileHall/Scenes/Tabs/tab_items.tscn
+## Scene: Scenes/Tabs/tab_items.tscn
 extends VBoxContainer
 
 

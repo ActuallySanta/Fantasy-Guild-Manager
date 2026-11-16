@@ -1,7 +1,7 @@
 ## One building on the Upgrades tab, drawn as a plan on grid paper: its icon,
 ## level diamonds, what it does now and next, and the Build button (or why you
 ## can't yet).
-## Scene: MobileHall/Scenes/Rows/upgrade_card.tscn
+## Scene: Scenes/Rows/Buildings/upgrade_card.tscn
 extends PanelContainer
 
 

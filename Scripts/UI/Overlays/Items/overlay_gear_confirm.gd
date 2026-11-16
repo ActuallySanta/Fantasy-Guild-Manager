@@ -6,11 +6,11 @@
 ##              their stats, and Cancel / Swap
 ## It belongs to tab_pack.gd, which opens it and acts on its signals; tapping
 ## the dim behind it cancels. Drawn over the whole screen (top_level).
-## Scene: MobileHall/Scenes/Overlays/overlay_gear_confirm.tscn
+## Scene: Scenes/Overlays/Items/overlay_gear_confirm.tscn
 extends Control
 
 
-const GearRowScene := preload("uid://5qr0450k1huj")  # MobileHall/Scenes/Rows/gear_row.tscn
+const GearRowScene := preload("uid://5qr0450k1huj")  # Scenes/Rows/Items/gear_row.tscn
 
 signal take_off_confirmed(item: StandardItem)
 signal swap_confirmed(item_on: StandardItem, item_off: StandardItem, character: GuildCharacter)

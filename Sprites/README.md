@@ -1,24 +1,25 @@
 # Mobile Hall art
 
-Every image and font the Mobile Hall UI draws lives in this folder. The ones here now are
+Every image the Mobile Hall UI draws lives in this folder (fonts are in `Fonts/`). The ones here now are
 **placeholders** (generated parchment, wood, seals and simple line icons) so you can swap
 them for your own art one piece at a time. Nothing in the scripts needs to change.
+`UI Textures/Extras/` is a spare art kit (frames, bars, knots, meters) that nothing uses yet.
 
 ## The three ways to reskin
 
 | You want to change... | Do this |
 |---|---|
-| **An image** (wood, paper, seal, coin, icon...) | Overwrite the file in `Art/Textures` or `Art/Icons` with your own art, **same name**. Godot re-imports it and every screen picks it up. |
-| **A font** | Drop your `.ttf`/`.otf` in `Art/Fonts`, open the matching `font_*.tres` and point its *Base Font* at it. |
-| **A colour, font size or which look a thing uses** | Open `MobileHall/hall_theme.tres` in the Theme editor. Each look (`TitleLabel`, `PaperCard`, `GoldButton`...) is a type variation there. Ink colours that change with game state are at the top of `Scripts/hall_style.gd`. |
+| **An image** (wood, paper, seal, coin, icon...) | Overwrite the file in `Sprites/UI Textures` or `Sprites/Hall Icons` with your own art, **same name**. Godot re-imports it and every screen picks it up. |
+| **A font** | Drop your `.ttf`/`.otf` in `Fonts/`, open the matching `font_*.tres` and point its *Base Font* at it. |
+| **A colour, font size or which look a thing uses** | Open `Themes/hall_theme.tres` in the Theme editor. Each look (`TitleLabel`, `PaperCard`, `GoldButton`...) is a type variation there. Ink colours that change with game state are at the top of `Scripts/Hall/Style/hall_style.gd`. |
 
 ## Images
 
-### Surfaces (9-slice): `Art/Textures`, used through `MobileHall/Styles/*.tres`
+### Surfaces (9-slice): `UI Textures`, used through `Themes/Styles/*.tres`
 
 These stretch to any size. The outer *margin* (in pixels) stays crisp and the middle
 tiles, so keep borders and torn edges inside the margin. If your art has a different
-border width, open the matching `Styles/*.tres` and change its *Texture Margin*.
+border width, open the matching `Themes/Styles/*.tres` and change its *Texture Margin*.
 
 | File | Used for | Margin (px) | Style file |
 |---|---|---|---|
@@ -44,7 +45,7 @@ border width, open the matching `Styles/*.tres` and change its *Texture Margin*.
 | `goods_tag.png`, `goods_tag_selected.png` | Shop goods as price tags (normal / picked) | 34 | `goods_tag*.tres` |
 | `awning.png` | Striped awning over the shopkeeper (tiles sideways) | none | set on `Awning` in `tab_shop.tscn` |
 
-### Ornaments (drawn as-is, any size): `Art/Textures`
+### Ornaments (drawn as-is, any size): `UI Textures`
 
 | File | Used for |
 |---|---|
@@ -61,32 +62,32 @@ border width, open the matching `Styles/*.tres` and change its *Texture Margin*.
 | `dash.png` | Dashed underlines (tiles) |
 | `box_on.png`, `box_off.png` | "Show busy" checkbox |
 | `tag_hole.png` | The string hole at the top of each shop price tag |
-| `Sprites/Shop/shopBackground.png`, `Sprites/Shop/shopkeeper.png` (outside this folder) | Grizzle on the Shop tab: the shop behind him (`Background` in `tab_shop.tscn`) and Grizzle on top (`ShopKeeper`) |
+| `Shop/shopBackground.png`, `Shop/shopkeeper.png` | Grizzle on the Shop tab: the shop behind him (`Background` in `tab_shop.tscn`) and Grizzle on top (`ShopKeeper`) |
 
-### Icons: `Art/Icons`
+### Icons: `Hall Icons`
 
 Pixel-art icons, **16 x 16 PNGs** (edit them in Aseprite at that size). They're **white**
 (with grey shading and a dark outline) so the UI can tint them: ink on paper, cream on wood.
 Keep your replacements white on transparent and they'll be tinted the same way.
 
 Each `name.png` has a `name.tres` beside it. That's what the scenes and code use: a
-`PixelIcon` (`Scripts/pixel_icon.gd`) that draws the PNG 6x bigger with sharp pixels, so a
+`PixelIcon` (`Scripts/UI/Components/pixel_icon.gd`) that draws the PNG 6x bigger with sharp pixels, so a
 16 x 16 icon is laid out like the old 96 x 96 ones and never blurs. **Edit the `.png`**; the
 `.tres` picks it up. To add an icon: draw `name.png`, duplicate any icon's `.tres` in the
 FileSystem dock as `name.tres` and set its *Source* to the new PNG, then add a row to
-`ICON_FILES` in `Scripts/hall_style.gd`. Buildings pick their icon in `BUILDING_ICONS` in
+`ICON_FILES` in `Scripts/Hall/Style/hall_style.gd`. Buildings pick their icon in `BUILDING_ICONS` in
 the same file. `stall` is the Shop tab.
 
-### Item icons: `Sprites/Item Icons` (outside this folder)
+### Item icons: `Item Icons`
 
 The item seals (Shop goods, Equipment tiles, a hero's Gear rows, the Equip picker) show one
 icon per item kind, on a seal in the item's rarity colour. These are full-size **96 x 96 PNGs**
 with the drawing centred, so `ICON_FILES` points at the PNG itself (no `PixelIcon` `.tres`).
 Each item kind ("Sword", "Pointy Hat"...) picks its icon in `ITEM_ICONS` in
-`Scripts/hall_style.gd`, and a kind with no icon shows its rarity tag (COM, RAR...) instead.
+`Scripts/Hall/Style/hall_style.gd`, and a kind with no icon shows its rarity tag (COM, RAR...) instead.
 Like the line icons they're tinted cream on the seal, so keep them light with a dark outline.
 
-## Fonts: `Art/Fonts`
+## Fonts: `Fonts/` (at the project root)
 
 | Wrapper | File now | Used for |
 |---|---|---|
@@ -106,5 +107,5 @@ free to ship with the game.
 
 A few simple shapes are plain `StyleBoxFlat`s: the header and nav bar, the day tile,
 badges, the gear button, folder tabs, outline boxes and pills, the toast. To give one
-of them art, open its file in `MobileHall/Styles`, choose *New StyleBoxTexture* in the
+of them art, open its file in `Themes/Styles`, choose *New StyleBoxTexture* in the
 inspector, and set its texture and margins. Every node using it updates.

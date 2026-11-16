@@ -5,7 +5,7 @@
 ##     "Found a New Guild" button (HallMain.start_new_run)
 ## Top to bottom: title, the quest's story one line at a time, the final
 ## battle's party, a parchment ledger (final stats, run records, roll call),
-## the team credits (MobileHall/Data/credits.tres, see CreditsList), and a
+## the team credits (Data/credits.tres, see CreditsList), and a
 ## closing line.
 ##
 ## The roll scrolls itself after START_DELAY. Any touch, drag or wheel hands
@@ -13,12 +13,12 @@
 ## reached, then stays, so the player can scroll back up and still leave.
 ## Reduced Motion: no auto-scroll, and the roll starts at its title.
 ## Reads HallMain.shown_credits (see HallMain.build_credits).
-## Scene: MobileHall/Scenes/Overlays/overlay_credits.tscn
+## Scene: Scenes/Overlays/Run End/overlay_credits.tscn
 extends Control
 
-const RollCallRowScene := preload("uid://bqn0i28l67um7")  # MobileHall/Scenes/Rows/roll_call_row.tscn
+const RollCallRowScene := preload("uid://bqn0i28l67um7")  # Scenes/Rows/Day End/roll_call_row.tscn
 ## The team credits (edit them in the inspector; see credits_list.gd).
-const TEAM_CREDITS: CreditsList = preload("uid://c72de0tnaska")  # MobileHall/Data/credits.tres
+const TEAM_CREDITS: CreditsList = preload("uid://c72de0tnaska")  # Data/credits.tres
 
 # ---- MOTION
 ## Seconds the roll holds still before it starts to move.

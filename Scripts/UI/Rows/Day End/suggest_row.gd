@@ -1,5 +1,5 @@
 ## An upgrade you can afford, offered on the End Day check with a buy button.
-## Scene: MobileHall/Scenes/Rows/suggest_row.tscn
+## Scene: Scenes/Rows/Day End/suggest_row.tscn
 extends HBoxContainer
 
 

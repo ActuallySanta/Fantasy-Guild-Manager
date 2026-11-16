@@ -6,10 +6,10 @@
 ## Gear: one row per equipped item (Take off) and per empty slot (Equip). Equip
 ## opens a pick list of owned items this hero's role can use; items worn by
 ## another hero can be taken from them. Rules live in the ItemShop autoload.
-## Scene: MobileHall/Scenes/Screens/screen_character.tscn
+## Scene: Scenes/Screens/screen_character.tscn
 extends VBoxContainer
 
-const GearRowScene := preload("uid://5qr0450k1huj")  # MobileHall/Scenes/Rows/gear_row.tscn
+const GearRowScene := preload("uid://5qr0450k1huj")  # Scenes/Rows/Items/gear_row.tscn
 
 # ---- MOTION
 ## Ink a stat line's number flashes when it changes (gear, training), and how

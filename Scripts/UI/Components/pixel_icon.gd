@@ -1,5 +1,5 @@
 ## A small pixel-art image drawn `pixel_scale` times bigger with sharp pixels.
-## Used by every icon in MobileHall/Art/Icons: the art is a 16 x 16 PNG (edit
+## Used by every icon in Sprites/Hall Icons: the art is a 16 x 16 PNG (edit
 ## it in Aseprite), and the .tres beside it is one of these, which the scenes
 ## and HallStyle.ICON_FILES point at.
 ##

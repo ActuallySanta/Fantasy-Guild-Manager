@@ -1,5 +1,5 @@
 ## One party going out tonight on the End Day check: quest, who, odds.
-## Scene: MobileHall/Scenes/Rows/plan_row.tscn
+## Scene: Scenes/Rows/Day End/plan_row.tscn
 extends HBoxContainer
 
 

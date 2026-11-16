@@ -2,7 +2,7 @@
 ## Reduced Motion, each a button that steps to the next choice. Changes apply
 ## right away and are saved (HallSettings). Back returns to the Menu; tapping
 ## the dimmed background closes both.
-## Scene: MobileHall/Scenes/Overlays/overlay_accessibility.tscn
+## Scene: Scenes/Overlays/Menu/overlay_accessibility.tscn
 extends Control
 
 ## Font size of the buttons and of the note under the title (design px;

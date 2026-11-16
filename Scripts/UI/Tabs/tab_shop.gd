@@ -14,10 +14,10 @@
 ## The keeper art is two layers in the scene: Sprites/Shop/shopBackground.png
 ## (Background) with Sprites/Shop/shopkeeper.png (ShopKeeper) drawn over it.
 ## Which item is picked is view state only, kept here.
-## Scene: MobileHall/Scenes/Tabs/tab_shop.tscn
+## Scene: Scenes/Tabs/tab_shop.tscn
 extends VBoxContainer
 
-const ShopTileScene := preload("uid://b25qy8uoil5du")  # MobileHall/Scenes/Rows/shop_tile.tscn
+const ShopTileScene := preload("uid://b25qy8uoil5du")  # Scenes/Rows/Items/shop_tile.tscn
 
 ## SIMPLIFIED (Info-Chunking): the "2 items in your pack" note beside
 ## Today's Goods (a reminder that unworn items are waiting to be equipped).

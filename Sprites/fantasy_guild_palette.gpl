@@ -2,7 +2,7 @@ GIMP Palette
 Name: Fantasy Guild Manager UI
 Columns: 6
 #
-# Sampled from MobileHall/Art/Textures, plus the inks in MobileHall/Scripts/hall_style.gd.
+# Sampled from Sprites/UI Textures, plus the inks in Scripts/Hall/Style/hall_style.gd.
 # Load in Aseprite: Palette menu > Load Palette (or drop into Aseprite's palettes folder).
 #
 # ---- Wood (backdrop, dark buttons, nav)

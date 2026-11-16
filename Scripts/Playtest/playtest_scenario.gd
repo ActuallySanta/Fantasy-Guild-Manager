@@ -1,5 +1,5 @@
 ## Playtest scenario loader for Mobile Hall.
-## Scenes: MobileHall/Playtest/scenario_*.tscn
+## Scenes: Scenes/Playtest/scenario_*.tscn
 ##
 ## Puts the game into a set state (day, standing, gold, a small hurt roster),
 ## then the Mobile Hall UI underneath starts from there. UI-only test setup:

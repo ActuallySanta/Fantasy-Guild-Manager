@@ -1,6 +1,6 @@
 ## Toast: a short message just above the action bar that fades out.
 ## Starts hidden; hall_main.gd show_toast() puts messages up.
-## Scene: MobileHall/Scenes/Shell/hall_toast.tscn
+## Scene: Scenes/Shell/hall_toast.tscn
 class_name HallToast
 extends PanelContainer
 

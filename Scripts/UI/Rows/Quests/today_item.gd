@@ -1,6 +1,6 @@
 ## One pinned note in the Board's "Today" checklist (Recruits / Decided / Upgrades).
 ## Green ink when done, dark ink when it wants a visit, faded otherwise.
-## Scene: MobileHall/Scenes/Rows/today_item.tscn
+## Scene: Scenes/Rows/Quests/today_item.tscn
 extends TapPanel
 
 

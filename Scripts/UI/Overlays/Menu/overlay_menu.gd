@@ -6,7 +6,7 @@
 ## deletes the saved run and starts a new guild).
 ## A small line under Close says which build is running (HallBuildInfo), so a
 ## phone can tell whether it's on the latest web deploy.
-## Scene: MobileHall/Scenes/Overlays/overlay_menu.tscn
+## Scene: Scenes/Overlays/Menu/overlay_menu.tscn
 extends Control
 
 ## Font size of the build line under Close (pixels): small, it's a footnote.

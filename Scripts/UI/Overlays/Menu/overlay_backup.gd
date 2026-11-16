@@ -5,7 +5,7 @@
 ## take two taps, like the Menu's Abandon run. Export and import work whether
 ## or not "Save runs" is on (an import turns it on). Back returns to the Menu;
 ## tapping the dimmed background closes both.
-## Scene: MobileHall/Scenes/Overlays/overlay_backup.tscn
+## Scene: Scenes/Overlays/Menu/overlay_backup.tscn
 extends Control
 
 ## Font size of the buttons (design px; HallFontScale grows them with everything else).

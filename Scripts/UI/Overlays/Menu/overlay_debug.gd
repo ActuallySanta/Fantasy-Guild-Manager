@@ -15,7 +15,7 @@
 ##   Run:    reroll today's quests and For Hire, skip the tutorial
 ## The rules live in HallDebug; every button calls a hall.debug_* action.
 ## Back returns to the Menu; tapping the dimmed background closes both.
-## Scene: MobileHall/Scenes/Overlays/overlay_debug.tscn
+## Scene: Scenes/Overlays/Menu/overlay_debug.tscn
 extends Control
 
 ## Font size of the buttons (design px; HallFontScale grows them with everything else).

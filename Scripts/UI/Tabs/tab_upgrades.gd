@@ -11,11 +11,11 @@
 ## tick them back on in the editor to restore): Build's treasury ledger
 ## (WalletBox, the header already shows gold and standing) and Tonight's
 ## "Heroes training or in a bed can't go on quests." note (TonightNote).
-## Scene: MobileHall/Scenes/Tabs/tab_upgrades.tscn
+## Scene: Scenes/Tabs/tab_upgrades.tscn
 extends VBoxContainer
 
-const UpgradeCardScene := preload("uid://bsodxki3j2b0o")  # MobileHall/Scenes/Rows/upgrade_card.tscn
-const RolledTagScene := preload("uid://dvyjbi6emukey")  # MobileHall/Scenes/Components/rolled_tag.tscn
+const UpgradeCardScene := preload("uid://bsodxki3j2b0o")  # Scenes/Rows/Buildings/upgrade_card.tscn
+const RolledTagScene := preload("uid://dvyjbi6emukey")  # Scenes/Components/rolled_tag.tscn
 
 ## Folder tab heights: the open one stands taller and joins the folder.
 const FOLDER_TAB_HEIGHT := 72

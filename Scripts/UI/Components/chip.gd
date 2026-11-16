@@ -1,8 +1,8 @@
 ## A small ink label, optionally with an icon and an outline.
 ## Used for stats, health, gold, rank, party size and other short facts.
-## The outline is white art (Styles/pill.tres or ink_box.tres) tinted the ink colour.
+## The outline is white art (Themes/Styles/pill.tres or ink_box.tres) tinted the ink colour.
 ## Stats and health are filled pills instead: the paper tint behind the ink.
-## Scene: MobileHall/Scenes/Components/chip.tscn
+## Scene: Scenes/Components/chip.tscn
 extends PanelContainer
 
 

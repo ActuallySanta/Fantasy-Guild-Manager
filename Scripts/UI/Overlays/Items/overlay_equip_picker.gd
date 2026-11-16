@@ -7,11 +7,11 @@
 ##   Cancel
 ## It belongs to tab_pack.gd, which opens it and acts on its signals; tapping
 ## the dim behind it closes it too. Drawn over the whole screen (top_level).
-## Scene: MobileHall/Scenes/Overlays/overlay_equip_picker.tscn
+## Scene: Scenes/Overlays/Items/overlay_equip_picker.tscn
 extends Control
 
 
-const PickRowScene := preload("uid://tlc3k0theskd")  # MobileHall/Scenes/Rows/equip_pick_row.tscn
+const PickRowScene := preload("uid://tlc3k0theskd")  # Scenes/Rows/Items/equip_pick_row.tscn
 
 signal equip_chosen(character: GuildCharacter)
 signal swap_chosen(character: GuildCharacter)
