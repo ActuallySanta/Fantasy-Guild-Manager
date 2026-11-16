@@ -47,10 +47,29 @@ func refresh_hireable_characters() -> void:
 		max_hireable_characters = 3
 		
 	if (GameState.standing > GuildUpgrades.MINIMUM_STANDING):
-		for i in max_hireable_characters:
-			hireable_characters.append(GuildCharacter.new())
+		_add_new_recruits()
 		_add_returning_characters()
 	on_hireables_refreshed.emit()
+
+
+## Adds max_hireable_characters new faces, their stats rolled from today's
+## HireScaling budget so they keep up with the guild's standing and power.
+## Sometimes one of them is a standout (HireScaling.STANDOUT_CHANCE) with a
+## bigger budget. Each one's price follows their budget (HireScaling.recruit_cost).
+func _add_new_recruits() -> void:
+	var day := GameState.day
+	var standing := GameState.standing
+	var budget := HireScaling.recruit_budget(day, standing, active_characters)
+	# which applicant is today's standout (-1 = nobody)
+	var standout_index := -1
+	if max_hireable_characters > 0 and randf() < HireScaling.STANDOUT_CHANCE:
+		standout_index = randi() % max_hireable_characters
+	for i in max_hireable_characters:
+		var points := HireScaling.standout_budget(budget) if i == standout_index else budget
+		var recruit := GuildCharacter.new()
+		recruit.reroll_stats(points, HireScaling.deviation_for(points))
+		recruit.cost = HireScaling.recruit_cost(day, standing, points)
+		hireable_characters.append(recruit)
 
 
 ## Each released hero rolls RETURN_CHANCE to come back to For Hire today.
