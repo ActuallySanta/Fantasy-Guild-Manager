@@ -1,0 +1,146 @@
+[gd_scene format=3 uid="uid://diwdybd70ky7l"]
+
+[ext_resource type="Script" uid="uid://d1tcydf3636ec" path="res://Scripts/UI/Tabs/tab_guild.gd" id="1_y07pm"]
+[ext_resource type="FontVariation" uid="uid://b7dyj081fpsg2" path="res://Fonts/font_title.tres" id="2_title"]
+[ext_resource type="Texture2D" uid="uid://ih4xtkgfq1o8" path="res://Sprites/Hall Icons/bed.tres" id="3_bed"]
+
+[node name="TabGuild" type="VBoxContainer"]
+theme_override_constants/separation = 0
+script = ExtResource("1_y07pm")
+
+[node name="SegMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = -2
+
+[node name="Seg" type="HBoxContainer" parent="SegMargin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="SegRoster" type="Button" parent="SegMargin/Seg"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 72)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+focus_mode = 0
+theme_type_variation = &"FolderTab"
+text = "Your Guild · 0/4"
+
+[node name="SegHire" type="Button" parent="SegMargin/Seg"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+focus_mode = 0
+theme_type_variation = &"FolderTabActive"
+text = "Applicants"
+
+[node name="HireBadge" type="PanelContainer" parent="SegMargin/Seg/SegHire"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -34.0
+offset_top = -16.0
+offset_right = 8.0
+offset_bottom = 26.0
+grow_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"Badge"
+
+[node name="HireBadgeText" type="Label" parent="SegMargin/Seg/SegHire/HireBadge"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"LabelLight"
+theme_override_fonts/font = ExtResource("2_title")
+theme_override_font_sizes/font_size = 26
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FolderMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 14
+
+[node name="Folder" type="PanelContainer" parent="FolderMargin"]
+layout_mode = 2
+theme_type_variation = &"FolderBody"
+
+[node name="Scroll" type="ScrollContainer" parent="FolderMargin/Folder"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="FolderMargin/Folder/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 12
+
+[node name="Col" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="BedsRow" type="HBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BedIcon" type="TextureRect" parent="FolderMargin/Folder/Scroll/Margin/Col/BedsRow"]
+modulate = Color(0.9294, 0.8902, 0.7961, 1)
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("3_bed")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Beds" type="Label" parent="FolderMargin/Folder/Scroll/Margin/Col/BedsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"LabelLight"
+theme_override_font_sizes/font_size = 24
+text = "Beds 0 of 4 · Barracks Lv 1"
+autowrap_mode = 3
+
+[node name="BedsButton" type="Button" parent="FolderMargin/Folder/Scroll/Margin/Col/BedsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 70)
+layout_mode = 2
+size_flags_vertical = 4
+focus_mode = 0
+theme_type_variation = &"GoldButton"
+theme_override_font_sizes/font_size = 28
+text = "Barracks"
+
+[node name="List" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Stack" type="VBoxContainer" parent="FolderMargin/Folder/Scroll/Margin/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = -28
+
+[node name="Empty" type="Label" parent="FolderMargin/Folder/Scroll/Margin/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 24
+text = "Nobody here yet."
+horizontal_alignment = 1
+autowrap_mode = 3

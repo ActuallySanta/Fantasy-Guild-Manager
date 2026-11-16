@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://eyqpbr188oi2"]
+
+[ext_resource type="Script" uid="uid://dqbuwhwv7qeli" path="res://Scripts/UI/Components/stat_strip.gd" id="1_mh62l"]
+[ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://Scenes/Components/chip.tscn" id="2_d5pfk"]
+
+[node name="StatStrip" type="HFlowContainer"]
+mouse_filter = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 2
+script = ExtResource("1_mh62l")
+
+[node name="Health" parent="." instance=ExtResource("2_d5pfk")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Text" parent="Health/Row" index="1"]
+theme_override_font_sizes/font_size = 28
+
+[node name="Stat0" parent="." instance=ExtResource("2_d5pfk")]
+layout_mode = 2
+
+[node name="Stat1" parent="." instance=ExtResource("2_d5pfk")]
+layout_mode = 2
+
+[node name="Stat2" parent="." instance=ExtResource("2_d5pfk")]
+layout_mode = 2
+
+[node name="Stat3" parent="." instance=ExtResource("2_d5pfk")]
+layout_mode = 2
+
+[node name="Stat4" parent="." instance=ExtResource("2_d5pfk")]
+layout_mode = 2

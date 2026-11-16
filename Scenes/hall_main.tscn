@@ -1,0 +1,209 @@
+[gd_scene format=3 uid="uid://dtw7iu2s1gibm"]
+
+[ext_resource type="Theme" uid="uid://b8dl3ku854ddh" path="res://Themes/hall_theme.tres" id="1_puoav"]
+[ext_resource type="Script" uid="uid://dtaxn3hxp6n5u" path="res://Scripts/Hall/hall_main.gd" id="2_f2ct0"]
+[ext_resource type="Script" uid="uid://blul1044ocxp2" path="res://Scripts/Quest Creator/quest_Manager.gd" id="3_0akhc"]
+[ext_resource type="Texture2D" uid="uid://6sc4epkipif0" path="res://Sprites/UI Textures/wood.png" id="4_wood"]
+[ext_resource type="PackedScene" uid="uid://b5bqn48cqktg4" path="res://Scenes/Tabs/tab_board.tscn" id="10_mpynf"]
+[ext_resource type="PackedScene" uid="uid://diwdybd70ky7l" path="res://Scenes/Tabs/tab_guild.tscn" id="12_cbnp0"]
+[ext_resource type="PackedScene" uid="uid://dfn4ypcw71ayy" path="res://Scenes/Tabs/tab_upgrades.tscn" id="14_v8b36"]
+[ext_resource type="PackedScene" uid="uid://b3jxdbegsxbvg" path="res://Scenes/Tabs/tab_items.tscn" id="15_shop1"]
+[ext_resource type="PackedScene" uid="uid://bt1iwlgoqgjw0" path="res://Scenes/Screens/screen_assign.tscn" id="16_tj44p"]
+[ext_resource type="PackedScene" uid="uid://chlxegiqwwtoa" path="res://Scenes/Screens/screen_character.tscn" id="18_c5uvo"]
+[ext_resource type="PackedScene" uid="uid://4icacknba0fh" path="res://Scenes/Overlays/Day/overlay_end_day.tscn" id="30_cwf4i"]
+[ext_resource type="PackedScene" uid="uid://farw7bcfj0fq" path="res://Scenes/Overlays/Menu/overlay_menu.tscn" id="32_kg28u"]
+[ext_resource type="PackedScene" uid="uid://ddcn2l6d4kiqp" path="res://Scenes/Overlays/Menu/overlay_accessibility.tscn" id="33_access"]
+[ext_resource type="PackedScene" uid="uid://bkp7backup2x" path="res://Scenes/Overlays/Menu/overlay_backup.tscn" id="33_backup"]
+[ext_resource type="PackedScene" uid="uid://1d6rh25p6bsg" path="res://Scenes/Overlays/Menu/overlay_debug.tscn" id="33_debug"]
+[ext_resource type="PackedScene" uid="uid://3cdpykowgja4" path="res://Scenes/Overlays/Day/overlay_report.tscn" id="34_6fy20"]
+[ext_resource type="PackedScene" uid="uid://bgwxd653pjox8" path="res://Scenes/Overlays/Day/overlay_welcome.tscn" id="36_61m5h"]
+[ext_resource type="PackedScene" uid="uid://cdmw3mrmuept3" path="res://Scenes/Overlays/Run End/overlay_game_over.tscn" id="37_gameover"]
+[ext_resource type="Shader" uid="uid://dkvytyy35gk2p" path="res://Themes/Styles/colorblind_filter.gdshader" id="39_cbf01"]
+[ext_resource type="PackedScene" uid="uid://0a18grxohlrg" path="res://Scenes/Overlays/Run End/overlay_credits.tscn" id="40_credits"]
+[ext_resource type="PackedScene" uid="uid://vr8mj4s68ib4" path="res://Scenes/Shell/hall_action_bar.tscn" id="50_action"]
+[ext_resource type="PackedScene" uid="uid://ctiyuxdww3u5j" path="res://Scenes/Shell/Header/hall_header.tscn" id="50_header"]
+[ext_resource type="PackedScene" uid="uid://ca70e6ixyakqm" path="res://Scenes/Shell/hall_nav.tscn" id="50_nav"]
+[ext_resource type="PackedScene" uid="uid://7rh1kia6seff" path="res://Scenes/Shell/hall_toast.tscn" id="50_toast"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cbf01"]
+shader = ExtResource("39_cbf01")
+shader_parameter/mode = 0
+shader_parameter/strength = 1.0
+
+[node name="MobileHall" type="Control" unique_id=279222940]
+texture_repeat = 2
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_puoav")
+script = ExtResource("2_f2ct0")
+
+[node name="Bg" type="TextureRect" parent="." unique_id=426701103]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource("4_wood")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="QuestManager" type="Node" parent="." unique_id=675283457]
+script = ExtResource("3_0akhc")
+
+[node name="Layout" type="VBoxContainer" parent="." unique_id=1937086672]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 0
+
+[node name="Header" parent="Layout" unique_id=1081086639 instance=ExtResource("50_header")]
+unique_name_in_owner = true
+
+[node name="Content" type="Control" parent="Layout" unique_id=325224631]
+clip_contents = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TabBoard" parent="Layout/Content" unique_id=1202712731 instance=ExtResource("10_mpynf")]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TabGuild" parent="Layout/Content" unique_id=1000027996 instance=ExtResource("12_cbnp0")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TabUpgrades" parent="Layout/Content" unique_id=1757114752 instance=ExtResource("14_v8b36")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="TabItems" parent="Layout/Content" unique_id=1648591991 instance=ExtResource("15_shop1")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ScreenAssign" parent="Layout/Content" unique_id=978985788 instance=ExtResource("16_tj44p")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ScreenCharacter" parent="Layout/Content" unique_id=1438968451 instance=ExtResource("18_c5uvo")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="ActionBar" parent="Layout" unique_id=1821092104 instance=ExtResource("50_action")]
+unique_name_in_owner = true
+
+[node name="Nav" parent="Layout" unique_id=1524568463 instance=ExtResource("50_nav")]
+unique_name_in_owner = true
+
+[node name="Toast" parent="." unique_id=2122765158 instance=ExtResource("50_toast")]
+unique_name_in_owner = true
+
+[node name="OverlayEndDay" parent="." unique_id=773934197 instance=ExtResource("30_cwf4i")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OverlayMenu" parent="." unique_id=1395998418 instance=ExtResource("32_kg28u")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OverlayAccessibility" parent="." unique_id=1083431963 instance=ExtResource("33_access")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OverlayBackup" parent="." instance=ExtResource("33_backup")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OverlayDebug" parent="." unique_id=1938247404 instance=ExtResource("33_debug")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OverlayReport" parent="." unique_id=1861879506 instance=ExtResource("34_6fy20")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OverlayWelcome" parent="." unique_id=950233597 instance=ExtResource("36_61m5h")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OverlayGameOver" parent="." unique_id=1593428695 instance=ExtResource("37_gameover")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="OverlayCredits" parent="." unique_id=289976827 instance=ExtResource("40_credits")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+
+[node name="ColorFilterLayer" type="CanvasLayer" parent="." unique_id=2131547255]
+layer = 100
+
+[node name="ColorFilter" type="ColorRect" parent="ColorFilterLayer" unique_id=2002895824]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_cbf01")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
