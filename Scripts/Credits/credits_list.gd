@@ -1,9 +1,9 @@
 ## The team credits shown at the end of the final battle's credits roll
 ## (overlay_credits.gd), for both the victory and the defeat versions.
-## Data: MobileHall/Data/credits.tres
+## Data: Data/credits.tres
 ##
 ## HOW TO ADD YOUR CREDITS (no code needed):
-##   1. In the FileSystem dock, double-click MobileHall/Data/credits.tres.
+##   1. In the FileSystem dock, double-click Data/credits.tres.
 ##   2. In the Inspector, expand Entries and click "Add Element".
 ##   3. Click the new empty slot and choose "New CreditEntry".
 ##   4. Expand it and fill in Section, Name and Contribution.
@@ -11,7 +11,7 @@
 ##      order their first entry appears; entries in the same section are
 ##      grouped under one heading.
 ##   6. Save (Ctrl+S). Run the game and win (or lose) the final battle to see it,
-##      or run MobileHall/Playtest/scenario_final_battle.tscn.
+##      or run Scenes/Playtest/scenario_final_battle.tscn.
 class_name CreditsList
 extends Resource
 

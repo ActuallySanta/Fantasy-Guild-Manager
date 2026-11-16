@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://nm3rjurnk3x2"]
+
+[ext_resource type="Script" uid="uid://b217255da2e7w" path="res://Scripts/UI/Rows/Day End/beat_row.gd" id="1_beat"]
+[ext_resource type="Texture2D" uid="uid://cb420nxynjehg" path="res://Sprites/Hall Icons/scroll.tres" id="2_icon"]
+
+[node name="BeatRow" type="HBoxContainer"]
+theme_override_constants/separation = 14
+script = ExtResource("1_beat")
+
+[node name="Icon" type="TextureRect" parent="."]
+modulate = Color(0.4196, 0.3647, 0.3098, 1)
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+texture = ExtResource("2_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Text" type="RichTextLabel" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+bbcode_enabled = true
+text = "[b]Maria[/b] traveled to [b]Mistwater Marsh[/b] to map out the area."
+fit_content = true
+scroll_active = false

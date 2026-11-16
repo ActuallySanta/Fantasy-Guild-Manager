@@ -1,0 +1,106 @@
+[gd_scene format=3 uid="uid://4icacknba0fh"]
+
+[ext_resource type="Script" uid="uid://dfxrirpu3k7g1" path="res://Scripts/UI/Overlays/Day/overlay_end_day.gd" id="1_3l375"]
+[ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://Themes/Styles/dim.tres" id="2_4xc3y"]
+
+[node name="OverlayEndDay" type="Control" unique_id=1202933692]
+layout_mode = 3
+anchors_preset = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_3l375")
+
+[node name="Dim" type="PanelContainer" parent="." unique_id=304134221]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = ExtResource("2_4xc3y")
+
+[node name="Sheet" type="PanelContainer" parent="." unique_id=806486711]
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_vertical = 0
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="Sheet" unique_id=1519062817]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Title" type="Label" parent="Sheet/Col" unique_id=2123615656]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 46
+text = "End Day 1?"
+
+[node name="Sub" type="Label" parent="Sheet/Col" unique_id=875548344]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+theme_type_variation = &"ItalicLabel"
+text = "2 parties going out tonight"
+
+[node name="PlanList" type="VBoxContainer" parent="Sheet/Col" unique_id=1760786515]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Denied" type="Label" parent="Sheet/Col" unique_id=1169545753]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
+text = "Denied: ..."
+autowrap_mode = 3
+
+[node name="UpgradeBox" type="PanelContainer" parent="Sheet/Col" unique_id=403106631]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"LedgerCard"
+
+[node name="Col" type="VBoxContainer" parent="Sheet/Col/UpgradeBox" unique_id=113201603]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="UpgradeTitle" type="Label" parent="Sheet/Col/UpgradeBox/Col" unique_id=65906806]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.2392, 0.3529, 0.1647, 1)
+text = "Before you go: you have 600 gold"
+autowrap_mode = 3
+
+[node name="SuggestList" type="VBoxContainer" parent="Sheet/Col/UpgradeBox/Col" unique_id=199225312]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Buttons" type="HBoxContainer" parent="Sheet/Col" unique_id=206324088]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BackButton" type="Button" parent="Sheet/Col/Buttons" unique_id=1100710454]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(210, 92)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "Not yet"
+
+[node name="EndButton" type="Button" parent="Sheet/Col/Buttons" unique_id=285584425]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 32
+text = "End Day"

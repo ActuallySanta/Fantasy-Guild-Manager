@@ -1,0 +1,8 @@
+[gd_resource type="FontVariation" format=3 uid="uid://b7dyj081fpsg2"]
+
+[ext_resource type="FontFile" uid="uid://cgausrqisf41b" path="res://Fonts/PirataOne-Regular.ttf" id="1_base"]
+[ext_resource type="FontFile" uid="uid://4rcpert1cng6" path="res://Fonts/Alegreya-VariableFont_wght.ttf" id="2_fallback"]
+
+[resource]
+fallbacks = Array[Font]([ExtResource("2_fallback")])
+base_font = ExtResource("1_base")

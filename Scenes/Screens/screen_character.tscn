@@ -1,0 +1,375 @@
+[gd_scene format=3 uid="uid://chlxegiqwwtoa"]
+
+[ext_resource type="Script" uid="uid://cggvi7nt6b43a" path="res://Scripts/UI/Screens/screen_character.gd" id="1_edguq"]
+[ext_resource type="PackedScene" uid="uid://h87tubvsjwc3" path="res://Scenes/Components/portrait.tscn" id="2_vio58"]
+[ext_resource type="Script" uid="uid://bpojheqlrxb24" path="res://Scripts/UI/Components/portrait.gd" id="3_yv2s2"]
+[ext_resource type="PackedScene" uid="uid://5khy5d8j40yo" path="res://Scenes/Components/chip.tscn" id="4_8ylyv"]
+[ext_resource type="Script" uid="uid://bh1skn0yrphtr" path="res://Scripts/UI/Components/chip.gd" id="6_w82a0"]
+[ext_resource type="StyleBox" uid="uid://1371ec6b7611" path="res://Themes/Styles/action_bar.tres" id="7_ye445"]
+[ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://Themes/Styles/dim.tres" id="10_rdim1"]
+
+[node name="ScreenCharacter" type="VBoxContainer" unique_id=2004027154]
+theme_override_constants/separation = 0
+script = ExtResource("1_edguq")
+
+[node name="Scroll" type="ScrollContainer" parent="." unique_id=1054034392]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Margin" type="MarginContainer" parent="Scroll" unique_id=2068276722]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 20
+
+[node name="Paper" type="PanelContainer" parent="Scroll/Margin"]
+layout_mode = 2
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="Scroll/Margin/Paper" unique_id=498792315]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Head" type="HBoxContainer" parent="Scroll/Margin/Paper/Col" unique_id=1177799186]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Portrait" parent="Scroll/Margin/Paper/Col/Head" unique_id=1225425876 instance=ExtResource("2_vio58")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 184)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("3_yv2s2")
+
+[node name="Info" type="VBoxContainer" parent="Scroll/Margin/Paper/Col/Head" unique_id=1057299182]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="Name" type="Label" parent="Scroll/Margin/Paper/Col/Head/Info" unique_id=2146863071]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 52
+text = "Name"
+autowrap_mode = 3
+
+[node name="Role" type="Label" parent="Scroll/Margin/Paper/Col/Head/Info" unique_id=1008286019]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+theme_type_variation = &"ItalicLabel"
+text = "the Knight"
+
+[node name="HealthRow" type="HBoxContainer" parent="Scroll/Margin/Paper/Col/Head/Info" unique_id=1211639126]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HealthChip" parent="Scroll/Margin/Paper/Col/Head/Info/HealthRow" unique_id=545259554 instance=ExtResource("4_8ylyv")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("6_w82a0")
+
+[node name="Injuries" type="Label" parent="Scroll/Margin/Paper/Col/Head/Info/HealthRow" unique_id=1550476930]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+theme_type_variation = &"ItalicLabel"
+text = "No injuries yet"
+
+[node name="Task" type="Label" parent="Scroll/Margin/Paper/Col/Head/Info" unique_id=1702968994]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+theme_override_colors/font_color = Color(0.18431373, 0.37254903, 0.5411765, 1)
+text = "Free today"
+autowrap_mode = 3
+
+[node name="StatsHeading" type="Label" parent="Scroll/Margin/Paper/Col" unique_id=528263454]
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 36
+text = "Stats"
+
+[node name="StatLines" type="VBoxContainer" parent="Scroll/Margin/Paper/Col" unique_id=1852435571]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Stat0" type="PanelContainer" parent="Scroll/Margin/Paper/Col/StatLines" unique_id=615173855]
+layout_mode = 2
+theme_type_variation = &"InkBox"
+
+[node name="Row" type="HBoxContainer" parent="Scroll/Margin/Paper/Col/StatLines/Stat0" unique_id=1965944522]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Name" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat0/Row" unique_id=1995052286]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "Power"
+
+[node name="Value" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat0/Row" unique_id=706212762]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 28
+text = "5"
+
+[node name="Stat1" type="PanelContainer" parent="Scroll/Margin/Paper/Col/StatLines" unique_id=604317056]
+layout_mode = 2
+theme_type_variation = &"InkBox"
+
+[node name="Row" type="HBoxContainer" parent="Scroll/Margin/Paper/Col/StatLines/Stat1" unique_id=1967049775]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Name" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat1/Row" unique_id=433555156]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "Power"
+
+[node name="Value" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat1/Row" unique_id=950791820]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 28
+text = "5"
+
+[node name="Stat2" type="PanelContainer" parent="Scroll/Margin/Paper/Col/StatLines" unique_id=1148367978]
+layout_mode = 2
+theme_type_variation = &"InkBox"
+
+[node name="Row" type="HBoxContainer" parent="Scroll/Margin/Paper/Col/StatLines/Stat2" unique_id=1657178460]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Name" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat2/Row" unique_id=347272420]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "Power"
+
+[node name="Value" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat2/Row" unique_id=855251439]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 28
+text = "5"
+
+[node name="Stat3" type="PanelContainer" parent="Scroll/Margin/Paper/Col/StatLines" unique_id=1638554971]
+layout_mode = 2
+theme_type_variation = &"InkBox"
+
+[node name="Row" type="HBoxContainer" parent="Scroll/Margin/Paper/Col/StatLines/Stat3" unique_id=1574790580]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Name" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat3/Row" unique_id=376778961]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "Power"
+
+[node name="Value" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat3/Row" unique_id=100645640]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 28
+text = "5"
+
+[node name="Stat4" type="PanelContainer" parent="Scroll/Margin/Paper/Col/StatLines" unique_id=1502248126]
+layout_mode = 2
+theme_type_variation = &"InkBox"
+
+[node name="Row" type="HBoxContainer" parent="Scroll/Margin/Paper/Col/StatLines/Stat4" unique_id=902301299]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Name" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat4/Row" unique_id=1522613967]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 26
+text = "Power"
+
+[node name="Value" type="Label" parent="Scroll/Margin/Paper/Col/StatLines/Stat4/Row" unique_id=1680068538]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+horizontal_alignment = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 28
+text = "5"
+
+[node name="PluckNote" type="Label" parent="Scroll/Margin/Paper/Col" unique_id=2111063860]
+custom_minimum_size = Vector2(40, 0)
+autowrap_mode = 3
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+theme_type_variation = &"ItalicLabel"
+text = "Pluck goes up every time this hero wins a quest (more for riskier odds)."
+
+[node name="GearHeading" type="Label" parent="Scroll/Margin/Paper/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 36
+text = "Gear"
+
+[node name="GearLines" type="VBoxContainer" parent="Scroll/Margin/Paper/Col"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="GearNote" type="Label" parent="Scroll/Margin/Paper/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 23
+text = "Buy gear in the Shop."
+autowrap_mode = 3
+
+[node name="StoryHeading" type="Label" parent="Scroll/Margin/Paper/Col" unique_id=670952099]
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 36
+text = "Backstory"
+
+[node name="Story" type="Label" parent="Scroll/Margin/Paper/Col" unique_id=1732400838]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.30588236, 0.23921569, 0.14901961, 1)
+text = "Grew up..."
+autowrap_mode = 3
+
+[node name="Footer" type="PanelContainer" parent="." unique_id=1607724144]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("7_ye445")
+
+[node name="Row" type="HBoxContainer" parent="Footer" unique_id=218369979]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="BackButton" type="Button" parent="Footer/Row" unique_id=692352486]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 28
+text = "Back"
+
+[node name="ReleaseButton" type="Button" parent="Footer/Row"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"WoodButton"
+text = "Release"
+
+[node name="HireButton" type="Button" parent="Footer/Row" unique_id=1178814079]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_override_font_sizes/font_size = 30
+text = "Hire (free)"
+
+[node name="ReleaseConfirm" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+top_level = true
+z_index = 10
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ReleaseDim" type="PanelContainer" parent="ReleaseConfirm"]
+unique_name_in_owner = true
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = ExtResource("10_rdim1")
+
+[node name="Sheet" type="PanelContainer" parent="ReleaseConfirm"]
+layout_mode = 0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_vertical = 0
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="ReleaseConfirm/Sheet"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ReleaseTitle" type="Label" parent="ReleaseConfirm/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 46
+text = "Release Name?"
+autowrap_mode = 3
+
+[node name="ReleaseSub" type="Label" parent="ReleaseConfirm/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "They leave the guild for good."
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="ReleaseConfirm/Sheet/Col"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ReleaseCancelButton" type="Button" parent="ReleaseConfirm/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(210, 92)
+layout_mode = 2
+focus_mode = 0
+text = "Cancel"
+
+[node name="ReleaseConfirmButton" type="Button" parent="ReleaseConfirm/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"WoodButton"
+text = "Release"

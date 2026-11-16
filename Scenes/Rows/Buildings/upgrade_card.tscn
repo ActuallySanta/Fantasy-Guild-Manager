@@ -1,0 +1,222 @@
+[gd_scene format=3 uid="uid://bsodxki3j2b0o"]
+
+[ext_resource type="Script" uid="uid://c4b6ejc73tjii" path="res://Scripts/UI/Rows/Buildings/upgrade_card.gd" id="1_upgrade"]
+[ext_resource type="Texture2D" uid="uid://ce33qlc0iebc7" path="res://Sprites/Hall Icons/swords.tres" id="2_icon"]
+[ext_resource type="Texture2D" uid="uid://b2bcm5mk7g15t" path="res://Sprites/Hall Icons/diamond.tres" id="3_diamond"]
+[ext_resource type="Texture2D" uid="uid://bqjjx2xnallqq" path="res://Sprites/UI Textures/dash.png" id="4_dash"]
+[ext_resource type="Texture2D" uid="uid://baflbvuj3ew0p" path="res://Sprites/Hall Icons/coins.tres" id="5_coins"]
+[ext_resource type="Texture2D" uid="uid://djwbyqk4uhihw" path="res://Sprites/UI Textures/pin.png" id="6_pin"]
+
+[node name="UpgradeCard" type="PanelContainer"]
+mouse_filter = 1
+theme_type_variation = &"PlanCard"
+script = ExtResource("1_upgrade")
+
+[node name="Col" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Top" type="HBoxContainer" parent="Col"]
+layout_mode = 2
+theme_override_constants/separation = 22
+
+[node name="IconBox" type="PanelContainer" parent="Col/Top"]
+mouse_filter = 1
+self_modulate = Color(0.2039, 0.1608, 0.1255, 1)
+custom_minimum_size = Vector2(124, 124)
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"InkBoxThick"
+
+[node name="Icon" type="TextureRect" parent="Col/Top/IconBox"]
+unique_name_in_owner = true
+modulate = Color(0.2039, 0.1608, 0.1255, 1)
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+texture = ExtResource("2_icon")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Info" type="VBoxContainer" parent="Col/Top"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = -6
+alignment = 1
+
+[node name="Name" type="Label" parent="Col/Top/Info"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 62
+text = "Armory"
+custom_minimum_size = Vector2(40, 0)
+autowrap_mode = 2
+
+[node name="LevelRow" type="HBoxContainer" parent="Col/Top/Info"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Level" type="Label" parent="Col/Top/Info/LevelRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 25
+text = "Level 1 / 5"
+
+[node name="Pips" type="HBoxContainer" parent="Col/Top/Info/LevelRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 4
+
+[node name="Pip0" type="TextureRect" parent="Col/Top/Info/LevelRow/Pips"]
+modulate = Color(0.2039, 0.1608, 0.1255, 1)
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_diamond")
+expand_mode = 1
+
+[node name="Pip1" type="TextureRect" parent="Col/Top/Info/LevelRow/Pips"]
+modulate = Color(0.2039, 0.1608, 0.1255, 1)
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_diamond")
+expand_mode = 1
+
+[node name="Pip2" type="TextureRect" parent="Col/Top/Info/LevelRow/Pips"]
+modulate = Color(0.2039, 0.1608, 0.1255, 1)
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_diamond")
+expand_mode = 1
+
+[node name="Pip3" type="TextureRect" parent="Col/Top/Info/LevelRow/Pips"]
+modulate = Color(0.2039, 0.1608, 0.1255, 1)
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_diamond")
+expand_mode = 1
+
+[node name="Pip4" type="TextureRect" parent="Col/Top/Info/LevelRow/Pips"]
+modulate = Color(0.2039, 0.1608, 0.1255, 1)
+custom_minimum_size = Vector2(24, 24)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_diamond")
+expand_mode = 1
+
+[node name="Dash" type="TextureRect" parent="Col"]
+custom_minimum_size = Vector2(0, 4)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("4_dash")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Now" type="Label" parent="Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Now · Every hero: Power +1, Defense +1"
+autowrap_mode = 3
+
+[node name="Next" type="Label" parent="Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
+theme_override_font_sizes/font_size = 25
+text = "Next · Every hero: Power +2, Defense +1"
+autowrap_mode = 3
+
+[node name="Bottom" type="HBoxContainer" parent="Col"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Status" type="Label" parent="Col/Bottom"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_type_variation = &"TitleLabel"
+theme_override_font_sizes/font_size = 32
+text = "ready to build"
+autowrap_mode = 3
+
+[node name="UpgradeButton" type="Button" parent="Col/Bottom"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 86)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"GoldButton"
+theme_override_font_sizes/font_size = 34
+text = "Build · 150"
+icon = ExtResource("5_coins")
+
+[node name="Nails" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TopLeft" type="TextureRect" parent="Nails"]
+layout_mode = 0
+offset_left = -16.0
+offset_top = -12.0
+offset_right = 4.0
+offset_bottom = 8.0
+mouse_filter = 2
+texture = ExtResource("6_pin")
+expand_mode = 1
+
+[node name="TopRight" type="TextureRect" parent="Nails"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -4.0
+offset_top = -12.0
+offset_right = 16.0
+offset_bottom = 8.0
+grow_horizontal = 0
+mouse_filter = 2
+texture = ExtResource("6_pin")
+expand_mode = 1
+
+[node name="BottomLeft" type="TextureRect" parent="Nails"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -6.0
+offset_right = 4.0
+offset_bottom = 14.0
+grow_vertical = 0
+mouse_filter = 2
+texture = ExtResource("6_pin")
+expand_mode = 1
+
+[node name="BottomRight" type="TextureRect" parent="Nails"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -4.0
+offset_top = -6.0
+offset_right = 16.0
+offset_bottom = 14.0
+grow_horizontal = 0
+grow_vertical = 0
+mouse_filter = 2
+texture = ExtResource("6_pin")
+expand_mode = 1
