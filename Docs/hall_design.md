@@ -200,6 +200,24 @@ Looks come from the theme, not from overrides: a label is `TitleLabel`, `CapsLab
 `PaperButton` or `SealButton`. Pick one in the inspector (*Theme > Type Variation*) rather
 than overriding colours or styles on the node, so a reskin reaches it.
 
+## Gear rarity
+
+Shop stock and quest gear (reward items and finds) roll their rarity in
+`StandardItem.get_rarity`. The guild's standing rank (the "Quests center on rank X" rank,
+not the quest's own rank) unlocks the top tiers at flat odds:
+
+| Guild rank | Legendary | Mythic |
+|---|---|---|
+| F, D | 0% | 0% |
+| C | 1% | 0% |
+| B | 5% | 1% |
+| A | 5% | 2% |
+| S (and freeplay) | 10% | 5% |
+
+The rest is split between Common, Uncommon and Rare (`LOW_TIER_WEIGHTS`, 35 : 25 : 20). A
+quest's rank shifts that split toward Rare but doesn't change the Legendary or Mythic odds.
+Named gear never rolls. Tuning is at the top of `standard_item.gd`.
+
 ## Debug tools
 
 Menu > **Debug tools** (shown while `GuildUpgrades.SHOW_DEBUG_BUTTONS` is on) holds
