@@ -74,7 +74,7 @@ The run ends when the guild can never send anyone out again (`HallMain.is_run_ov
 nobody is alive (patients in a Hospital bed count as alive), nobody in today's For Hire
 costs what you have, and no recruit ever will. That means standing is at or below
 `GuildUpgrades.MINIMUM_STANDING`, or tomorrow's recruit price is already more than your
-gold (prices never go down). Recruits are free on days 1-2, so it can't happen then. It's
+gold (that's the cheapest a recruit can be, and it never goes down; see Recruits). Recruits are free on days 1-2, so it can't happen then. It's
 checked when a new day starts (after the Day Report), after a release, and when the
 scene loads. The ledger's numbers come from `HallMain.run_stats`, tallied as you play.
 **Found a New Guild** resets the autoloads to Day 1 and loads `hall_main.tscn` again.
@@ -159,6 +159,23 @@ are played out), and the tuning numbers sit at the top of that file.
   own once they're Healthy.
 - **Revive:** Hospital level 5 brings one fallen hero back per run, Gravely hurt and in a bed.
 - The Day Report's header has an "At home" line with who trained and who healed.
+
+## Recruits
+
+Each morning's new applicants keep up with the guild (`HireScaling`, tuning at the top of
+`Scripts/Hall/Rules/hire_scaling.gd`; called from `CharacterContainer.refresh_hireable_characters`).
+
+- **Stat budget:** the higher of the standing floor (`BASE_POINTS` 17 + `POINTS_PER_RANK` 4
+  per standing rank) and `POWER_FRACTION` (85%) of the living roster's average base stat
+  total (Armory bonus, gear and Pluck left out). Freeplay multiplies it by
+  `HallRules.freeplay_scale`, like quests. The role's +3 comes on top as before, and the
+  stats' spread grows with the budget.
+- **Standouts:** on `STANDOUT_CHANCE` (35%) of mornings one applicant gets
+  `STANDOUT_BONUS` (×1.25) points. Nothing labels them; the higher stats and price do.
+- **Price:** the day's price (`GuildCharacter.recruit_cost_for_day`) plus `PRICE_PER_POINT`
+  (10g) per point over the standing floor. Days 1-2 stay free. The day's price is the
+  cheapest a recruit can be, so the Game Over check still uses it.
+- Released heroes who come back keep their own stats and their 2× price.
 
 ## Quest growth
 
