@@ -42,12 +42,9 @@ const COLUMNS := [
 	"gold_earned_total", "gold_spent_total", "quests_sent_total", "quests_won_total",
 	"heroes_hired_total", "items_found_total", "avg_pluck",
 	"freeplay", "tutorial_skipped",
-<<<<<<< Updated upstream:Scripts/Hall/Debug/run_logger.gd
 	# added later: kept at the end so older sheet columns don't shift
 	"avg_hire_total",
-=======
 	"quest_odds_min_today", "quest_odds_avg_today", "max_pluck",
->>>>>>> Stashed changes:MobileHall/Scripts/run_logger.gd
 ]
 
 var hall: HallMain
@@ -150,14 +147,11 @@ func _log(kind: String, results: Array) -> void:
 		"avg_pluck": snappedf(float(pluck_total) / alive, 0.01) if alive > 0 else 0.0,
 		"freeplay": GameState.is_freeplay,
 		"tutorial_skipped": hall.tutorial != null and bool(hall.tutorial.get("is_skipped")),
-<<<<<<< Updated upstream:Scripts/Hall/Debug/run_logger.gd
 		"avg_hire_total": _avg_hire_total(),
-=======
 		"quest_odds_min_today": odds_min_cell,
 		"quest_odds_avg_today": odds_avg_cell,
 		# highest Pluck among living heroes after tonight = going into tomorrow
 		"max_pluck": max_pluck,
->>>>>>> Stashed changes:MobileHall/Scripts/run_logger.gd
 	}
 	_last_standing = GuildUpgrades.standing
 	_write_csv(row)
