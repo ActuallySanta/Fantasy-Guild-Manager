@@ -129,6 +129,19 @@ static func recruit_cost_for_day(day: int) -> int:
 	return 0
 
 
+## Rolls this character's stats again from `points` stat points (plus the
+## usual role bonus), with a spread of `deviation` (see HireScaling).
+## Used for recruits, whose budget grows with the guild. Pluck's temp stats
+## are rebuilt to match the new base stats.
+func reroll_stats(points: int, deviation: int) -> void:
+	total_points = points
+	stat_deviation = deviation
+	for stat in stats:
+		stats[stat] = 0
+	generate_stat_spread(stats, total_points)
+	reset_temp_stats()
+
+
 ## Generate the stats using normalized random number sampling
 func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int) -> void:
 	var _stat_weights: Array[float]

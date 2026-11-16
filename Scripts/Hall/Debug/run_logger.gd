@@ -40,6 +40,8 @@ const COLUMNS := [
 	"gold_earned_total", "gold_spent_total", "quests_sent_total", "quests_won_total",
 	"heroes_hired_total", "items_found_total", "avg_pluck",
 	"freeplay", "tutorial_skipped",
+	# added later: kept at the end so older sheet columns don't shift
+	"avg_hire_total",
 ]
 
 var hall: HallMain
@@ -127,6 +129,7 @@ func _log(kind: String, results: Array) -> void:
 		"avg_pluck": snappedf(float(pluck_total) / alive, 0.01) if alive > 0 else 0.0,
 		"freeplay": GameState.is_freeplay,
 		"tutorial_skipped": hall.tutorial != null and bool(hall.tutorial.get("is_skipped")),
+		"avg_hire_total": _avg_hire_total(),
 	}
 	_last_standing = GuildUpgrades.standing
 	_write_csv(row)
@@ -135,6 +138,21 @@ func _log(kind: String, results: Array) -> void:
 		while _queue.size() > MAX_QUEUE:
 			_queue.pop_front()
 		_send()
+
+
+## The average stat total (HallStyle.quest_stat_total, the applicant letter's
+## total) of the new faces in For Hire right now, so playtests show whether
+## recruits keep up with the guild (HireScaling). Returning released heroes
+## are left out. 0.0 when there are no new recruits.
+func _avg_hire_total() -> float:
+	var total := 0
+	var count := 0
+	for recruit in CharacterContainer.hireable_characters:
+		if CharacterContainer.released_characters.has(recruit):
+			continue
+		total += HallStyle.quest_stat_total(recruit)
+		count += 1
+	return snappedf(float(total) / count, 0.01) if count > 0 else 0.0
 
 
 func _write_csv(row: Dictionary) -> void:
