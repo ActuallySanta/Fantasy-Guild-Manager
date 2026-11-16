@@ -1,4 +1,5 @@
-## Run logger: one row per day (gold, standing, heroes, quest tallies) for
+## Run logger: one row per day (gold, standing, heroes, quest tallies, the
+## day's min/average quest odds, average and top Pluck) for
 ## balancing. Every row goes to a local CSV (user://run_log.csv) and, when
 ## SHEET_URL is set, to a Google Sheet through a small Apps Script web app
 ## (Scripts/Playtest/run_log_apps_script.gs has the script and setup).
@@ -31,7 +32,8 @@ const SEND_TEST_ROW_ON_START := false
 ## Most rows held while offline; the oldest are dropped past this.
 const MAX_QUEUE := 200
 
-## Column order for the CSV and the sheet.
+## Column order for the CSV and the sheet. New columns go on the END only:
+## the sheet writes values by position under its existing header row.
 const COLUMNS := [
 	"run_id", "logged_at", "platform", "event", "day",
 	"gold", "standing", "standing_change",
@@ -40,8 +42,12 @@ const COLUMNS := [
 	"gold_earned_total", "gold_spent_total", "quests_sent_total", "quests_won_total",
 	"heroes_hired_total", "items_found_total", "avg_pluck",
 	"freeplay", "tutorial_skipped",
+<<<<<<< Updated upstream:Scripts/Hall/Debug/run_logger.gd
 	# added later: kept at the end so older sheet columns don't shift
 	"avg_hire_total",
+=======
+	"quest_odds_min_today", "quest_odds_avg_today", "max_pluck",
+>>>>>>> Stashed changes:MobileHall/Scripts/run_logger.gd
 ]
 
 var hall: HallMain
@@ -90,20 +96,35 @@ func _log(kind: String, results: Array) -> void:
 	var hurt := 0
 	var dead := 0
 	var pluck_total := 0
+	var max_pluck := 0
 	for character in hall.roster():
 		if HallStyle.is_dead(character):
 			dead += 1
 			continue
 		alive += 1
 		pluck_total += character.pluck
+		max_pluck = maxi(max_pluck, character.pluck)
 		if character.injury_level != GuildCharacter.InjuryLevel.HEALTHY:
 			hurt += 1
 	var won_today := 0
 	var gold_today := 0
+	# success odds (percent, 0-100) the day's quests were sent at. A party
+	# with no chance yet (-1) counts as 0%; a sure thing past 100 counts as 100
+	var odds_min := -1.0
+	var odds_total := 0.0
 	for result in results:
 		gold_today += int(result.get("gold", 0))
 		if result.get("succeeded", false):
 			won_today += 1
+		var chance := clampf(float(result.get("chance", 0)), 0.0, 100.0)
+		odds_total += chance
+		odds_min = chance if odds_min < 0.0 else minf(odds_min, chance)
+	# blank (not 0) on a day nothing was sent, so sheet averages skip that day
+	var odds_min_cell: Variant = ""
+	var odds_avg_cell: Variant = ""
+	if not results.is_empty():
+		odds_min_cell = snappedf(odds_min, 0.1)
+		odds_avg_cell = snappedf(odds_total / results.size(), 0.1)
 	var stats: Dictionary = hall.run_stats
 	var row := {
 		"run_id": _run_id,
@@ -129,7 +150,14 @@ func _log(kind: String, results: Array) -> void:
 		"avg_pluck": snappedf(float(pluck_total) / alive, 0.01) if alive > 0 else 0.0,
 		"freeplay": GameState.is_freeplay,
 		"tutorial_skipped": hall.tutorial != null and bool(hall.tutorial.get("is_skipped")),
+<<<<<<< Updated upstream:Scripts/Hall/Debug/run_logger.gd
 		"avg_hire_total": _avg_hire_total(),
+=======
+		"quest_odds_min_today": odds_min_cell,
+		"quest_odds_avg_today": odds_avg_cell,
+		# highest Pluck among living heroes after tonight = going into tomorrow
+		"max_pluck": max_pluck,
+>>>>>>> Stashed changes:MobileHall/Scripts/run_logger.gd
 	}
 	_last_standing = GuildUpgrades.standing
 	_write_csv(row)
@@ -156,6 +184,7 @@ func _avg_hire_total() -> float:
 
 
 func _write_csv(row: Dictionary) -> void:
+	_retire_old_csv()
 	var is_new := not FileAccess.file_exists(CSV_PATH)
 	var file := FileAccess.open(CSV_PATH, FileAccess.READ_WRITE if not is_new else FileAccess.WRITE)
 	if file == null:
@@ -168,6 +197,24 @@ func _write_csv(row: Dictionary) -> void:
 		line.append(str(row[column]))
 	file.store_csv_line(line)
 	file.close()
+
+
+## A CSV started before COLUMNS last changed has the old header, so new rows
+## wouldn't line up: move it aside to run_log_old.csv (replacing an older one)
+## and let _write_csv start a fresh file.
+func _retire_old_csv() -> void:
+	if not FileAccess.file_exists(CSV_PATH):
+		return
+	var file := FileAccess.open(CSV_PATH, FileAccess.READ)
+	if file == null:
+		return
+	var header := file.get_csv_line()
+	file.close()
+	if header == PackedStringArray(COLUMNS):
+		return
+	var old_path := CSV_PATH.get_basename() + "_old.csv"
+	DirAccess.remove_absolute(old_path)
+	DirAccess.rename_absolute(CSV_PATH, old_path)
 
 
 ## Post every queued row in one request (one at a time; the next waits).
