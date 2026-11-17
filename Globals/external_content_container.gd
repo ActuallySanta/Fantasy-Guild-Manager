@@ -118,16 +118,16 @@ func _ready() -> void:
 	for i in range(16):
 		quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, i))
 
-	for i in range(1):
+	for i in range(7):
 		milestone_story.append(MultiColumnLoader._load_info_from_rows(milestone_story_path, i))
 		
-	for i in range(9):
+	for i in range(22):
 		minor_story.append(MultiColumnLoader._load_info_from_rows(minor_story_path, i))
 
 	for i in range(4):
 		location_names.append(MultiColumnLoader._load_info_from_file(dunegon_locations_test_path, 1, i))
 		
-	for i in range(9):
+	for i in range(22):
 		minor_vars.append((MultiColumnLoader._load_info_from_rows(minor_variable_path, i)))
 	pass # Replace with function body.
 

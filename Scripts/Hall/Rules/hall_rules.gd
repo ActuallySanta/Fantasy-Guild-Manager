@@ -110,8 +110,8 @@ static func new_entry(quest: CreatedQuest, is_milestone: bool) -> Dictionary:
 ## is_freeplay: GameState.is_freeplay.
 ## Returns an Array of new_entry() Dictionaries, in board order.
 static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Array:
-	if day == HallMain.MILESTONE_DAY:
-		return [new_entry(CreatedQuest.new(2, 10), true)]
+	if (day == 10 || day == 30 || day == 50):
+		return [new_entry(CreatedQuest.new(2, day), true)]
 
 	if day == HallMain.FINAL_DAY and not is_freeplay:
 		# ==== FINAL QUEST CONTENT ===========================================
@@ -151,15 +151,23 @@ static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Arra
 		if(noRepeatQuests): #if a minor quest has already been created, create only standard quests
 			quest = CreatedQuest.new(rank, 5)
 		match(GameState.day): #set the boolean
-			2, 4, 7, 9, 12, 15:
+			2, 4, 7, 9, 12, 15, 23, 26, 32, 34, 43, 48:
 				noRepeatQuests = true
-			18, 20:
+			18, 20, 28, 40, 45:
 				quest = CreatedQuest.new(rank, GameState.day)
 				entries.append(new_entry(quest, false))
 				quest = CreatedQuest.new(rank, -1 * GameState.day)
 				entries.append(new_entry(quest, false))
 				return entries
-		
+			37:
+				quest = CreatedQuest.new(rank, GameState.day)
+				entries.append(new_entry(quest, false))
+				quest = CreatedQuest.new(rank, -1 * GameState.day)
+				entries.append(new_entry(quest, false))
+				quest = CreatedQuest.new(rank, 3737)
+				entries.append(new_entry(quest, false))
+				return entries
+				
 		if is_freeplay:
 			quest.apply_freeplay_scaling(freeplay_scale(day))
 		entries.append(new_entry(quest, false))

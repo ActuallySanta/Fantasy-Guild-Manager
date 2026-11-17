@@ -157,4 +157,3 @@ static func build_credits(result: Dictionary, run_stats: Dictionary, roster: Arr
 		"stats": build_run_over_stats(run_stats, roster),
 		"records": build_run_records(run_stats, roster),
 	}
-

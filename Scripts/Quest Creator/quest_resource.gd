@@ -130,7 +130,7 @@ var trained_stat_quest_chance: float = 50.0
 
 func _init(diff := 0, dayNum := 0) -> void:
 	match(dayNum):
-		1, 2, 4, 7, 9, 10, 12, 15, 18, -18:
+		1, 2, 4, 7, 9, 10, 12, 15, 18, -18, 20, -20, 23, 26, 28, -28, 30, 32, 34, 37, -37, 3737, 40, -40, 43, 45, -45, 48, 50:
 			_initMilestoneVars(dayNum)
 			return
 
@@ -237,11 +237,18 @@ func apply_freeplay_scaling(multiplier: float) -> void:
 
 
 func calcSuccessChance(_questingAdventurers: Array) -> int:
-	var statHitNum = 60.0 + (20 * difficulty)
+	var statHitNum = 75.0 + (25 * difficulty)
+	if (difficulty >= 2):
+		statHitNum += (10 * difficulty - 1)
+	if (difficulty >= 4):
+		statHitNum += (15 * difficulty - 3)
+		
 	if (maxAdventurers == 1):
 		statHitNum = (statHitNum / 2)
 	elif(maxAdventurers == 3):
 		statHitNum *= 1.5
+	elif(maxAdventurers > 3):
+		statHitNum *= 2
 	statHitNum *= requirement_multiplier
 	var statTotal = 0.0
 
@@ -802,6 +809,54 @@ func _initMilestoneVars(dayNum: int):
 			favStat = FavoredStat.Wisdom
 			questTitle = str("Pursue a NECROMANCER and defeat him!")
 			styleOfQuest = 2
+		30:
+			difficulty = 4
+			maxAdventurers = 5
+			questNum = 3
+			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
+			regionNum = 2
+			location = QuestManager.world_regions[regionNum].returnName(type)
+			goldReward = 300 + (150 * difficulty)
+			startingGoldReward = 300 + (150 * difficulty)
+			favStat = FavoredStat.Pluck
+			questTitle = str("Defeat a DEMON GENERAL!")
+			styleOfQuest = 2
+		40:
+			difficulty = 5
+			maxAdventurers = 4
+			questNum = 4
+			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
+			regionNum = 0
+			location = QuestManager.world_regions[regionNum].returnName(type)
+			goldReward = 300 + (150 * difficulty)
+			startingGoldReward = 300 + (150 * difficulty)
+			favStat = FavoredStat.PowerAndDefense
+			questTitle = str("Defeat the second DEMON GENERAL!")
+			styleOfQuest = 2
+		-40:
+			difficulty = 5
+			maxAdventurers = 5
+			questNum = 5
+			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
+			regionNum = 3
+			location = QuestManager.world_regions[regionNum].returnName(type)
+			goldReward = 300 + (150 * difficulty)
+			startingGoldReward = 300 + (150 * difficulty)
+			favStat = FavoredStat.WisdomAndSleaze
+			questTitle = str("Defeat the third DEMON GENERAL!")
+			styleOfQuest = 2
+		50:
+			difficulty = 6
+			maxAdventurers = 8
+			questNum = 6
+			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
+			regionNum = 1
+			location = QuestManager.world_regions[regionNum].returnName(type)
+			goldReward = 300 + (150 * difficulty)
+			startingGoldReward = 300 + (150 * difficulty)
+			favStat = FavoredStat.Pluck
+			questTitle = str("Stand against the DEMON KING!")
+			styleOfQuest = 2
 		_:
 			var storyNum = 0
 			match dayNum:
@@ -823,6 +878,32 @@ func _initMilestoneVars(dayNum: int):
 					storyNum = 7
 				-18:
 					storyNum = 8
+				23:
+					storyNum = 9
+				-26:
+					storyNum = 10
+				28:
+					storyNum = 11
+				-28:
+					storyNum = 12
+				32:
+					storyNum = 13
+				34:
+					storyNum = 14
+				37:
+					storyNum = 15
+				-37:
+					storyNum = 16
+				3737:
+					storyNum = 17
+				43:
+					storyNum = 18
+				45:
+					storyNum = 19
+				-45:
+					storyNum = 20
+				48:
+					storyNum = 21
 					
 			difficulty = ExternalContentContainer.get_Minor_Story_Variables(storyNum, 0).to_int()
 			maxAdventurers = ExternalContentContainer.get_Minor_Story_Variables(storyNum, 1).to_int()
