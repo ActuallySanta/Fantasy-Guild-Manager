@@ -46,9 +46,9 @@ const DESIGN_HEIGHT := 1280.0
 const MAX_SCALE := 1.5
 ## Range of the final factor (screen factor x Text size setting). The scenes
 ## are checked to hold their text up to MAX_TOTAL_SCALE (a phone on the
-## largest Text size: 1.5 x HallSettings.TEXT_SIZE_FACTORS' last entry).
+## largest Text size: 1.5 x HallSettings.TEXT_SIZE_FACTORS' last entry, 1.725).
 const MIN_TOTAL_SCALE := 0.75
-const MAX_TOTAL_SCALE := 2.0
+const MAX_TOTAL_SCALE := 1.75
 ## Physical pixels per point on Android (dp are defined at 160 dpi) and on
 ## Windows / Linux (100% display scaling is 96 dpi).
 const ANDROID_BASE_DPI := 160.0

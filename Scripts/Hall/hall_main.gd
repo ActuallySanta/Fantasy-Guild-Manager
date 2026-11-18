@@ -1288,7 +1288,7 @@ func toggle_reduce_motion() -> void:
 	set_reduce_motion(not reduce_motion)
 
 
-## Accessibility's Text size button: Small -> Normal -> Large -> Largest -> Small.
+## Accessibility's Text size button: Small -> Normal -> Large -> Small.
 func cycle_text_size() -> void:
 	set_text_size((text_size + 1) % HallSettings.TEXT_SIZES.size())
 
