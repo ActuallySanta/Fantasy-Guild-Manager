@@ -24,7 +24,7 @@ const TOPICS := [
 	{"title": "Quests & Odds", "icon": "scroll", "rows": [
 		["scroll", "Reading a quest", "Each card shows its rank, gold, party size and the stat it favours."],
 		["target", "Odds", "Heroes strong in the favoured stat add the most chance. Low odds risk failure and injuries."],
-		["check", "Send or Deny", "Send seals the party; they leave tonight. Deny skips the quest but costs standing. Reconsider brings it back the same day."],
+		["check", "Send or Deny", "Pinning an adventurer sends the quest; they leave tonight. Recall unpins them. Deny skips the quest but costs standing. Reconsider brings it back the same day."],
 		["diamond", "Ranks", "Quests run from F up to S. Higher standing brings higher ranks and bigger pay."],
 	]},
 	{"title": "Heroes & Stats", "icon": "person", "rows": [

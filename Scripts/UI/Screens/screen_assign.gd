@@ -2,13 +2,14 @@
 ## Scene: Scenes/Screens/screen_assign.tscn
 ##
 ## Top to bottom:
-##   strip   - back to the Board, then one little scroll per quest
+##   strip   - back to the Quests tab, then one little scroll per quest
 ##             (state-coloured); switching keeps every quest's picks
 ##   writ    - the quest as an unrolled scroll: type, title, reward, party
 ##             size, favored stat, the pinned party (tap to remove) and the
 ##             live success chance
-##   picker  - every adventurer, best fit first, with stats and what they add
-##   footer  - Deny / Seal & send (or Recall / Reconsider once decided)
+##   picker  - every adventurer, best fit first, with stats and what they add;
+##             pinning anyone sends the quest
+##   footer  - Deny or Recall / Back to Quests (Quests / Reconsider once denied)
 extends VBoxContainer
 
 const QuestTabScene := preload("uid://cp5084mci60mt")  # Scenes/Rows/Quests/quest_tab.tscn
@@ -75,12 +76,11 @@ const BUTTON_DENY := "Deny"
 const TEXT_DENY_COST := "-%d"
 ## Room kept on the Deny button's right for the shield.
 const DENY_COST_ROOM := 64.0
-const BUTTON_SEND := "Seal & send %s"
-const BUTTON_SEND_PARTY := "Seal & send party"
-const BUTTON_SEND_EMPTY := "Pin someone first"
 const BUTTON_RECALL := "Recall"
-const BUTTON_NEXT := "Next Quest"
-const BUTTON_BOARD := "Board"
+## The footer's right button on open and sent quests (pinning sends a quest).
+const BUTTON_BACK_TO_QUESTS := "Back to Quests"
+## The strip's back button and the footer's left button on a denied quest.
+const BUTTON_BOARD := "Quests"
 const BUTTON_RECONSIDER := "Reconsider"
 
 # ---- NODES
@@ -372,19 +372,19 @@ func _pick_group(entry: Dictionary, character: GuildCharacter) -> int:
 
 # ---- footer
 
-## Left / right footer buttons depend on the quest's state:
-##   open   -> Deny [shield -N] | Seal & send <name>
-##   sent   -> Recall | Next Quest (or Board when nothing's left to decide)
-##   denied -> Board | Reconsider
-## The left button is always wood; the right one is the wax-sealed button.
+## Left / right footer buttons depend on the quest's state (pinning anyone
+## sends an open quest, so there's no Send button):
+##   open   -> Deny [shield -N] | Back to Quests
+##   sent   -> Recall (unpins everyone) | Back to Quests
+##   denied -> Quests | Reconsider
+## The left button is always wood; the right one is gold.
 func _show_footer(entry: Dictionary) -> void:
-	_right_button.disabled = false
 	_left_button.icon = null
 	_deny_cost.visible = false
 	match entry.state:
 		HallStyle.QUEST_STATE_SENT:
 			_left_button.text = BUTTON_RECALL
-			_right_button.text = BUTTON_NEXT if hall.undecided_count() > 0 else BUTTON_BOARD
+			_right_button.text = BUTTON_BACK_TO_QUESTS
 		HallStyle.QUEST_STATE_DENIED:
 			_left_button.text = BUTTON_BOARD
 			_right_button.text = BUTTON_RECONSIDER
@@ -393,16 +393,10 @@ func _show_footer(entry: Dictionary) -> void:
 			_left_button.icon = HallStyle.icon_texture("x")
 			_deny_cost_value.text = TEXT_DENY_COST % HallRules.standing_for_deny(entry.quest)
 			_deny_cost.visible = true
-			if entry.party.is_empty():
-				_right_button.text = BUTTON_SEND_EMPTY
-			elif entry.party.size() == 1:
-				_right_button.text = BUTTON_SEND % entry.party[0].name
-			else:
-				_right_button.text = BUTTON_SEND_PARTY
-			_right_button.disabled = entry.party.is_empty()
+			_right_button.text = BUTTON_BACK_TO_QUESTS
 
 
-## Recall (sent) / Board (denied) / Deny (open).
+## Recall (sent) / Quests (denied) / Deny (open).
 func _on_left_button_pressed() -> void:
 	match hall.current_quest_entry().state:
 		HallStyle.QUEST_STATE_SENT:
@@ -413,15 +407,9 @@ func _on_left_button_pressed() -> void:
 			hall.deny_quest()
 
 
-## Next Quest or Board (sent) / Reconsider (denied) / Seal & send (open).
+## Reconsider (denied) / Back to Quests (open or sent).
 func _on_right_button_pressed() -> void:
-	match hall.current_quest_entry().state:
-		HallStyle.QUEST_STATE_SENT:
-			if hall.undecided_count() > 0:
-				hall.open_assign(hall.next_undecided_index(hall.active_screen.quest_index))
-			else:
-				hall.close_screen()
-		HallStyle.QUEST_STATE_DENIED:
-			hall.reconsider_quest()
-		_:
-			hall.send_party()
+	if hall.current_quest_entry().state == HallStyle.QUEST_STATE_DENIED:
+		hall.reconsider_quest()
+	else:
+		hall.close_screen()

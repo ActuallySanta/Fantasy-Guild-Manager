@@ -29,16 +29,16 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 
 | Feedback | What Mobile Hall does |
 |---|---|
-| Can't compare one quest against all the others (Deck, Flow) | **Board** tab lists every quest of the day on one screen, with reward, party size, favored stat, state and odds |
+| Can't compare one quest against all the others (Deck, Flow) | **Quests** tab (the Board) lists every quest of the day on one screen, with reward, party size, favored stat, state and odds |
 | Can't see stats while assigning (Deck) | **Assign Party** picker shows each adventurer's health and four quest stats (favored one outlined), plus how much they add to the odds |
-| Picked parties are dropped unless you send them (Flow) | A quest's party is a **draft** that stays until you send, recall or change it. Switching quests keeps every draft |
+| Picked parties are dropped unless you send them (Flow) | Pinning anyone to a quest **sends** it; there's no separate Send step. The party stays until you unpin them, **Recall** (unpins everyone) or move them. Switching quests keeps every party |
 | Hard to switch between quests (Ledger) | Numbered **quest strip** at the top of Assign Party. One tap switches quests, and each tab is coloured by state |
 | Not sure what to do next (Ledger) | The Board's Today checklist points at what still needs doing, and an **End Day** button sits under the quest list (it opens the next undecided quest first if any are left) |
 | Upgrades forgotten in every version | **Upgrades** tab badge when you can afford something, an Upgrades box on the Board's Today checklist, and the **End Day check** offers affordable upgrades before the day ends. None of these offer upgrades while Pip still holds the Guild tab back (until Day 3); the Board's box says when it opens |
 | No way to get denied quests back (Ledger) | Denied quests stay on the Board. Open one and tap **Reconsider** |
 | No signal when new recruits arrive (Ledger) | **Guild** badge ("3 new") each morning until you open Applicants |
 | Hiring and questing blurred together (Deck) | Guild tab has two clearly separate folder tabs: **Your Guild** / **Applicants** |
-| Tutorial skipped Home (Ledger) | Welcome card walks through Board, Guild, Upgrades and the big button, then lands on the Board |
+| Tutorial skipped Home (Ledger) | Welcome card walks through Quests, Members, Guild and End Day, then lands on the Quests tab |
 | Small buttons (Flow) | Main buttons are 88–96 px tall, nav tabs 100 px, list rows are tappable as a whole |
 | Too much scrolling / decorative art (Ledger) | No decorative art. The Board fits 5 quests without much scrolling. "Coming soon" buildings collapse into one line |
 | Quest results are walls of text (Flow) | **Day Report** is one short letter per quest: a result stamp, who went and at what odds, who got hurt, one line per story beat with an icon, and a one-line sign-off |
@@ -49,14 +49,14 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 ┌ header ─ Day · Bone Drake countdown · gold · standing · menu ┐
 │ warning strip ─ "Last hero standing" (only when one death from falling) │
 │ content ─ Board | Guild | Upgrades | Items  (or a screen over them) │
-└ nav ─ Board (undecided) · Members (new recruits) · Guild (affordable) · Items ┘
+└ nav ─ Quests (undecided) · Members (new recruits) · Guild (affordable) · Items ┘
 ```
 
 | Screen | What's on it |
 |---|---|
-| Board (tab) | Today checklist (Recruits / Quests / Upgrades, each tappable), then all quests, then the **End Day** button. Rows show *Pick a party*, *Party picked*, *Sent* or *Denied* with odds and mini portraits |
-| Assign Party | Quest strip; quest card; party seats (tap to remove) with live odds; picker sorted best fit first, in three groups: free adventurers, then those already in another quest's party (greyed out, saying "Picked for / Sent on #N"; tapping one opens a Move popup that asks before taking them off that quest), then those who can't go (hospital bed, training) at the very bottom. Footer: Deny / Send Party, or Recall / Next Quest, or Board / Reconsider |
-| Guild (tab, "Members" in the nav) | A folder with two tabs: Your Guild (roster with health, today's task, all five stats) / Applicants (a stack of letters of introduction; tap one peeking out to read it, Hire on the top one). Bed count links to the Barracks |
+| Board (tab, "Quests" in the nav) | Today checklist (Recruits / Decided Quests / Upgrades, each tappable), then all quests, then the **End Day** button. Rows show *Pick a party*, *Sent* or *Denied* with odds and mini portraits |
+| Assign Party | Quest strip; quest card; party seats (tap to remove) with live odds; picker sorted best fit first, in three groups: free adventurers, then those already in another quest's party (greyed out, saying "Picked for / Sent on #N"; tapping one opens a Move popup that asks before taking them off that quest), then those who can't go (hospital bed, training) at the very bottom. Pinning anyone sends the quest (SENT is stamped on it); a saved run from before this rule sends any quest with a party on load. Footer: Deny / Back to Quests (open), Recall / Back to Quests (sent; Recall unpins everyone), or Quests / Reconsider (denied) |
+| Guild (tab, "Members" in the nav) | A folder with two tabs: Your Guild (roster with health, today's task, all five stats) / Applicants (a stack of letters of introduction; tap one peeking out to read it, Hire on the top one, with the applicant's whole backstory under the Hire button; applicants have no Details page). Bed count links to the Barracks |
 | Upgrades (tab, "Guild" in the nav) | A folder with two tabs. **Facilities**: the Training Yard plan (heroes in a slot with a Pow / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital plan (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: the treasury ledger, a plan per building (affordable first) with level diamonds, now/next effect, cost or what's missing, and "coming soon" buildings as rolled-up scrolls. Badge = upgrades you can afford |
 | Items (tab, id "shop") | A folder with two tabs; the first visit each day opens on the Shop. **Inventory** (the "pack" section in code): every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar just above the nav |
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |

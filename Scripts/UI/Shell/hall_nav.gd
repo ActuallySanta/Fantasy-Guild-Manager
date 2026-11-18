@@ -1,4 +1,4 @@
-## Nav: the bottom tabs (Board / Members / Guild / Shop), always visible.
+## Nav: the bottom tabs (Quests / Members / Guild / Shop), always visible.
 ## The open one is parchment (NavTabActive in hall_theme) and stands taller,
 ## the rest dark wood (NavTab); each has a badge when it needs a visit.
 ## Button ids match HallMain.TAB_IDS (Nav_<id> in the scene).
@@ -57,7 +57,7 @@ func button(tab_id: String) -> Button:
 
 
 func refresh() -> void:
-	# Assign Party counts as part of the Board
+	# Assign Party counts as part of the Quests tab
 	var highlighted_tab := "board" if hall.active_screen.get("kind", "") == HallMain.SCREEN_ASSIGN else hall.active_tab
 	for tab_id in HallMain.TAB_IDS:
 		var nav_button := button(tab_id)

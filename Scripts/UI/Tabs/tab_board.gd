@@ -12,7 +12,7 @@ const QuestRowScene := preload("uid://dxhtjf067jytf")  # Scenes/Rows/Quests/ques
 # ---- TEXT
 # Today note titles
 const TODAY_RECRUITS := "Recruits"
-const TODAY_QUESTS := "Decided"
+const TODAY_QUESTS := "Decided Quests"
 const TODAY_UPGRADES := "Upgrades"
 # Today note values
 const RECRUITS_NEW := "%d new"
