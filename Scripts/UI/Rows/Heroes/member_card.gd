@@ -1,6 +1,7 @@
 ## One adventurer in the Guild tab's roster (a parchment card): portrait,
 ## what they're doing today, and health with their two strongest stats.
-## Tap for details (the character page shows every stat).
+## Tap for details (the character page shows every stat); a caret on the right
+## points down to say there's more.
 ## Scene: Scenes/Rows/Heroes/member_card.tscn
 extends TapPanel
 
@@ -28,6 +29,12 @@ const SHOWN_STAT_COUNT := 2
 @onready var _role: Label = %Role
 @onready var _task_chip = %TaskChip           # chip.gd
 @onready var _stats = %Stats                  # stat_strip.gd
+@onready var _chevron: Label = %Chevron
+
+
+func _ready() -> void:
+	# the caret points down, like the report letters' "tap to read" caret
+	HallStyle.turn_caret(_chevron, HallStyle.CARET_DOWN)
 
 
 func setup(hall: HallMain, character: GuildCharacter) -> void:
