@@ -72,6 +72,9 @@ const RED_BG := Color("#F2DCD4")
 const GOLD := Color("#B8913A")
 const GOLD_TEXT := Color("#6B5A1E")
 const GOLD_BG := Color("#F3E7C6")
+## Bright gold for "look here" arrows (the Day Report's scroll arrow; the same
+## gold as Pip's spotlight ring and arrow, OverlayTutorial.RING_COLOR).
+const POINTER_GOLD := Color("#F6B93B")
 const GREEN := Color("#4A6B35")           ## success, sent, done
 const GREEN_TEXT := Color("#3D5A2A")
 const GREEN_BG := Color("#E0EBD3")
