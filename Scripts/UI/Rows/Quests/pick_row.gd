@@ -25,7 +25,7 @@ const TEXT_TRAINING := "Training %s"
 # Right-hand column
 const TEXT_ADDS := "+%d%%"
 const TEXT_ADDS_SUB := "to odds"
-const TEXT_IN_PARTY := "Pinned"
+const TEXT_IN_PARTY := "Assigned"
 const TEXT_CANT_GO := "-"
 const TEXT_CANT_GO_SUB := "can't go"
 const TEXT_IN_BED_SUB := "in a bed"
@@ -100,7 +100,7 @@ func _show_pick_state(hall: HallMain, entry: Dictionary, character: GuildCharact
 		_adds_sub.visible = false
 		HallStyle.set_font_color(_adds_value, HallStyle.GREEN_TEXT)
 		HallStyle.style_panel(self, HallStyle.SENT_CARD_BG)
-		# just pinned: "Pinned" stamps onto the row
+		# just pinned: "Assigned" stamps onto the row
 		if hall.pending_fx.get("seat_in") == character:
 			HallFx.stamp_in(_adds_value, 1.6)
 	elif not hall.can_go_on_quests(character):
