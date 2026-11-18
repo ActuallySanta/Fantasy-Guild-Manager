@@ -34,7 +34,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Picked parties are dropped unless you send them (Flow) | Pinning anyone to a quest **sends** it; there's no separate Send step. The party stays until you unpin them, **Recall** (unpins everyone) or move them. Switching quests keeps every party |
 | Hard to switch between quests (Ledger) | Numbered **quest strip** at the top of Assign Party. One tap switches quests, and each tab is coloured by state |
 | Not sure what to do next (Ledger) | The Board's Today checklist points at what still needs doing, and an **End Day** button sits under the quest list (it opens the next undecided quest first if any are left) |
-| Upgrades forgotten in every version | **Upgrades** tab badge when you can afford something, an Upgrades box on the Board's Today checklist, and the **End Day check** offers affordable upgrades before the day ends. None of these offer upgrades while Pip still holds the Guild tab back (until Day 3); the Board's box says when it opens |
+| Upgrades forgotten in every version | **Upgrades** tab badge when you can afford something, an Upgrades box on the Board's Today checklist, and the **End Day check** offers affordable upgrades before the day ends. None of these offer upgrades while Pip still holds the Guild tab back (until Day 3); the Board's box sits blank and greyed until then |
 | No way to get denied quests back (Ledger) | Denied quests stay on the Board. Open one and tap **Reconsider** |
 | No signal when new recruits arrive (Ledger) | **Guild** badge ("3 new") each morning until you open Applicants |
 | Hiring and questing blurred together (Deck) | Guild tab has two clearly separate folder tabs: **Your Guild** / **Applicants** |
@@ -110,6 +110,16 @@ existed load as already seen. Playtest scenarios skip it.
 The story is a placeholder. Edit the `INTRO STORY TEXT` block at the top of
 `overlay_intro.gd` (one entry per paragraph, BBCode allowed), then check it with Debug
 tools' **Replay intro**.
+
+## Tutorial pacing
+
+While Pip's tutorial is on, controls it hasn't taught yet keep their place but show no text
+or badge, are greyed, and do nothing (`OverlayTutorial.UNLOCK_DAY`):
+
+- Applicants, hero pages and Deny open on Day 2.
+- The Guild tab opens on Day 3, and Items on Day 5.
+- Skip tutorial lifts them all.
+- Locks come from the day and the saved skip flag, so saves are unchanged.
 
 ## Final battle, credits and freeplay
 

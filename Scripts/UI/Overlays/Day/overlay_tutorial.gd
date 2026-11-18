@@ -9,7 +9,8 @@
 ##           player), reading a quest, picking a party, Send, End Day, the
 ##           Day Report
 ##   Day 2 - a hero's page (stats, Pluck, gear), odds and what a win grows
-##           (a trained stat or Pluck), Deny,
+##           (a trained stat or Pluck), Applicants (new heroes each
+##           morning, hiring), Deny,
 ##           how the guild can fall (HallMain.is_run_over)
 ##   Day 3 - the Guild tab: upgrading a building, the Training Yard, the
 ##           Hospital, and why posted heroes can't quest
@@ -971,7 +972,7 @@ func _day_one() -> Array:
 		# Uncle John's card gets its own spotlight step (it used to be dimmed
 		# behind the Board step's spotlight, so the player couldn't see him)
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"),
-			"text": "Look! Here is [b]%s[/b], a priest and your first member. More heroes will appear each day under the Applicants tab." \
+			"text": "Look! Here is [b]%s[/b], a priest and your first member. More heroes will come looking for work starting tomorrow." \
 					% HallRules.STARTING_HERO_NAME},
 		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
 			"do": "Tap Quests", "text": "Now find him work to do: open the [b]Quests[/b] tab."},
@@ -984,7 +985,7 @@ func _day_one() -> Array:
 		{"target": func(): return hall.end_day_button(), "on": "end_check",
 			"do": "Tap End Day", "text": "Tap [b]End Day[/b] to send your quests off!"},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
-			"do": "Tap End Day", "text": "Here you can check what quests you denied and accepted, as well as any available upgrades! Tap on end day to finish your choices. "},
+			"do": "Tap End Day", "text": "Here you can check tonight's plan before the day ends. Tap [b]End Day[/b] to finish your choices."},
 		# the Day Report: the totals, then open a letter and read it
 		{"target": func(): return _u(_report(), "Totals"),
 			"text": "Good morning! This is the [b]Day Report[/b]. Up top: how many quests succeeded, the %s you earned, and anyone who got hurt." % GOLD},
@@ -1015,6 +1016,8 @@ func _day_two() -> Array:
 			"text": "Here are your character's stats. Successful quests with high odds increase a stat. However risky successes grow %s which increases every stat." % PLK},
 		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close", "bare": true,
 			"do": "Tap Back", "text": "Tap back on the bottom of the screen to return."},
+			{"target": func(): return _u(_tab("guild"), "SegHire"), "on": "tab", "when": func(d): return d.guild == "hire",
+				"do": "Tap Applicants", "text": "New heroes come looking for work every morning. Hiring costs %s, and your beds limit how many you can keep." % GOLD},
 		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board", "bare": true,
 			"do": "Tap Quests", "text": "Open the [b]Quests[/b] tab."},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign", "bare": true,
