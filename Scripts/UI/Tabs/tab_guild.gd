@@ -95,7 +95,8 @@ func refresh() -> void:
 
 
 func _is_hire_section() -> bool:
-	return hall.guild_section == HallMain.GUILD_SECTION_HIRE
+	# the hire section stays closed while hiring isn't taught yet
+	return hall.guild_section == HallMain.GUILD_SECTION_HIRE and not hall.is_locked(OverlayTutorial.FEATURE_HIRE)
 
 
 # ---- top of the tab
@@ -104,18 +105,22 @@ func _is_hire_section() -> bool:
 ## Applicants gets a count badge while closed.
 func _show_section_buttons() -> void:
 	var on_hire := _is_hire_section()
+	var hire_locked := hall.is_locked(OverlayTutorial.FEATURE_HIRE)
 	if SHOW_ROSTER_COUNT:
 		_roster_section_button.text = SECTION_ROSTER % [CharacterContainer.living_count(), CharacterContainer.max_characters]
 	else:
 		_roster_section_button.text = SECTION_ROSTER_PLAIN
 	_hire_section_button.text = SECTION_HIRE
+	HallStyle.set_locked(_hire_section_button, hire_locked, SECTION_HIRE)
+	if SHOW_BARRACKS_LINK:
+		HallStyle.set_locked(_barracks_button, hall.is_tab_locked("upgrades"), BEDS_BUTTON)
 	_roster_section_button.theme_type_variation = &"FolderTab" if on_hire else &"FolderTabActive"
 	_hire_section_button.theme_type_variation = &"FolderTabActive" if on_hire else &"FolderTab"
 	_roster_section_button.custom_minimum_size.y = FOLDER_TAB_HEIGHT if on_hire else FOLDER_TAB_HEIGHT_OPEN
 	_hire_section_button.custom_minimum_size.y = FOLDER_TAB_HEIGHT_OPEN if on_hire else FOLDER_TAB_HEIGHT
 
 	var recruit_count := CharacterContainer.hireable_characters.size()
-	_hire_badge.visible = not on_hire and recruit_count > 0 and not hall.is_roster_full()
+	_hire_badge.visible = not hire_locked and not on_hire and recruit_count > 0 and not hall.is_roster_full()
 	_hire_badge_text.text = str(recruit_count)
 
 

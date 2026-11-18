@@ -665,11 +665,6 @@ func is_tab_locked(tab_id: String) -> bool:
 	return is_locked(tab_id)
 
 
-## Deprecated: removed in Task 2.
-func tab_unlock_day(_tab_id: String) -> int:
-	return 0
-
-
 ## Buildings that can be upgraded right now (enough gold and standing).
 ## None while the Guild tab (id "upgrades") is still locked, so nothing
 ## (the End Day sheet, the Board note, the badge) offers them early.

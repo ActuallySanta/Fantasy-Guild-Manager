@@ -56,6 +56,7 @@ func setup(hall: HallMain, entry: Dictionary, character: GuildCharacter,
 	else:
 		pressed.connect(hall.toggle_in_party.bind(character))
 	_info_button.pressed.connect(hall.open_character.bind(character))
+	HallStyle.set_locked(_info_button, hall.is_locked(OverlayTutorial.FEATURE_HERO_PAGE))
 	_portrait.show_character(character)
 	_name.text = character.name
 	_role.text = TEXT_ROLE % HallStyle.role_name(character)

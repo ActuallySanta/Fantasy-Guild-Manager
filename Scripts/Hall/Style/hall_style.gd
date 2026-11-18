@@ -570,6 +570,23 @@ static func style_button(button: Button, kind: String = "gold", font_size: int =
 		HallFontScale.set_size(button, "font_size", font_size)
 
 
+## The tint a locked control is greyed with (a feature Pip hasn't taught yet).
+const LOCKED_MODULATE := Color(0.55, 0.55, 0.55, 0.7)
+
+
+## Show a control as locked (blank, greyed, inert) or back to normal. A Button
+## loses its text and gets `disabled`; any Control gets LOCKED_MODULATE. Size
+## and layout never change, and icons stay (greyed by the tint). Callers hide
+## badges and extra labels themselves.
+## control: what to lock. is_locked: true locks, false restores.
+## label: the Button text to restore when unlocked ("" for an icon-only button).
+static func set_locked(control: Control, is_locked: bool, label: String = "") -> void:
+	if control is Button:
+		control.text = "" if is_locked else label
+		control.disabled = is_locked
+	control.modulate = LOCKED_MODULATE if is_locked else Color.WHITE
+
+
 ## A coloured seal (white art tinted `fill`) with a short tag on it (quest type, building).
 static func style_tag(tag_panel: Control, tag_label: Label, text: String, fill: Color) -> void:
 	tag_panel.theme_type_variation = &"TypeSeal"

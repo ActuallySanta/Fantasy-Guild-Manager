@@ -135,10 +135,13 @@ var _shown_chance := -1
 ## The SENT ink on the quest card (null = none) and which quest it's for.
 var _writ_stamp: Control
 var _writ_stamp_quest := -1
+## The No Roster Hire button's label from the scene, to restore once hiring unlocks.
+var _hire_label := ""
 
 
 func setup(main: HallMain) -> void:
 	hall = main
+	_hire_label = _hire_button.text
 	_back_button.pressed.connect(hall.close_screen)
 	_hire_button.pressed.connect(func(): hall.open_tab("guild", HallMain.GUILD_SECTION_HIRE))
 	_left_button.pressed.connect(_on_left_button_pressed)
@@ -375,6 +378,7 @@ func _show_picker(entry: Dictionary) -> void:
 	_pick_list.visible = can_pick
 	_all_busy_label.visible = can_pick and shown_adventurers.is_empty() and hidden_busy_count > 0
 	_no_roster_box.visible = not has_roster
+	HallStyle.set_locked(_hire_button, hall.is_locked(OverlayTutorial.FEATURE_HIRE), _hire_label)
 
 
 ## True when `character` is in a party for a quest other than `entry`'s
@@ -408,16 +412,18 @@ func _show_footer(entry: Dictionary) -> void:
 	_deny_cost.visible = false
 	match entry.state:
 		HallStyle.QUEST_STATE_SENT:
-			_left_button.text = BUTTON_RECALL
+			HallStyle.set_locked(_left_button, false, BUTTON_RECALL)
 			_right_button.text = BUTTON_BACK_TO_QUESTS
 		HallStyle.QUEST_STATE_DENIED:
-			_left_button.text = BUTTON_BOARD
+			HallStyle.set_locked(_left_button, false, BUTTON_BOARD)
 			_right_button.text = BUTTON_RECONSIDER
 		_:
-			_left_button.text = BUTTON_DENY
+			# Deny is blank, greyed and inert (no cost tag) until Pip teaches it
+			var deny_locked := hall.is_locked(OverlayTutorial.FEATURE_DENY)
+			HallStyle.set_locked(_left_button, deny_locked, BUTTON_DENY)
 			_left_button.icon = HallStyle.icon_texture("x")
 			_deny_cost_value.text = TEXT_DENY_COST % HallRules.standing_for_deny(entry.quest)
-			_deny_cost.visible = true
+			_deny_cost.visible = not deny_locked
 			_right_button.text = BUTTON_BACK_TO_QUESTS
 
 
