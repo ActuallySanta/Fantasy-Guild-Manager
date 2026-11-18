@@ -145,6 +145,16 @@ text = "19"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Buttons" type="HBoxContainer" parent="Col"]
+layout_mode = 2
+theme_override_constants/separation = 26
+
+[node name="HireButton" parent="Col/Buttons" instance=ExtResource("5_seal")]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 88)
+layout_mode = 2
+text = "Hire · free"
+
 [node name="Story" type="HBoxContainer" parent="Col"]
 layout_mode = 2
 theme_override_constants/separation = 6
@@ -170,26 +180,6 @@ theme_override_colors/font_color = Color(0.2039, 0.1608, 0.1255, 1)
 theme_override_font_sizes/font_size = 25
 text = "ailed as a child prophet, Juan escaped a cult and now dreams of taking it down."
 autowrap_mode = 3
-max_lines_visible = 3
-text_overrun_behavior = 3
-
-[node name="Buttons" type="HBoxContainer" parent="Col"]
-layout_mode = 2
-theme_override_constants/separation = 26
-
-[node name="DetailsButton" type="Button" parent="Col/Buttons"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(190, 88)
-layout_mode = 2
-focus_mode = 0
-theme_override_font_sizes/font_size = 28
-text = "Details"
-
-[node name="HireButton" parent="Col/Buttons" instance=ExtResource("5_seal")]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 88)
-layout_mode = 2
-text = "Hire · free"
 
 [node name="BottomGap" type="Control" parent="Col"]
 custom_minimum_size = Vector2(0, 12)

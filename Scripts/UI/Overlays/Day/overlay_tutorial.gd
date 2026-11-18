@@ -846,6 +846,24 @@ func _row(root: Node, script_file: String, unique_child := "", filter := Callabl
 	return null
 
 
+## The Day Report overlay.
+func _report() -> Node:
+	return hall.get_node("%OverlayReport")
+
+
+## The first everyday (foldable) letter in the Day Report that is folded
+## (`folded` true) or open (false), or null.
+func _report_letter(folded: bool) -> Control:
+	return _row(_report(), "report_entry.gd", "", func(letter): return not letter.is_story and letter.is_folded == folded)
+
+
+## True when tonight's report has a letter that folds (story quests' letters
+## never fold, and a night with nobody out has no letters). Reads the report's
+## data, so it works before the letters are built.
+func _has_foldable_letter() -> bool:
+	return hall.shown_report.get("results", []).any(func(result): return not HallStyle.is_story_quest(result))
+
+
 func _training_section() -> Node:
 	return _u(_tab("upgrades"), "TrainingSection")
 
@@ -943,19 +961,30 @@ func _day_one() -> Array:
 			"text": "Look! Here is [b]%s[/b], a priest and your first member. More heroes will appear each day under the Applicants tab." \
 					% HallRules.STARTING_HERO_NAME},
 		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
-			"do": "Tap Board", "text": "Now find him work to do: open the [b]Board[/b] tab."},
+			"do": "Tap Quests", "text": "Now find him work to do: open the [b]Quests[/b] tab."},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
 			"do": "Tap the quest card", "text": "Here's a first quest! Quests show its rank, how much %s you will earn, party size, and the favoured stat for the quest. Tap it to send an adventurer!" % GOLD},
 		{"target": func(): return _u(_screen("assign"), "PickList"), "on": "pick", "when": func(d): return _party_ready(d),
 			"do": "Tap an adventurer row to assign them on the quest", "deny": ["InfoButton"], "text": func(): return _pick_text()},
-		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "send",
-			"do": "Tap Seal & Send", "text": "Low chances on a quest give a risk of failure and injuries. Click Seal & send on the bottom of screen to confirm your choice."},
-		{"target": func(): return hall.action_button(), "on": "end_check",
-			"do": "Tap End Day", "text": "Quick tip! This bar always shows your next step if you are ever stuck. Tap [b]End Day[/b] to send your quests off!"},
+		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "close",
+			"do": "Tap Back to Quests", "text": "Picking an adventurer sends them on the quest. Low chances give a risk of failure and injuries. Tap [b]Back to Quests[/b] to return."},
+		{"target": func(): return hall.end_day_button(), "on": "end_check",
+			"do": "Tap End Day", "text": "Tap [b]End Day[/b] to send your quests off!"},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
 			"do": "Tap End Day", "text": "Here you can check what quests you denied and accepted, as well as any available upgrades! Tap on end day to finish your choices. "},
-		{"target": func(): return _u(hall.get_node("%OverlayReport"), "ActionButton"), "on": "new_day",
-			"do": "Tap to start Day 2", "text": "Good Morning! This screen lets you see how the parties did. Tap on Open the Doors to move on."},
+		# the Day Report: the totals, then open a letter and read it
+		{"target": func(): return _u(_report(), "Totals"),
+			"text": "Good morning! This is the [b]Day Report[/b]. Up top: how many quests succeeded, the %s you earned, and anyone who got hurt." % GOLD},
+		{"target": func(): return _report_letter(true), "on": "read_letter",
+			"skip": func(): return not _has_foldable_letter(),
+			"do": "Tap the letter", "text": "Each quest sends a letter home. Tap it to open it and read what happened."},
+		# spotlight just the story lines: the whole open letter is too tall to
+		# leave Pip room above or below it
+		{"target": func(): return _u(_report_letter(false), "Beats"),
+			"skip": func(): return not _has_foldable_letter(),
+			"text": "Here's the story, one line per moment. The stamp up top says whether the quest succeeded, and the last line says what they brought home. Tap a letter again to fold it."},
+		{"target": func(): return _u(_report(), "ActionButton"), "on": "new_day",
+			"do": "Tap to start Day 2", "text": "That's the night! Tap [b]Open the Doors[/b] to start Day 2."},
 	]
 
 
@@ -974,7 +1003,7 @@ func _day_two() -> Array:
 		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close", "bare": true,
 			"do": "Tap Back", "text": "Tap back on the bottom of the screen to return."},
 		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board", "bare": true,
-			"do": "Tap Board", "text": "Open the [b]Board[/b]."},
+			"do": "Tap Quests", "text": "Open the [b]Quests[/b] tab."},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign", "bare": true,
 			"do": "Tap a quest card",
 			"text": "Open a quest card. Tapping [b]Deny[/b] skips a quest at a cost for standing. Another thing, Adventurers can [b]die[/b], so pick your odds with care. See you on Day 3!"},

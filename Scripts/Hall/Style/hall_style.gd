@@ -654,6 +654,28 @@ static func set_font_color(control: Control, font_color: Color) -> void:
 	control.add_theme_color_override("default_color", font_color)
 
 
+## A "›" caret label's turn (degrees, clockwise): CARET_DOWN points it down
+## (there's more to open), CARET_UP points it up (it's open).
+const CARET_DOWN := 90.0
+const CARET_UP := -90.0
+
+## Point a caret label (text "›") by turning it `degrees` clockwise about its
+## own centre. Put the caret in a plain Control (not a Container): containers
+## reset their children's rotation every time they lay them out. The pivot
+## follows the label's size. seconds > 0 turns it smoothly (it snaps with
+## Reduce Motion on).
+static func turn_caret(caret: Control, degrees: float, seconds: float = 0.0) -> void:
+	caret.pivot_offset = caret.size / 2.0
+	# keep the pivot centred when a container resizes it (hooked up once)
+	if not caret.has_meta(&"caret_pivot_hooked"):
+		caret.set_meta(&"caret_pivot_hooked", true)
+		caret.resized.connect(func() -> void: caret.pivot_offset = caret.size / 2.0)
+	if seconds <= 0.0 or HallFx.reduce_motion or not caret.is_inside_tree():
+		caret.rotation_degrees = degrees
+		return
+	caret.create_tween().tween_property(caret, "rotation_degrees", degrees, seconds)
+
+
 # ============================================================ SCENE HELPERS
 
 ## Remove and free every child of a list container before refilling it.

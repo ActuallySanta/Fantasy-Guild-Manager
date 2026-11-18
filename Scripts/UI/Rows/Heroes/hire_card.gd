@@ -1,6 +1,6 @@
 ## One applicant on the Guild tab, written as a letter of introduction: who they
-## are, all five stats in boxes, the first line of their backstory, Details and
-## a wax-sealed Hire button with their price.
+## are, all five stats in boxes, a wax-sealed Hire button with their price, and
+## their whole backstory under it (applicants have no Details page).
 ## Scene: Scenes/Rows/Heroes/hire_card.tscn
 extends PanelContainer
 
@@ -20,7 +20,6 @@ const TEXT_NO_BEDS := "No beds left"
 @onready var _total: Label = %Total
 @onready var _drop_cap: Label = %DropCap
 @onready var _blurb: Label = %Blurb
-@onready var _details_button: Button = %DetailsButton
 @onready var _hire_button: Button = %HireButton
 
 
@@ -34,7 +33,6 @@ func _ready() -> void:
 ## letter_index = place in today's applicants (unused now that letters have no
 ## number; kept so callers don't change).
 func setup(hall: HallMain, recruit: GuildCharacter, _letter_index: int = 0) -> void:
-	_details_button.pressed.connect(hall.open_character.bind(recruit))
 	_hire_button.pressed.connect(_on_hire_pressed.bind(hall, recruit))
 
 	# who they are
@@ -47,8 +45,8 @@ func setup(hall: HallMain, recruit: GuildCharacter, _letter_index: int = 0) -> v
 		column.get_node("Box/Value").text = str(HallStyle.stat_value(recruit, stat_index))
 	_total.text = str(HallStyle.quest_stat_total(recruit))
 
-	# first line of the backstory, with a red drop cap
-	var story := HallStyle.clean_backstory(recruit).get_slice("\n", 0)
+	# the whole backstory, with a red drop cap
+	var story := HallStyle.clean_backstory(recruit)
 	_drop_cap.text = story.left(1)
 	_blurb.text = story.substr(1)
 

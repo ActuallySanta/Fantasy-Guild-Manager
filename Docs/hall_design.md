@@ -29,16 +29,16 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 
 | Feedback | What Mobile Hall does |
 |---|---|
-| Can't compare one quest against all the others (Deck, Flow) | **Board** tab lists every quest of the day on one screen, with reward, party size, favored stat, state and odds |
+| Can't compare one quest against all the others (Deck, Flow) | **Quests** tab (the Board) lists every quest of the day on one screen, with reward, party size, favored stat, state and odds |
 | Can't see stats while assigning (Deck) | **Assign Party** picker shows each adventurer's health and four quest stats (favored one outlined), plus how much they add to the odds |
-| Picked parties are dropped unless you send them (Flow) | A quest's party is a **draft** that stays until you send, recall or change it. Switching quests keeps every draft |
+| Picked parties are dropped unless you send them (Flow) | Pinning anyone to a quest **sends** it; there's no separate Send step. The party stays until you unpin them, **Recall** (unpins everyone) or move them. Switching quests keeps every party |
 | Hard to switch between quests (Ledger) | Numbered **quest strip** at the top of Assign Party. One tap switches quests, and each tab is coloured by state |
-| Not sure what to do next (Ledger) | One **action bar** button above the nav, always the next step: *For Hire* → *Next Quest* → *End Day* |
+| Not sure what to do next (Ledger) | The Board's Today checklist points at what still needs doing, and an **End Day** button sits under the quest list (it opens the next undecided quest first if any are left) |
 | Upgrades forgotten in every version | **Upgrades** tab badge when you can afford something, an Upgrades box on the Board's Today checklist, and the **End Day check** offers affordable upgrades before the day ends. None of these offer upgrades while Pip still holds the Guild tab back (until Day 3); the Board's box says when it opens |
 | No way to get denied quests back (Ledger) | Denied quests stay on the Board. Open one and tap **Reconsider** |
 | No signal when new recruits arrive (Ledger) | **Guild** badge ("3 new") each morning until you open Applicants |
 | Hiring and questing blurred together (Deck) | Guild tab has two clearly separate folder tabs: **Your Guild** / **Applicants** |
-| Tutorial skipped Home (Ledger) | Welcome card walks through Board, Guild, Upgrades and the big button, then lands on the Board |
+| Tutorial skipped Home (Ledger) | Welcome card walks through Quests, Members, Guild and End Day, then lands on the Quests tab |
 | Small buttons (Flow) | Main buttons are 88–96 px tall, nav tabs 100 px, list rows are tappable as a whole |
 | Too much scrolling / decorative art (Ledger) | No decorative art. The Board fits 5 quests without much scrolling. "Coming soon" buildings collapse into one line |
 | Quest results are walls of text (Flow) | **Day Report** is one short letter per quest: a result stamp, who went and at what odds, who got hurt, one line per story beat with an icon, and a one-line sign-off |
@@ -46,23 +46,22 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 ## Layout
 
 ```
-┌ header ─ Day · Bone Drake countdown · gold · standing · menu ┐
+┌ header ─ Day · Bone Drake countdown (BOSS seal + days left) · gold · standing · menu ┐
 │ warning strip ─ "Last hero standing" (only when one death from falling) │
 │ content ─ Board | Guild | Upgrades | Items  (or a screen over them) │
-│ action bar ─ "what to do next" + one big button             │
-└ nav ─ Board (undecided) · Members (new recruits) · Guild (affordable) · Items ┘
+└ nav ─ Quests (undecided) · Members (new recruits) · Guild (affordable) · Items ┘
 ```
 
 | Screen | What's on it |
 |---|---|
-| Board (tab) | Today checklist (Recruits / Quests / Upgrades, each tappable), then all quests. Rows show *Pick a party*, *Party picked*, *Sent* or *Denied* with odds and mini portraits |
-| Assign Party | Quest strip; quest card; party seats (tap to remove) with live odds; picker sorted best fit first. Adventurers already in another quest's party are hidden unless **Show busy** is on; shown, they say "Picked for / Sent on #N" and move over when tapped. Footer: Deny / Send Party, or Recall / Next Quest, or Board / Reconsider |
-| Guild (tab, "Members" in the nav) | A folder with two tabs: Your Guild (roster with health, today's task, all five stats) / Applicants (a stack of letters of introduction; tap one peeking out to read it, Hire on the top one). Bed count links to the Barracks |
+| Board (tab, "Quests" in the nav) | Today checklist (Recruits / Decided Quests / Upgrades, each tappable), then all quests, then the **End Day** button. Rows show *Pick a party*, *Sent* or *Denied* with odds and mini portraits |
+| Assign Party | Quest strip; quest card; party seats (filled ones stack beside the odds, empty ones share one row under them across the card; tap a filled one to remove them, an empty one to scroll down to the picker) with live odds; picker sorted best fit first, in three groups: free adventurers, then those already in another quest's party (greyed out, saying "Picked for / Sent on #N"; tapping one opens a Move popup that asks before taking them off that quest), then those who can't go (hospital bed, training) at the very bottom. Pinning anyone sends the quest (SENT is stamped on it); a saved run from before this rule sends any quest with a party on load. Footer: Deny / Back to Quests (open), Recall / Back to Quests (sent; Recall unpins everyone), or Quests / Reconsider (denied) |
+| Guild (tab, "Members" in the nav) | A folder with two tabs: Your Guild (roster with health, two strongest stats and a status on the right: On quest #N, Idle, Training <stat>, In hospital or Fallen) / Applicants (a stack of letters of introduction; tap one peeking out to read it, Hire on the top one, with the applicant's whole backstory under the Hire button; applicants have no Details page). Bed count links to the Barracks |
 | Upgrades (tab, "Guild" in the nav) | A folder with two tabs. **Facilities**: the Training Yard plan (heroes in a slot with a Pow / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital plan (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: the treasury ledger, a plan per building (affordable first) with level diamonds, now/next effect, cost or what's missing, and "coming soon" buildings as rolled-up scrolls. Badge = upgrades you can afford |
-| Items (tab, id "shop") | A folder with two tabs; the first visit each day opens on the Shop. **Inventory** (the "pack" section in code): every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar where the action bar usually is |
+| Items (tab, id "shop") | A folder with two tabs; the first visit each day opens on the Shop. **Inventory** (the "pack" section in code): every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar just above the nav |
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
-| Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story |
+| Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story. Everyday letters start folded with a down caret and "Tap to read the letter"; tapping opens the story and flips the caret up. Story quests never fold. On Day 1 Pip walks through it: the totals, then opening a letter (that step waits until one is opened), then its story lines |
 | Intro crawl | A new run only, before the tutorial. The story of how you inherited the guild rolls up a black screen, then **Open the Doors** (see "Intro crawl") |
 | Final Battle credits | Day 50 only. **Victory**: on a warm, dark backdrop the night's story rolls up the screen line by line, then who fought, a parchment ledger (final stats without the Bone Drake, run records, roll call), the team credits, and **Begin Freeplay**. **Defeat**: the same roll in cold colours with an epitaph, and **Found a New Guild** |
 | Game Over | The guild ledger: days survived, a 2 x 3 grid (gold earned, quests won, heroes hired, fallen, final standing, Bone Drake), a roll call of every hero and their fate, and Found a New Guild |
@@ -85,7 +84,7 @@ A red **Last hero standing** strip shows under the header when the guild is one 
 from falling (`HallMain.is_one_death_from_falling`). That means one hero is alive, nobody
 in today's For Hire is affordable, and either tomorrow's recruit price is more than your
 gold or standing is within `DANGER_STANDING_MARGIN` of the floor. The Welcome card's
-"Don't run out of heroes" row and Pip's Day 1 Day Report step explain the rule.
+"Don't run out of heroes" row explains the rule.
 
 Tapping the gold coin or the standing shield in the header drops a parchment card
 from it (`HeaderPopup`; tap anywhere else to close it). The **gold** card shows what
@@ -333,10 +332,10 @@ in `Scripts/UI/X/`.
 - `Scripts/Hall/Save/`: `hall_save.gd`, `hall_save_transfer.gd`, `hall_settings.gd`, `hall_web_files.gd`: the saved run, backup codes, saved settings, moving a code on and off the device
 - `Scripts/Hall/Style/`: `hall_style.gd` (ink colours, stat / injury / odds tables, quest-type, building and item-icon tables, icon table, text helpers, restyles), `hall_fx.gd` (animations), `hall_font_scale.gd`
 - `Scripts/Hall/Web/`: web update checks and the Menu's build line. `Scripts/Hall/Debug/`: the Debug tools and the run logger
-- `Scenes/Shell/`: action bar, nav and toast; `Shell/Header/`: the header (day, Bone Drake countdown, counters, danger strip) and its gold and standing popups
+- `Scenes/Shell/`: nav and toast; `Shell/Header/`: the header (day, Bone Drake countdown, counters, danger strip) and its gold and standing popups
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
-- `Scenes/Overlays/`: `Day/` (End Day check, Day Report, Welcome; the tutorial coach is script-only), `Run End/` (Game Over, Final Battle credits), `Menu/` (Menu, Accessibility, Backup save, Debug, update prompt), `Items/` (equip picker, take-off confirm)
+- `Scenes/Overlays/`: `Day/` (End Day check, Day Report, Welcome, the Assign Party move popup; the tutorial coach is script-only), `Run End/` (Game Over, Final Battle credits), `Menu/` (Menu, Accessibility, Backup save, Debug, update prompt), `Items/` (equip picker, take-off confirm)
 - `Scenes/Rows/`: list rows. `Quests/` (quest row, Today note, quest tab, party seat, picker row), `Heroes/` (roster and hire cards, applicant peek), `Buildings/` (Training / Hospital card, row and heading, upgrade card), `Items/` (pack and shop tiles, equip picker row, gear row), `Day End/` (report entry, story line, plan row, upgrade suggestion, roll call)
 - `Scenes/Components/`: chip, portrait, stat strip, odds bar, divider, seal button, rolled-up scroll tag
 - `Scenes/Playtest/` + `Scripts/Playtest/`: scenes that start a run partway in

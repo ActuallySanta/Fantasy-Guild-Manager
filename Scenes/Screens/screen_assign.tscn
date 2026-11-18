@@ -9,8 +9,8 @@
 [ext_resource type="PackedScene" uid="uid://b3neobxrym5mx" path="res://Scenes/Components/odds_bar.tscn" id="7_kj605"]
 [ext_resource type="StyleBox" uid="uid://1371ec6b7611" path="res://Themes/Styles/action_bar.tres" id="8_footer"]
 [ext_resource type="Texture2D" uid="uid://ealg7qhxhkmi" path="res://Sprites/Hall Icons/x.tres" id="9_x"]
-[ext_resource type="PackedScene" uid="uid://j7s636wj68s6" path="res://Scenes/Components/seal_button.tscn" id="10_seal"]
 [ext_resource type="Texture2D" uid="uid://dq7yxvfputc03" path="res://Sprites/UI Textures/shield.png" id="11_shield"]
+[ext_resource type="PackedScene" uid="uid://d2mvq7rk5p3c" path="res://Scenes/Overlays/Day/overlay_move_confirm.tscn" id="12_move"]
 
 [node name="ScreenAssign" type="VBoxContainer"]
 theme_override_constants/separation = 0
@@ -35,7 +35,7 @@ size_flags_vertical = 0
 focus_mode = 0
 theme_type_variation = &"WoodButton"
 theme_override_font_sizes/font_size = 30
-text = "Board"
+text = "Quests"
 icon = ExtResource("2_back")
 
 [node name="QuestTabs" type="HBoxContainer" parent="StripMargin/Strip"]
@@ -202,6 +202,12 @@ horizontal_alignment = 1
 autowrap_mode = 3
 uppercase = true
 
+[node name="EmptySeats" type="HFlowContainer" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
 [node name="OddsBar" parent="Scroll/Margin/Col/Writ/WritMargin/QuestCard/Col/PartyBox" instance=ExtResource("7_kj605")]
 unique_name_in_owner = true
 layout_mode = 2
@@ -346,7 +352,16 @@ text = "-1"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="RightButton" parent="Footer/Row" instance=ExtResource("10_seal")]
+[node name="RightButton" type="Button" parent="Footer/Row"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Seal & send Maria"
+custom_minimum_size = Vector2(0, 92)
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"GoldButton"
+theme_override_font_sizes/font_size = 36
+text = "Back to Quests"
+text_overrun_behavior = 3
+
+[node name="MoveConfirm" parent="." instance=ExtResource("12_move")]
+unique_name_in_owner = true

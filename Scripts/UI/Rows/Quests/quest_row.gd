@@ -34,7 +34,6 @@ const TEXT_GOLD := "%d"
 const TEXT_PARTY_SIZE := "%d max"
 # State (right)
 const TEXT_OPEN := "Pick a party"
-const TEXT_DRAFT := "Party picked"
 const TEXT_SENT := "Sent"
 const TEXT_SENT_STAMP := "SENT"
 const TEXT_DENIED := "Denied"
@@ -138,5 +137,5 @@ func _show_state(entry: Dictionary) -> void:
 			HallStyle.set_font_color(_state_label, HallStyle.RED)
 			modulate = Color(1, 1, 1, DENIED_OPACITY)
 		_:
-			_state_label.text = TEXT_DRAFT if not entry.party.is_empty() else TEXT_OPEN
+			_state_label.text = TEXT_OPEN
 			HallStyle.set_font_color(_state_label, HallStyle.BLUE_TEXT)

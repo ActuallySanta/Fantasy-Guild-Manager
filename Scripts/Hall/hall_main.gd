@@ -6,9 +6,6 @@
 ##   header      - day, Bone Drake countdown, gold, standing, menu button
 ##   content     - one of four tabs (Board, Members, Guild, Items), or a screen
 ##                 over them (Assign Party, Character)
-##   action bar  - one big "what to do next" button (hidden on screens, which
-##                 have their own buttons in that spot, and on the Items tab,
-##                 whose Pack item bar / Shop Buy bar sits there)
 ##   nav         - Board / Members / Guild / Items with badges, always visible
 ##                 (ids: board / guild / upgrades / shop)
 ## Overlays over everything: End Day check, Day Report, Welcome, Menu,
@@ -20,9 +17,9 @@
 ## What the feedback asked for, and where it lives:
 ##   - every quest on one screen to compare        -> Board tab
 ##   - stats visible while picking a party         -> Assign Party picker rows
-##   - parties kept without sending them           -> entry.party is a draft
+##   - parties kept while switching quests         -> pinning sends; the party stays
 ##   - switch quests without losing your picks     -> quest strip on Assign Party
-##   - one obvious next step                       -> action bar
+##   - one obvious way to end the day              -> End Day button on the Board
 ##   - upgrades part of the loop                   -> Upgrades badge, Board
 ##                                                    checklist, End Day check
 ##   - denied quests can come back                 -> "Reconsider"
@@ -41,7 +38,6 @@
 ##   hall_settings.gd  HallSettings    accessibility settings on disk
 ##   hall_debug.gd     HallDebug       the Menu's Debug tools (cheats for testing)
 ##   hall_header.gd    HallHeader      day, countdown, counters (and their motion), danger strip
-##   hall_action_bar.gd HallActionBar  the "what to do next" banner
 ##   hall_nav.gd       HallNav         bottom tabs and their badges
 ##   hall_toast.gd     HallToast       the fading message
 ##   hall_style.gd / hall_fx.gd         colors and tables / animations
@@ -59,7 +55,7 @@ extends Control
 
 ## Fired at the end of each player action, for the tutorial coach
 ## (overlay_tutorial.gd). event: tab, hire, character, close, assign, pick,
-## send, deny, end_check, end_day, new_day, upgrade, training_picker, train,
+## send, deny, end_check, end_day, read_letter, new_day, upgrade, training_picker, train,
 ## admit, buy, equip, game_over, freeplay.
 signal tutorial_event(event: String, data: Variant)
 
@@ -136,8 +132,8 @@ const VIEW_FADE_SECONDS := 0.14
 # ---- toasts
 const TOAST_SENT := "Party sent: %s"
 const TOAST_DENIED := "Denied: %s (-%d standing)"
-const TOAST_RECALLED := "Party recalled. Your picks are kept."
-const TOAST_RECONSIDER := "Back on the board: %s"
+const TOAST_RECALLED := "Party recalled"
+const TOAST_RECONSIDER := "Back on the quest list: %s"
 const TOAST_MOVED := "%s moved from %s"
 const TOAST_PARTY_FULL := "Party is full"
 const TOAST_DEAD := "%s can't go on quests anymore."
@@ -196,7 +192,7 @@ const STAMP_HIRED := "HIRED"
 ## Today's quests, in board order. Each entry is a Dictionary:
 ##   quest:     CreatedQuest
 ##   state:     HallStyle.QUEST_STATE_OPEN | QUEST_STATE_SENT | QUEST_STATE_DENIED
-##   party:     Array of GuildCharacter (a draft while the quest is open)
+##   party:     Array of GuildCharacter (anyone pinned means the quest is sent)
 ##   milestone: bool (true for the Bone Drake quest)
 ##   final:     bool (true for the FINAL_DAY battle)
 var quest_entries: Array = []
@@ -362,7 +358,6 @@ var tutorial: Control
 
 # ---- shell (each is its own scene in Scenes/Shell/)
 @onready var _header: HallHeader = %Header
-@onready var _action_bar: HallActionBar = %ActionBar
 @onready var _nav: HallNav = %Nav
 @onready var _toast: HallToast = %Toast
 
@@ -410,7 +405,7 @@ func _ready() -> void:
 	if HallWebUpdate.apply_waiting_update():
 		return
 	# every shell piece, tab, screen and overlay gets a reference back to this script
-	var views: Array = [_header, _action_bar, _nav] + _tabs.values() + _screens.values() + _all_overlays()
+	var views: Array = [_header, _nav] + _tabs.values() + _screens.values() + _all_overlays()
 	for view in views:
 		view.setup(self)
 
@@ -444,6 +439,7 @@ func _ready() -> void:
 	if uses_save_file and is_save_enabled:
 		HallSave.request_persistent_storage()
 		is_resumed_run = HallSave.load_run(self)
+		_send_picked_drafts()
 
 	add_child(tutorial)
 	tutorial.setup(self)
@@ -761,16 +757,6 @@ func close_screen() -> void:
 	tutorial_event.emit("close", null)
 
 
-## The action bar's button: always the next thing to do
-## (hire someone -> decide the next quest -> end the day).
-func do_next_step() -> void:
-	if roster().is_empty() and can_hire_anyone():
-		open_tab("guild", GUILD_SECTION_HIRE)
-	elif undecided_count() > 0:
-		open_assign(next_undecided_index(0))
-	else:
-		open_end_check()
-
 # ---- overlays
 
 
@@ -844,8 +830,8 @@ func open_welcome() -> void:
 	queue_refresh()
 
 
-## The fresh-run welcome leads to the Board; the action bar then says what's
-## next. Opened from the Menu, closing just goes back to where you were.
+## The fresh-run welcome leads to the Board, which lists the day's quests and
+## the End Day button. Opened from the Menu, closing just goes back to where you were.
 func close_welcome() -> void:
 	is_welcome_open = false
 	if is_welcome_from_menu:
@@ -923,9 +909,19 @@ func toggle_in_party(character: GuildCharacter) -> void:
 
 	entry.party.append(character)
 	pending_fx.seat_in = character
-	Sfx.play(&"party_join")
+	# pinning anyone sends an open quest (there's no separate Send button)
+	var is_newly_sent: bool = entry.state == HallStyle.QUEST_STATE_OPEN
+	if is_newly_sent:
+		entry.state = HallStyle.QUEST_STATE_SENT
+		pending_fx.writ_stamp = true
+		show_toast(TOAST_SENT % entry.quest.questTitle)
+		Sfx.play(&"quest_send")
+	else:
+		Sfx.play(&"party_join")
 	queue_refresh()
 	tutorial_event.emit("pick", entry)
+	if is_newly_sent:
+		tutorial_event.emit("send", entry)
 
 
 ## Take someone out of a party. A sent quest left with nobody goes back to open.
@@ -941,17 +937,12 @@ func set_show_busy_adventurers(is_on: bool) -> void:
 	queue_refresh()
 
 
-## Send the party, then jump to the next undecided quest (or back to the Board).
-func send_party() -> void:
-	var entry := current_quest_entry()
-	if entry.is_empty() or entry.party.is_empty():
-		return
-	entry.state = HallStyle.QUEST_STATE_SENT
-	show_toast(TOAST_SENT % entry.quest.questTitle)
-	Sfx.play(&"quest_send")
-	pending_fx.writ_stamp = true
-	_hold_then_move_on()
-	tutorial_event.emit("send", entry)
+## Quests with a party pinned are sent (toggle_in_party). Saves from before
+## that rule can hold open quests with a draft party: send those.
+func _send_picked_drafts() -> void:
+	for entry in quest_entries:
+		if entry.state == HallStyle.QUEST_STATE_OPEN and not entry.party.is_empty():
+			entry.state = HallStyle.QUEST_STATE_SENT
 
 
 ## Turn the quest down (costs standing), then jump to the next undecided quest.
@@ -972,11 +963,13 @@ func deny_quest() -> void:
 	tutorial_event.emit("deny", entry)
 
 
-## Undo Send: the party goes back to being a draft.
+## Undo Send: everyone is unpinned and the quest is open again (a pinned
+## party always means sent, so the party can't stay as a draft).
 func recall_party() -> void:
 	var entry := current_quest_entry()
 	if entry.is_empty():
 		return
+	entry.party.clear()
 	entry.state = HallStyle.QUEST_STATE_OPEN
 	show_toast(TOAST_RECALLED)
 	Sfx.play(&"quest_undo")
@@ -1645,6 +1638,12 @@ func start_freeplay() -> void:
 	HallFx.curtain(fx_layer, DUSK_INK, begin, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
 
 
+## A Day Report letter was tapped open (report_entry.gd); Pip's Day 1
+## walkthrough waits for this.
+func report_letter_opened() -> void:
+	tutorial_event.emit("read_letter", null)
+
+
 ## The report's button: starts the next day after End Day (under a dusk wash,
 ## so the report, the new Board and the day flip don't all snap at once),
 ## otherwise just closes.
@@ -1688,7 +1687,6 @@ func refresh() -> void:
 		return
 	_header.refresh()
 	_refresh_content()
-	_action_bar.refresh()
 	_nav.refresh()
 	_refresh_overlays()
 	# rows were just rebuilt: let every card and button in a scroll list pass
@@ -1756,9 +1754,9 @@ func nav_button(tab_id: String) -> Button:
 	return _nav.button(tab_id)
 
 
-## The action bar's big button.
-func action_button() -> Button:
-	return _action_bar.button()
+## The Board tab's End Day button.
+func end_day_button() -> Button:
+	return _tabs.board.end_day_button()
 
 # ---- overlays
 
@@ -1792,7 +1790,7 @@ func _all_overlays() -> Array:
 
 # ============================================================ TOAST
 
-## Short message just above the action bar that fades out (see hall_toast.gd).
+## Short message just above the nav that fades out (see hall_toast.gd).
 func show_toast(message: String) -> void:
 	_toast.show_message(message)
 
