@@ -46,7 +46,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 ## Layout
 
 ```
-┌ header ─ Day · Bone Drake countdown · gold · standing · menu ┐
+┌ header ─ Day · Bone Drake countdown (BOSS seal + days left) · gold · standing · menu ┐
 │ warning strip ─ "Last hero standing" (only when one death from falling) │
 │ content ─ Board | Guild | Upgrades | Items  (or a screen over them) │
 └ nav ─ Quests (undecided) · Members (new recruits) · Guild (affordable) · Items ┘
