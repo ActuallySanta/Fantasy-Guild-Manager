@@ -241,6 +241,11 @@ var is_end_check_open := false
 ## so the End Day sheet stays as the player left it while the dusk falls.
 var is_night_falling := false
 var is_welcome_open := true
+## True once the player has pressed Begin on the intro story crawl
+## (overlay_intro.gd). Saved with the run, so the crawl shows once per save.
+var is_intro_seen := false
+## Debug tools' Replay intro: shows the crawl again on any day (not saved).
+var is_intro_replay := false
 ## How to Play was opened from the Menu (topic list, Close keeps the tab).
 var is_welcome_from_menu := false
 var is_menu_open := false
@@ -375,6 +380,7 @@ var tutorial: Control
 @onready var _debug_overlay: Control = %OverlayDebug
 @onready var _game_over_overlay: Control = %OverlayGameOver
 @onready var _credits_overlay: Control = %OverlayCredits
+@onready var _intro_overlay: Control = %OverlayIntro
 
 # ---- colorblind filter
 @onready var _color_filter: ColorRect = %ColorFilter
@@ -849,6 +855,27 @@ func close_welcome() -> void:
 		return
 	# (open_tab plays the tab sound)
 	open_tab("board")
+
+
+## True while the intro story crawl (overlay_intro.gd) should cover the hall:
+## a new run's Day 1 until Begin is pressed, once per save. Only for the real
+## game (uses_save_file), so playtest scenarios skip it. Also while Debug
+## tools' Replay intro has it open.
+func is_intro_open() -> bool:
+	return is_intro_replay or (uses_save_file and not is_intro_seen and GameState.day == 1)
+
+
+## The crawl's Begin button: never show it again on this save, then start
+## Pip's Day 1 tutorial (which waited for it). A debug replay just closes.
+func close_intro() -> void:
+	Sfx.play(&"page_close")
+	if is_intro_replay:
+		is_intro_replay = false
+		queue_refresh()
+		return
+	is_intro_seen = true
+	queue_refresh()
+	tutorial.resume_today()
 
 # ---- quests
 
@@ -1400,6 +1427,15 @@ func debug_skip_tutorial() -> void:
 	show_toast(TOAST_DEBUG_TUTORIAL)
 	queue_refresh()
 
+
+## Debug tools' Replay intro: close the Menu and roll the intro crawl again,
+## on any day (for rereading edited text). Its Begin button just closes it.
+func debug_replay_intro() -> void:
+	is_debug_open = false
+	is_menu_open = false
+	is_intro_replay = true
+	queue_refresh()
+
 # ---- end of day
 
 
@@ -1741,14 +1777,17 @@ func _refresh_overlays() -> void:
 	_accessibility_overlay.visible = not is_report_open and is_accessibility_open
 	_backup_overlay.visible = not is_report_open and is_backup_open
 	_debug_overlay.visible = not is_report_open and is_debug_open
-	_welcome_overlay.visible = not is_report_open and is_welcome_open
+	# the intro crawl comes before everything (a new run's Day 1), so it hides the Welcome card
+	var is_intro_shown := is_intro_open()
+	_intro_overlay.visible = is_intro_shown
+	_welcome_overlay.visible = not is_report_open and is_welcome_open and not is_intro_shown
 	for overlay in _all_overlays():
 		if overlay.visible:
 			overlay.refresh()
 
 
 func _all_overlays() -> Array:
-	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _backup_overlay, _debug_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay]
+	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _backup_overlay, _debug_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay, _intro_overlay]
 
 
 # ============================================================ TOAST

@@ -1,0 +1,141 @@
+[gd_scene format=3 uid="uid://dintr0scene7k"]
+
+[ext_resource type="Script" uid="uid://cintr0crawl5s" path="res://Scripts/UI/Overlays/Day/overlay_intro.gd" id="1_intro"]
+[ext_resource type="Texture2D" uid="uid://bswbe5m6msbdj" path="res://Sprites/UI Textures/connector.png" id="2_connector"]
+
+[node name="OverlayIntro" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_intro")
+
+[node name="Bg" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="Margin" type="MarginContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_right = 48
+
+[node name="Roll" type="VBoxContainer" parent="Scroll/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="TopSpace" type="Control" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 1000)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Title" type="Label" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLight"
+theme_override_font_sizes/font_size = 66
+text = "The Inheritance"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Sub" type="Label" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 30
+text = "How you came to the guild"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="StoryGap" type="Control" parent="Scroll/Margin/Roll"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Story" type="VBoxContainer" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 44
+
+[node name="EndGap" type="Control" parent="Scroll/Margin/Roll"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="End" type="Label" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLight"
+theme_override_font_sizes/font_size = 52
+text = "The guild is yours, Guildmaster."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="BottomSpace" type="Control" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 520)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Footer" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -180.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 26
+
+[node name="Col" type="VBoxContainer" parent="Footer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+alignment = 2
+
+[node name="Connector" type="TextureRect" parent="Footer/Col"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("2_connector")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="BeginButton" type="Button" parent="Footer/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"GoldButton"
+theme_override_font_sizes/font_size = 46
+text = "Open the Doors"
+autowrap_mode = 3

@@ -210,6 +210,15 @@ theme_override_font_sizes/font_size = 26
 text = "TutorialButton"
 autowrap_mode = 3
 
+[node name="IntroButton" type="Button" parent="Center/Sheet/Col/Scroll/Tools"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+text = "IntroButton"
+autowrap_mode = 3
+
 [node name="BackButton" type="Button" parent="Center/Sheet/Col"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 88)

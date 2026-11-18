@@ -116,6 +116,7 @@ static func build_snapshot(hall: HallMain) -> Dictionary:
 		"final_battle_lost": hall.final_battle_lost,
 		"for_hire_last_seen_day": hall.for_hire_last_seen_day,
 		"show_busy_adventurers": hall.show_busy_adventurers,
+		"is_intro_seen": hall.is_intro_seen,
 	}
 	# the night's report / credits, saved as if they're already showing
 	for key in hall.night_save:
@@ -331,6 +332,9 @@ static func apply_snapshot(hall: HallMain, snapshot: Dictionary) -> void:
 	hall.final_battle_lost = hall_state.get("final_battle_lost", hall.final_battle_lost)
 	hall.for_hire_last_seen_day = hall_state.get("for_hire_last_seen_day", hall.for_hire_last_seen_day)
 	hall.show_busy_adventurers = hall_state.get("show_busy_adventurers", hall.show_busy_adventurers)
+	# defaults to true, not the fresh run's false: a save from before the intro
+	# crawl existed is a run that has already started, so it never rolls it
+	hall.is_intro_seen = hall_state.get("is_intro_seen", true)
 
 	var tutorial_state: Dictionary = snapshot.tutorial
 	if hall.tutorial and not tutorial_state.is_empty():

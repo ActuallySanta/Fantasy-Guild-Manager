@@ -12,7 +12,8 @@
 ##   Wallet: gold and standing steps (HallDebug.GOLD_STEPS / STANDING_STEPS)
 ##   Guild:  add a hero, add an item, heal everyone, max the buildings,
 ##           reset the upgrades
-##   Run:    reroll today's quests and For Hire, skip the tutorial
+##   Run:    reroll today's quests and For Hire, skip the tutorial,
+##           replay the intro story crawl
 ## The rules live in HallDebug; every button calls a hall.debug_* action.
 ## Back returns to the Menu; tapping the dimmed background closes both.
 ## Scene: Scenes/Overlays/Menu/overlay_debug.tscn
@@ -38,6 +39,7 @@ const BUTTON_MAX := "Max all buildings"
 const BUTTON_RESET := "Reset upgrades"
 const BUTTON_REROLL := "Reroll quests and For Hire"
 const BUTTON_TUTORIAL := "Skip tutorial"
+const BUTTON_INTRO := "Replay intro"
 const CHECK_SAVE := "Save runs"
 const CHECK_SAVE_OFF := "Save runs (off for debug runs)"
 const BUTTON_BACK := "Back"
@@ -62,6 +64,7 @@ const TOAST_CHECK_FAILED := "Couldn't check for updates · are you online?"
 @onready var _reset_button: Button = %ResetButton
 @onready var _reroll_button: Button = %RerollButton
 @onready var _tutorial_button: Button = %TutorialButton
+@onready var _intro_button: Button = %IntroButton
 @onready var _save_check: CheckBox = %SaveCheckBox
 @onready var _back_button: Button = %BackButton
 @onready var _update_button: Button = %UpdateButton
@@ -84,6 +87,7 @@ func setup(main: HallMain) -> void:
 	_reset_button.pressed.connect(hall.reset_upgrades)
 	_reroll_button.pressed.connect(hall.debug_reroll_today)
 	_tutorial_button.pressed.connect(hall.debug_skip_tutorial)
+	_intro_button.pressed.connect(hall.debug_replay_intro)
 	_save_check.toggled.connect(hall.set_save_enabled)
 	_back_button.pressed.connect(hall.close_debug)
 	_update_button.pressed.connect(_on_update_pressed)
@@ -113,10 +117,11 @@ func setup(main: HallMain) -> void:
 	_reset_button.text = BUTTON_RESET
 	_reroll_button.text = BUTTON_REROLL
 	_tutorial_button.text = BUTTON_TUTORIAL
+	_intro_button.text = BUTTON_INTRO
 	_back_button.text = BUTTON_BACK
 	_update_button.text = BUTTON_UPDATE
 	for button in [_update_button, _skip_button, _hero_button, _item_button, _heal_button, _max_button,
-			_reset_button, _reroll_button, _tutorial_button, _save_check]:
+			_reset_button, _reroll_button, _tutorial_button, _intro_button, _save_check]:
 		HallStyle.style_button(button, "paper", BUTTON_FONT_SIZE)
 	HallStyle.style_button(_enable_button, "red", BUTTON_FONT_SIZE)
 	HallStyle.style_button(_back_button, "wood", BUTTON_FONT_SIZE)
@@ -141,6 +146,8 @@ func refresh() -> void:
 		_jump_buttons[day].disabled = not HallDebug.can_jump_to(hall, day)
 	_hero_button.disabled = not CharacterContainer.has_free_bed()
 	_tutorial_button.disabled = not (hall.tutorial and hall.tutorial.is_running())
+	# Pip's dim and button locks would cover the crawl's Begin button
+	_intro_button.disabled = hall.tutorial != null and hall.tutorial.is_running()
 
 
 ## A paper tool button added to `grid` (used for the step buttons built from

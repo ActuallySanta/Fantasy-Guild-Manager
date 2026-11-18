@@ -63,6 +63,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
 | Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story |
+| Intro crawl | A new run only, before the tutorial. The story of how you inherited the guild rolls up a black screen, then **Open the Doors** (see "Intro crawl") |
 | Final Battle credits | Day 50 only. **Victory**: on a warm, dark backdrop the night's story rolls up the screen line by line, then who fought, a parchment ledger (final stats without the Bone Drake, run records, roll call), the team credits, and **Begin Freeplay**. **Defeat**: the same roll in cold colours with an epitaph, and **Found a New Guild** |
 | Game Over | The guild ledger: days survived, a 2 x 3 grid (gold earned, quests won, heroes hired, fallen, final standing, Bone Drake), a roll call of every hero and their fate, and Found a New Guild |
 | Menu | How to play, last night's report, Accessibility, reset upgrades (debug), abandon run |
@@ -95,6 +96,21 @@ meter: the red half fills as standing nears `MINIMUM_STANDING` (recruits stop co
 the green half fills toward the next milestone, a quest rank or a building level. The
 numbers come from `HallWallet` (static functions); the milestones are built from
 `HallRules` and `GuildUpgrades` tuning, so they follow it.
+
+## Intro crawl
+
+A new run opens on a story crawl (`Scenes/Overlays/Day/overlay_intro.tscn`) before Pip's
+Day 1 tutorial (or the Welcome card when the tutorial is off): who the player is and how
+they came to inherit the guild, in the credits' gold ink on black. It moves like the
+credits (`CrawlRoll`, shared with them): it scrolls itself, any touch hands it to the
+player, and **Open the Doors** appears once the bottom is reached. Pressing it sets
+`HallMain.is_intro_seen`, which is saved, so each save sees the crawl once. Closing the
+game before pressing it shows the crawl again next time. Saves from before the crawl
+existed load as already seen. Playtest scenarios skip it.
+
+The story is a placeholder. Edit the `INTRO STORY TEXT` block at the top of
+`overlay_intro.gd` (one entry per paragraph, BBCode allowed), then check it with Debug
+tools' **Replay intro**.
 
 ## Final battle, credits and freeplay
 
@@ -234,7 +250,8 @@ sits next to "Save runs" above the warning, so it doesn't need a debug run eithe
 - **Wallet:** gold and standing steps (`HallDebug.GOLD_STEPS`, `STANDING_STEPS`).
 - **Guild:** add a free hero (needs a free bed), add a random item to the Inventory, heal
   everyone (the dead come back if there's a bed), max every building, reset upgrades.
-- **Run:** reroll today's quests and For Hire, skip the tutorial.
+- **Run:** reroll today's quests and For Hire, skip the tutorial, replay the intro crawl
+  (on any day; off while Pip is talking).
 
 None of it counts toward the Game Over ledger or the credits (`run_stats`).
 
