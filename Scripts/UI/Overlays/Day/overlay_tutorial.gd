@@ -54,8 +54,8 @@
 ##   If a step's target can't be found for a moment, Next appears so the
 ##   player can never get stuck.
 ##
-## Tab pacing: while the tutorial is on, Guild (id "upgrades") unlocks on
-## Day 3 and Shop on Day 5. Skipping the tutorial lifts both locks.
+## Feature pacing: while the tutorial is on, untaught controls are blank and
+## greyed (see UNLOCK_DAY). Skip tutorial lifts every lock.
 class_name OverlayTutorial
 extends Control
 
@@ -66,7 +66,24 @@ const TUTORIAL_DAYS := [1, 2, 3, 5]
 ## Script key for the freeplay walkthrough (not a day: it starts on the
 ## "freeplay" event, whatever day that is).
 const FREEPLAY_SCRIPT := -1
-const UNLOCK_DAY := {"upgrades": 3, "shop": 5}
+## Feature ids that aren't a tab (the tab features use their tab ids).
+const FEATURE_HIRE := "hire"
+const FEATURE_HERO_PAGE := "hero_page"
+const FEATURE_DENY := "deny"
+## The first day each feature is open while the tutorial is on (days).
+## A feature not listed here is never locked.
+const UNLOCK_DAY := {
+	## Applicants list and the Hire button; Pip teaches hiring on Day 2.
+	"hire": 2,
+	## Hero detail pages (tapping a hero); Pip teaches them on Day 2.
+	"hero_page": 2,
+	## The Deny button on Assign Party; Pip teaches it on Day 2.
+	"deny": 2,
+	## The Guild tab (buildings and upgrades); Pip teaches it on Day 3.
+	"upgrades": 3,
+	## The Shop tab; Pip teaches it on Day 5.
+	"shop": 5,
+}
 
 # ---- SIMPLIFIED (Info-Chunking): set these back to true to restore
 ## Tapping Pip swaps the bubble between the top and bottom of the screen,
@@ -217,15 +234,11 @@ func resume_today() -> void:
 	start.call_deferred(day)
 
 
-## Tabs held back until the tutorial gets to them.
-func is_tab_locked(tab_id: String) -> bool:
-	if not ENABLED or is_skipped or not UNLOCK_DAY.has(tab_id):
+## True while the tutorial holds `feature` back (a FEATURE_* id or a tab id).
+func is_locked(feature: String) -> bool:
+	if not ENABLED or is_skipped or not UNLOCK_DAY.has(feature):
 		return false
-	return GameState.day < UNLOCK_DAY[tab_id]
-
-
-func unlock_day(tab_id: String) -> int:
-	return UNLOCK_DAY.get(tab_id, 0)
+	return GameState.day < UNLOCK_DAY[feature]
 
 
 func is_running() -> bool:
