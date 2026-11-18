@@ -118,6 +118,8 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _deny_cost: Control = %DenyCost
 @onready var _deny_cost_value: Label = %DenyCostValue
 @onready var _right_button: Button = %RightButton
+# Popup (top_level, over the whole screen)
+@onready var _move_confirm = %MoveConfirm      # overlay_move_confirm.gd
 
 ## The main hall script (state + actions), set in setup().
 var hall: HallMain
@@ -139,6 +141,7 @@ func setup(main: HallMain) -> void:
 	_show_busy_toggle.toggled.connect(hall.set_show_busy_adventurers)
 	_show_busy_toggle.text = BUTTON_SHOW_BUSY
 	_back_button.text = BUTTON_BOARD
+	_move_confirm.setup(hall)
 	_make_room_for_deny_cost()
 
 
@@ -305,8 +308,10 @@ func shake_writ() -> void:
 # ---- picker
 
 ## Every living adventurer, best fit for this quest first (the dead are left out).
-## Adventurers in another quest's party (sent or picked) go at the bottom and
-## say which quest they're on. (With HIDE_BUSY_OPTION on, they're left out
+## Adventurers in another quest's party (sent or picked) come after the free
+## ones, greyed out, and say which quest they're on; tapping one asks before
+## moving them (overlay_move_confirm). Those who can't go (hospital bed,
+## training) come last. (With HIDE_BUSY_OPTION on, busy ones are left out
 ## unless "Show busy" is on.)
 func _show_picker(entry: Dictionary) -> void:
 	# split the roster into shown / hidden
@@ -320,16 +325,18 @@ func _show_picker(entry: Dictionary) -> void:
 		else:
 			shown_adventurers.append(character)
 
-	# free adventurers first, those on another quest last; most chance added first within each
+	# free adventurers first, then those on another quest, then those who can't
+	# go; most chance added first within each group
 	shown_adventurers.sort_custom(func(first, second):
-		var is_first_busy := _is_busy_elsewhere(entry, first)
-		if is_first_busy != _is_busy_elsewhere(entry, second):
-			return not is_first_busy
+		var first_group := _pick_group(entry, first)
+		var second_group := _pick_group(entry, second)
+		if first_group != second_group:
+			return first_group < second_group
 		return hall.chance_added_by(entry, first) > hall.chance_added_by(entry, second))
 
 	HallStyle.clear_children(_pick_list)
 	for character in shown_adventurers:
-		HallStyle.add_row(_pick_list, PickRowScene).setup(hall, entry, character)
+		HallStyle.add_row(_pick_list, PickRowScene).setup(hall, entry, character, _move_confirm.open)
 
 	# header, toggle and empty states
 	var can_pick: bool = entry.state != HallStyle.QUEST_STATE_DENIED
@@ -350,6 +357,17 @@ func _show_picker(entry: Dictionary) -> void:
 func _is_busy_elsewhere(entry: Dictionary, character: GuildCharacter) -> bool:
 	var quest_index: int = hall.quest_index_of(character)
 	return quest_index >= 0 and hall.quest_entries[quest_index] != entry
+
+
+## Which part of the picker `character` is listed in: 0 = free (or pinned
+## here), 1 = in another quest's party, 2 = can't go (hospital bed, training).
+## entry: the quest being assigned.
+func _pick_group(entry: Dictionary, character: GuildCharacter) -> int:
+	if not hall.can_go_on_quests(character):
+		return 2
+	if _is_busy_elsewhere(entry, character):
+		return 1
+	return 0
 
 
 # ---- footer

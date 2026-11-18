@@ -11,6 +11,7 @@
 [ext_resource type="Texture2D" uid="uid://ealg7qhxhkmi" path="res://Sprites/Hall Icons/x.tres" id="9_x"]
 [ext_resource type="PackedScene" uid="uid://j7s636wj68s6" path="res://Scenes/Components/seal_button.tscn" id="10_seal"]
 [ext_resource type="Texture2D" uid="uid://dq7yxvfputc03" path="res://Sprites/UI Textures/shield.png" id="11_shield"]
+[ext_resource type="PackedScene" uid="uid://d2mvq7rk5p3c" path="res://Scenes/Overlays/Day/overlay_move_confirm.tscn" id="12_move"]
 
 [node name="ScreenAssign" type="VBoxContainer"]
 theme_override_constants/separation = 0
@@ -350,3 +351,6 @@ vertical_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 text = "Seal & send Maria"
+
+[node name="MoveConfirm" parent="." instance=ExtResource("12_move")]
+unique_name_in_owner = true
