@@ -103,6 +103,7 @@ const BUTTON_RECONSIDER := "Reconsider"
 # Party
 @onready var _party_box: Control = %PartyBox
 @onready var _party_seats: VBoxContainer = %Slots
+@onready var _empty_seats: HFlowContainer = %EmptySeats
 @onready var _odds_value: Label = %OddsValue
 @onready var _odds_circle: TextureRect = %Circle
 @onready var _odds_word: Label = %OddsWord
@@ -226,19 +227,25 @@ func _show_quest_card(entry: Dictionary) -> void:
 
 # ---- party
 
-## Seats (pinned cards or empty) and the party's success chance, circled in
-## its ink. Hidden for denied quests.
+## Seats and the party's success chance, circled in its ink. Filled seats
+## stack in the column beside the odds; empty seats share one row under them
+## across the whole quest card (wrapping only when they don't fit). Hidden for
+## denied quests.
 func _show_party(entry: Dictionary) -> void:
 	_party_box.visible = entry.state != HallStyle.QUEST_STATE_DENIED
 
 	HallStyle.clear_children(_party_seats)
+	HallStyle.clear_children(_empty_seats)
 	for seat_index in hall.party_size_limit(entry):
 		var seated: GuildCharacter = entry.party[seat_index] if seat_index < entry.party.size() else null
-		var seat: Control = HallStyle.add_row(_party_seats, PartySlotScene)
+		var seat_list: Container = _party_seats if seated != null else _empty_seats
+		var seat: Control = HallStyle.add_row(seat_list, PartySlotScene)
 		seat.setup(hall, entry, seated, scroll_to_picker)
 		# the seat someone just left fades back to empty
 		if hall.pending_fx.get("seat_out", false) and seat_index == entry.party.size():
 			HallFx.fade_in(seat)
+	_party_seats.visible = not entry.party.is_empty()
+	_empty_seats.visible = _empty_seats.get_child_count() > 0
 
 	var chance: int = hall.success_chance(entry, entry.party)
 	var odds := HallStyle.odds_look(chance)

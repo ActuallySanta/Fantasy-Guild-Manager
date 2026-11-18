@@ -1,12 +1,19 @@
 ## One seat in Assign Party's party: a pinned card with portrait, name, role and
-## their value in the quest's favored stat (tap to take them out), or an empty
-## seat waiting for someone (tap to scroll down to the adventurers).
+## their value in the quest's favored stat (tap to take them out), or a
+## compact empty seat waiting for someone (tap to scroll down to the
+## adventurers; empty seats share a row and split its width).
 ## Scene: Scenes/Rows/Quests/party_slot.tscn
 extends TapPanel
 
 
 ## Empty seats fade back.
 const EMPTY_SEAT_OPACITY := 0.55
+## Empty seats share a row (Assign Party's EmptySeats), so they're shorter than
+## a filled seat and stretch to split the row: smallest width and height
+## (design px), and their "Empty seat" text size.
+const EMPTY_SEAT_MIN_WIDTH := 130
+const EMPTY_SEAT_HEIGHT := 76
+const EMPTY_SEAT_FONT_SIZE := 26
 
 # ---- TEXT
 const TEXT_ROLE := "the %s"
@@ -40,6 +47,12 @@ func setup(hall: HallMain, entry: Dictionary, seated: GuildCharacter,
 	else:
 		_name.text = TEXT_EMPTY
 		_hint.visible = false
+		# compact, and stretched to share its row with the other empty seats
+		custom_minimum_size = Vector2(HallFontScale.px(EMPTY_SEAT_MIN_WIDTH), HallFontScale.px(EMPTY_SEAT_HEIGHT))
+		size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		HallFontScale.set_size(_name, "font_size", EMPTY_SEAT_FONT_SIZE)
+		_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_name.text_overrun_behavior = TextServer.OVERRUN_NO_TRIMMING
 		HallStyle.set_font_color(_name, HallStyle.TEXT_SOFT)
 		modulate = Color(1, 1, 1, EMPTY_SEAT_OPACITY)
 		if on_empty_pressed.is_valid():
