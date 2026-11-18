@@ -1,5 +1,5 @@
 ## Tutorial coach: Pip the guild clerk walks a new player through the real
-## Mobile Hall UI on Days 1, 2, 3 and 5. Each step spotlights one control and
+## Mobile Hall UI on Days 1, 2, 5 and GuildUpgrades.UNLOCK_DAY (10). Each step spotlights one control and
 ## waits for the player to use it (or press Next on explain-only steps), so
 ## the player learns by doing instead of reading an intro screen. Every step
 ## asks for an action (only Day 1's welcome is a plain Next card); what used
@@ -11,9 +11,9 @@
 ##   Day 2 - a hero's page (stats, Pluck, gear), odds and what a win grows
 ##           (a trained stat or Pluck), Deny,
 ##           how the guild can fall (HallMain.is_run_over)
-##   Day 3 - the Guild tab: upgrading a building, the Training Yard, the
-##           Hospital, and why posted heroes can't quest
 ##   Day 5 - the Shop: role-locked items, buying, equipping from a hero's page
+##   Day 10 (GuildUpgrades.UNLOCK_DAY) - the Guild tab: upgrading a building,
+##           the Training Yard, the Hospital, and why posted heroes can't quest
 ##   Freeplay - after the final battle is won (HallMain.start_freeplay): what
 ##           changes now the story is over (endless days, climbing quests,
 ##           the S++ rank). Runs even if the main tutorial was skipped.
@@ -54,19 +54,24 @@
 ##   If a step's target can't be found for a moment, Next appears so the
 ##   player can never get stuck.
 ##
-## Tab pacing: while the tutorial is on, Guild (id "upgrades") unlocks on
-## Day 3 and Shop on Day 5. Skipping the tutorial lifts both locks.
+## Tab pacing: Guild (id "upgrades") is locked until GuildUpgrades.UNLOCK_DAY
+## and Items (id "shop") until ItemShop.UNLOCK_DAY in every run, tutorial or
+## not (HallMain.is_tab_locked). Their walkthroughs run on those days.
 class_name OverlayTutorial
 extends Control
 
 
 ## Off = no coach, no tab locks, and the old Welcome card shows instead.
 const ENABLED := true
-const TUTORIAL_DAYS := [1, 2, 3, 5]
+## Days with a fixed tutorial script. The Guild walkthrough also runs, on
+## GuildUpgrades.UNLOCK_DAY (see _is_tutorial_day).
+const TUTORIAL_DAYS := [1, 2, 5]
+## Script key for the Guild tab walkthrough (run on GuildUpgrades.UNLOCK_DAY,
+## kept as its own key so the script doesn't move if that day is retuned).
+const GUILD_SCRIPT := 3
 ## Script key for the freeplay walkthrough (not a day: it starts on the
 ## "freeplay" event, whatever day that is).
 const FREEPLAY_SCRIPT := -1
-const UNLOCK_DAY := {"upgrades": 3, "shop": 5}
 
 # ---- SIMPLIFIED (Info-Chunking): set these back to true to restore
 ## Tapping Pip swaps the bubble between the top and bottom of the screen,
@@ -208,24 +213,25 @@ func setup(main: Control) -> void:
 ## nor while the intro story crawl is (HallMain.close_intro calls this again).
 func resume_today() -> void:
 	var day := GameState.day
-	if not ENABLED or is_skipped or not TUTORIAL_DAYS.has(day) or done.get(day, false):
+	if not ENABLED or is_skipped or not _is_tutorial_day(day) or done.get(_script_for_day(day), false):
 		return
 	if hall.is_intro_open() or is_running():
 		return
 	if not (hall.shown_report.is_empty() and hall.shown_credits.is_empty() and hall.run_over_stats.is_empty()):
 		return
-	start.call_deferred(day)
+	start.call_deferred(day, _script_for_day(day))
 
 
-## Tabs held back until the tutorial gets to them.
-func is_tab_locked(tab_id: String) -> bool:
-	if not ENABLED or is_skipped or not UNLOCK_DAY.has(tab_id):
-		return false
-	return GameState.day < UNLOCK_DAY[tab_id]
+## True when `day` has a tutorial script: a TUTORIAL_DAYS day or the day the
+## Guild tab opens (GuildUpgrades.UNLOCK_DAY).
+func _is_tutorial_day(day: int) -> bool:
+	return TUTORIAL_DAYS.has(day) or day == GuildUpgrades.UNLOCK_DAY
 
 
-func unlock_day(tab_id: String) -> int:
-	return UNLOCK_DAY.get(tab_id, 0)
+## The script key that runs on `day` (also its key in `done`): GUILD_SCRIPT on
+## GuildUpgrades.UNLOCK_DAY, otherwise the day itself.
+func _script_for_day(day: int) -> int:
+	return GUILD_SCRIPT if day == GuildUpgrades.UNLOCK_DAY else day
 
 
 func is_running() -> bool:
@@ -309,11 +315,11 @@ func _on_event(event: String, data: Variant = null) -> void:
 	_seen[event] = true
 	if event == "buy" and data is StandardItem:
 		_bought_item = data
-	# Day 3 and Day 5 begin when their morning starts
-	if event == "new_day" and ENABLED and not is_skipped and TUTORIAL_DAYS.has(int(data)) and not done.get(int(data), false):
+	# Day 5 and the Guild day begin when their morning starts
+	if event == "new_day" and ENABLED and not is_skipped and _is_tutorial_day(int(data)) and not done.get(_script_for_day(int(data)), false):
 		if is_running():
 			_finish()
-		start(int(data))
+		start(int(data), _script_for_day(int(data)))
 		return
 	# freeplay explains a new mode, so it runs even after Skip tutorial
 	if event == "freeplay" and ENABLED and not done.get(FREEPLAY_SCRIPT, false):
@@ -886,7 +892,7 @@ func _pick_text() -> String:
 	return "Tap on one of the adventurers to assign them on the quest."
 
 
-## Day 3's Facilities step: Training and Hospital in one line (their own steps
+## The Guild walkthrough's Facilities step: Training and Hospital in one line (their own steps
 ## can be skipped), plus a note when nothing could be built.
 func _tonight_text() -> String:
 	var text := "Now the [b]Facilities[/b] tab. The [b]Training Yard[/b] increases a stat and the [b]Hospital[/b] heals an adventurer faster."
@@ -938,7 +944,7 @@ func _steps_for(script: int) -> Array:
 			return _day_one()
 		2:
 			return _day_two()
-		3:
+		GUILD_SCRIPT:
 			return _day_three()
 		5:
 			return _day_five()
@@ -1006,14 +1012,14 @@ func _day_two() -> Array:
 			"do": "Tap Quests", "text": "Open the [b]Quests[/b] tab."},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign", "bare": true,
 			"do": "Tap a quest card",
-			"text": "Open a quest card. Tapping [b]Deny[/b] skips a quest at a cost for standing. Another thing, Adventurers can [b]die[/b], so pick your odds with care. See you on Day 3!"},
+			"text": "Open a quest card. Tapping [b]Deny[/b] skips a quest at a cost for standing. Another thing, Adventurers can [b]die[/b], so pick your odds with care. See you soon!"},
 	]
 
 
 func _day_three() -> Array:
 	return [
 		{"target": func(): return _nav("upgrades"), "on": "tab", "when": func(d): return d.tab == "upgrades",
-			"do": "Tap Guild", "text": "Day 3! The [b]Guild[/b] tab is open. Take a look."},
+			"do": "Tap Guild", "text": "Day %d! The Bone Drake is coming, and the [b]Guild[/b] tab is open. Take a look." % GuildUpgrades.UNLOCK_DAY},
 		{"target": func(): return _u(_tab("upgrades"), "SegBuild"), "on": "tab", "when": func(d): return d.upgrades == "build",
 			"skip": func(): return hall.upgrades_section == "build", "bare": true,
 			"do": "Tap Build", "text": "Open [b]Build[/b]."},
@@ -1052,7 +1058,7 @@ func _day_five() -> Array:
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
 			"skip": func(): return not _seen.get("buy", false) or _someone_fits_bought(),
 			"do": "Tap Members",
-			"text": func(): return "Nobody can use the %s yet. Open [b]Members[/b] and hire a [b]%s[/b] from Applicants. That's everything. Good luck!" % [_bought_name(), _bought_role()]},
+			"text": func(): return "Nobody can use the %s yet. Open [b]Members[/b] and hire a [b]%s[/b] from Applicants. Good luck!" % [_bought_name(), _bought_role()]},
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
 			"skip": func(): return not _seen.get("buy", false) or not _someone_fits_bought(),
 			"do": "Tap Members", "text": "Gear goes on from a hero's page. Open [b]Members[/b]."},
@@ -1066,7 +1072,7 @@ func _day_five() -> Array:
 		{"target": func(): return _u(_screen("character"), "GearLines"), "tap": true, "on": "equip",
 			"skip": func(): return not _seen.get("buy", false) or not _someone_fits_bought(),
 			"do": "Tap Equip, then the item", "deny": ["SideButton"],
-			"text": func(): return "Tap [b]Equip[/b], then the %s. Its bonus counts on every quest. That's everything! More help is under Menu > How to play." % _bought_name()},
+			"text": func(): return "Tap [b]Equip[/b], then the %s. Its bonus counts on every quest. That's all until the [b]Guild[/b] tab opens on Day %d. More help is under Menu > How to play." % [_bought_name(), GuildUpgrades.UNLOCK_DAY]},
 	]
 
 

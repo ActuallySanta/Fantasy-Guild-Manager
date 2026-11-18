@@ -656,14 +656,21 @@ func next_undecided_index(start_index: int = 0) -> int:
 # ---- upgrades and countdown
 
 
-## True while Pip holds a bottom tab back (see OverlayTutorial.UNLOCK_DAY).
+## True while a bottom tab is held back. In every run, tutorial or not, the
+## Guild tab (id "upgrades") stays locked until GuildUpgrades.UNLOCK_DAY and
+## the Items tab (id "shop") until ItemShop.UNLOCK_DAY.
 func is_tab_locked(tab_id: String) -> bool:
-	return tutorial != null and tutorial.is_tab_locked(tab_id)
+	return GameState.day < tab_unlock_day(tab_id)
 
 
-## The day a locked tab opens (see is_tab_locked).
+## The day a tab opens (0 = always open; see is_tab_locked).
 func tab_unlock_day(tab_id: String) -> int:
-	return tutorial.unlock_day(tab_id) if tutorial != null else 0
+	match tab_id:
+		"upgrades":
+			return GuildUpgrades.UNLOCK_DAY
+		"shop":
+			return ItemShop.UNLOCK_DAY
+	return 0
 
 
 ## Buildings that can be upgraded right now (enough gold and standing).
