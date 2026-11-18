@@ -10,7 +10,8 @@
 ##           Day Report
 ##   Day 2 - a hero's page (stats, Pluck, gear), odds and what a win grows
 ##           (a trained stat or Pluck), Applicants (new heroes each
-##           morning, hiring), Deny,
+##           morning, hiring; Pip steps back so the player can hire, and
+##           carries on when they open Quests), Deny,
 ##           how the guild can fall (HallMain.is_run_over)
 ##   Day 3 - the Guild tab: upgrading a building, the Training Yard, the
 ##           Hospital, and why posted heroes can't quest
@@ -32,6 +33,9 @@
 ##     to a small chip (tap to read the full line).
 ##   - "bare" steps hide the bubble: just the ring and the arrow, for steps
 ##     that only say "tap this".
+##   - "free" steps step back: no dim, no button locks and no Pip, so the
+##     player can use the whole hall (e.g. hire on Day 2's Applicants). Only
+##     the ring and arrow stay, marking where to go to carry on.
 ##
 ## HOW IT WORKS
 ##   hall_main emits tutorial_event(event, data) from its actions:
@@ -52,6 +56,9 @@
 ##             (e.g. a row's Info button that would leave the step)
 ##     bare    true = no bubble, just the ring and arrow. The text is still
 ##             kept: it shows (with Next) if the target goes missing.
+##     free    true = the hall stays fully usable while the step waits for
+##             `on`: no dim, no button locks, Pip hidden (like bare). The
+##             text is kept for the missing-target fallback, as with bare.
 ##   If a step's target can't be found for a moment, Next appears so the
 ##   player can never get stuck.
 ##
@@ -371,8 +378,19 @@ func _process(delta: float) -> void:
 	_lock_timer -= delta
 	if _lock_timer <= 0.0:
 		_lock_timer = LOCK_INTERVAL
-		_apply_locks(step, target)
+		# a free step hands every button back (and keeps doing so, since the
+		# hall rebuilds rows on refresh); other steps lock all but the spotlight
+		if _is_free(step):
+			_release_locks()
+		else:
+			_apply_locks(step, target)
 	_layout(step, target, delta)
+
+
+## A "free" step (see the header): the whole hall is usable while it waits.
+## A step being re-read after Back is never free (its action is already done).
+func _is_free(step: Dictionary) -> bool:
+	return step.get("free", false) and not _is_reviewing()
 
 
 ## Is the spotlit control meant to be used on this step?
@@ -435,16 +453,22 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 	var waits: bool = step.has("on") and not _is_reviewing()
 	var is_lost: bool = step.get("target") != null and target == null and _missing_for > MISSING_GRACE
 	var show_next: bool = not waits or is_lost
-	# bare steps: no bubble, just the ring and the arrow. The bubble comes back
-	# (with Next) if the target goes missing, so the player can't get stuck.
-	_bubble.visible = not step.get("bare", false) or is_lost
+	var is_free := _is_free(step)
+	# bare and free steps: no bubble (Pip is hidden), just the ring and the
+	# arrow. The bubble comes back (with Next) if the target goes missing, so
+	# the player can't get stuck.
+	_bubble.visible = not (step.get("bare", false) or is_free) or is_lost
 
 	# ---- the spotlight hole and the dim around it
 	var hole := Rect2()
 	if target != null:
 		var xf: Transform2D = get_global_transform().affine_inverse() * target.get_global_transform()
 		hole = Rect2(xf.origin, target.size * xf.get_scale()).grow(HOLE_PAD).intersection(Rect2(Vector2.ZERO, full))
-	if hole.has_area():
+	if is_free:
+		# no dim at all: every tap reaches the hall
+		for blocker in _blockers:
+			_set_rect(blocker, Rect2())
+	elif hole.has_area():
 		_set_rect(_blockers[0], Rect2(0, 0, full.x, hole.position.y))
 		_set_rect(_blockers[1], Rect2(0, hole.end.y, full.x, full.y - hole.end.y))
 		_set_rect(_blockers[2], Rect2(0, hole.position.y, hole.position.x, hole.size.y))
@@ -1018,8 +1042,11 @@ func _day_two() -> Array:
 			"do": "Tap Back", "text": "Tap back on the bottom of the screen to return."},
 		{"target": func(): return _u(_tab("guild"), "SegHire"), "on": "tab", "when": func(d): return d.guild == "hire",
 			"do": "Tap Applicants", "text": "New heroes come looking for work every morning. Hiring costs %s, and your beds limit how many you can keep." % GOLD},
-		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board", "bare": true,
-			"do": "Tap Quests", "text": "Open the [b]Quests[/b] tab."},
+		# Pip steps back here so the player can hire (or not) before moving on;
+		# the script carries on when they open the Quests tab
+		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board", "free": true,
+			"do": "Hire if you like, then tap Quests",
+			"text": "Hire anyone who catches your eye, or save your %s for later. Open the [b]Quests[/b] tab when you're ready." % GOLD},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign", "bare": true,
 			"do": "Tap a quest card",
 			"text": "Open a quest card. Tapping [b]Deny[/b] skips a quest at a cost for standing. Another thing, Adventurers can [b]die[/b], so pick your odds with care. See you on Day 3!"},

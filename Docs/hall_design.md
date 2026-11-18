@@ -116,7 +116,9 @@ tools' **Replay intro**.
 While Pip's tutorial is on, controls it hasn't taught yet keep their place but show no text
 or badge, are greyed, and do nothing (`OverlayTutorial.UNLOCK_DAY`):
 
-- Applicants, hero pages and Deny open on Day 2.
+- Applicants, hero pages and Deny open on Day 2. Once Pip has shown Applicants, Pip hides
+  (no dim, every button usable, just a ring on the Quests tab) so the player can hire or
+  not, and picks the Day 2 walkthrough up again when they open Quests.
 - The Guild tab opens on Day 3, and Items on Day 5.
 - Skip tutorial lifts them all.
 - Locks come from the day and the saved skip flag, so saves are unchanged.
