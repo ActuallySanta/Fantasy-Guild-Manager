@@ -35,6 +35,10 @@ const WRIT_STAMP_TILT := -0.16
 ## The odds circle's box (design px). Grown with the font scale so the big
 ## "87%" stays inside the circle art.
 const ODDS_STACK_SIZE := Vector2(210, 100)
+## Tapping an empty seat scrolls down to the adventurers: seconds the scroll
+## takes, and the gap (design px) left above the "Your adventurers" heading.
+const PICKER_SCROLL_SECONDS := 0.35
+const PICKER_SCROLL_GAP := 12
 
 ## SIMPLIFIED: true = adventurers busy on another quest are hidden unless the
 ## "Show busy" toggle is on (with a "2 busy hidden" note). false = they're
@@ -161,6 +165,20 @@ func scroll_to_top() -> void:
 	_scroll.scroll_vertical = 0
 
 
+## An empty seat's tap: slide the screen down so the "Your adventurers"
+## heading sits near the top, PICKER_SCROLL_GAP below it (snaps with Reduce
+## Motion on). The ScrollContainer stops at the bottom on its own.
+func scroll_to_picker() -> void:
+	var offset := _pick_header.global_position.y - _scroll.global_position.y
+	var target := int(_scroll.scroll_vertical + offset - HallFontScale.px(PICKER_SCROLL_GAP))
+	target = clampi(target, 0, int(_scroll.get_v_scroll_bar().max_value - _scroll.size.y))
+	if HallFx.reduce_motion:
+		_scroll.scroll_vertical = target
+		return
+	create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT) \
+			.tween_property(_scroll, "scroll_vertical", target, PICKER_SCROLL_SECONDS)
+
+
 func refresh() -> void:
 	# grows with the font scale (here, not in setup, so a Text size change follows)
 	_odds_stack.custom_minimum_size = HallFontScale.px_vec(ODDS_STACK_SIZE)
@@ -217,7 +235,7 @@ func _show_party(entry: Dictionary) -> void:
 	for seat_index in hall.party_size_limit(entry):
 		var seated: GuildCharacter = entry.party[seat_index] if seat_index < entry.party.size() else null
 		var seat: Control = HallStyle.add_row(_party_seats, PartySlotScene)
-		seat.setup(hall, entry, seated)
+		seat.setup(hall, entry, seated, scroll_to_picker)
 		# the seat someone just left fades back to empty
 		if hall.pending_fx.get("seat_out", false) and seat_index == entry.party.size():
 			HallFx.fade_in(seat)

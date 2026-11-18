@@ -1,6 +1,6 @@
 ## One seat in Assign Party's party: a pinned card with portrait, name, role and
 ## their value in the quest's favored stat (tap to take them out), or an empty
-## seat waiting for someone.
+## seat waiting for someone (tap to scroll down to the adventurers).
 ## Scene: Scenes/Rows/Quests/party_slot.tscn
 extends TapPanel
 
@@ -20,7 +20,10 @@ const TEXT_EMPTY := "Empty seat"
 
 
 ## seated = the adventurer in this seat, or null for an empty seat.
-func setup(hall: HallMain, entry: Dictionary, seated: GuildCharacter) -> void:
+## on_empty_pressed: called when an empty seat is tapped (Assign Party scrolls
+## down to its picker); left empty, an empty seat does nothing.
+func setup(hall: HallMain, entry: Dictionary, seated: GuildCharacter,
+		on_empty_pressed: Callable = Callable()) -> void:
 	var is_filled := seated != null
 	_portrait.visible = is_filled
 	_favored_chip.visible = is_filled
@@ -39,3 +42,5 @@ func setup(hall: HallMain, entry: Dictionary, seated: GuildCharacter) -> void:
 		_hint.visible = false
 		HallStyle.set_font_color(_name, HallStyle.TEXT_SOFT)
 		modulate = Color(1, 1, 1, EMPTY_SEAT_OPACITY)
+		if on_empty_pressed.is_valid():
+			pressed.connect(on_empty_pressed)
