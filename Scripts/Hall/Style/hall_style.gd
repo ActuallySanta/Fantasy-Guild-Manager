@@ -85,6 +85,8 @@ const STORY_INK := Color("#9C7426")
 const STORY_BG := Color("#F6E3B0")
 
 # ---- the end-of-story roll (overlay_credits.gd): ink on a dark backdrop
+## The intro story crawl (overlay_intro.gd): plain black, in the victory's gold ink.
+const INTRO_BG := Color.BLACK
 const CREDITS_BG := Color("#1B140F")      ## victory: a warm, near-black hall
 const CREDITS_INK := Color("#F3E2B0")     ## victory: candlelit gold text
 const CREDITS_INK_SOFT := Color("#C9B68A")  ## victory: captions, roles

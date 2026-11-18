@@ -197,15 +197,20 @@ func setup(main: Control) -> void:
 	# a run brought back from the save file picks up through resume_today() instead
 	if ENABLED and GameState.day == 1 and not hall.is_resumed_run:
 		hall.is_welcome_open = false
-		start.call_deferred(1)
+		# the intro story crawl goes first; its Begin button calls resume_today()
+		if not hall.is_intro_open():
+			start.call_deferred(1)
 
 
 ## A saved run was just loaded (HallSave.load_run restored is_skipped and done):
 ## if today has a tutorial script that wasn't finished, run it again from its
-## first step. Not while the night's report, the credits or Game Over is up.
+## first step. Not while the night's report, the credits or Game Over is up,
+## nor while the intro story crawl is (HallMain.close_intro calls this again).
 func resume_today() -> void:
 	var day := GameState.day
 	if not ENABLED or is_skipped or not TUTORIAL_DAYS.has(day) or done.get(day, false):
+		return
+	if hall.is_intro_open() or is_running():
 		return
 	if not (hall.shown_report.is_empty() and hall.shown_credits.is_empty() and hall.run_over_stats.is_empty()):
 		return

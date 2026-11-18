@@ -14,7 +14,8 @@ full-screen in portrait and works offline after the first visit.
 
 ## How to play
 
-Each day follows the same loop:
+A new run opens with a short story crawl about how you inherited the guild. After that,
+each day follows the same loop:
 
 1. **Board.** See every quest on offer today, with its reward, rank, party size and odds.
 2. **Guild.** Hire applicants, check on your heroes, and train or heal them.
