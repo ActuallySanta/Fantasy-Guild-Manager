@@ -110,7 +110,6 @@ func _show_section_buttons() -> void:
 		_roster_section_button.text = SECTION_ROSTER % [CharacterContainer.living_count(), CharacterContainer.max_characters]
 	else:
 		_roster_section_button.text = SECTION_ROSTER_PLAIN
-	_hire_section_button.text = SECTION_HIRE
 	HallStyle.set_locked(_hire_section_button, hire_locked, SECTION_HIRE)
 	if SHOW_BARRACKS_LINK:
 		HallStyle.set_locked(_barracks_button, hall.is_tab_locked("upgrades"), BEDS_BUTTON)

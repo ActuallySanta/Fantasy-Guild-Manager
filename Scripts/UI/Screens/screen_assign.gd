@@ -39,6 +39,9 @@ const ODDS_STACK_SIZE := Vector2(210, 100)
 ## takes, and the gap (design px) left above the "Your adventurers" heading.
 const PICKER_SCROLL_SECONDS := 0.35
 const PICKER_SCROLL_GAP := 12
+## The footer's left button's normal minimum width (design px), matching the
+## scene. A locked (blank) Deny holds its labelled width instead of this.
+const LEFT_BUTTON_MIN_WIDTH := 200.0
 
 ## SIMPLIFIED: true = adventurers busy on another quest are hidden unless the
 ## "Show busy" toggle is on (with a "2 busy hidden" note). false = they're
@@ -410,6 +413,7 @@ func _pick_group(entry: Dictionary, character: GuildCharacter) -> int:
 func _show_footer(entry: Dictionary) -> void:
 	_left_button.icon = null
 	_deny_cost.visible = false
+	_left_button.custom_minimum_size.x = LEFT_BUTTON_MIN_WIDTH
 	match entry.state:
 		HallStyle.QUEST_STATE_SENT:
 			HallStyle.set_locked(_left_button, false, BUTTON_RECALL)
@@ -420,8 +424,13 @@ func _show_footer(entry: Dictionary) -> void:
 		_:
 			# Deny is blank, greyed and inert (no cost tag) until Pip teaches it
 			var deny_locked := hall.is_locked(OverlayTutorial.FEATURE_DENY)
-			HallStyle.set_locked(_left_button, deny_locked, BUTTON_DENY)
+			# Measure Deny's labelled width, then hold it while locked so the
+			# blank button keeps its size and Back to Quests doesn't widen.
+			HallStyle.set_locked(_left_button, false, BUTTON_DENY)
 			_left_button.icon = HallStyle.icon_texture("x")
+			if deny_locked:
+				_left_button.custom_minimum_size.x = _left_button.get_combined_minimum_size().x
+				HallStyle.set_locked(_left_button, true, BUTTON_DENY)
 			_deny_cost_value.text = TEXT_DENY_COST % HallRules.standing_for_deny(entry.quest)
 			_deny_cost.visible = not deny_locked
 			_right_button.text = BUTTON_BACK_TO_QUESTS

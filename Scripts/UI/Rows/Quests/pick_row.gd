@@ -17,6 +17,7 @@ const SHOW_ADDS_CAPTION := false
 # ---- TEXT
 # Who they are
 const TEXT_ROLE := "the %s"
+const TEXT_INFO := "i"
 # Where they already are
 const TEXT_PICKED_FOR := "Picked for %s"
 const TEXT_SENT_ON := "Sent on %s"
@@ -56,7 +57,7 @@ func setup(hall: HallMain, entry: Dictionary, character: GuildCharacter,
 	else:
 		pressed.connect(hall.toggle_in_party.bind(character))
 	_info_button.pressed.connect(hall.open_character.bind(character))
-	HallStyle.set_locked(_info_button, hall.is_locked(OverlayTutorial.FEATURE_HERO_PAGE))
+	HallStyle.set_locked(_info_button, hall.is_locked(OverlayTutorial.FEATURE_HERO_PAGE), TEXT_INFO)
 	_portrait.show_character(character)
 	_name.text = character.name
 	_role.text = TEXT_ROLE % HallStyle.role_name(character)

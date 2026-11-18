@@ -36,6 +36,8 @@ var hall: HallMain
 
 ## Last badge text per nav tab (to pop on change).
 var _shown_badges := {}
+## Each tab's last applied locked state, so refresh only re-applies a change.
+var _shown_locked := {}
 
 ## Each nav button's label from the scene, to restore when its tab unlocks.
 var _labels := {}
@@ -67,7 +69,12 @@ func refresh() -> void:
 		nav_button.theme_type_variation = &"NavTabActive" if is_active else &"NavTab"
 		nav_button.custom_minimum_size.y = NAV_HEIGHT_OPEN if is_active else NAV_HEIGHT
 
-		HallStyle.set_locked(nav_button, hall.is_tab_locked(tab_id), _labels[tab_id])
+		# only touch the lock when it changes (or on the first refresh), so a
+		# refresh never re-enables a button Pip has disabled
+		var is_locked := hall.is_tab_locked(tab_id)
+		if _shown_locked.get(tab_id) != is_locked:
+			HallStyle.set_locked(nav_button, is_locked, _labels[tab_id])
+			_shown_locked[tab_id] = is_locked
 		var badge_text := _badge_text_for(tab_id)
 		var badge: Control = nav_button.get_node("Badge")
 		badge.visible = badge_text != ""
