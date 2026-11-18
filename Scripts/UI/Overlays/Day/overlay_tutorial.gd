@@ -9,7 +9,9 @@
 ##           player), reading a quest, picking a party, Send, End Day, the
 ##           Day Report
 ##   Day 2 - a hero's page (stats, Pluck, gear), odds and what a win grows
-##           (a trained stat or Pluck), Deny,
+##           (a trained stat or Pluck), Applicants (new heroes each
+##           morning, hiring; Pip steps back so the player can hire, and
+##           carries on when they open Quests), Deny,
 ##           how the guild can fall (HallMain.is_run_over)
 ##   Day 5 - the Shop: role-locked items, buying, equipping from a hero's page
 ##   Day 10 (GuildUpgrades.UNLOCK_DAY) - the Guild tab: upgrading a building,
@@ -31,6 +33,9 @@
 ##     to a small chip (tap to read the full line).
 ##   - "bare" steps hide the bubble: just the ring and the arrow, for steps
 ##     that only say "tap this".
+##   - "free" steps step back: no dim, no button locks and no Pip, so the
+##     player can use the whole hall (e.g. hire on Day 2's Applicants). Only
+##     the ring and arrow stay, marking where to go to carry on.
 ##
 ## HOW IT WORKS
 ##   hall_main emits tutorial_event(event, data) from its actions:
@@ -51,12 +56,19 @@
 ##             (e.g. a row's Info button that would leave the step)
 ##     bare    true = no bubble, just the ring and arrow. The text is still
 ##             kept: it shows (with Next) if the target goes missing.
+##     free    true = the hall stays fully usable while the step waits for
+##             `on`: no dim, no button locks, Pip hidden (like bare). The
+##             text is kept for the missing-target fallback, as with bare.
 ##   If a step's target can't be found for a moment, Next appears so the
 ##   player can never get stuck.
 ##
 ## Tab pacing: Guild (id "upgrades") is locked until GuildUpgrades.UNLOCK_DAY
 ## and Items (id "shop") until ItemShop.UNLOCK_DAY in every run, tutorial or
 ## not (HallMain.is_tab_locked). Their walkthroughs run on those days.
+## Feature pacing: while the tutorial is on, controls Pip hasn't taught yet
+## (Applicants, hero pages, Deny) are blank and greyed until their day (see
+## UNLOCK_DAY). Skip tutorial lifts those, but not the tab locks.
+## Locked controls look the same either way (HallStyle.set_locked).
 class_name OverlayTutorial
 extends Control
 
@@ -72,6 +84,21 @@ const GUILD_SCRIPT := 3
 ## Script key for the freeplay walkthrough (not a day: it starts on the
 ## "freeplay" event, whatever day that is).
 const FREEPLAY_SCRIPT := -1
+## Features the tutorial holds back that aren't a tab (the Guild and Items
+## tabs are locked by day in every run instead: HallMain.is_tab_locked).
+const FEATURE_HIRE := "hire"
+const FEATURE_HERO_PAGE := "hero_page"
+const FEATURE_DENY := "deny"
+## The first day each feature is open while the tutorial is on (days).
+## A feature not listed here is never locked by the tutorial.
+const UNLOCK_DAY := {
+	## Applicants list and the Hire button; Pip teaches hiring on Day 2.
+	FEATURE_HIRE: 2,
+	## Hero detail pages (tapping a hero); Pip teaches them on Day 2.
+	FEATURE_HERO_PAGE: 2,
+	## The Deny button on Assign Party; Pip teaches it on Day 2.
+	FEATURE_DENY: 2,
+}
 
 # ---- SIMPLIFIED (Info-Chunking): set these back to true to restore
 ## Tapping Pip swaps the bubble between the top and bottom of the screen,
@@ -222,6 +249,14 @@ func resume_today() -> void:
 	start.call_deferred(day, _script_for_day(day))
 
 
+## True while the tutorial holds `feature` (a FEATURE_* id) back. Tabs are
+## never locked here: HallMain.is_tab_locked handles them in every run.
+func is_locked(feature: String) -> bool:
+	if not ENABLED or is_skipped or not UNLOCK_DAY.has(feature):
+		return false
+	return GameState.day < UNLOCK_DAY[feature]
+
+
 ## True when `day` has a tutorial script: a TUTORIAL_DAYS day or the day the
 ## Guild tab opens (GuildUpgrades.UNLOCK_DAY).
 func _is_tutorial_day(day: int) -> bool:
@@ -363,8 +398,19 @@ func _process(delta: float) -> void:
 	_lock_timer -= delta
 	if _lock_timer <= 0.0:
 		_lock_timer = LOCK_INTERVAL
-		_apply_locks(step, target)
+		# a free step hands every button back (and keeps doing so, since the
+		# hall rebuilds rows on refresh); other steps lock all but the spotlight
+		if _is_free(step):
+			_release_locks()
+		else:
+			_apply_locks(step, target)
 	_layout(step, target, delta)
+
+
+## A "free" step (see the header): the whole hall is usable while it waits.
+## A step being re-read after Back is never free (its action is already done).
+func _is_free(step: Dictionary) -> bool:
+	return step.get("free", false) and not _is_reviewing()
 
 
 ## Is the spotlit control meant to be used on this step?
@@ -427,16 +473,22 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 	var waits: bool = step.has("on") and not _is_reviewing()
 	var is_lost: bool = step.get("target") != null and target == null and _missing_for > MISSING_GRACE
 	var show_next: bool = not waits or is_lost
-	# bare steps: no bubble, just the ring and the arrow. The bubble comes back
-	# (with Next) if the target goes missing, so the player can't get stuck.
-	_bubble.visible = not step.get("bare", false) or is_lost
+	var is_free := _is_free(step)
+	# bare and free steps: no bubble (Pip is hidden), just the ring and the
+	# arrow. The bubble comes back (with Next) if the target goes missing, so
+	# the player can't get stuck.
+	_bubble.visible = not (step.get("bare", false) or is_free) or is_lost
 
 	# ---- the spotlight hole and the dim around it
 	var hole := Rect2()
 	if target != null:
 		var xf: Transform2D = get_global_transform().affine_inverse() * target.get_global_transform()
 		hole = Rect2(xf.origin, target.size * xf.get_scale()).grow(HOLE_PAD).intersection(Rect2(Vector2.ZERO, full))
-	if hole.has_area():
+	if is_free:
+		# no dim at all: every tap reaches the hall
+		for blocker in _blockers:
+			_set_rect(blocker, Rect2())
+	elif hole.has_area():
 		_set_rect(_blockers[0], Rect2(0, 0, full.x, hole.position.y))
 		_set_rect(_blockers[1], Rect2(0, hole.end.y, full.x, full.y - hole.end.y))
 		_set_rect(_blockers[2], Rect2(0, hole.position.y, hole.position.x, hole.size.y))
@@ -964,7 +1016,7 @@ func _day_one() -> Array:
 		# Uncle John's card gets its own spotlight step (it used to be dimmed
 		# behind the Board step's spotlight, so the player couldn't see him)
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"),
-			"text": "Look! Here is [b]%s[/b], a priest and your first member. More heroes will appear each day under the Applicants tab." \
+			"text": "Look! Here is [b]%s[/b], a priest and your first member. More heroes will come looking for work starting tomorrow." \
 					% HallRules.STARTING_HERO_NAME},
 		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
 			"do": "Tap Quests", "text": "Now find him work to do: open the [b]Quests[/b] tab."},
@@ -977,7 +1029,7 @@ func _day_one() -> Array:
 		{"target": func(): return hall.end_day_button(), "on": "end_check",
 			"do": "Tap End Day", "text": "Tap [b]End Day[/b] to send your quests off!"},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
-			"do": "Tap End Day", "text": "Here you can check what quests you denied and accepted, as well as any available upgrades! Tap on end day to finish your choices. "},
+			"do": "Tap End Day", "text": "Here you can check tonight's plan before the day ends. Tap [b]End Day[/b] to finish your choices."},
 		# the Day Report: the totals, then open a letter and read it
 		{"target": func(): return _u(_report(), "Totals"),
 			"text": "Good morning! This is the [b]Day Report[/b]. Up top: how many quests succeeded, the %s you earned, and anyone who got hurt." % GOLD},
@@ -1008,8 +1060,13 @@ func _day_two() -> Array:
 			"text": "Here are your character's stats. Successful quests with high odds increase a stat. However risky successes grow %s which increases every stat." % PLK},
 		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close", "bare": true,
 			"do": "Tap Back", "text": "Tap back on the bottom of the screen to return."},
-		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board", "bare": true,
-			"do": "Tap Quests", "text": "Open the [b]Quests[/b] tab."},
+		{"target": func(): return _u(_tab("guild"), "SegHire"), "on": "tab", "when": func(d): return d.guild == "hire",
+			"do": "Tap Applicants", "text": "New heroes come looking for work every morning. Hiring costs %s, and your beds limit how many you can keep." % GOLD},
+		# Pip steps back here so the player can hire (or not) before moving on;
+		# the script carries on when they open the Quests tab
+		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board", "free": true,
+			"do": "Hire if you like, then tap Quests",
+			"text": "Hire anyone who catches your eye, or save your %s for later. Open the [b]Quests[/b] tab when you're ready." % GOLD},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign", "bare": true,
 			"do": "Tap a quest card",
 			"text": "Open a quest card. Tapping [b]Deny[/b] skips a quest at a cost for standing. Another thing, Adventurers can [b]die[/b], so pick your odds with care. See you soon!"},

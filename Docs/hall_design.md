@@ -34,7 +34,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Picked parties are dropped unless you send them (Flow) | Pinning anyone to a quest **sends** it; there's no separate Send step. The party stays until you unpin them, **Recall** (unpins everyone) or move them. Switching quests keeps every party |
 | Hard to switch between quests (Ledger) | Numbered **quest strip** at the top of Assign Party. One tap switches quests, and each tab is coloured by state |
 | Not sure what to do next (Ledger) | The Board's Today checklist points at what still needs doing, and an **End Day** button sits under the quest list (it opens the next undecided quest first if any are left) |
-| Upgrades forgotten in every version | **Upgrades** tab badge when you can afford something, an Upgrades box on the Board's Today checklist, and the **End Day check** offers affordable upgrades before the day ends. None of these offer upgrades while the Guild tab is still locked (until Day 10, `GuildUpgrades.UNLOCK_DAY`, the Bone Drake's day, tutorial or not; Pip walks through it that day); the Board's box says when it opens |
+| Upgrades forgotten in every version | **Upgrades** tab badge when you can afford something, an Upgrades box on the Board's Today checklist, and the **End Day check** offers affordable upgrades before the day ends. None of these offer upgrades while the Guild tab is still locked (until Day 10, `GuildUpgrades.UNLOCK_DAY`, the Bone Drake's day, tutorial or not; Pip walks through it that day); the Board's box sits blank and greyed until then |
 | No way to get denied quests back (Ledger) | Denied quests stay on the Board. Open one and tap **Reconsider** |
 | No signal when new recruits arrive (Ledger) | **Guild** badge ("3 new") each morning until you open Applicants |
 | Hiring and questing blurred together (Deck) | Guild tab has two clearly separate folder tabs: **Your Guild** / **Applicants** |
@@ -61,7 +61,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Items (tab, id "shop") | Locked until Day 5 (`ItemShop.UNLOCK_DAY`) in every run, tutorial or not. A folder with two tabs; the first visit each day opens on the Shop. **Inventory** (the "pack" section in code): every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar just above the nav |
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
-| Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story. Everyday letters start folded with a down caret and "Tap to read the letter"; tapping opens the story and flips the caret up. Story quests never fold. On Day 1 Pip walks through it: the totals, then opening a letter (that step waits until one is opened), then its story lines |
+| Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story. Everyday letters start folded with a down caret and "Tap to read the letter"; tapping opens the story and flips the caret up. Story quests never fold. While letters run below the bottom of the screen, a gold arrow bobs and flashes there until you scroll down (it holds still with Reduce motion). On Day 1 Pip walks through it: the totals, then opening a letter (that step waits until one is opened), then its story lines |
 | Intro crawl | A new run only, before the tutorial. The story of how you inherited the guild rolls up a black screen, then **Open the Doors** (see "Intro crawl") |
 | Final Battle credits | Day 50 only. **Victory**: on a warm, dark backdrop the night's story rolls up the screen line by line, then who fought, a parchment ledger (final stats without the Bone Drake, run records, roll call), the team credits, and **Begin Freeplay**. **Defeat**: the same roll in cold colours with an epitaph, and **Found a New Guild** |
 | Game Over | The guild ledger: days survived, a 2 x 3 grid (gold earned, quests won, heroes hired, fallen, final standing, Bone Drake), a roll call of every hero and their fate, and Found a New Guild |
@@ -110,6 +110,20 @@ existed load as already seen. Playtest scenarios skip it.
 The story is a placeholder. Edit the `INTRO STORY TEXT` block at the top of
 `overlay_intro.gd` (one entry per paragraph, BBCode allowed), then check it with Debug
 tools' **Replay intro**.
+
+## Tutorial pacing
+
+While Pip's tutorial is on, controls it hasn't taught yet keep their place but show no text
+or badge, are greyed, and do nothing (`OverlayTutorial.UNLOCK_DAY`):
+
+- Applicants, hero pages and Deny open on Day 2. Once Pip has shown Applicants, Pip hides
+  (no dim, every button usable, just a ring on the Quests tab) so the player can hire or
+  not, and picks the Day 2 walkthrough up again when they open Quests.
+- Skip tutorial lifts these.
+- The Guild tab (Day 10, `GuildUpgrades.UNLOCK_DAY`) and Items (Day 5,
+  `ItemShop.UNLOCK_DAY`) are locked by day in every run, tutorial or not, and look the
+  same while locked: blank, greyed, no badge.
+- Locks come from the day and the saved skip flag, so saves are unchanged.
 
 ## Final battle, credits and freeplay
 

@@ -51,6 +51,7 @@ func _ready() -> void:
 
 func setup(hall: HallMain, character: GuildCharacter) -> void:
 	pressed.connect(hall.open_character.bind(character))
+	_chevron.visible = not hall.is_locked(OverlayTutorial.FEATURE_HERO_PAGE)
 	_portrait.show_character(character)
 	_name.text = character.name
 	_role.text = TEXT_ROLE % HallStyle.role_name(character)

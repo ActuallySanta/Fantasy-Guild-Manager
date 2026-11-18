@@ -9,11 +9,14 @@ extends TapPanel
 @onready var _value: Label = %Value
 
 
-## look: "done" (green) | "todo" (dark ink) | "idle" (faded).
+## look: "done" (green) | "todo" (dark ink) | "idle" (faded) |
+## "locked" (blank and greyed: Pip hasn't taught it yet).
 ## icon_name is unused now (the notes are pinned paper, no icon); kept for callers.
 func set_item(title: String, value: String, _icon_name: String, look: String) -> void:
-	_title.text = title
-	_value.text = value
+	var is_locked := look == "locked"
+	_title.text = "" if is_locked else title
+	_value.text = "" if is_locked else value
+	HallStyle.set_locked(self, is_locked)
 	match look:
 		"done":
 			HallStyle.set_font_color(_value, HallStyle.GREEN_TEXT)

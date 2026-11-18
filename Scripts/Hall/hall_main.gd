@@ -165,7 +165,6 @@ const TOAST_SWAPPED := "%s swapped the %s for the %s"
 const TOAST_WRONG_ROLE := "Only %ss can use the %s."
 const TOAST_HANDS_FULL := "%s's hands are full"
 const TOAST_GEAR_DEAD := "%s can't use gear anymore."
-const TOAST_TAB_LOCKED := "Pip will open this on Day %d."
 const TOAST_WELCOME_BACK := "Welcome back · Day %d"
 # ---- debug tools (overlay_debug.gd)
 const TOAST_DEBUG_ON := "Debug run: saving off"
@@ -522,7 +521,7 @@ func can_hire_anyone() -> bool:
 
 ## Recruits the player hasn't looked at yet today (drives the Guild badge).
 func unseen_recruit_count() -> int:
-	if for_hire_last_seen_day == GameState.day or is_roster_full():
+	if is_locked(OverlayTutorial.FEATURE_HIRE) or for_hire_last_seen_day == GameState.day or is_roster_full():
 		return 0
 	return CharacterContainer.hireable_characters.size()
 
@@ -656,6 +655,16 @@ func next_undecided_index(start_index: int = 0) -> int:
 # ---- upgrades and countdown
 
 
+## True while a feature is held back: a bottom tab until its unlock day (every
+## run, see is_tab_locked), or a control Pip hasn't taught yet while the
+## tutorial is on (OverlayTutorial.UNLOCK_DAY: Applicants, hero pages, Deny).
+## feature = a tab id ("upgrades", "shop") or an OverlayTutorial.FEATURE_* id.
+func is_locked(feature: String) -> bool:
+	if is_tab_locked(feature):
+		return true
+	return tutorial != null and tutorial.is_locked(feature)
+
+
 ## True while a bottom tab is held back. In every run, tutorial or not, the
 ## Guild tab (id "upgrades") stays locked until GuildUpgrades.UNLOCK_DAY and
 ## the Items tab (id "shop") until ItemShop.UNLOCK_DAY.
@@ -697,8 +706,10 @@ func days_until_drake() -> int:
 ## Switch bottom tab. Closes any screen; party drafts stay on their quests.
 ## `section` optionally picks the tab's half (GUILD_SECTION_* or UPGRADES_SECTION_*).
 func open_tab(tab_id: String, section: String = "") -> void:
-	if is_tab_locked(tab_id):
-		show_error_toast(TOAST_TAB_LOCKED % tab_unlock_day(tab_id))
+	# a locked tab (or the locked Applicants half) just doesn't open
+	if is_locked(tab_id):
+		return
+	if tab_id == "guild" and section == GUILD_SECTION_HIRE and is_locked(OverlayTutorial.FEATURE_HIRE):
 		return
 	Sfx.play(&"tab_switch")
 	active_tab = tab_id
@@ -747,6 +758,8 @@ func open_assign(quest_index: int) -> void:
 
 ## Open a character's details over whatever is showing.
 func open_character(character: GuildCharacter) -> void:
+	if is_locked(OverlayTutorial.FEATURE_HERO_PAGE):
+		return
 	active_screen = {"kind": SCREEN_CHARACTER, "character": character, "return_to": active_screen.duplicate()}
 	Sfx.play(&"page_open")
 	queue_refresh()
@@ -954,6 +967,8 @@ func _send_picked_drafts() -> void:
 
 ## Turn the quest down (costs standing), then jump to the next undecided quest.
 func deny_quest() -> void:
+	if is_locked(OverlayTutorial.FEATURE_DENY):
+		return
 	var entry := current_quest_entry()
 	if entry.is_empty():
 		return
@@ -1030,6 +1045,8 @@ func _go_to_next_undecided() -> void:
 
 ## Returns true when they joined (hire_card.gd then flies its letter to the roster).
 func hire(character: GuildCharacter) -> bool:
+	if is_locked(OverlayTutorial.FEATURE_HIRE):
+		return false
 	if is_roster_full():
 		show_error_toast(TOAST_ROSTER_FULL)
 		queue_refresh()
@@ -1097,8 +1114,7 @@ func release(character: GuildCharacter) -> void:
 
 func upgrade_building(building: int) -> void:
 	# buildings open with the Guild tab
-	if is_tab_locked("upgrades"):
-		show_error_toast(TOAST_TAB_LOCKED % tab_unlock_day("upgrades"))
+	if is_locked("upgrades"):
 		return
 	var gold_before: int = GameState.gold
 	if GuildUpgrades.try_upgrade(building):

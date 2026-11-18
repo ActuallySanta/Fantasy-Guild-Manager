@@ -28,6 +28,19 @@ const SIGN_NAIL_Y := 9.0
 ## Chip text size on the totals strip.
 const TOTALS_FONT_SIZE := 28
 
+# ---- SCROLL ARROW (more letters below the fold)
+## The arrow shows while more than this many px of the letters are still
+## below the bottom of the scroll area, and hides once the player gets there.
+const SCROLL_ARROW_HIDE_WITHIN := 40.0
+## Gap (px) between the arrow and the bottom of the scroll area.
+const SCROLL_ARROW_MARGIN := 12.0
+## The bob: how far it moves (px) and how fast (radians per second).
+const SCROLL_ARROW_BOB_HEIGHT := 8.0
+const SCROLL_ARROW_BOB_SPEED := 5.0
+## The flash: lowest opacity (0..1) it fades to, and how fast (radians per second).
+const SCROLL_ARROW_MIN_ALPHA := 0.35
+const SCROLL_ARROW_FLASH_SPEED := 6.0
+
 # ---- SIMPLIFIED (Info-Chunking): set to true to restore
 ## "2 letters tonight" under the report's title.
 const SHOW_LETTERS_NOTE := false
@@ -71,6 +84,9 @@ const BUTTON_CLOSE := "Close"
 @onready var _action_button: Button = %ActionButton
 ## The strings and the button under them, hung (and swung) as one sign.
 @onready var _hanging_sign: Control = %ActionButton.get_parent()
+## Gold down-arrow over the bottom of the letters while more are out of
+## sight below (see _update_scroll_arrow).
+@onready var _scroll_arrow: TextureRect = %ScrollArrow
 
 ## The main hall script (state + actions), set in setup().
 var hall: HallMain
@@ -80,11 +96,46 @@ var _built_report: Dictionary = {}
 var _total_gold := 0
 ## The gold chip's format tonight: TEXT_GOLD, or TEXT_GOLD_AND_ITEMS filled in.
 var _gold_format := TEXT_GOLD
+## Seconds the scroll arrow has been animating (drives its bob and flash).
+var _arrow_time := 0.0
 
 
 func setup(main: HallMain) -> void:
 	hall = main
 	_action_button.pressed.connect(hall.close_report)
+	HallStyle.tint_art(_scroll_arrow, HallStyle.POINTER_GOLD)
+
+
+func _process(delta: float) -> void:
+	_update_scroll_arrow(delta)
+
+
+## Show the bobbing, flashing arrow while letters are hidden below the bottom
+## of the scroll area, placed just above that bottom edge and centred on it.
+## It holds still (no bob, no flash) with Reduce motion on.
+## delta = seconds since the last frame.
+func _update_scroll_arrow(delta: float) -> void:
+	var scroll_bar := _scroll.get_v_scroll_bar()
+	var hidden_below: float = scroll_bar.max_value - scroll_bar.page - _scroll.scroll_vertical
+	var is_shown := is_visible_in_tree() and hidden_below > SCROLL_ARROW_HIDE_WITHIN
+	_scroll_arrow.visible = is_shown
+	if not is_shown:
+		_arrow_time = 0.0
+		return
+	_arrow_time += delta
+	var bob := 0.0
+	var alpha := 1.0
+	if not HallFx.reduce_motion:
+		bob = SCROLL_ARROW_BOB_HEIGHT * sin(_arrow_time * SCROLL_ARROW_BOB_SPEED)
+		var flash := 0.5 + 0.5 * cos(_arrow_time * SCROLL_ARROW_FLASH_SPEED)
+		alpha = lerpf(SCROLL_ARROW_MIN_ALPHA, 1.0, flash)
+	_scroll_arrow.modulate.a = alpha
+	# the scroll's rect in this overlay's own coordinates
+	var scroll_rect := Rect2(_scroll.global_position - global_position, _scroll.size)
+	var arrow_size := _scroll_arrow.size
+	_scroll_arrow.position = Vector2(
+			scroll_rect.get_center().x - arrow_size.x * 0.5,
+			scroll_rect.end.y - arrow_size.y - SCROLL_ARROW_MARGIN + bob)
 	for chip in [_succeeded_chip, _gold_chip, _injured_chip, _dead_chip]:
 		var chip_text: Label = chip.get_node("Row/Text")
 		HallFontScale.set_size(chip_text, "font_size", TOTALS_FONT_SIZE)

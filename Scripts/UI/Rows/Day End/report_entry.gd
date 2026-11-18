@@ -66,6 +66,9 @@ const BEAT_ICON_STORY := "star"
 
 ## Text size of the "tap to read" hint on everyday letters.
 const FOLD_HINT_FONT_SIZE := 22
+## Narrowest the hint may get (px) before it wraps, the same as the Title and
+## From labels' minimum in the scene.
+const FOLD_HINT_MIN_WIDTH := 40
 ## Seconds the story takes to fade in when a folded letter is opened.
 const UNFOLD_SECONDS := 0.18
 ## The caret before the "tap to read" hint (down = folded, up = open): text
@@ -227,6 +230,12 @@ func _add_fold_hint() -> void:
 	_fold_hint.theme_type_variation = &"ItalicLabel"
 	_fold_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fold_hint.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	# wraps like the Title and From lines above it: unwrapped, the hint alone
+	# was wider than the letter at the biggest Text sizes and pushed it off
+	# the right of the screen
+	_fold_hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_fold_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_fold_hint.custom_minimum_size.x = FOLD_HINT_MIN_WIDTH
 	HallFontScale.set_size(_fold_hint, "font_size", FOLD_HINT_FONT_SIZE)
 	HallStyle.set_font_color(_fold_hint, HallStyle.TEXT_SOFT)
 	hint_row.add_child(_fold_hint)

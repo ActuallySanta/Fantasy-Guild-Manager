@@ -87,16 +87,18 @@ theme_override_constants/v_separation = 8
 unique_name_in_owner = true
 self_modulate = Color(0.5451, 0.1804, 0.1647, 1)
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 theme_type_variation = &"InkBoxThick"
 
 [node name="HurtText" type="Label" parent="Col/Tags/HurtTag"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"CapsLabel"
 theme_override_colors/font_color = Color(0.5451, 0.1804, 0.1647, 1)
 theme_override_font_sizes/font_size = 23
 text = "Hurt: Maria"
+autowrap_mode = 3
 uppercase = true
 
 [node name="DiedTag" type="PanelContainer" parent="Col/Tags"]
@@ -104,7 +106,7 @@ unique_name_in_owner = true
 visible = false
 self_modulate = Color(0.2902, 0.2314, 0.3098, 1)
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 3
 theme_type_variation = &"InkBoxThick"
 
 [node name="DiedRow" type="HBoxContainer" parent="Col/Tags/DiedTag"]
@@ -123,11 +125,14 @@ stretch_mode = 5
 
 [node name="DiedText" type="Label" parent="Col/Tags/DiedTag/DiedRow"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
+size_flags_horizontal = 3
 theme_type_variation = &"CapsLabel"
 theme_override_colors/font_color = Color(0.2902, 0.2314, 0.3098, 1)
 theme_override_font_sizes/font_size = 23
 text = "Died: Alex"
+autowrap_mode = 3
 uppercase = true
 
 [node name="FoundTag" type="PanelContainer" parent="Col/Tags"]
