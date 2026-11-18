@@ -26,8 +26,8 @@ each day follows the same loop:
 5. **Upgrades and Items.** Spend gold on buildings (Armory, Barracks, Training Yard,
    Hospital) and gear from the Shop.
 
-The run ends if the guild can never send anyone out again. The big button above the
-bottom bar always shows the next step, and Pip, the tutorial guide, walks you through
+The run ends if the guild can never send anyone out again. The End Day button sits
+at the bottom of the Board, and Pip, the tutorial guide, walks you through
 the first few days.
 
 ## Running it from source

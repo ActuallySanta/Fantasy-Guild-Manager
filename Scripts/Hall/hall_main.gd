@@ -6,9 +6,6 @@
 ##   header      - day, Bone Drake countdown, gold, standing, menu button
 ##   content     - one of four tabs (Board, Members, Guild, Items), or a screen
 ##                 over them (Assign Party, Character)
-##   action bar  - one big "what to do next" button (hidden on screens, which
-##                 have their own buttons in that spot, and on the Items tab,
-##                 whose Pack item bar / Shop Buy bar sits there)
 ##   nav         - Board / Members / Guild / Items with badges, always visible
 ##                 (ids: board / guild / upgrades / shop)
 ## Overlays over everything: End Day check, Day Report, Welcome, Menu,
@@ -22,7 +19,7 @@
 ##   - stats visible while picking a party         -> Assign Party picker rows
 ##   - parties kept without sending them           -> entry.party is a draft
 ##   - switch quests without losing your picks     -> quest strip on Assign Party
-##   - one obvious next step                       -> action bar
+##   - one obvious way to end the day              -> End Day button on the Board
 ##   - upgrades part of the loop                   -> Upgrades badge, Board
 ##                                                    checklist, End Day check
 ##   - denied quests can come back                 -> "Reconsider"
@@ -41,7 +38,6 @@
 ##   hall_settings.gd  HallSettings    accessibility settings on disk
 ##   hall_debug.gd     HallDebug       the Menu's Debug tools (cheats for testing)
 ##   hall_header.gd    HallHeader      day, countdown, counters (and their motion), danger strip
-##   hall_action_bar.gd HallActionBar  the "what to do next" banner
 ##   hall_nav.gd       HallNav         bottom tabs and their badges
 ##   hall_toast.gd     HallToast       the fading message
 ##   hall_style.gd / hall_fx.gd         colors and tables / animations
@@ -362,7 +358,6 @@ var tutorial: Control
 
 # ---- shell (each is its own scene in Scenes/Shell/)
 @onready var _header: HallHeader = %Header
-@onready var _action_bar: HallActionBar = %ActionBar
 @onready var _nav: HallNav = %Nav
 @onready var _toast: HallToast = %Toast
 
@@ -410,7 +405,7 @@ func _ready() -> void:
 	if HallWebUpdate.apply_waiting_update():
 		return
 	# every shell piece, tab, screen and overlay gets a reference back to this script
-	var views: Array = [_header, _action_bar, _nav] + _tabs.values() + _screens.values() + _all_overlays()
+	var views: Array = [_header, _nav] + _tabs.values() + _screens.values() + _all_overlays()
 	for view in views:
 		view.setup(self)
 
@@ -761,16 +756,6 @@ func close_screen() -> void:
 	tutorial_event.emit("close", null)
 
 
-## The action bar's button: always the next thing to do
-## (hire someone -> decide the next quest -> end the day).
-func do_next_step() -> void:
-	if roster().is_empty() and can_hire_anyone():
-		open_tab("guild", GUILD_SECTION_HIRE)
-	elif undecided_count() > 0:
-		open_assign(next_undecided_index(0))
-	else:
-		open_end_check()
-
 # ---- overlays
 
 
@@ -844,8 +829,8 @@ func open_welcome() -> void:
 	queue_refresh()
 
 
-## The fresh-run welcome leads to the Board; the action bar then says what's
-## next. Opened from the Menu, closing just goes back to where you were.
+## The fresh-run welcome leads to the Board, which lists the day's quests and
+## the End Day button. Opened from the Menu, closing just goes back to where you were.
 func close_welcome() -> void:
 	is_welcome_open = false
 	if is_welcome_from_menu:
@@ -1688,7 +1673,6 @@ func refresh() -> void:
 		return
 	_header.refresh()
 	_refresh_content()
-	_action_bar.refresh()
 	_nav.refresh()
 	_refresh_overlays()
 	# rows were just rebuilt: let every card and button in a scroll list pass
@@ -1756,9 +1740,9 @@ func nav_button(tab_id: String) -> Button:
 	return _nav.button(tab_id)
 
 
-## The action bar's big button.
-func action_button() -> Button:
-	return _action_bar.button()
+## The Board tab's End Day button.
+func end_day_button() -> Button:
+	return _tabs.board.end_day_button()
 
 # ---- overlays
 
@@ -1792,7 +1776,7 @@ func _all_overlays() -> Array:
 
 # ============================================================ TOAST
 
-## Short message just above the action bar that fades out (see hall_toast.gd).
+## Short message just above the nav that fades out (see hall_toast.gd).
 func show_toast(message: String) -> void:
 	_toast.show_message(message)
 

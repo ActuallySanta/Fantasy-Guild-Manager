@@ -1,4 +1,4 @@
-## Toast: a short message just above the action bar that fades out.
+## Toast: a short message just above the nav that fades out.
 ## Starts hidden; hall_main.gd show_toast() puts messages up.
 ## Scene: Scenes/Shell/hall_toast.tscn
 class_name HallToast

@@ -7,8 +7,7 @@
 ##   Grid     - one pack_tile per item, grouped by role; a worn one carries its
 ##              hero's portrait and an "ON GWEN" ribbon
 ##   Item bar - the picked item: what it does, who wears it, and Take off or
-##              Equip (sits where the action bar normally is; hall_main
-##              hides the action bar on this tab)
+##              Equip (sits just above the nav)
 ## Equip opens the hero picker (overlay_equip_picker.gd); Take off, and
 ## swapping onto a hero whose slots are full, ask first (overlay_gear_confirm.gd).
 ## Both are children of this scene drawn over the whole screen. The picked
