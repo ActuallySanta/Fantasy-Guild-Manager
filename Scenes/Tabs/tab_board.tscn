@@ -2,6 +2,20 @@
 
 [ext_resource type="Script" uid="uid://bwii1eyxbqp10" path="res://Scripts/UI/Tabs/tab_board.gd" id="1_uvw3s"]
 [ext_resource type="PackedScene" uid="uid://edhkrbpcjf3j" path="res://Scenes/Rows/Quests/today_item.tscn" id="2_otn60"]
+[ext_resource type="Texture2D" uid="uid://ysbk3204vjbg" path="res://Sprites/UI Textures/torn.png" id="3_torn"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_heading"]
+content_margin_left = 16.0
+content_margin_top = 2.0
+content_margin_right = 16.0
+content_margin_bottom = 4.0
+texture = ExtResource("3_torn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
 
 [node name="TabBoard" type="ScrollContainer"]
 horizontal_scroll_mode = 0
@@ -11,7 +25,7 @@ script = ExtResource("1_uvw3s")
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 22
+theme_override_constants/margin_top = 14
 theme_override_constants/margin_right = 16
 theme_override_constants/margin_bottom = 20
 
@@ -21,7 +35,7 @@ theme_override_constants/separation = 14
 
 [node name="Today" type="HBoxContainer" parent="Margin/Col"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 12
 
 [node name="TodayRecruits" parent="Margin/Col/Today" instance=ExtResource("2_otn60")]
 unique_name_in_owner = true
@@ -39,15 +53,17 @@ layout_mode = 2
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Heading" type="Label" parent="Margin/Col/HeadingBox"]
+[node name="HeadingNote" type="PanelContainer" parent="Margin/Col/HeadingBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_heading")
+
+[node name="Heading" type="Label" parent="Margin/Col/HeadingBox/HeadingNote"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"HeadingLight"
-theme_override_font_sizes/font_size = 50
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 44
 text = "Today's Quests"
-custom_minimum_size = Vector2(40, 0)
-autowrap_mode = 3
 
 [node name="QuestList" type="VBoxContainer" parent="Margin/Col"]
 unique_name_in_owner = true
