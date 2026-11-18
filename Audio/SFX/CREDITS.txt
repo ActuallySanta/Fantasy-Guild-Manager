@@ -1,0 +1,75 @@
+Sound effect credits
+====================
+
+Every sound here is CC0 (public domain dedication) or public domain, so none
+of them legally require credit. Credit is still given below, since the authors
+ask for it and it's good manners. Keep this file in step when you swap a sound.
+
+Format: game file  <-  source file  (changes made)
+
+
+Kenney (https://kenney.nl), CC0
+-------------------------------
+RPG Audio        https://kenney.nl/assets/rpg-audio
+  tab_switch.ogg, tab_switch_2.ogg      <- bookFlip2, bookFlip3
+  page_open.ogg                         <- bookOpen
+  page_close.ogg                        <- bookClose
+  party_join.ogg, party_join_2.ogg      <- beltHandle1, beltHandle2
+  party_leave.ogg, party_leave_2.ogg    <- footstep02, footstep06
+  release.ogg                           <- doorClose_1
+  shop_buy.ogg, shop_buy_2.ogg          <- dropLeather, handleSmallLeather
+  equip.ogg, equip_2.ogg, equip_3.ogg   <- drawKnife1, drawKnife2, drawKnife3
+  unequip.ogg, unequip_2.ogg            <- cloth2, cloth3
+  training_start.ogg, _2.ogg            <- knifeSlice, knifeSlice2
+  hospital_admit.ogg, _2.ogg            <- creak3, creak1
+  hospital_discharge.ogg                <- doorOpen_1
+  gold_spend.ogg                        <- handleCoins2
+
+Interface Sounds https://kenney.nl/assets/interface-sounds
+  ui_tap.ogg, ui_tap_2.ogg, ui_tap_3.ogg <- click_002, click_003, click_004
+  ui_error.ogg                          <- error_008
+
+Impact Sounds    https://kenney.nl/assets/impact-sounds
+  quest_send.ogg, quest_send_2.ogg      <- impactWood_heavy_000, impactWood_heavy_002
+  quest_deny.wav                        <- impactWood_heavy_001 + impactPunch_heavy_000 (layered)
+  building_upgrade.wav                  <- impactMining_000, _002, _000 (three strikes 0.26 s apart)
+  standing_lose.ogg, _2.ogg             <- impactPlate_heavy_001, impactPlate_heavy_003
+  standing_land.ogg, _2.ogg             <- impactTin_medium_000, impactTin_medium_003
+  hero_hurt.ogg, hero_hurt_2.ogg        <- impactPunch_medium_000, impactPunch_medium_002
+  hero_died.ogg                         <- impactBell_heavy_001
+  night_fall.wav                        <- impactBell_heavy_001 (half speed, an octave down, as a low gong)
+
+Music Jingles    https://kenney.nl/assets/music-jingles
+  revive.ogg                            <- jingles_PIZZI02
+  item_found.ogg                        <- jingles_PIZZI16
+  danger_warning.ogg                    <- jingles_HIT02
+  hire.wav                              <- impactWood_heavy_002 + jingles_PIZZI15 (stamp, then jingle 0.06 s later)
+  letter_success.wav                    <- impactWood_heavy_000 + jingles_PIZZI04 (stamp, then jingle 0.06 s later)
+  letter_fail.wav                       <- impactWood_heavy_001 + jingles_PIZZI05 (stamp, then jingle 0.06 s later)
+
+Casino Audio     https://kenney.nl/assets/casino-audio
+  quest_undo.ogg, quest_undo_2.ogg      <- card-slide-1, card-slide-2
+  hire_letter_fly.ogg, _2.ogg           <- card-shove-1, card-shove-3
+
+
+OpenGameArt (https://opengameart.org), CC0
+------------------------------------------
+  story_day.ogg   <- theircoming3.ogg, "Their Coming (generic horn sound)" by StumpyStrust
+                     https://opengameart.org/content/their-coming-generic-horn-sound
+  victory.ogg     <- fanfare.ogg, "Just a random fanfare" by Spring Spring
+                     https://opengameart.org/content/just-a-random-fanfare
+  defeat.wav      <- defeat.wav, "Medieval: Defeat Theme" by RandomMind (first 8 s, faded out from 6 s)
+                     https://opengameart.org/content/medieval-defeat-theme
+  game_over.wav   <- the same Defeat Theme (first 4 s, faded out from 2.6 s)
+
+
+Wikimedia Commons, public domain
+--------------------------------
+  day_start.wav   <- "Small rooster crowing" by alys (from pdsounds.org), cut to the single crow (2.35-4.6 s)
+                     https://commons.wikimedia.org/wiki/File:Small_rooster_crowing.ogg
+
+
+Made for this game (synthesized), CC0
+-------------------------------------
+  coin_land.wav, coin_land_2.wav, coin_land_3.wav   metal coin clinks
+  pip_talk.wav ... pip_talk_5.wav                   Pip's gibberish chirps

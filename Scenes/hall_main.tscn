@@ -141,7 +141,7 @@ anchors_preset = 15
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="OverlayBackup" parent="." instance=ExtResource("33_backup")]
+[node name="OverlayBackup" parent="." unique_id=269097272 instance=ExtResource("33_backup")]
 unique_name_in_owner = true
 visible = false
 z_index = 10

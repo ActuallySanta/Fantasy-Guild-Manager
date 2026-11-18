@@ -2,6 +2,12 @@
 
 Date: 2026-11-18. Status: approved, implemented.
 
+> **Later change (merged from master):** the Guild and Items tabs are now locked by day
+> in every run, tutorial or not (`GuildUpgrades.UNLOCK_DAY` = 10, `ItemShop.UNLOCK_DAY`
+> = 5; `HallMain.is_tab_locked`), and Skip tutorial no longer lifts them. The tutorial's
+> `UNLOCK_DAY` keeps only Applicants, hero pages and Deny. The locked look below applies
+> to both.
+
 ## Why
 
 New players are overwhelmed on Day 1: too much text and too many tabs and

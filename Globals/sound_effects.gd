@@ -56,7 +56,7 @@ const SOUNDS := {
 	&"quest_deny": {"volume_db": 0.0, "pitch_jitter": 0.03},
 	&"quest_undo": {"volume_db": -4.0, "pitch_jitter": 0.0},
 	# ---- guild
-	&"hire": {"volume_db": 0.0, "pitch_jitter": 0.03},
+	&"hire": {"volume_db": -5.0, "pitch_jitter": 0.03},
 	&"hire_letter_fly": {"volume_db": -4.0, "pitch_jitter": 0.05},
 	&"release": {"volume_db": -2.0, "pitch_jitter": 0.0},
 	# ---- items
@@ -81,7 +81,7 @@ const SOUNDS := {
 	&"hero_hurt": {"volume_db": -3.0, "pitch_jitter": 0.05},
 	&"hero_died": {"volume_db": 0.0, "pitch_jitter": 0.0},
 	&"item_found": {"volume_db": -3.0, "pitch_jitter": 0.04},
-	&"day_start": {"volume_db": 0.0, "pitch_jitter": 0.0},
+	&"day_start": {"volume_db": -15.0, "pitch_jitter": 0.0},
 	&"story_day": {"volume_db": 0.0, "pitch_jitter": 0.0},
 	&"danger_warning": {"volume_db": -2.0, "pitch_jitter": 0.0},
 	# ---- endings

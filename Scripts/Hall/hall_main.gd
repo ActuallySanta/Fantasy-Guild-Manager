@@ -655,14 +655,31 @@ func next_undecided_index(start_index: int = 0) -> int:
 # ---- upgrades and countdown
 
 
-## True while Pip holds a feature back (see OverlayTutorial.UNLOCK_DAY).
+## True while a feature is held back: a bottom tab until its unlock day (every
+## run, see is_tab_locked), or a control Pip hasn't taught yet while the
+## tutorial is on (OverlayTutorial.UNLOCK_DAY: Applicants, hero pages, Deny).
+## feature = a tab id ("upgrades", "shop") or an OverlayTutorial.FEATURE_* id.
 func is_locked(feature: String) -> bool:
+	if is_tab_locked(feature):
+		return true
 	return tutorial != null and tutorial.is_locked(feature)
 
 
-## True while Pip holds a bottom tab back (see is_locked).
+## True while a bottom tab is held back. In every run, tutorial or not, the
+## Guild tab (id "upgrades") stays locked until GuildUpgrades.UNLOCK_DAY and
+## the Items tab (id "shop") until ItemShop.UNLOCK_DAY.
 func is_tab_locked(tab_id: String) -> bool:
-	return is_locked(tab_id)
+	return GameState.day < tab_unlock_day(tab_id)
+
+
+## The day a tab opens (0 = always open; see is_tab_locked).
+func tab_unlock_day(tab_id: String) -> int:
+	match tab_id:
+		"upgrades":
+			return GuildUpgrades.UNLOCK_DAY
+		"shop":
+			return ItemShop.UNLOCK_DAY
+	return 0
 
 
 ## Buildings that can be upgraded right now (enough gold and standing).
@@ -1287,7 +1304,7 @@ func toggle_reduce_motion() -> void:
 	set_reduce_motion(not reduce_motion)
 
 
-## Accessibility's Text size button: Small -> Normal -> Large -> Largest -> Small.
+## Accessibility's Text size button: Small -> Normal -> Large -> Small.
 func cycle_text_size() -> void:
 	set_text_size((text_size + 1) % HallSettings.TEXT_SIZES.size())
 

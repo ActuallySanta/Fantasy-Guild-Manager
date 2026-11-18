@@ -43,11 +43,27 @@ const HOSPITAL_STAGES_PER_NIGHT := [1, 2, 3, 3, 3]
 const ARMORY_BONUS := [Vector2i(1, 1), Vector2i(2, 1), Vector2i(2, 2), Vector2i(3, 2), Vector2i(3, 3)]
 const BARRACKS_MAX_HEROES := [4, 6, 8, 10, 12]
 
-# ---- Costs (PLACEHOLDER numbers — tune these) ----
+# ---- Pacing: when buildings open and what they cost ----
+## The day the Guild tab (building upgrades, Training Yard, Hospital) opens:
+## the Bone Drake's day (HallMain.MILESTONE_DAY). Locked before this
+## whether or not the tutorial is on (HallMain.is_tab_locked); Pip's Guild
+## walkthrough runs on this day (OverlayTutorial).
+const UNLOCK_DAY := 10
 ## Gold to reach level N is UPGRADE_GOLD_COST[N - 1]. Level 1 is free (owned at start).
-const UPGRADE_GOLD_COST := [0, 150, 300, 500, 800]
-## Standing needed to buy level N.
-const UPGRADE_STANDING_REQ := [0, 5, 10, 15, 20]
+## Tuned so an average run maxes every implemented building (4 of them; the
+## Office isn't yet) around Day 40: ~11,300 gold per building, ~45,000 in all.
+## Income compounds: wins raise standing by their rank + 1, standing raises the
+## quest rank (HallRules.standing_rank_for), and rank raises the gold. That
+## growth flattens once standing reaches the top rank (HallRules.TOP_STANDING_RANK),
+## around Day 20-25 for a solid run, so late income is high but steady. From the
+## run log (Guild Manager Run Log sheet, Nov 2026): ~150-550 gold a day through
+## Day 10; modelled on from there, an average run banks ~40-55k for buildings
+## by Day 40 after hiring and gear. Each level costs ~1.6-2x the last to match.
+## If the Office gets implemented, the total rises by a quarter: retune.
+const UPGRADE_GOLD_COST := [0, 900, 1900, 3300, 5200]
+## Standing needed to buy level N. Spread out so the top levels also wait on
+## a strong reputation, not just a full purse (level 5 = rank-B quests territory).
+const UPGRADE_STANDING_REQ := [0, 8, 18, 30, 45]
 
 # ---- Economy: the wallet a new run starts with, and the standing floor for recruits ----
 const STARTING_GOLD := 0
