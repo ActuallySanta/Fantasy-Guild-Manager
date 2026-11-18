@@ -55,7 +55,7 @@ extends Control
 
 ## Fired at the end of each player action, for the tutorial coach
 ## (overlay_tutorial.gd). event: tab, hire, character, close, assign, pick,
-## send, deny, end_check, end_day, new_day, upgrade, training_picker, train,
+## send, deny, end_check, end_day, read_letter, new_day, upgrade, training_picker, train,
 ## admit, buy, equip, game_over, freeplay.
 signal tutorial_event(event: String, data: Variant)
 
@@ -1636,6 +1636,12 @@ func start_freeplay() -> void:
 		start_new_day()
 		tutorial_event.emit("freeplay", GameState.day)
 	HallFx.curtain(fx_layer, DUSK_INK, begin, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
+
+
+## A Day Report letter was tapped open (report_entry.gd); Pip's Day 1
+## walkthrough waits for this.
+func report_letter_opened() -> void:
+	tutorial_event.emit("read_letter", null)
 
 
 ## The report's button: starts the next day after End Day (under a dusk wash,

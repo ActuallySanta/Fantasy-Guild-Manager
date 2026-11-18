@@ -214,7 +214,10 @@ func _show_entries(results: Array) -> void:
 	var story_results := results.filter(HallStyle.is_story_quest)
 	var other_results := results.filter(func(result): return not HallStyle.is_story_quest(result))
 	for result in story_results + other_results:
-		HallStyle.add_row(_entry_list, ReportEntryScene).setup(result, true)
+		var entry: Control = HallStyle.add_row(_entry_list, ReportEntryScene)
+		entry.setup(result, true)
+		# Pip's Day 1 walkthrough waits for a letter to be opened
+		entry.opened.connect(hall.report_letter_opened)
 	_empty_label.text = TEXT_NOBODY_WENT
 	_empty_label.visible = results.is_empty()
 	_scroll.scroll_vertical = 0

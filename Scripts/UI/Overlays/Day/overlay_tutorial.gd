@@ -846,6 +846,24 @@ func _row(root: Node, script_file: String, unique_child := "", filter := Callabl
 	return null
 
 
+## The Day Report overlay.
+func _report() -> Node:
+	return hall.get_node("%OverlayReport")
+
+
+## The first everyday (foldable) letter in the Day Report that is folded
+## (`folded` true) or open (false), or null.
+func _report_letter(folded: bool) -> Control:
+	return _row(_report(), "report_entry.gd", "", func(letter): return not letter.is_story and letter.is_folded == folded)
+
+
+## True when tonight's report has a letter that folds (story quests' letters
+## never fold, and a night with nobody out has no letters). Reads the report's
+## data, so it works before the letters are built.
+func _has_foldable_letter() -> bool:
+	return hall.shown_report.get("results", []).any(func(result): return not HallStyle.is_story_quest(result))
+
+
 func _training_section() -> Node:
 	return _u(_tab("upgrades"), "TrainingSection")
 
@@ -954,8 +972,19 @@ func _day_one() -> Array:
 			"do": "Tap End Day", "text": "Tap [b]End Day[/b] to send your quests off!"},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
 			"do": "Tap End Day", "text": "Here you can check what quests you denied and accepted, as well as any available upgrades! Tap on end day to finish your choices. "},
-		{"target": func(): return _u(hall.get_node("%OverlayReport"), "ActionButton"), "on": "new_day",
-			"do": "Tap to start Day 2", "text": "Good Morning! This screen lets you see how the parties did. Tap on Open the Doors to move on."},
+		# the Day Report: the totals, then open a letter and read it
+		{"target": func(): return _u(_report(), "Totals"),
+			"text": "Good morning! This is the [b]Day Report[/b]. Up top: how many quests succeeded, the %s you earned, and anyone who got hurt." % GOLD},
+		{"target": func(): return _report_letter(true), "on": "read_letter",
+			"skip": func(): return not _has_foldable_letter(),
+			"do": "Tap the letter", "text": "Each quest sends a letter home. Tap it to open it and read what happened."},
+		# spotlight just the story lines: the whole open letter is too tall to
+		# leave Pip room above or below it
+		{"target": func(): return _u(_report_letter(false), "Beats"),
+			"skip": func(): return not _has_foldable_letter(),
+			"text": "Here's the story, one line per moment. The stamp up top says whether the quest succeeded, and the last line says what they brought home. Tap a letter again to fold it."},
+		{"target": func(): return _u(_report(), "ActionButton"), "on": "new_day",
+			"do": "Tap to start Day 2", "text": "That's the night! Tap [b]Open the Doors[/b] to start Day 2."},
 	]
 
 

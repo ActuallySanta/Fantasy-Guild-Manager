@@ -11,6 +11,9 @@
 ## Scene: Scenes/Rows/Day End/report_entry.tscn
 extends TapPanel
 
+## A folded letter was tapped open (the Day Report passes it on for Pip).
+signal opened
+
 const BeatRowScene := preload("uid://nm3rjurnk3x2")  # Scenes/Rows/Day End/beat_row.tscn
 const ChipScene := preload("uid://5khy5d8j40yo")  # Scenes/Components/chip.tscn
 
@@ -249,6 +252,7 @@ func toggle_folded() -> void:
 	if not is_folded:
 		for node in _foldable:
 			HallFx.fade_in(node, 0.0, UNFOLD_SECONDS)
+		opened.emit()
 
 
 ## Play this letter in, starting `delay` seconds from now: it fades up, the
