@@ -157,6 +157,14 @@ const PORTRAIT_FRAME := preload("uid://cscfv0x0mk446")  # Sprites/UI Textures/po
 const ARROW_ICON := preload("uid://c2nc04lk4jmw3")  # Sprites/Hall Icons/arrow_left.tres
 ## Ground behind Pip inside the frame (a parchment tint).
 const PIP_GROUND := Color("#E9DEC4")
+## Pip's portrait, drawn on the same 2160 x 1620 canvas as the heroes' icons.
+const PIP_ART := preload("uid://bwklr4hux7gdg")  # Sprites/Pip.png
+## Where Pip's art sits on the round mask, as anchors (x = left, y = top,
+## z = right, w = bottom; 0 and 1 are the mask's edges). The art keeps its
+## aspect, centred in that box. Wider than a hero's framing (the Art node in
+## Scenes/Components/portrait.tscn: -0.8, -0.3, 1.8, 1.3), so Pip's ears, fez
+## and bow tie all fit inside the circle.
+const PIP_ART_ANCHORS := Vector4(-0.33, -0.1, 1.28, 1.11)
 
 ## The main hall script (untyped: hall_main preloads this file).
 var hall: Control
@@ -788,9 +796,9 @@ func _build() -> void:
 	foot.add_child(_skip_button)
 
 
-## Pip's portrait: the round portrait mask (parchment ground; its shape clips
-## Pip through HallStyle.mask_to) and
-## the round portrait frame on top, the same art as the heroes' portraits.
+## Pip's portrait: Pip's art (PIP_ART) on the round portrait mask (parchment
+## ground; its shape clips the art through HallStyle.mask_to) and the round
+## portrait frame on top, the same mask and frame as the heroes' portraits.
 func _build_portrait() -> Control:
 	var holder := Control.new()
 	holder.custom_minimum_size = Vector2(84, 84)
@@ -803,14 +811,23 @@ func _build_portrait() -> Control:
 	mask.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	HallStyle.tint_art(mask, PIP_GROUND)
 	holder.add_child(mask)
-	var pip := PipFace.new()
+	var pip := TextureRect.new()
+	pip.texture = PIP_ART
+	pip.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	pip.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pip.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# the art's box is bigger than the mask (PIP_ART_ANCHORS), like a hero's
+	pip.set_anchor(SIDE_LEFT, PIP_ART_ANCHORS.x)
+	pip.set_anchor(SIDE_TOP, PIP_ART_ANCHORS.y)
+	pip.set_anchor(SIDE_RIGHT, PIP_ART_ANCHORS.z)
+	pip.set_anchor(SIDE_BOTTOM, PIP_ART_ANCHORS.w)
 	mask.add_child(pip)
 	# clipped by the portrait mask shader, not clip_children (broken on iPhone
-	# Safari); Pip fills the mask, so the mask's rect is Pip's own rect
-	pip.resized.connect(func() -> void: HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(Vector2.ZERO, pip.size)))
-	HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(Vector2.ZERO, pip.size))
+	# Safari): the mask's rect in the art's own pixels, as in portrait.gd
+	var update_mask := func() -> void:
+		HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(-pip.position, mask.size))
+	pip.resized.connect(update_mask)
+	update_mask.call()
 	var frame := TextureRect.new()
 	frame.texture = PORTRAIT_FRAME
 	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -837,34 +854,6 @@ class Pointer extends Control:
 		draw_texture_rect(arrow, Rect2(-size / 2.0, size), false, tint)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
-
-## Pip: a goblin clerk with round glasses, drawn with shapes (no art asset yet;
-## the round portrait mask and frame around it are the project's art).
-class PipFace extends Control:
-	func _draw() -> void:
-		var s := size.x / 50.0
-		var ink := Color("#2A1A10")
-		var skin := Color("#7BC47F")
-		var body := StyleBoxFlat.new()
-		body.bg_color = Color("#9B72CF")
-		body.set_border_width_all(int(2.5 * s))
-		body.border_color = ink
-		body.set_corner_radius_all(int(9 * s))
-		draw_style_box(body, Rect2(Vector2(11, 38) * s, Vector2(28, 11) * s))
-		for side in [-1, 1]:
-			var ear := PackedVector2Array([Vector2(25 + 11 * side, 25) * s, Vector2(25 + 23 * side, 16) * s, Vector2(25 + 12 * side, 33) * s])
-			draw_colored_polygon(ear, skin)
-			ear.append(ear[0])
-			draw_polyline(ear, ink, 2.5 * s)
-		var head := Vector2(25, 28) * s
-		draw_circle(head, 12 * s, skin)
-		draw_arc(head, 12 * s, 0, TAU, 40, ink, 2.5 * s)
-		for side in [-1, 1]:
-			var lens := Vector2(25 + 4.5 * side, 27) * s
-			draw_circle(lens, 4.2 * s, Color("#FFFBF0"))
-			draw_arc(lens, 4.2 * s, 0, TAU, 24, ink, 2 * s)
-			draw_circle(lens, 1.5 * s, ink)
-		draw_arc(Vector2(25, 32.5) * s, 3 * s, 0.3, PI - 0.3, 12, ink, 2 * s)
 
 # ============================================================ FINDING TARGETS
 

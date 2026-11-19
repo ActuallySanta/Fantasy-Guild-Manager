@@ -63,6 +63,7 @@ border width, open the matching `Themes/Styles/*.tres` and change its *Texture M
 | `box_on.png`, `box_off.png` | "Show busy" checkbox |
 | `tag_hole.png` | The string hole at the top of each shop price tag |
 | `Shop/shopBackground.png`, `Shop/shopkeeper.png` | Grizzle on the Shop tab: the shop behind him (`Background` in `tab_shop.tscn`) and Grizzle on top (`ShopKeeper`) |
+| `Pip.png` (in `Sprites/` itself) | Pip, the tutorial coach, in the round portrait frame on the coach's bubble. Same 2160 x 1620 canvas as the character icons; `PIP_ART_ANCHORS` in `overlay_tutorial.gd` sets how much of it the circle shows |
 
 ### Icons: `Hall Icons`
 
