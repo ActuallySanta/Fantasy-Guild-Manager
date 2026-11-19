@@ -17,7 +17,8 @@ of introduction, buildings are plans on grid paper, and the night's results come
 letters with a Success / Failed stamp.
 Colour still carries meaning, now as ink: each stat has its own ink, green = good / sent,
 red = bad / denied / hurt, blue = odds / to do, gold = money, and each quest type has a
-coloured seal (DUN, ESC, SCT, INT, BOSS).
+coloured seal with its own icon (DUN, ESC, SCT, INT, BOSS: an exclamation point, FINAL: a
+horned skull).
 
 All art is a swappable placeholder. **See `Sprites/README.md`** for every file, what it's used
 for and how to replace it. In short: images are in `Sprites/` and fonts in `Fonts/`, each surface is a

@@ -76,7 +76,9 @@ Each `name.png` has a `name.tres` beside it. That's what the scenes and code use
 `.tres` picks it up. To add an icon: draw `name.png`, duplicate any icon's `.tres` in the
 FileSystem dock as `name.tres` and set its *Source* to the new PNG, then add a row to
 `ICON_FILES` in `Scripts/Hall/Style/hall_style.gd`. Buildings pick their icon in `BUILDING_ICONS` in
-the same file. `stall` is the Shop tab.
+the same file. `stall` is the Shop tab. Quest types pick their seal icon in `QUEST_TYPES` (same
+file): `exclamation` is the BOSS seal (also on the header's Bone Drake countdown), and
+`horned_skull` is the FINAL seal (`skull` is the injury icon).
 
 ### Item icons: `Item Icons`
 

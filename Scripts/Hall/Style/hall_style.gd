@@ -111,13 +111,14 @@ const FINAL_TYPE_ID := 6
 ## (the Assign Party scroll), seal colour, short tag, and the icon (an
 ## ICON_FILES name) drawn on its seal. A type with no "icon" shows its tag
 ## on the seal instead; the tag is also used where there's no seal.
+## The BOSS seal (exclamation) is also the one on the header's Bone Drake countdown.
 const QUEST_TYPES := {
 	1: {"name": "Clear Dungeon", "writ": "Writ of Clearing", "color": Color("#4A5E32"), "tag": "DUN", "icon": "gate"},
 	2: {"name": "Escort", "writ": "Writ of Escort", "color": Color("#7A5236"), "tag": "ESC", "icon": "escort"},
 	3: {"name": "Scout Terrain", "writ": "Writ of Scouting", "color": Color("#3F5A74"), "tag": "SCT", "icon": "flag"},
 	4: {"name": "Gather Intel", "writ": "Writ of Intelligence", "color": Color("#5B4A7A"), "tag": "INT", "icon": "eye"},
-	MILESTONE_TYPE_ID: {"name": "Milestone", "writ": "Writ of the Drake", "color": Color("#7D2A26"), "tag": "BOSS"},
-	FINAL_TYPE_ID: {"name": "Final Battle", "writ": "Writ of the Last Stand", "color": Color("#3A1F3D"), "tag": "FINAL"},
+	MILESTONE_TYPE_ID: {"name": "Milestone", "writ": "Writ of the Drake", "color": Color("#7D2A26"), "tag": "BOSS", "icon": "exclamation"},
+	FINAL_TYPE_ID: {"name": "Final Battle", "writ": "Writ of the Last Stand", "color": Color("#3A1F3D"), "tag": "FINAL", "icon": "horned_skull"},
 }
 
 # ---- stats
@@ -491,6 +492,8 @@ const ICON_FILES := {
 	"escort": "uid://bkk0x60yoyngi",  # Sprites/Hall Icons/escort.tres
 	"flag": "uid://h5m6winn3vrf",  # Sprites/Hall Icons/flag.tres
 	"eye": "uid://2203hgt8y6l4",  # Sprites/Hall Icons/eye.tres
+	"exclamation": "uid://cw2umeq54y4yp",  # Sprites/Hall Icons/exclamation.tres (BOSS)
+	"horned_skull": "uid://dcpsq15tsp22n",  # Sprites/Hall Icons/horned_skull.tres (FINAL)
 	# item seals (ITEM_ICONS). Full-size art (96 x 96 PNGs with the drawing
 	# centred), not 16 x 16 PixelIcons, so they point at the PNG itself.
 	"item_sword": "uid://cfmenvuyddpqu",  # Sprites/Item Icons/sword_icon.png
