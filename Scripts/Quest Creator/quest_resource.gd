@@ -647,14 +647,25 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 		successfulChecks += 1
 	else:
 		var succSearDet = randi_range(1, 100)
+		match(difficulty):
+			-1:
+				succSearDet += 30
+			0:
+				succSearDet += 15
+			1:
+				succSearDet += 5
+		
+		if(succSearDet > 100):
+			succSearDet = 100
+		
 		if(1 <= succSearDet && succSearDet <= 15):
 			returnString = str(returnString, "[b]", searchingAdventurer.name, "[/b] tripped on a rock and gained [color=FD0000][b]1 INJURY[/b][/color].\n")
-		elif(16 <= succSearDet && succSearDet <= 45):
+		elif(31 <= succSearDet && succSearDet <= 60):
 			returnString = str(returnString, "[b]The Party[/b] discovered a hidden room containing multiple chests, but [color=FD0000][b]NOTHING OF VALUE[/b][/color] was inside.\n")
-		elif(46 <= succSearDet && succSearDet <= 75):
+		elif(61 <= succSearDet && succSearDet <= 90):
 			returnString = str(returnString, "[b]", searchingAdventurer.name, 
 			"[/b] went off alone to search for treasure, but returned with [color=FD0000][b]NOTHING[/b][/color].\n")
-		elif(76 <= succSearDet && succSearDet <= 90):
+		elif(16 <= succSearDet && succSearDet <= 30):
 			var extraGold = randi_range(3, 15)
 			goldReward += extraGold
 			returnString = str(returnString, "[b]", searchingAdventurer.name, 
