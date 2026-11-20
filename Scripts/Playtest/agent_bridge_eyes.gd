@@ -9,6 +9,10 @@ extends RefCounted
 ## Seconds to wait after a tap before the screenshot, so the hall's reaction
 ## (refresh, tween starts, toasts) is on screen. Seconds.
 const TAP_SETTLE_SECONDS := 0.6
+## How long a `swipe` takes when no seconds are given. Seconds.
+const SWIPE_DEFAULT_SECONDS := 0.3
+## The longest a `swipe` may take. Seconds.
+const MAX_SWIPE_SECONDS := 2.0
 ## The longest a `wait` command may sleep. Seconds.
 const MAX_WAIT_SECONDS := 10.0
 ## The game's size in viewport coordinates, and the size of every screenshot. Pixels.
@@ -19,7 +23,7 @@ const WINDOW_MARGIN_PIXELS := 80
 const SHOTS_FOLDER := "shots/"
 ## Commands an eyes-mode persona may use. Everything else is refused, so the
 ## persona sees only what a player sees.
-const ALLOWED_COMMANDS: Array[String] = ["ping", "status", "screenshot", "tap", "wait", "quit"]
+const ALLOWED_COMMANDS: Array[String] = ["ping", "status", "screenshot", "tap", "swipe", "wait", "quit"]
 ## Text of the refusal for any other command.
 const NOT_ALLOWED_ERROR := "not allowed in eyes mode"
 
@@ -95,6 +99,58 @@ static func tap(viewport: Viewport, tree: SceneTree, tap_args: Dictionary) -> Di
 	release.pressed = false
 	release.position = point
 	release.global_position = point
+	viewport.push_input(release, true)
+	await tree.create_timer(TAP_SETTLE_SECONDS).timeout
+	return {"ok": true}
+
+
+## Drags from one point to another (viewport coordinates, same bounds check as
+## tap): a press, interpolated mouse motions (left button held) over the
+## duration, then a release. Drag-scrolling a ScrollContainer works from plain
+## mouse events (it reads InputEventMouseMotion with the button mask), so no
+## touch events are needed. Waits TAP_SETTLE_SECONDS afterwards.
+## viewport: the bridge's viewport. tree: for frame and timer waits.
+## swipe_args: {x1, y1, x2, y2, seconds (optional, clamped to MAX_SWIPE_SECONDS)}.
+## Returns {ok} or {ok: false, error}; the caller adds the screenshot.
+static func swipe(viewport: Viewport, tree: SceneTree, swipe_args: Dictionary) -> Dictionary:
+	var values: Array = []
+	for key in ["x1", "y1", "x2", "y2"]:
+		var value: Variant = swipe_args.get(key)
+		if not (value is float or value is int):
+			return {"ok": false, "error": "swipe needs numeric x1, y1, x2, y2"}
+		values.append(float(value))
+	var start := Vector2(values[0], values[1])
+	var end := Vector2(values[2], values[3])
+	var screen := Rect2(Vector2.ZERO, viewport.get_visible_rect().size)
+	if not screen.has_point(start) or not screen.has_point(end):
+		return {"ok": false, "error": "swipe outside the screen"}
+	var seconds := clampf(float(swipe_args.get("seconds", SWIPE_DEFAULT_SECONDS)), 0.0, MAX_SWIPE_SECONDS)
+	var press := InputEventMouseButton.new()
+	press.button_index = MOUSE_BUTTON_LEFT
+	press.pressed = true
+	press.button_mask = MOUSE_BUTTON_MASK_LEFT
+	press.position = start
+	press.global_position = start
+	viewport.push_input(press, true)
+	# one motion per frame while the time passes, ending exactly on the end point
+	var elapsed := 0.0
+	var previous := start
+	while elapsed < seconds:
+		await tree.process_frame
+		elapsed += tree.root.get_process_delta_time()
+		var point := start.lerp(end, minf(elapsed / seconds, 1.0))
+		var motion := InputEventMouseMotion.new()
+		motion.position = point
+		motion.global_position = point
+		motion.relative = point - previous
+		motion.button_mask = MOUSE_BUTTON_MASK_LEFT
+		viewport.push_input(motion, true)
+		previous = point
+	var release := InputEventMouseButton.new()
+	release.button_index = MOUSE_BUTTON_LEFT
+	release.pressed = false
+	release.position = end
+	release.global_position = end
 	viewport.push_input(release, true)
 	await tree.create_timer(TAP_SETTLE_SECONDS).timeout
 	return {"ok": true}

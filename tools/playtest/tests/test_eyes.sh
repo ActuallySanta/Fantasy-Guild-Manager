@@ -10,7 +10,7 @@ check() { # name, condition result (0 = pass)
 }
 "$TOOLS/prepare.sh" "$TMP/pt" >/dev/null
 B1="$TMP/b1"
-"$TOOLS/launch.sh" "$TMP/pt" "$B1" -- --bridge-dir="$(cygpath -m "$B1")" --mode=eyes --seed=4417 --intro --test-hooks
+"$TOOLS/launch.sh" "$TMP/pt" "$B1" -- --bridge-dir="$(cygpath -m "$B1")" --mode=eyes --seed=4417 --intro --reduce-motion --test-hooks
 check "eyes launch reached ready" $?
 OUT="$("$TOOLS/bridge.sh" "$B1" ping)"; echo "$OUT"
 [[ "$OUT" == *'"intro_open":true'* ]]; check "ping reports intro_open true" $?
@@ -20,14 +20,18 @@ SHOT="$(echo "$OUT" | sed -E 's/.*"path":"([^"]*)".*/\1/')"
 [ -s "$SHOT" ]; check "screenshot PNG exists" $?
 OUT="$("$TOOLS/bridge.sh" "$B1" state)"; echo "$OUT"
 [[ "$OUT" == *"not allowed in eyes mode"* ]]; check "state refused in eyes mode" $?
+OUT="$("$TOOLS/bridge.sh" "$B1" plan '{}')"
+[[ "$OUT" == *"not allowed in eyes mode"* ]]; check "plan refused in eyes mode" $?
 OUT="$("$TOOLS/bridge.sh" "$B1" end_day)"
 [[ "$OUT" == *"not allowed in eyes mode"* ]]; check "end_day refused in eyes mode" $?
-# the Begin button shows once the crawl has scrolled to its end (a few minutes at most)
+OUT="$("$TOOLS/bridge.sh" "$B1" swipe '{"x1":-5,"y1":0,"x2":10,"y2":10}')"
+[[ "$OUT" == *"outside the screen"* ]]; check "swipe outside the screen refused" $?
+# reduced motion: the crawl does not roll by itself, so swipe up until Begin shows
 RECT=""
-for i in $(seq 1 30); do
+for i in $(seq 1 25); do
 	RECT="$("$TOOLS/bridge.sh" "$B1" debug_rect '{"node":"BeginButton"}')"
 	[[ "$RECT" == *'"visible":true'* ]] && break
-	"$TOOLS/bridge.sh" "$B1" wait '{"seconds":10}' >/dev/null
+	"$TOOLS/bridge.sh" "$B1" swipe '{"x1":360,"y1":1000,"x2":360,"y2":200,"seconds":0.4}' >/dev/null
 done
 echo "$RECT"
 [[ "$RECT" == *'"visible":true'* ]]; check "Begin button visible" $?

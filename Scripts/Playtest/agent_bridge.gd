@@ -130,19 +130,23 @@ func _poll_command() -> void:
 ## Runs one command (a coroutine: end_day waits for the night). Returns the response dictionary (without "id").
 func _dispatch(command: String, args: Variant) -> Dictionary:
 	var arg_dict: Dictionary = args if args is Dictionary else {}
-	# once the run has ended every action is refused
-	if command in ACTION_COMMANDS and AgentBridgeActions.is_run_over(_hall):
-		return {"ok": false, "error": "run over"}
+	# first, so eyes mode never learns the run is over from a refused action
 	if options.get("mode", "rules") == "eyes":
 		var is_hook: bool = command == "debug_rect" and options.get("test_hooks", false)
 		if not AgentBridgeEyes.is_allowed(command) and not is_hook:
 			return {"ok": false, "error": AgentBridgeEyes.NOT_ALLOWED_ERROR}
+	# once the run has ended every action is refused
+	if command in ACTION_COMMANDS and AgentBridgeActions.is_run_over(_hall):
+		return {"ok": false, "error": "run over"}
 	match command:
 		"screenshot":
 			return await _take_screenshot()
 		"tap":
 			var tapped := await AgentBridgeEyes.tap(get_viewport(), get_tree(), arg_dict)
 			return await _take_screenshot() if tapped.ok else tapped
+		"swipe":
+			var swiped := await AgentBridgeEyes.swipe(get_viewport(), get_tree(), arg_dict)
+			return await _take_screenshot() if swiped.ok else swiped
 		"wait":
 			await AgentBridgeEyes.wait(get_tree(), arg_dict)
 			return await _take_screenshot()
