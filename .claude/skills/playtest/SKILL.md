@@ -59,7 +59,7 @@ Constant: `MAX_PARALLEL = 4` (at most 4 bridges/Godot windows at once).
       bash tools/playtest/launch.sh "$SCRATCH/project" "$BRIDGE" -- --bridge-dir="$BRIDGE" --mode=eyes --seed=<seed> --persona=<slug> --run=<n> --label=<label> [persona flags]
       ```
       Add the bridge dir to `LAUNCHED` as soon as you call launch. If launch exits non-zero, record the persona run as `failed: <reason>` (use the launch message and the tail of `$BRIDGE/godot.log`), run `stop.sh` on it, and carry on with the other jobs.
-   2. **Sheet check (first bridge only).** Right after `launch.sh` returns and BEFORE dispatching the agent (the agent sends `quit` itself, and a mid-run check would race it on `cmd.json`), run `bash tools/playtest/bridge.sh "$BRIDGE" status '{}'`. If `sheet` is `checking`, poll every 2 s for up to 20 s. Record the first final value (anything but `checking`) for the report banner (see step 5). One bridge is enough unless that value is `offline`, in which case repeat on the next launched bridge.
+   2. **Sheet check (every bridge).** Right after `launch.sh` returns and BEFORE dispatching that bridge's agent (the agent sends `quit` itself, and a mid-run check would race it on `cmd.json`), run `bash tools/playtest/bridge.sh "$BRIDGE" status '{}'`. If `sheet` is `checking`, poll every 2 s for up to 20 s. Record that bridge's first final value (anything but `checking`) for the report banner (see step 5).
    3. Dispatch the persona with the Agent tool: `subagent_type: playtester-<slug>`, `run_in_background: true`. The prompt gives exactly these lines:
       ```
       bridge_dir: <BRIDGE>
@@ -68,10 +68,10 @@ Constant: `MAX_PARALLEL = 4` (at most 4 bridges/Godot windows at once).
       run: <n>
       game_rules_hint: none
       ```
-      Use the absolute bridge path as the bash scripts see it. The agent plays only through `bridge.sh`, writes its own diary, and ends its reply with one fenced json block.
+      Use the mixed-style path from step 1. If the `playtester-<slug>` agent type is not available (agents load at session start), dispatch `general-purpose` with `model: sonnet` instead, and start its prompt with: "Read .claude/agents/playtester-<slug>.md; it is your complete persona and instructions; ignore its frontmatter and follow its body exactly; that file is the one repo file you may read." followed by the same input lines. The agent plays only through `bridge.sh`, writes its own diary, and ends its reply with one fenced json block.
    4. When the agent finishes, parse the last fenced json block of its reply. If there is no valid block, or it parses but lacks the required keys (`persona`, `run`, `mode`, `furthest_day`, `drake`, `deaths`, `confusions`, `ui_issues`, `verdict`), record `failed: no valid JSON block` for that run. Add the outcome to the results list. Either way, run `bash tools/playtest/stop.sh "$BRIDGE"` and start the next waiting job.
 
-5. **Sheet banner.** Use the `sheet` value recorded in step 4.2 (`off`, `checking`, `ready`, `not_redeployed` or `offline`). `quit` flushes pending rows to the sheet when `ready`. If it is not `ready`, put a banner at the top of the report:
+5. **Sheet banner.** Use the `sheet` values recorded in step 4.2, one per bridge (`off`, `checking`, `ready`, `not_redeployed` or `offline`). Banner if ANY bridge's final value is not ready, and list which bridges. `quit` flushes pending rows to the sheet when `ready`. If it is not `ready`, put a banner at the top of the report:
    - `not_redeployed`: "AI rows were logged locally only: the run-log Apps Script hasn't been redeployed yet".
    - `offline`: "AI rows were logged locally only: the sheet could not be reached".
    - `off` or `checking`: "AI rows were not sent to the sheet (sheet status: <value>)".

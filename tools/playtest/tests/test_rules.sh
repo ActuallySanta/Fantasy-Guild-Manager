@@ -4,6 +4,14 @@
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TOOLS="$(cd "$HERE/.." && pwd)"
 TMP="$(mktemp -d)"
+# however the test ends, stop every bridge it started (no leaked Godot) and remove the scratch copy
+cleanup() {
+	for pidfile in "$TMP"/*/pid; do
+		[ -f "$pidfile" ] && "$TOOLS/stop.sh" "$(dirname "$pidfile")" >/dev/null 2>&1
+	done
+	rm -rf "$TMP"
+}
+trap cleanup EXIT
 FAILS=0
 check() { # name, condition result (0 = pass)
 	if [ "$2" -eq 0 ]; then echo "PASS: $1"; else echo "FAIL: $1"; FAILS=$((FAILS + 1)); fi
@@ -14,7 +22,7 @@ launch_bridge() {
 	"$TOOLS/launch.sh" "$TMP/pt" "$TMP/$name" --headless -- --bridge-dir="$(cygpath -m "$TMP/$name")" --mode=rules --seed=4417 "$@" >/dev/null
 }
 # quest_indexes <state json>: the quest indexes on today's Board, space separated.
-quest_indexes() { echo "$1" | grep -o '"quests":\[.*\],"roster"' | grep -o '"index":[0-9]*' | cut -d: -f2 | tr '\n' ' '; }
+quest_indexes() { echo "$1" | grep -o '"quests":\[.*],"resp_id"' | grep -o '"index":[0-9]*' | cut -d: -f2 | tr '\n' ' '; }
 # deny_json <state json> [skip index]: JSON array of every quest index but the skipped one.
 deny_json() {
 	local out="" i
@@ -80,6 +88,7 @@ sleep 0.2
 OUT="$("$TOOLS/bridge.sh" "$TMP/d" state)"
 wait
 [[ "$OUT" == *'"ok":true'* && "$OUT" == *'"day":2'* ]]; check "state sent during end_day shows the next day" $?
+grep -q '"report"' "$TMP/d_end.json"; check "backgrounded end_day answered with its own report" $?
 
 # a runtime error inside a command answers "internal error" and the bridge keeps going
 OUT="$("$TOOLS/bridge.sh" "$TMP/d" crash)"
@@ -106,5 +115,4 @@ OUT="$("$TOOLS/bridge.sh" "$TMP/c" end_day)"
 [[ "$OUT" == *"run over"* ]]; check "end_day after run over errors" $?
 "$TOOLS/stop.sh" "$TMP/c"
 
-rm -rf "$TMP"
 [ "$FAILS" -eq 0 ]

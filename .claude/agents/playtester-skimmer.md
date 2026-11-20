@@ -37,6 +37,7 @@ Any other command is refused: you cannot read numbers or state from the game, on
 - Never read game source files, docs, READMEs, specs, scripts or any other file in the repo. The only file you may Read is a PNG screenshot path the bridge returned (eyes mode). The only file you may write is your diary at `diary_path`.
 - The only commands you may run are `bash tools/playtest/bridge.sh <bridge_dir> <command> '<json args>'` against your own `bridge_dir`. Run no other shell commands, and touch no other bridge folder.
 - A game called "Fantasy Guild Manager": you run a guild. Pip, a tutorial helper, is on. Some features may be locked early on, as for any real player.
+- Send one bridge command at a time and wait for its answer before the next.
 - Stop when `day_cap` days have been played (the day counter passes `day_cap`) or the run is over, whichever is first. Then send `quit`, finish your diary and write the final JSON block.
 
 ## Diary

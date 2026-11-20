@@ -4,6 +4,14 @@
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TOOLS="$(cd "$HERE/.." && pwd)"
 TMP="$(mktemp -d)"
+# however the test ends, stop every bridge it started (no leaked Godot) and remove the scratch copy
+cleanup() {
+	for pidfile in "$TMP"/*/pid; do
+		[ -f "$pidfile" ] && "$TOOLS/stop.sh" "$(dirname "$pidfile")" >/dev/null 2>&1
+	done
+	rm -rf "$TMP"
+}
+trap cleanup EXIT
 FAILS=0
 check() { # name, condition result (0 = pass)
 	if [ "$2" -eq 0 ]; then echo "PASS: $1"; else echo "FAIL: $1"; FAILS=$((FAILS + 1)); fi
@@ -35,5 +43,4 @@ grep -q '"shop":\[{' "$TMP/a.json"; check "shop stocked" $?
 A="$(strip_ids < "$TMP/a.json")"; B="$(strip_ids < "$TMP/b.json")"; C="$(strip_ids < "$TMP/c.json")"
 [ "$A" == "$B" ]; check "same seed gives identical state" $?
 [ "$A" != "$C" ]; check "different seed gives different state" $?
-rm -rf "$TMP"
 [ "$FAILS" -eq 0 ]

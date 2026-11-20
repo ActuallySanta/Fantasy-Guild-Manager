@@ -46,7 +46,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 
 **The UI** (the "Mobile Hall") is split by file type, and the same subfolder names are used on both sides, so a scene and its script sit at matching paths (`Scenes/Rows/Quests/quest_row.tscn` ↔ `Scripts/UI/Rows/Quests/quest_row.gd`):
 - `Scenes/`: `hall_main.tscn`, then `Tabs/`, `Screens/`, `Components/`, `Shell/` (and `Shell/Header/`), `Overlays/{Day,Run End,Menu,Items}/`, `Rows/{Quests,Heroes,Buildings,Items,Day End}/`, and `Playtest/`.
-- `Scripts/UI/`: the script for each of those scenes. `Scripts/Hall/`: `hall_main.gd` plus the scene-less hall scripts in `Rules/`, `Save/`, `Style/`, `Web/` and `Debug/`. `Scripts/Playtest/`: `playtest_scenario.gd`.
+- `Scripts/UI/`: the script for each of those scenes. `Scripts/Hall/`: `hall_main.gd` plus the scene-less hall scripts in `Rules/`, `Save/`, `Style/`, `Web/` and `Debug/`. `Scripts/Playtest/`: `playtest_scenario.gd`, plus `agent_bridge*.gd` (the AI playtest bridge, excluded from exports).
 - Art and looks: `Sprites/` (`Hall Icons/`, `UI Textures/`, and its `README.md` on swapping art), `Fonts/`, `Themes/` (`hall_theme.tres` and the StyleBoxes in `Styles/`). `Data/credits.tres` holds the team credits.
 - Save files store the `res://` path of hero and item icons (`HallSave` `REF_TEXTURE`), so moving or renaming `Sprites/Character Icons/` or `Sprites/Item Icons/` breaks old saves.
 

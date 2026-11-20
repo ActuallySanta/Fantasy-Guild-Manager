@@ -272,7 +272,7 @@ None of it counts toward the Game Over ledger or the credits (`run_stats`).
 
 ## AI playtesting
 
-`/playtest` (`.claude/skills/playtest/SKILL.md`) runs AI personas (`.claude/agents/playtester-*.md`) against a scratch copy of the project, using the `tools/playtest/` scripts and the debug-only bridge scene (`Scenes/Playtest/agent_bridge.tscn`, `Scripts/Playtest/agent_bridge*.gd`, excluded from exports). The bridge instances the hall, seeds the RNG (`--seed`) and re-rolls day 1's heroes, hire pool, shop and quests, so every persona starts from the same state. It changes game state only through hall actions.
+`/playtest` (`.claude/skills/playtest/SKILL.md`) runs AI personas (`.claude/agents/playtester-*.md`) against a scratch copy of the project, using the `tools/playtest/` scripts and the debug-only bridge scene (`Scenes/Playtest/agent_bridge.tscn`, `Scripts/Playtest/agent_bridge*.gd`, excluded from exports). The bridge instances the hall, seeds the RNG (`--seed`) in `_enter_tree`, before the hall rolls day 1's heroes, hire pool, shop and quests, so every persona starts from the same state. It changes game state only through hall actions (apart from the `--test-hooks` test commands; launch flags apply settings).
 
 - **Rules mode** (min-maxer, cautious-planner, reckless-gambler, typical-player): `state` returns a snapshot built from hall queries, `plan` applies a day's actions, `end_day` plays the night. Runs can go all the way to day 50.
 - **Eyes mode** (first-timer, skimmer, accessibility, genre-veteran): only `screenshot`, `tap`, `swipe` and `wait`, like a player. It needs a window, so it isn't headless.

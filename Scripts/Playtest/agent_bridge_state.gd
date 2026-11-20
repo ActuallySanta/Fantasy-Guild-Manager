@@ -28,7 +28,7 @@ static func build(hall: HallMain) -> Dictionary:
 		"days_until_drake": hall.days_until_drake(),
 		"gold": GameState.gold,
 		"standing": GameState.standing,
-		"run_over": hall.is_run_over(),
+		"run_over": AgentBridgeActions.is_run_over(hall),
 		"locked": _locked(hall),
 		"roster": hall.roster().map(func(character): return _hero(hall, character)),
 		"hires": CharacterContainer.hireable_characters.map(_hire),

@@ -21,6 +21,8 @@ const READY_FILE := "ready.json"
 
 ## Longest `quit` waits for the run log to finish posting, in seconds.
 const QUIT_FLUSH_SECONDS := 15
+## How often `quit` rechecks the run log while flushing, in seconds.
+const FLUSH_STEP_SECONDS := 0.25
 
 ## Commands that change the game; refused once the run is over.
 const ACTION_COMMANDS: Array[String] = ["plan", "end_day"]
@@ -126,14 +128,14 @@ func _flush_logger() -> void:
 		return
 	var waited := 0.0
 	while _logger.ai_sheet_status == "checking" and waited < QUIT_FLUSH_SECONDS:
-		await get_tree().create_timer(0.25).timeout
-		waited += 0.25
+		await get_tree().create_timer(FLUSH_STEP_SECONDS).timeout
+		waited += FLUSH_STEP_SECONDS
 	if _logger.ai_sheet_status != "ready":
 		return
 	while _logger.pending_rows() > 0 and waited < QUIT_FLUSH_SECONDS:
 		_logger.flush()
-		await get_tree().create_timer(0.25).timeout
-		waited += 0.25
+		await get_tree().create_timer(FLUSH_STEP_SECONDS).timeout
+		waited += FLUSH_STEP_SECONDS
 
 
 ## Takes a screenshot of the viewport. Returns {ok, path, width, height, day}.
@@ -164,6 +166,8 @@ func _poll_command() -> void:
 	_busy = false
 	var response: Dictionary = result if result is Dictionary and not result.is_empty() else {"ok": false, "error": "internal error in %s" % command}
 	response["id"] = id
+	# the key bridge.sh matches on: unlike "id" it never appears inside a nested payload
+	response["resp_id"] = id
 	_write_json(RESPONSE_FILE, response)
 	if response.get("quit", false):
 		get_tree().quit()

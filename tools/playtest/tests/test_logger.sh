@@ -5,6 +5,14 @@
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TOOLS="$(cd "$HERE/.." && pwd)"
 TMP="$(mktemp -d)"
+# however the test ends, stop every bridge it started (no leaked Godot) and remove the scratch copy
+cleanup() {
+	for pidfile in "$TMP"/*/pid; do
+		[ -f "$pidfile" ] && "$TOOLS/stop.sh" "$(dirname "$pidfile")" >/dev/null 2>&1
+	done
+	rm -rf "$TMP"
+}
+trap cleanup EXIT
 FAILS=0
 check() { # name, condition result (0 = pass)
 	if [ "$2" -eq 0 ]; then echo "PASS: $1"; else echo "FAIL: $1"; FAILS=$((FAILS + 1)); fi
@@ -15,7 +23,7 @@ launch_bridge() { # name [extra user args...]
 }
 # json_field <json> <key>: a top-level string or number value.
 json_field() { echo "$1" | grep -o "\"$2\":\"\?[^,\"}]*" | head -1 | sed -E "s/\"$2\":\"?//"; }
-quest_indexes() { echo "$1" | grep -o '"quests":\[.*\],"roster"' | grep -o '"index":[0-9]*' | cut -d: -f2 | tr '\n' ' '; }
+quest_indexes() { echo "$1" | grep -o '"quests":\[.*],"resp_id"' | grep -o '"index":[0-9]*' | cut -d: -f2 | tr '\n' ' '; }
 deny_json() {
 	local out="" i
 	for i in $(quest_indexes "$1"); do out="$out${out:+,}$i"; done
@@ -68,5 +76,4 @@ echo "sheet status: $SHEET"
 [ "$SHEET" = "not_redeployed" ]; check "old script answers not_redeployed" $?
 "$TOOLS/stop.sh" "$TMP/d"
 
-rm -rf "$TMP"
 [ "$FAILS" -eq 0 ]

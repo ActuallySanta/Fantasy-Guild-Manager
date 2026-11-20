@@ -9,6 +9,10 @@
 ## and posts with a threaded HTTPRequest, so the game never waits on the
 ## network. Rows that fail to send stay queued and go out with the next day.
 ##
+## AI playtests: the bridge calls configure_ai, which switches the logger to its
+## own CSV (user://run_log_ai.csv), the sheet's "AI Raw" tab, and a one-time
+## redeploy check of the Apps Script (ai_sheet_status). Human logging is unchanged.
+##
 ## UI only, like the tutorial: hall_main._ready adds it; it reads hall state
 ## and never changes it.
 class_name RunLogger
@@ -98,13 +102,13 @@ func setup(main: HallMain) -> void:
 ## "AI Raw" tab. Posting only starts once a GET of SHEET_URL answers with
 ## ai_tab:true (the redeployed script); the old script would write AI rows
 ## into the human tab, so then nothing is posted. Call before the first row.
-## run_id: unique per run (the bridge builds it). persona/seed_value/run_number/mode:
+## new_run_id: unique per run (the bridge builds it). persona/seed_value/run_number/mode:
 ## the extra cells. can_post: false (--no-sheet) keeps everything local.
-func configure_ai(run_id: String, persona: String, seed_value: int, run_number: int, mode: String, can_post: bool) -> void:
+func configure_ai(new_run_id: String, persona: String, seed_value: int, run_number: int, mode: String, can_post: bool) -> void:
 	if not ENABLED:
 		return
 	_is_ai = true
-	_run_id = run_id
+	_run_id = new_run_id
 	_ai_extras = {"persona": persona, "seed": seed_value, "run_number": run_number, "mode": mode}
 	_queue.clear()
 	if not can_post or SHEET_URL == "" or _http == null:

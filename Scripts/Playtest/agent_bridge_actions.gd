@@ -57,48 +57,48 @@ static func plan(hall: HallMain, plan_args: Dictionary) -> Dictionary:
 	var applied: Array = []
 	var rejected: Array = []
 	# records one step: an empty reason means it worked
-	var log := func(step: String, reason: String) -> void:
+	var record := func(step: String, reason: String) -> void:
 		if reason == "":
 			applied.append(step)
 		else:
 			rejected.append({"step": step, "reason": reason})
 
 	for id in _list(plan_args, "hire"):
-		log.call("hire %s" % id, _hire(hall, str(id)))
+		record.call("hire %s" % id, _hire(hall, str(id)))
 	for id in _list(plan_args, "release"):
-		log.call("release %s" % id, _release(hall, str(id)))
+		record.call("release %s" % id, _release(hall, str(id)))
 	for index in _list(plan_args, "buy"):
-		log.call("buy %d" % int(index), _buy(hall, int(index)))
+		record.call("buy %d" % int(index), _buy(hall, int(index)))
 	for pair in _list(plan_args, "equip"):
-		log.call("equip %s" % [pair], _equip(hall, pair))
+		record.call("equip %s" % [pair], _equip(hall, pair))
 	for id in _list(plan_args, "unequip"):
-		log.call("unequip %s" % id, _unequip(hall, str(id)))
+		record.call("unequip %s" % id, _unequip(hall, str(id)))
 	for pair in _list(plan_args, "train"):
-		log.call("train %s" % [pair], _train(hall, pair))
+		record.call("train %s" % [pair], _train(hall, pair))
 	for id in _list(plan_args, "stop_training"):
-		log.call("stop_training %s" % id, _hero_step(hall, str(id), hall.stop_training,
+		record.call("stop_training %s" % id, _hero_step(hall, str(id), hall.stop_training,
 				func(hero): return "" if not GuildUpgrades.is_training(hero) else "still training"))
 	for id in _list(plan_args, "admit"):
-		log.call("admit %s" % id, _hero_step(hall, str(id), hall.admit,
+		record.call("admit %s" % id, _hero_step(hall, str(id), hall.admit,
 				func(hero): return "" if GuildUpgrades.is_patient(hero) else "no free bed or not hurt"))
 	for id in _list(plan_args, "discharge"):
-		log.call("discharge %s" % id, _hero_step(hall, str(id), hall.discharge,
+		record.call("discharge %s" % id, _hero_step(hall, str(id), hall.discharge,
 				func(hero): return "" if not GuildUpgrades.is_patient(hero) else "still in a bed"))
 	for id in _list(plan_args, "revive"):
-		log.call("revive %s" % id, _hero_step(hall, str(id), hall.revive,
+		record.call("revive %s" % id, _hero_step(hall, str(id), hall.revive,
 				func(hero): return "" if not HallStyle.is_dead(hero) else "could not revive"))
 	for building in _list(plan_args, "upgrade"):
-		log.call("upgrade %d" % int(building), _upgrade(hall, int(building)))
+		record.call("upgrade %d" % int(building), _upgrade(hall, int(building)))
 	for assignment in _list(plan_args, "assign"):
 		if not assignment is Dictionary:
-			log.call("assign %s" % [assignment], "expected {quest, party}")
+			record.call("assign %s" % [assignment], "expected {quest, party}")
 			continue
 		var quest := int(assignment.get("quest", -1))
 		var party: Array = assignment.get("party", []) if assignment.get("party", []) is Array else []
 		for id in party:
-			log.call("assign %s to quest %d" % [id, quest], _assign(hall, quest, str(id)))
+			record.call("assign %s to quest %d" % [id, quest], _assign(hall, quest, str(id)))
 	for index in _list(plan_args, "deny"):
-		log.call("deny %d" % int(index), _deny(hall, int(index)))
+		record.call("deny %d" % int(index), _deny(hall, int(index)))
 
 	return {"ok": true, "applied": applied, "rejected": rejected, "state": AgentBridgeState.build(hall)}
 
