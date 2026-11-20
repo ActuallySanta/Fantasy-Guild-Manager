@@ -28,11 +28,15 @@ var _poll_timer := 0.0
 ## Id of the last command answered, so one cmd.json is handled once.
 var _last_handled_id := 0
 
-@onready var _hall: Control = $HallMain
+@onready var _hall: HallMain = $HallMain
 
 
 func _enter_tree() -> void:
 	_parse_args()
+	# Before the hall's _ready (and the autoloads' deferred first restock) roll
+	# anything, so the first hire pool, shop stock and Board come from the seed.
+	if options.has("seed"):
+		seed(int(options.seed))
 
 
 func _ready() -> void:
@@ -89,6 +93,10 @@ func _dispatch(command: String, _args: Variant) -> Dictionary:
 	match command:
 		"ping":
 			return {"ok": true, "mode": options.get("mode", "rules"), "day": GameState.day}
+		"state":
+			var state := AgentBridgeState.build(_hall)
+			state["ok"] = true
+			return state
 		"quit":
 			return {"ok": true, "quit": true}
 		_:
