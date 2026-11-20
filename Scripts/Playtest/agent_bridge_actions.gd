@@ -214,6 +214,8 @@ static func _deny(hall: HallMain, quest: int) -> String:
 		return "locked"
 	if quest < 0 or quest >= hall.quest_entries.size():
 		return "no such quest"
+	if hall.quest_entries[quest].state == HallStyle.QUEST_STATE_DENIED:
+		return "already denied"
 	hall.open_assign(quest)
 	hall.deny_quest()
 	return "" if hall.quest_entries[quest].state == HallStyle.QUEST_STATE_DENIED else "cannot deny"

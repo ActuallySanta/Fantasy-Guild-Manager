@@ -30,6 +30,10 @@ var _bridge_dir := ""
 var _poll_timer := 0.0
 ## Id of the last command answered, so one cmd.json is handled once.
 var _last_handled_id := 0
+## True while a command is being answered (end_day waits for the night over
+## several frames). New commands wait in cmd.json until it clears, so they are
+## never run against a half-played night and responses stay in order.
+var _busy := false
 
 @onready var _hall: HallMain = $HallMain
 
@@ -74,6 +78,8 @@ func _parse_args() -> void:
 
 ## Reads cmd.json if it holds a command not yet answered, and answers it.
 func _poll_command() -> void:
+	if _busy:
+		return
 	var path := _bridge_dir + COMMAND_FILE
 	if not FileAccess.file_exists(path):
 		return
@@ -84,9 +90,11 @@ func _poll_command() -> void:
 	if id <= _last_handled_id:
 		return
 	_last_handled_id = id
+	_busy = true
 	var response: Dictionary = await _dispatch(str(parsed.get("command", "")), parsed.get("args", {}))
 	response["id"] = id
 	_write_json(RESPONSE_FILE, response)
+	_busy = false
 	if response.get("quit", false):
 		get_tree().quit()
 

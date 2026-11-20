@@ -63,6 +63,24 @@ OUT="$("$TOOLS/bridge.sh" "$TMP/b" end_day)"; echo "$OUT" | head -c 300; echo
 [[ "$OUT" == *'"run_over":true'* && "$OUT" == *'"run_over_reason":"final_'* ]]; check "final battle ends the run" $?
 "$TOOLS/stop.sh" "$TMP/b"
 
+# ---- idempotent deny and the busy guard
+launch_bridge d --test-hooks
+"$TOOLS/bridge.sh" "$TMP/d" debug '{"call":"debug_skip_tutorial","args":[]}' >/dev/null
+S="$("$TOOLS/bridge.sh" "$TMP/d" state)"
+STAND_BEFORE="$(echo "$S" | grep -o '"standing":[0-9-]*' | head -1 | cut -d: -f2)"
+OUT="$("$TOOLS/bridge.sh" "$TMP/d" plan '{"deny":[0,0]}')"
+[[ "$OUT" == *'"applied":["deny 0"]'* && "$OUT" == *'already denied'* ]]; check "second deny of one quest is rejected" $?
+STAND_AFTER="$(echo "$OUT" | grep -o '"standing":[0-9-]*' | head -1 | cut -d: -f2)"
+echo "standing $STAND_BEFORE -> $STAND_AFTER"
+[ "$STAND_AFTER" -lt "$STAND_BEFORE" ] && [ "$((STAND_BEFORE - STAND_AFTER))" -le 3 ]; check "standing dropped (once)" $?
+# Busy guard: send end_day in the background, then state while the night plays out.
+# Both go through the one cmd.json, so state is answered only after end_day finishes.
+"$TOOLS/bridge.sh" "$TMP/d" end_day > "$TMP/d_end.json" &
+sleep 0.2
+OUT="$("$TOOLS/bridge.sh" "$TMP/d" state)"
+wait
+[[ "$OUT" == *'"ok":true'* && "$OUT" == *'"day":2'* ]]; check "state sent during end_day shows the next day" $?
+
 # ---- game over
 launch_bridge c --test-hooks
 # Pip's tutorial locks Deny on day 1, so skip it first
