@@ -19,6 +19,9 @@ const RESPONSE_FILE := "resp.json"
 const RESPONSE_TEMP_FILE := "resp.tmp"
 const READY_FILE := "ready.json"
 
+## Longest `quit` waits for the run log to finish posting, in seconds.
+const QUIT_FLUSH_SECONDS := 15
+
 ## Commands that change the game; refused once the run is over.
 const ACTION_COMMANDS: Array[String] = ["plan", "end_day"]
 
@@ -36,6 +39,8 @@ var _last_handled_id := 0
 var _busy := false
 ## Screenshots taken so far this run (names the files in shots/).
 var _shot_count := 0
+## The hall's RunLogger, switched to the AI target in _ready (null if absent).
+var _logger: RunLogger
 
 @onready var _hall: HallMain = $HallMain
 
@@ -53,6 +58,7 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	_apply_launch_flags()
+	_configure_logger()
 	_write_json(READY_FILE, {"ok": true, "mode": options.get("mode", "rules")})
 
 
@@ -92,6 +98,36 @@ func _apply_launch_flags() -> void:
 	_hall.set_text_size(int(options.get("text_size", HallSettings.DEFAULT_TEXT_SIZE)))
 	_hall.set_color_filter(int(options.get("color_filter", 0)))
 	_hall.set_reduce_motion(options.get("reduce_motion", false) or options.get("mode", "rules") == "rules")
+
+
+## Points the hall's RunLogger at the AI target (own CSV, "AI Raw" tab).
+## --no-sheet keeps it local. The run id is unique per launch even with a
+## shared seed: ai-<label>-<persona>-<run>-<unix time>.
+func _configure_logger() -> void:
+	_logger = _hall.get_node_or_null("RunLogger") as RunLogger
+	if _logger == null:
+		return
+	var run_id := "ai-%s-%s-%s-%d" % [options.get("label", "none"), options.get("persona", "none"), options.get("run", "0"), int(Time.get_unix_time_from_system())]
+	_logger.configure_ai(run_id, str(options.get("persona", "")), int(options.get("seed", 0)), int(options.get("run", 0)), str(options.get("mode", "rules")), not options.get("no_sheet", false))
+
+
+## The run log's part of the status answer.
+func _log_status() -> Dictionary:
+	if _logger == null:
+		return {"run_id": "", "sheet": "off", "pending_rows": 0}
+	return {"run_id": _logger.run_id(), "sheet": _logger.ai_sheet_status, "pending_rows": _logger.pending_rows()}
+
+
+## Waits (up to QUIT_FLUSH_SECONDS) for queued run-log rows to post, retrying
+## the send. Only when the sheet check passed; otherwise nothing could post.
+func _flush_logger() -> void:
+	if _logger == null or _logger.ai_sheet_status != "ready":
+		return
+	var waited := 0.0
+	while _logger.pending_rows() > 0 and waited < QUIT_FLUSH_SECONDS:
+		_logger.flush()
+		await get_tree().create_timer(0.25).timeout
+		waited += 0.25
 
 
 ## Takes a screenshot of the viewport. Returns {ok, path, width, height, day}.
@@ -173,13 +209,20 @@ func _dispatch(command: String, args: Variant) -> Dictionary:
 			if command == "kill_all":
 				return AgentBridgeActions.kill_all(_hall)
 			return AgentBridgeActions.debug(_hall, arg_dict)
-		"ping", "status":
+		"status":
+			var status := _log_status()
+			status["ok"] = true
+			status["day"] = GameState.day
+			status["user_dir"] = OS.get_user_data_dir()
+			return status
+		"ping":
 			return {"ok": true, "mode": options.get("mode", "rules"), "day": GameState.day, "intro_open": _hall.is_intro_open(), "text_size": _hall.text_size}
 		"state":
 			var state := AgentBridgeState.build(_hall)
 			state["ok"] = true
 			return state
 		"quit":
+			await _flush_logger()
 			return {"ok": true, "quit": true}
 		_:
 			return {"ok": false, "error": "unknown command %s" % command}
