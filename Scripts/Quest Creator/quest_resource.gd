@@ -518,6 +518,17 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 
 	if combatChance >= successDetermination:
 		var succComDet = randi_range(1, 100)
+		match(difficulty):
+			-1:
+				succComDet -= 9
+			0:
+				succComDet -= 5
+			1:
+				succComDet -= 2
+		
+		if(succComDet > 100):
+			succComDet = 100
+			
 		if(1 <= succComDet && succComDet <= 25):
 				returnString = str(
 					"[b]The Party[/b] was ATTACKED by a group of ",
@@ -563,6 +574,18 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 	else:
 		var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
 		var succComDet = randi_range(1, 100)
+		match(difficulty):
+			-1:
+				succComDet += 50
+			0:
+				succComDet += 35
+			1:
+				succComDet += 15
+			2:
+				succComDet += 5
+		
+		if(succComDet > 100):
+			succComDet = 100
 		
 		if(1 <= succComDet && succComDet <= 25):
 			returnString = str(
