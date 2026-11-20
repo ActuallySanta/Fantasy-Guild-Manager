@@ -21,13 +21,13 @@ extends Control
 const INTRO_TITLE := "The Inheritance"
 const INTRO_SUB := "How you aquired the guild"
 const INTRO_PARAGRAPHS: Array[String] = [
-	"You were a simple turnip farmer. Then a letter came from your Uncle John: your grandfather had died and left you his guild.",
-	"Once it was the pride of the realm. Now its heroes are gone and its coffers are dry. Only Uncle John, a priest of stubborn faith, and Pip, the goblin clerk, stayed on.",
-	"But the guild was not left to you by chance. The [b]Demon King[/b] is rising. He grows stronger with every passing day, and one day he will march on the world.",
+	"You were a simple turnip farmer. Then one day, you recieved a letter from your Uncle John. \"Your grandfather had died and left you his guild.\"",
+	"This guild was once the pride of the world. Now many of its heroes are gone and its facilities run dry. Only Uncle John, a priest of stubborn faith, and Pip, the goblin clerk, stayed.",
+	"However, the guild was not left to you by chance. The [b]Demon King[/b] is rising. He grows stronger with every passing day, and one day he will march on the world.",
 	"[i]\"Make the guild strong again,\"[/i] the letter said. [i]\"Strong enough to stand against him.\"[/i]",
 	"So you hung up your hoe and came, to a dusty hall, a single hero, and a quest board with one notice pinned to it.",
 ]
-const INTRO_END_LINE := "The guild is yours, Guildmaster."
+const INTRO_END_LINE := "The guild is now yours, Guildmaster."
 const BUTTON_BEGIN := "Open the Doors"
 # ==== END INTRO STORY TEXT =================================================
 
