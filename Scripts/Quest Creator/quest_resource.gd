@@ -526,8 +526,8 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 			1:
 				succComDet -= 2
 		
-		if(succComDet > 100):
-			succComDet = 100
+		if(succComDet < 1):
+			succComDet = 1
 			
 		if(1 <= succComDet && succComDet <= 25):
 				returnString = str(
