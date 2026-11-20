@@ -40,7 +40,7 @@ Constant: `MAX_PARALLEL = 4` (at most 4 bridges/Godot windows at once).
 
 ## Procedure
 
-1. **Set up.** Parse the arguments and apply the defaults. Set `DATE=$(date +%F)`, `REPO` to the repo root, and `SCRATCH=/tmp/fgm-playtest-$DATE-$LABEL`. Create `$SCRATCH/bridges` and `$SCRATCH/diaries`. Run `git rev-parse --short HEAD` for the report header. Keep a list `LAUNCHED` of every bridge dir you start.
+1. **Set up.** Parse the arguments and apply the defaults. Set `DATE=$(date +%F)` and `REPO` to the repo root. Build `SCRATCH="$(cygpath -m "$(mktemp -d)")"`: a mixed-style `C:/...` path that Git Bash, Godot and the Windows-native Read/Write tools all accept. Use it for the project, bridge and diary paths (never a bare `/tmp`, which Git Bash and the native tools see differently). The `diary_path` and `bridge_dir` handed to agents are these mixed-style paths. Create `$SCRATCH/bridges` and `$SCRATCH/diaries`. Run `git rev-parse --short HEAD` for the report header. Keep a list `LAUNCHED` of every bridge dir you start. Keep a results list (in your context, or `$SCRATCH/results.jsonl`): as each background agent completes, add `{persona, run, parsed JSON or "failed: <reason>"}`.
 
 2. **Prepare the scratch copy.** Once, from the repo root:
    ```bash
@@ -59,7 +59,8 @@ Constant: `MAX_PARALLEL = 4` (at most 4 bridges/Godot windows at once).
       bash tools/playtest/launch.sh "$SCRATCH/project" "$BRIDGE" -- --bridge-dir="$BRIDGE" --mode=eyes --seed=<seed> --persona=<slug> --run=<n> --label=<label> [persona flags]
       ```
       Add the bridge dir to `LAUNCHED` as soon as you call launch. If launch exits non-zero, record the persona run as `failed: <reason>` (use the launch message and the tail of `$BRIDGE/godot.log`), run `stop.sh` on it, and carry on with the other jobs.
-   2. Dispatch the persona with the Agent tool: `subagent_type: playtester-<slug>`, `run_in_background: true`. The prompt gives exactly these lines:
+   2. **Sheet check (first bridge only).** Right after `launch.sh` returns and BEFORE dispatching the agent (the agent sends `quit` itself, and a mid-run check would race it on `cmd.json`), run `bash tools/playtest/bridge.sh "$BRIDGE" status '{}'`. If `sheet` is `checking`, poll every 2 s for up to 20 s. Record the first final value (anything but `checking`) for the report banner (see step 5). One bridge is enough unless that value is `offline`, in which case repeat on the next launched bridge.
+   3. Dispatch the persona with the Agent tool: `subagent_type: playtester-<slug>`, `run_in_background: true`. The prompt gives exactly these lines:
       ```
       bridge_dir: <BRIDGE>
       diary_path: <DIARY>
@@ -68,13 +69,9 @@ Constant: `MAX_PARALLEL = 4` (at most 4 bridges/Godot windows at once).
       game_rules_hint: none
       ```
       Use the absolute bridge path as the bash scripts see it. The agent plays only through `bridge.sh`, writes its own diary, and ends its reply with one fenced json block.
-   3. When the agent finishes, parse the last fenced json block of its reply. If there is no valid block, record `failed: no valid JSON block` for that run. Either way, run `bash tools/playtest/stop.sh "$BRIDGE"` and start the next waiting job.
+   4. When the agent finishes, parse the last fenced json block of its reply. If there is no valid block, or it parses but lacks the required keys (`persona`, `run`, `mode`, `furthest_day`, `drake`, `deaths`, `confusions`, `ui_issues`, `verdict`), record `failed: no valid JSON block` for that run. Add the outcome to the results list. Either way, run `bash tools/playtest/stop.sh "$BRIDGE"` and start the next waiting job.
 
-5. **Check the sheet once.** On the first live bridge, before it is stopped (a rules run is easiest), run:
-   ```bash
-   bash tools/playtest/bridge.sh "$BRIDGE" status '{}'
-   ```
-   Read `sheet`: `off`, `checking`, `ready`, `not_redeployed` or `offline`. `quit` (inside `stop.sh`) flushes pending rows to the sheet when `ready`. If `sheet` is `checking`, check again on the next bridge. If the final value is not `ready`, put a banner at the top of the report:
+5. **Sheet banner.** Use the `sheet` value recorded in step 4.2 (`off`, `checking`, `ready`, `not_redeployed` or `offline`). `quit` flushes pending rows to the sheet when `ready`. If it is not `ready`, put a banner at the top of the report:
    - `not_redeployed`: "AI rows were logged locally only: the run-log Apps Script hasn't been redeployed yet".
    - `offline`: "AI rows were logged locally only: the sheet could not be reached".
    - `off` or `checking`: "AI rows were not sent to the sheet (sheet status: <value>)".
