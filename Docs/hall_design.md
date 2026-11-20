@@ -270,6 +270,16 @@ sits next to "Save runs" above the warning, so it doesn't need a debug run eithe
 
 None of it counts toward the Game Over ledger or the credits (`run_stats`).
 
+## AI playtesting
+
+`/playtest` (`.claude/skills/playtest/SKILL.md`) runs AI personas (`.claude/agents/playtester-*.md`) against a scratch copy of the project, using the `tools/playtest/` scripts and the debug-only bridge scene (`Scenes/Playtest/agent_bridge.tscn`, `Scripts/Playtest/agent_bridge*.gd`, excluded from exports). The bridge instances the hall, seeds the RNG (`--seed`) and re-rolls day 1's heroes, hire pool, shop and quests, so every persona starts from the same state. It changes game state only through hall actions.
+
+- **Rules mode** (min-maxer, cautious-planner, reckless-gambler, typical-player): `state` returns a snapshot built from hall queries, `plan` applies a day's actions, `end_day` plays the night. Runs can go all the way to day 50.
+- **Eyes mode** (first-timer, skimmer, accessibility, genre-veteran): only `screenshot`, `tap`, `swipe` and `wait`, like a player. It needs a window, so it isn't headless.
+- **Run log:** the bridge sets the run logger's AI target, so rows carry `persona` and `seed` and go to `user://run_log_ai.csv` and the Google Sheet's `AI Raw` tab, with the `AI Day Ends`, `AI Runs`, `AI Summary` and `AI Charts` tabs mirroring the human ones. Human rows are unchanged.
+- **Apps Script redeploy:** the web app must be redeployed with a new version of `Scripts/Playtest/run_log_apps_script.gs` before AI rows reach the sheet. Until then the bridge's `status.sheet` is `not_redeployed`, rows stay local, and the report shows a banner.
+- Reports go to `Docs/playtests/` (see its README).
+
 ## Saving and offline play
 
 **Dev switch:** saving is **off by default** (`HallSettings.DEFAULT_SAVE_ENABLED`), so

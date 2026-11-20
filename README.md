@@ -51,6 +51,15 @@ The window starts in portrait (720 × 1280), like a phone. You can resize it.
 standing and roster (for example, right before the Bone Drake, or on the Game Over
 screen). Open one and press **F6** (Run Current Scene).
 
+### AI playtesters
+
+Eight AI personas can play the game and report back: four read the game's numbers
+(min-maxer, cautious-planner, reckless-gambler, typical-player) and four play by
+screenshot and tap only (first-timer, skimmer, accessibility, genre-veteran). In Claude
+Code, run `/playtest` (arguments: `personas=`, `runs=`, `seed=`, `label=`, `days=`). It
+works in a scratch copy of the project and writes `Docs/playtests/<date>-<label>.md`
+(see `Docs/playtests/README.md`). The scripts are in `tools/playtest/`.
+
 ### Saving while developing
 
 By default every launch starts a fresh Day 1. To keep your run between launches, open
