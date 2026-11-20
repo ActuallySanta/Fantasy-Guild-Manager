@@ -19,6 +19,9 @@ const RESPONSE_FILE := "resp.json"
 const RESPONSE_TEMP_FILE := "resp.tmp"
 const READY_FILE := "ready.json"
 
+## Commands that change the game; refused once the run is over.
+const ACTION_COMMANDS: Array[String] = ["plan", "end_day"]
+
 ## Parsed user args (see _parse_args): bridge_dir, mode, seed, persona, run, label...
 var options: Dictionary = {}
 ## Bridge directory with forward slashes and a trailing slash.
@@ -81,16 +84,31 @@ func _poll_command() -> void:
 	if id <= _last_handled_id:
 		return
 	_last_handled_id = id
-	var response := _dispatch(str(parsed.get("command", "")), parsed.get("args", {}))
+	var response: Dictionary = await _dispatch(str(parsed.get("command", "")), parsed.get("args", {}))
 	response["id"] = id
 	_write_json(RESPONSE_FILE, response)
 	if response.get("quit", false):
 		get_tree().quit()
 
 
-## Runs one command. Returns the response dictionary (without "id").
-func _dispatch(command: String, _args: Variant) -> Dictionary:
+## Runs one command (a coroutine: end_day waits for the night). Returns the response dictionary (without "id").
+func _dispatch(command: String, args: Variant) -> Dictionary:
+	var arg_dict: Dictionary = args if args is Dictionary else {}
+	# once the run has ended every action is refused
+	if command in ACTION_COMMANDS and AgentBridgeActions.is_run_over(_hall):
+		return {"ok": false, "error": "run over"}
 	match command:
+		"plan":
+			return AgentBridgeActions.plan(_hall, arg_dict)
+		"end_day":
+			return await AgentBridgeActions.end_day(_hall, get_tree())
+		"debug", "kill_all":
+			# test hooks: personas never get them (no --test-hooks flag)
+			if not options.get("test_hooks", false):
+				return {"ok": false, "error": "unknown command %s" % command}
+			if command == "kill_all":
+				return AgentBridgeActions.kill_all(_hall)
+			return AgentBridgeActions.debug(_hall, arg_dict)
 		"ping":
 			return {"ok": true, "mode": options.get("mode", "rules"), "day": GameState.day}
 		"state":
