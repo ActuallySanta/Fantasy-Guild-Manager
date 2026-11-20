@@ -55,6 +55,12 @@ var died_on_quest: String = ""
 ## heroes count from Day 1. Feeds the credits' longest-serving record.
 var joined_on_day: int = 1
 
+## Lowest weight a stat may be rolled with, in stat points. Keeps every stat >= 0.
+const MIN_STAT_WEIGHT := 0.0
+## How many times a below-minimum weight is redrawn before falling back to
+## MIN_STAT_WEIGHT (a count of draws).
+const MAX_WEIGHT_REDRAWS := 20
+
 var stat_deviation: int = 2
 
 var stats: Dictionary[StatType, int] = {
@@ -142,6 +148,17 @@ func reroll_stats(points: int, deviation: int) -> void:
 	reset_temp_stats()
 
 
+## Draws one stat weight from a normal curve, redrawing any result below
+## MIN_STAT_WEIGHT (at most MAX_WEIGHT_REDRAWS tries, then MIN_STAT_WEIGHT).
+## `mean` and `deviation` are in stat points. Returns the weight, in stat points.
+func _draw_stat_weight(mean: float, deviation: float) -> float:
+	for attempt in MAX_WEIGHT_REDRAWS:
+		var weight := randfn(mean, deviation)
+		if weight >= MIN_STAT_WEIGHT:
+			return weight
+	return MIN_STAT_WEIGHT
+
+
 ## Generate the stats using normalized random number sampling
 func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int) -> void:
 	var _stat_weights: Array[float]
@@ -152,7 +169,7 @@ func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int)
 
 	#Generate random numbers and sum them all up
 	for stat in _stat_weights.size():
-		_stat_weights[stat] = randfn(_total_points / _stats.size(), stat_deviation)
+		_stat_weights[stat] = _draw_stat_weight(float(_total_points) / _stats.size(), stat_deviation)
 		stat_sum += _stat_weights[stat]
 
 	#After all the stats are added together, make them proportional to the total points
