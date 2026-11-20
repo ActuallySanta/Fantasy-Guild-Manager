@@ -9,6 +9,9 @@
 class_name AgentBridgeState
 extends RefCounted
 
+## Hero and item ids are emitted as strings: instance ids can exceed 2^53,
+## which JSON numbers (floats) can't hold exactly.
+
 ## Features whose lock the snapshot reports: bottom tabs, then Pip's tutorial gates.
 const LOCKABLE_FEATURES: Array[String] = ["upgrades", "shop", "hire", "hero_page", "deny"]
 ## `kind` values of a quest entry.
@@ -47,13 +50,13 @@ static func _locked(hall: HallMain) -> Dictionary:
 ## One roster hero. `injury` is the InjuryLevel name, `stats` uses StatType names.
 static func _hero(hall: HallMain, character: GuildCharacter) -> Dictionary:
 	return {
-		"id": character.get_instance_id(),
+		"id": id_of(character),
 		"name": character.name,
 		"role": GuildCharacter.CharacterRole.keys()[character.role],
 		"injury": GuildCharacter.InjuryLevel.keys()[character.injury_level],
 		"pluck": character.pluck,
 		"stats": _stats(character.stats),
-		"gear": character.equipped_items.map(func(item): return item.get_instance_id()),
+		"gear": character.equipped_items.map(func(item): return id_of(item)),
 		"can_quest": hall.can_go_on_quests(character),
 		"training": GuildUpgrades.is_training(character),
 	}
@@ -62,7 +65,7 @@ static func _hero(hall: HallMain, character: GuildCharacter) -> Dictionary:
 ## One For Hire applicant. `cost` is the hire price in gold.
 static func _hire(character: GuildCharacter) -> Dictionary:
 	return {
-		"id": character.get_instance_id(),
+		"id": id_of(character),
 		"name": character.name,
 		"role": GuildCharacter.CharacterRole.keys()[character.role],
 		"cost": character.cost,
@@ -85,7 +88,7 @@ static func _quests(hall: HallMain) -> Array:
 			"name": entry.quest.questTitle,
 			"kind": kind,
 			"slots": hall.party_size_limit(entry),
-			"party": entry.party.map(func(character): return character.get_instance_id()),
+			"party": entry.party.map(func(character): return id_of(character)),
 			"chance": hall.success_chance(entry, entry.party),
 			"decided": entry.state != HallStyle.QUEST_STATE_OPEN,
 			"denied": entry.state == HallStyle.QUEST_STATE_DENIED,
@@ -109,10 +112,10 @@ static func _shop() -> Array:
 	return shop
 
 
-## One owned item. `worn_by` is the wearer's id, or 0 when it is in the pack.
+## One owned item. `worn_by` is the wearer's id, or "" when it is in the pack.
 static func _owned_item(item: StandardItem) -> Dictionary:
 	return {
-		"id": item.get_instance_id(),
+		"id": id_of(item),
 		"name": item.name,
 		"worn_by": item.curr_user.get_instance_id() if item.curr_user != null else 0,
 	}
@@ -141,3 +144,19 @@ static func _stat_bonus(item: StandardItem) -> Dictionary:
 	if item is PassiveItem:
 		return {"stat": GuildCharacter.StatType.keys()[item.affected_stat], "amount": item.stat_amount}
 	return {}
+
+
+## The id the snapshot uses for a hero or item: its instance id as a string
+## (JSON numbers lose precision on ids this large). object: the hero or item.
+static func id_of(object: Object) -> String:
+	return str(object.get_instance_id())
+
+
+## Finds the object whose snapshot id is `id`. candidates: heroes or items to
+## search (e.g. hall.roster(), ItemContainer.owned_items). id: a string from
+## the snapshot. Returns the object, or null if none matches.
+static func find_by_id(candidates: Array, id: String) -> Object:
+	for candidate in candidates:
+		if id_of(candidate) == id:
+			return candidate
+	return null
