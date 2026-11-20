@@ -100,8 +100,9 @@ numbers come from `HallWallet` (static functions); the milestones are built from
 ## Intro crawl
 
 A new run opens on a story crawl (`Scenes/Overlays/Day/overlay_intro.tscn`) before Pip's
-Day 1 tutorial (or the Welcome card when the tutorial is off): who the player is and how
-they came to inherit the guild, in the credits' gold ink on black. It moves like the
+Day 1 tutorial (or the Welcome card when the tutorial is off): who the player is, how
+they came to inherit the guild, and why (it must grow strong enough to face the Demon
+King), in the credits' gold ink on black. It moves like the
 credits (`CrawlRoll`, shared with them): it scrolls itself, any touch hands it to the
 player, and **Open the Doors** appears once the bottom is reached. Pressing it sets
 `HallMain.is_intro_seen`, which is saved, so each save sees the crawl once. Closing the
