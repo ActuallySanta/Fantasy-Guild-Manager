@@ -117,7 +117,7 @@ static func _owned_item(item: StandardItem) -> Dictionary:
 	return {
 		"id": id_of(item),
 		"name": item.name,
-		"worn_by": item.curr_user.get_instance_id() if item.curr_user != null else 0,
+		"worn_by": id_of(item.curr_user) if item.curr_user != null else "",
 	}
 
 

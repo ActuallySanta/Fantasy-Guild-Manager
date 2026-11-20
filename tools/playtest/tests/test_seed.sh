@@ -10,7 +10,7 @@ check() { # name, condition result (0 = pass)
 }
 # Strips instance ids (they differ per process) so two runs can be compared.
 strip_ids() {
-	sed -E 's/"(id|worn_by)":("[^"]*"|-?[0-9]+),?//g; s/"gear":\[[^]]*\]/"gear":[]/g; s/"party":\[[^]]*\]/"party":[]/g'
+	sed -E 's/"(id|worn_by)":"[^"]*",?//g; s/"gear":\[[^]]*\]/"gear":[]/g; s/"party":\[[^]]*\]/"party":[]/g'
 }
 # state_of <name> <seed>: launches a bridge, saves its state to $TMP/<name>.json, stops it.
 state_of() {
@@ -27,6 +27,10 @@ grep -q '"ok":true' "$TMP/a.json"; check "state ok" $?
 grep -q '"hires":\[{' "$TMP/a.json"; check "day 1 has a hire" $?
 grep -q '"id":"-\?[0-9]\+"' "$TMP/a.json"; check "ids are JSON strings" $?
 grep -q '"quests":\[{' "$TMP/a.json"; check "day 1 has quests" $?
+# every worn_by must be a JSON string; this pattern catches an int (checked against a sample too)
+INT_WORN_BY='"worn_by":[^"]'
+echo '{"items":[{"worn_by":0}]}' | grep -q "$INT_WORN_BY"; check "int worn_by pattern matches a bad sample" $?
+! grep -q "$INT_WORN_BY" "$TMP/a.json"; check "no non-string worn_by in state" $?
 grep -q '"shop":\[{' "$TMP/a.json"; check "shop stocked" $?
 A="$(strip_ids < "$TMP/a.json")"; B="$(strip_ids < "$TMP/b.json")"; C="$(strip_ids < "$TMP/c.json")"
 [ "$A" == "$B" ]; check "same seed gives identical state" $?
