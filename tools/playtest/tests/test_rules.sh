@@ -81,6 +81,13 @@ OUT="$("$TOOLS/bridge.sh" "$TMP/d" state)"
 wait
 [[ "$OUT" == *'"ok":true'* && "$OUT" == *'"day":2'* ]]; check "state sent during end_day shows the next day" $?
 
+# a runtime error inside a command answers "internal error" and the bridge keeps going
+OUT="$("$TOOLS/bridge.sh" "$TMP/d" crash)"
+[[ "$OUT" == *'"ok":false'* && "$OUT" == *"internal error"* ]]; check "runtime error answers internal error" $?
+OUT="$("$TOOLS/bridge.sh" "$TMP/d" ping)"
+[[ "$OUT" == *'"ok":true'* ]]; check "ping answers after a runtime error" $?
+"$TOOLS/stop.sh" "$TMP/d"
+
 # ---- game over
 launch_bridge c --test-hooks
 # Pip's tutorial locks Deny on day 1, so skip it first

@@ -91,10 +91,14 @@ func _poll_command() -> void:
 		return
 	_last_handled_id = id
 	_busy = true
-	var response: Dictionary = await _dispatch(str(parsed.get("command", "")), parsed.get("args", {}))
+	var command := str(parsed.get("command", ""))
+	# untyped: a runtime error inside _dispatch aborts it and yields null (or an empty dictionary)
+	var result: Variant = await _dispatch(command, parsed.get("args", {}))
+	# cleared first thing, so nothing below can leave the bridge wedged
+	_busy = false
+	var response: Dictionary = result if result is Dictionary and not result.is_empty() else {"ok": false, "error": "internal error in %s" % command}
 	response["id"] = id
 	_write_json(RESPONSE_FILE, response)
-	_busy = false
 	if response.get("quit", false):
 		get_tree().quit()
 
@@ -110,6 +114,13 @@ func _dispatch(command: String, args: Variant) -> Dictionary:
 			return AgentBridgeActions.plan(_hall, arg_dict)
 		"end_day":
 			return await AgentBridgeActions.end_day(_hall, get_tree())
+		"crash":
+			# test hook: a deliberate runtime error, to prove the bridge survives one
+			if not options.get("test_hooks", false):
+				return {"ok": false, "error": "unknown command %s" % command}
+			var nothing: Object = null
+			nothing.call("no_such_method")
+			return {"ok": true}
 		"debug", "kill_all":
 			# test hooks: personas never get them (no --test-hooks flag)
 			if not options.get("test_hooks", false):
