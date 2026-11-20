@@ -118,12 +118,18 @@ func _log_status() -> Dictionary:
 	return {"run_id": _logger.run_id(), "sheet": _logger.ai_sheet_status, "pending_rows": _logger.pending_rows()}
 
 
-## Waits (up to QUIT_FLUSH_SECONDS) for queued run-log rows to post, retrying
-## the send. Only when the sheet check passed; otherwise nothing could post.
+## Waits (up to QUIT_FLUSH_SECONDS in all) for the sheet check to finish, then
+## for queued run-log rows to post, retrying the send. Only when the sheet
+## check passed; otherwise nothing could post.
 func _flush_logger() -> void:
-	if _logger == null or _logger.ai_sheet_status != "ready":
+	if _logger == null:
 		return
 	var waited := 0.0
+	while _logger.ai_sheet_status == "checking" and waited < QUIT_FLUSH_SECONDS:
+		await get_tree().create_timer(0.25).timeout
+		waited += 0.25
+	if _logger.ai_sheet_status != "ready":
+		return
 	while _logger.pending_rows() > 0 and waited < QUIT_FLUSH_SECONDS:
 		_logger.flush()
 		await get_tree().create_timer(0.25).timeout

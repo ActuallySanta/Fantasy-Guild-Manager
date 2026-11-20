@@ -16,24 +16,38 @@
 const SHEET_ID = "1YN1BRbHZNM5ZyHxs8oSd4T0L0wtOcbYK4MuKLQNC8QM";
 const TOKEN = "goobers";   // must match TOKEN in run_logger.gd
 const AI_SHEET_NAME = "AI Raw";   // the AI playtest tab
+const LOCK_WAIT_MS = 20000;   // longest a post waits for another post to finish
 
 function doPost(e) {
   const data = JSON.parse(e.postData.contents);
   if (data.token !== TOKEN) return out({ ok: false, error: "bad token" });
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  const sheet = data.sheet === "ai"
-    ? getOrCreateAiSheet(ss, data.columns.length)
-    : (ss.getSheetByName("Sheet1") || ss.getSheets()[0]);
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(data.columns);
-    sheet.setFrozenRows(1);
+  // One post at a time: parallel AI runs could otherwise both create the AI
+  // tab or both write to the same free rows. A busy answer makes the logger
+  // keep its rows and retry with the next one.
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(LOCK_WAIT_MS);
+  } catch (err) {
+    return out({ ok: false, error: "busy" });
   }
-  const rows = data.rows || [];
-  if (rows.length > 0) {
-    // one write for the whole batch (fast, even with a backlog)
-    sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
+  try {
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = data.sheet === "ai"
+      ? getOrCreateAiSheet(ss, data.columns.length)
+      : (ss.getSheetByName("Sheet1") || ss.getSheets()[0]);
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(data.columns);
+      sheet.setFrozenRows(1);
+    }
+    const rows = data.rows || [];
+    if (rows.length > 0) {
+      // one write for the whole batch (fast, even with a backlog)
+      sheet.getRange(sheet.getLastRow() + 1, 1, rows.length, rows[0].length).setValues(rows);
+    }
+    return out({ ok: true, added: rows.length });
+  } finally {
+    lock.releaseLock();
   }
-  return out({ ok: true, added: rows.length });
 }
 
 // The AI tab: added after the last tab if missing, and wide enough for the
