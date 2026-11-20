@@ -34,6 +34,8 @@ var _last_handled_id := 0
 ## several frames). New commands wait in cmd.json until it clears, so they are
 ## never run against a half-played night and responses stay in order.
 var _busy := false
+## Screenshots taken so far this run (names the files in shots/).
+var _shot_count := 0
 
 @onready var _hall: HallMain = $HallMain
 
@@ -44,9 +46,13 @@ func _enter_tree() -> void:
 	# anything, so the first hire pool, shop stock and Board come from the seed.
 	if options.has("seed"):
 		seed(int(options.seed))
+	# --intro: the hall decides in its _ready whether the crawl shows, so set it now
+	if options.get("intro", false):
+		$HallMain.shows_intro_without_save = true
 
 
 func _ready() -> void:
+	_apply_launch_flags()
 	_write_json(READY_FILE, {"ok": true, "mode": options.get("mode", "rules")})
 
 
@@ -74,6 +80,24 @@ func _parse_args() -> void:
 	_bridge_dir = str(options.get("bridge_dir", "")).replace("\\", "/")
 	if not _bridge_dir.ends_with("/"):
 		_bridge_dir += "/"
+
+
+## Applies --text-size=N, --color-filter=N and --reduce-motion (both modes), and
+## always reduce motion in rules mode. The hall's own _ready has already run.
+## Every setting is applied (to its default when no flag is given), because the
+## hall saves them to user://settings and a later launch would inherit them.
+func _apply_launch_flags() -> void:
+	if options.get("mode", "rules") == "eyes":
+		AgentBridgeEyes.fit_window(get_window())
+	_hall.set_text_size(int(options.get("text_size", HallSettings.DEFAULT_TEXT_SIZE)))
+	_hall.set_color_filter(int(options.get("color_filter", 0)))
+	_hall.set_reduce_motion(options.get("reduce_motion", false) or options.get("mode", "rules") == "rules")
+
+
+## Takes a screenshot of the viewport. Returns {ok, path, width, height, day}.
+func _take_screenshot() -> Dictionary:
+	_shot_count += 1
+	return await AgentBridgeEyes.screenshot(get_viewport(), _bridge_dir, _shot_count)
 
 
 ## Reads cmd.json if it holds a command not yet answered, and answers it.
@@ -109,7 +133,24 @@ func _dispatch(command: String, args: Variant) -> Dictionary:
 	# once the run has ended every action is refused
 	if command in ACTION_COMMANDS and AgentBridgeActions.is_run_over(_hall):
 		return {"ok": false, "error": "run over"}
+	if options.get("mode", "rules") == "eyes":
+		var is_hook: bool = command == "debug_rect" and options.get("test_hooks", false)
+		if not AgentBridgeEyes.is_allowed(command) and not is_hook:
+			return {"ok": false, "error": AgentBridgeEyes.NOT_ALLOWED_ERROR}
 	match command:
+		"screenshot":
+			return await _take_screenshot()
+		"tap":
+			var tapped := await AgentBridgeEyes.tap(get_viewport(), get_tree(), arg_dict)
+			return await _take_screenshot() if tapped.ok else tapped
+		"wait":
+			await AgentBridgeEyes.wait(get_tree(), arg_dict)
+			return await _take_screenshot()
+		"debug_rect":
+			# test hook: personas never get it (eyes mode refuses it without --test-hooks)
+			if not options.get("test_hooks", false):
+				return {"ok": false, "error": "unknown command %s" % command}
+			return AgentBridgeEyes.debug_rect(_hall, arg_dict)
 		"plan":
 			return AgentBridgeActions.plan(_hall, arg_dict)
 		"end_day":
@@ -128,8 +169,8 @@ func _dispatch(command: String, args: Variant) -> Dictionary:
 			if command == "kill_all":
 				return AgentBridgeActions.kill_all(_hall)
 			return AgentBridgeActions.debug(_hall, arg_dict)
-		"ping":
-			return {"ok": true, "mode": options.get("mode", "rules"), "day": GameState.day}
+		"ping", "status":
+			return {"ok": true, "mode": options.get("mode", "rules"), "day": GameState.day, "intro_open": _hall.is_intro_open(), "text_size": _hall.text_size}
 		"state":
 			var state := AgentBridgeState.build(_hall)
 			state["ok"] = true
