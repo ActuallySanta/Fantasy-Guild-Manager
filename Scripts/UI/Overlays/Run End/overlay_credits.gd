@@ -8,7 +8,7 @@
 ## the team credits (Data/credits.tres, see CreditsList), and a
 ## closing line.
 ##
-## The roll scrolls itself after START_DELAY. Any touch, drag or wheel hands
+## The roll scrolls itself (CrawlRoll) after a short delay. Any touch, drag or wheel hands
 ## it to the player for good. The button waits until the bottom is first
 ## reached, then stays, so the player can scroll back up and still leave.
 ## Reduced Motion: no auto-scroll, and the roll starts at its title.
@@ -21,8 +21,7 @@ const RollCallRowScene := preload("uid://bqn0i28l67um7")  # Scenes/Rows/Day End/
 const TEAM_CREDITS: CreditsList = preload("uid://c72de0tnaska")  # Data/credits.tres
 
 # ---- MOTION
-## Seconds the roll holds still before it starts to move.
-const START_DELAY := 1.2
+## (The start delay and the bottom check live in CrawlRoll.)
 ## How fast the roll moves (pixels per second) on a victory, and on a defeat.
 const SCROLL_SPEED := 70.0
 const DEFEAT_SCROLL_SPEED := 50.0
@@ -33,8 +32,6 @@ const TOP_SPACE_SHARE := 0.85
 ## Blank space under the closing line (pixels), so it can scroll up past the
 ## pinned button instead of ending under it.
 const BOTTOM_SPACE := 520.0
-## The bottom counts as reached within this many pixels of the end.
-const BOTTOM_SLACK := 4.0
 
 # ---- LOOK
 ## Font sizes: story lines, party names, team names, contributions.
@@ -122,12 +119,8 @@ const BUTTON_NEW_RUN := "Found a New Guild"
 var hall: HallMain
 ## The credits currently built on screen (frozen once the final battle is over).
 var _built_credits: Dictionary = {}
-## True while the roll moves by itself (until the player touches it or it ends).
-var _is_auto_scrolling := false
-## Seconds left before the roll starts to move.
-var _start_wait := 0.0
-## Where the roll is, in fractional pixels (scroll_vertical is an int).
-var _scroll_position := 0.0
+## The roll's motion: auto-scroll, hand-over to the player, the button at the bottom.
+var _roll: CrawlRoll
 ## Ink for text on the dark roll: main and soft (set per mood).
 var _ink := HallStyle.CREDITS_INK
 var _ink_soft := HallStyle.CREDITS_INK_SOFT
@@ -137,8 +130,9 @@ func setup(main: HallMain) -> void:
 	hall = main
 	_action_button.pressed.connect(_on_action_pressed)
 	HallStyle.style_button(_action_button, "gold", 46)
-	_scroll.get_v_scroll_bar().value_changed.connect(_on_scrolled)
-	set_process(false)
+	_roll = CrawlRoll.new()
+	add_child(_roll)
+	_roll.setup(_scroll, _top_space, _bottom_space, _footer)
 
 
 func refresh() -> void:
@@ -172,60 +166,12 @@ func _on_action_pressed() -> void:
 # ---- the roll
 
 
-## Back to the top with the button hidden, then (motion allowed) wait and roll.
+## Back to the top with the button hidden, then (motion allowed) wait and roll
+## (see CrawlRoll). A defeat rolls slower.
 func _start_roll() -> void:
-	_footer.visible = false
-	var screen_height: float = size.y if size.y > 0.0 else get_viewport_rect().size.y
-	_top_space.custom_minimum_size.y = 0.0 if HallFx.reduce_motion else screen_height * TOP_SPACE_SHARE
-	_bottom_space.custom_minimum_size.y = BOTTOM_SPACE
-	_scroll_position = 0.0
-	_scroll.scroll_vertical = 0
-	_is_auto_scrolling = not HallFx.reduce_motion
-	_start_wait = START_DELAY
-	set_process(_is_auto_scrolling)
-
-
-func _process(delta: float) -> void:
-	if not _is_auto_scrolling or not visible:
-		set_process(false)
-		return
-	if _start_wait > 0.0:
-		_start_wait -= delta
-		return
 	var speed := SCROLL_SPEED if _built_credits.get("won", false) else DEFEAT_SCROLL_SPEED
-	_scroll_position += speed * delta
-	_scroll.scroll_vertical = int(_scroll_position)
-	# the last line has passed: stop, the button takes over
-	if _is_at_bottom():
-		_stop_auto_scroll()
+	_roll.start(speed, TOP_SPACE_SHARE, BOTTOM_SPACE)
 
-
-## Any touch, drag or wheel while the roll moves gives it to the player.
-func _input(event: InputEvent) -> void:
-	if not _is_auto_scrolling or not visible:
-		return
-	var is_touch: bool = event is InputEventScreenTouch or event is InputEventScreenDrag
-	var is_click: bool = event is InputEventMouseButton and event.pressed
-	if is_touch or is_click:
-		_stop_auto_scroll()
-
-
-func _stop_auto_scroll() -> void:
-	_is_auto_scrolling = false
-	set_process(false)
-
-
-## The roll moved (by itself or by the player): the first time it reaches the
-## bottom the button appears, and it stays from then on.
-func _on_scrolled(_value: float) -> void:
-	if not _footer.visible and _is_at_bottom():
-		_footer.visible = true
-		HallFx.appear(_footer, 0.85)
-
-
-func _is_at_bottom() -> bool:
-	var bar := _scroll.get_v_scroll_bar()
-	return bar.value + bar.page >= bar.max_value - BOTTOM_SLACK
 
 # ---- sections
 

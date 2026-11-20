@@ -1,4 +1,4 @@
-## Nav: the bottom tabs (Board / Members / Guild / Shop), always visible.
+## Nav: the bottom tabs (Quests / Members / Guild / Shop), always visible.
 ## The open one is parchment (NavTabActive in hall_theme) and stands taller,
 ## the rest dark wood (NavTab); each has a badge when it needs a visit.
 ## Button ids match HallMain.TAB_IDS (Nav_<id> in the scene).
@@ -25,8 +25,6 @@ const MAX_FONT_FACTOR := 1.5
 
 # ============================================================ TEXT
 
-## A tab Pip hasn't opened yet shows the day it opens on its badge.
-const BADGE_LOCKED := "Day %d"
 const BADGE_HIRE_FIRST := "!"
 const BADGE_NEW_RECRUITS := "%d new"
 
@@ -38,6 +36,11 @@ var hall: HallMain
 
 ## Last badge text per nav tab (to pop on change).
 var _shown_badges := {}
+## Each tab's last applied locked state, so refresh only re-applies a change.
+var _shown_locked := {}
+
+## Each nav button's label from the scene, to restore when its tab unlocks.
+var _labels := {}
 
 
 # ============================================================ SETUP AND REFRESH
@@ -46,6 +49,7 @@ func setup(main: HallMain) -> void:
 	hall = main
 	for tab_id in HallMain.TAB_IDS:
 		var nav_button := button(tab_id)
+		_labels[tab_id] = nav_button.text
 		nav_button.pressed.connect(hall.open_tab.bind(tab_id))
 		HallFontScale.set_size(nav_button, "font_size", TAB_FONT_SIZE, MAX_FONT_FACTOR)
 		HallFontScale.set_size(nav_button.get_node("Badge/Text"), "font_size", BADGE_FONT_SIZE, MAX_FONT_FACTOR)
@@ -57,7 +61,7 @@ func button(tab_id: String) -> Button:
 
 
 func refresh() -> void:
-	# Assign Party counts as part of the Board
+	# Assign Party counts as part of the Quests tab
 	var highlighted_tab := "board" if hall.active_screen.get("kind", "") == HallMain.SCREEN_ASSIGN else hall.active_tab
 	for tab_id in HallMain.TAB_IDS:
 		var nav_button := button(tab_id)
@@ -65,6 +69,12 @@ func refresh() -> void:
 		nav_button.theme_type_variation = &"NavTabActive" if is_active else &"NavTab"
 		nav_button.custom_minimum_size.y = NAV_HEIGHT_OPEN if is_active else NAV_HEIGHT
 
+		# only touch the lock when it changes (or on the first refresh), so a
+		# refresh never re-enables a button Pip has disabled
+		var is_locked := hall.is_tab_locked(tab_id)
+		if _shown_locked.get(tab_id) != is_locked:
+			HallStyle.set_locked(nav_button, is_locked, _labels[tab_id])
+			_shown_locked[tab_id] = is_locked
 		var badge_text := _badge_text_for(tab_id)
 		var badge: Control = nav_button.get_node("Badge")
 		badge.visible = badge_text != ""
@@ -78,11 +88,14 @@ func refresh() -> void:
 ## What a nav tab's badge says ("" = no badge).
 func _badge_text_for(tab_id: String) -> String:
 	if hall.is_tab_locked(tab_id):
-		return BADGE_LOCKED % hall.tab_unlock_day(tab_id)
+		return ""
 	match tab_id:
 		"board":
 			return str(hall.undecided_count()) if hall.undecided_count() > 0 else ""
 		"guild":
+			# no badge while hiring isn't taught yet
+			if hall.is_locked(OverlayTutorial.FEATURE_HIRE):
+				return ""
 			if hall.roster().is_empty() and hall.can_hire_anyone():
 				return BADGE_HIRE_FIRST
 			return BADGE_NEW_RECRUITS % hall.unseen_recruit_count() if hall.unseen_recruit_count() > 0 else ""

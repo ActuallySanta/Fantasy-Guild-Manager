@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://d2mvq7rk5p3c"]
+
+[ext_resource type="Script" uid="uid://c4mvq7rk2e8w" path="res://Scripts/UI/Overlays/Day/overlay_move_confirm.gd" id="1_move"]
+[ext_resource type="StyleBox" uid="uid://do4q37xbfx05p" path="res://Themes/Styles/dim.tres" id="2_dim"]
+
+[node name="OverlayMoveConfirm" type="Control"]
+visible = false
+top_level = true
+z_index = 10
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_move")
+
+[node name="Dim" type="PanelContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = ExtResource("2_dim")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_right = 32
+
+[node name="Center" type="CenterContainer" parent="Margin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Sheet" type="PanelContainer" parent="Margin/Center"]
+custom_minimum_size = Vector2(600, 0)
+layout_mode = 2
+theme_type_variation = &"Sheet"
+
+[node name="Col" type="VBoxContainer" parent="Margin/Center/Sheet"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLabel"
+theme_override_font_sizes/font_size = 40
+text = "Move Maria?"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Body" type="Label" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "Maria is picked for #2 Escort the Merchant."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Note" type="Label" parent="Margin/Center/Sheet/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLabel"
+theme_override_font_sizes/font_size = 24
+text = "Moving them takes them off that quest."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Margin/Center/Sheet/Col"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="CancelButton" type="Button" parent="Margin/Center/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"WoodButton"
+theme_override_font_sizes/font_size = 28
+text = "Cancel"
+
+[node name="MoveButton" type="Button" parent="Margin/Center/Sheet/Col/Buttons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 84)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+theme_type_variation = &"PaperButton"
+theme_override_font_sizes/font_size = 28
+text = "Move"

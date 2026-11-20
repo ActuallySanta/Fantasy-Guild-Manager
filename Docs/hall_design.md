@@ -17,7 +17,8 @@ of introduction, buildings are plans on grid paper, and the night's results come
 letters with a Success / Failed stamp.
 Colour still carries meaning, now as ink: each stat has its own ink, green = good / sent,
 red = bad / denied / hurt, blue = odds / to do, gold = money, and each quest type has a
-coloured seal (DUN, ESC, SCT, INT, BOSS).
+coloured seal with its own icon (DUN, ESC, SCT, INT, BOSS: an exclamation point, FINAL: a
+horned skull).
 
 All art is a swappable placeholder. **See `Sprites/README.md`** for every file, what it's used
 for and how to replace it. In short: images are in `Sprites/` and fonts in `Fonts/`, each surface is a
@@ -29,16 +30,16 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 
 | Feedback | What Mobile Hall does |
 |---|---|
-| Can't compare one quest against all the others (Deck, Flow) | **Board** tab lists every quest of the day on one screen, with reward, party size, favored stat, state and odds |
+| Can't compare one quest against all the others (Deck, Flow) | **Quests** tab (the Board) lists every quest of the day on one screen, with reward, party size, favored stat, state and odds |
 | Can't see stats while assigning (Deck) | **Assign Party** picker shows each adventurer's health and four quest stats (favored one outlined), plus how much they add to the odds |
-| Picked parties are dropped unless you send them (Flow) | A quest's party is a **draft** that stays until you send, recall or change it. Switching quests keeps every draft |
+| Picked parties are dropped unless you send them (Flow) | Pinning anyone to a quest **sends** it; there's no separate Send step. The party stays until you unpin them, **Recall** (unpins everyone) or move them. Switching quests keeps every party |
 | Hard to switch between quests (Ledger) | Numbered **quest strip** at the top of Assign Party. One tap switches quests, and each tab is coloured by state |
-| Not sure what to do next (Ledger) | One **action bar** button above the nav, always the next step: *For Hire* → *Next Quest* → *End Day* |
-| Upgrades forgotten in every version | **Upgrades** tab badge when you can afford something, an Upgrades box on the Board's Today checklist, and the **End Day check** offers affordable upgrades before the day ends. None of these offer upgrades while Pip still holds the Guild tab back (until Day 3); the Board's box says when it opens |
+| Not sure what to do next (Ledger) | The Board's Today checklist points at what still needs doing, and an **End Day** button sits under the quest list (it opens the next undecided quest first if any are left) |
+| Upgrades forgotten in every version | **Upgrades** tab badge when you can afford something, an Upgrades box on the Board's Today checklist, and the **End Day check** offers affordable upgrades before the day ends. None of these offer upgrades while the Guild tab is still locked (until Day 10, `GuildUpgrades.UNLOCK_DAY`, the Bone Drake's day, tutorial or not; Pip walks through it that day); the Board's box sits blank and greyed until then |
 | No way to get denied quests back (Ledger) | Denied quests stay on the Board. Open one and tap **Reconsider** |
 | No signal when new recruits arrive (Ledger) | **Guild** badge ("3 new") each morning until you open Applicants |
 | Hiring and questing blurred together (Deck) | Guild tab has two clearly separate folder tabs: **Your Guild** / **Applicants** |
-| Tutorial skipped Home (Ledger) | Welcome card walks through Board, Guild, Upgrades and the big button, then lands on the Board |
+| Tutorial skipped Home (Ledger) | Welcome card walks through Quests, Members, Guild and End Day, then lands on the Quests tab |
 | Small buttons (Flow) | Main buttons are 88–96 px tall, nav tabs 100 px, list rows are tappable as a whole |
 | Too much scrolling / decorative art (Ledger) | No decorative art. The Board fits 5 quests without much scrolling. "Coming soon" buildings collapse into one line |
 | Quest results are walls of text (Flow) | **Day Report** is one short letter per quest: a result stamp, who went and at what odds, who got hurt, one line per story beat with an icon, and a one-line sign-off |
@@ -46,27 +47,27 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 ## Layout
 
 ```
-┌ header ─ Day · Bone Drake countdown · gold · standing · menu ┐
+┌ header ─ Day · Bone Drake countdown (BOSS seal + days left) · gold · standing · menu ┐
 │ warning strip ─ "Last hero standing" (only when one death from falling) │
 │ content ─ Board | Guild | Upgrades | Items  (or a screen over them) │
-│ action bar ─ "what to do next" + one big button             │
-└ nav ─ Board (undecided) · Members (new recruits) · Guild (affordable) · Items ┘
+└ nav ─ Quests (undecided) · Members (new recruits) · Guild (affordable) · Items ┘
 ```
 
 | Screen | What's on it |
 |---|---|
-| Board (tab) | Today checklist (Recruits / Quests / Upgrades, each tappable), then all quests. Rows show *Pick a party*, *Party picked*, *Sent* or *Denied* with odds and mini portraits |
-| Assign Party | Quest strip; quest card; party seats (tap to remove) with live odds; picker sorted best fit first. Adventurers already in another quest's party are hidden unless **Show busy** is on; shown, they say "Picked for / Sent on #N" and move over when tapped. Footer: Deny / Send Party, or Recall / Next Quest, or Board / Reconsider |
-| Guild (tab, "Members" in the nav) | A folder with two tabs: Your Guild (roster with health, today's task, all five stats) / Applicants (a stack of letters of introduction; tap one peeking out to read it, Hire on the top one). Bed count links to the Barracks |
+| Board (tab, "Quests" in the nav) | Today checklist (Recruits / Decided Quests / Upgrades, each tappable), then all quests, then the **End Day** button. Rows show *Pick a party*, *Sent* or *Denied* with odds and mini portraits |
+| Assign Party | Quest strip; quest card; party seats (filled ones stack beside the odds, empty ones share one row under them across the card; tap a filled one to remove them, an empty one to scroll down to the picker) with live odds; picker sorted best fit first, in three groups: free adventurers, then those already in another quest's party (greyed out, saying "Picked for / Sent on #N"; tapping one opens a Move popup that asks before taking them off that quest), then those who can't go (hospital bed, training) at the very bottom. Pinning anyone sends the quest (SENT is stamped on it); a saved run from before this rule sends any quest with a party on load. Footer: Deny / Back to Quests (open), Recall / Back to Quests (sent; Recall unpins everyone), or Quests / Reconsider (denied) |
+| Guild (tab, "Members" in the nav) | A folder with two tabs: Your Guild (roster with health, two strongest stats and a status on the right: On quest #N, Idle, Training <stat>, In hospital or Fallen) / Applicants (a stack of letters of introduction; tap one peeking out to read it, Hire on the top one, with the applicant's whole backstory under the Hire button; applicants have no Details page). Bed count links to the Barracks |
 | Upgrades (tab, "Guild" in the nav) | A folder with two tabs. **Facilities**: the Training Yard plan (heroes in a slot with a Pow / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital plan (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: the treasury ledger, a plan per building (affordable first) with level diamonds, now/next effect, cost or what's missing, and "coming soon" buildings as rolled-up scrolls. Badge = upgrades you can afford |
-| Items (tab, id "shop") | A folder with two tabs; the first visit each day opens on the Shop. **Inventory** (the "pack" section in code): every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar where the action bar usually is |
+| Items (tab, id "shop") | Locked until Day 5 (`ItemShop.UNLOCK_DAY`) in every run, tutorial or not. A folder with two tabs; the first visit each day opens on the Shop. **Inventory** (the "pack" section in code): every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar just above the nav |
 | Character | Portrait, health, injuries, today's task, five stats with Armory bonus, backstory, Hire for recruits |
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
-| Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story |
+| Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story. Everyday letters start folded with a down caret and "Tap to read the letter"; tapping opens the story and flips the caret up. Story quests never fold. While letters run below the bottom of the screen, a gold arrow bobs and flashes there until you scroll down (it holds still with Reduce motion). On Day 1 Pip walks through it: the totals, then opening a letter (that step waits until one is opened), then its story lines |
+| Intro crawl | A new run only, before the tutorial. The story of how you inherited the guild rolls up a black screen, then **Open the Doors** (see "Intro crawl") |
 | Final Battle credits | Day 50 only. **Victory**: on a warm, dark backdrop the night's story rolls up the screen line by line, then who fought, a parchment ledger (final stats without the Bone Drake, run records, roll call), the team credits, and **Begin Freeplay**. **Defeat**: the same roll in cold colours with an epitaph, and **Found a New Guild** |
 | Game Over | The guild ledger: days survived, a 2 x 3 grid (gold earned, quests won, heroes hired, fallen, final standing, Bone Drake), a roll call of every hero and their fate, and Found a New Guild |
 | Menu | How to play, last night's report, Accessibility, reset upgrades (debug), abandon run |
-| Accessibility | Text size (Small / Normal / Large / Largest, applied live by `HallFontScale.set_text_factor`), colorblind filter (Off / Red-weak / Green-weak / Blue-yellow), reduced motion; each button taps to the next choice, saved to `user://settings.cfg` |
+| Accessibility | Text size (Small / Normal / Large, applied live by `HallFontScale.set_text_factor`), colorblind filter (Off / Red-weak / Green-weak / Blue-yellow), reduced motion; each button taps to the next choice, saved to `user://settings.cfg` |
 
 ## Game Over
 
@@ -84,7 +85,7 @@ A red **Last hero standing** strip shows under the header when the guild is one 
 from falling (`HallMain.is_one_death_from_falling`). That means one hero is alive, nobody
 in today's For Hire is affordable, and either tomorrow's recruit price is more than your
 gold or standing is within `DANGER_STANDING_MARGIN` of the floor. The Welcome card's
-"Don't run out of heroes" row and Pip's Day 1 Day Report step explain the rule.
+"Don't run out of heroes" row explains the rule.
 
 Tapping the gold coin or the standing shield in the header drops a parchment card
 from it (`HeaderPopup`; tap anywhere else to close it). The **gold** card shows what
@@ -95,6 +96,35 @@ meter: the red half fills as standing nears `MINIMUM_STANDING` (recruits stop co
 the green half fills toward the next milestone, a quest rank or a building level. The
 numbers come from `HallWallet` (static functions); the milestones are built from
 `HallRules` and `GuildUpgrades` tuning, so they follow it.
+
+## Intro crawl
+
+A new run opens on a story crawl (`Scenes/Overlays/Day/overlay_intro.tscn`) before Pip's
+Day 1 tutorial (or the Welcome card when the tutorial is off): who the player is and how
+they came to inherit the guild, in the credits' gold ink on black. It moves like the
+credits (`CrawlRoll`, shared with them): it scrolls itself, any touch hands it to the
+player, and **Open the Doors** appears once the bottom is reached. Pressing it sets
+`HallMain.is_intro_seen`, which is saved, so each save sees the crawl once. Closing the
+game before pressing it shows the crawl again next time. Saves from before the crawl
+existed load as already seen. Playtest scenarios skip it.
+
+The story is a placeholder. Edit the `INTRO STORY TEXT` block at the top of
+`overlay_intro.gd` (one entry per paragraph, BBCode allowed), then check it with Debug
+tools' **Replay intro**.
+
+## Tutorial pacing
+
+While Pip's tutorial is on, controls it hasn't taught yet keep their place but show no text
+or badge, are greyed, and do nothing (`OverlayTutorial.UNLOCK_DAY`):
+
+- Applicants, hero pages and Deny open on Day 2. Once Pip has shown Applicants, Pip hides
+  (no dim, every button usable, just a ring on the Quests tab) so the player can hire or
+  not, and picks the Day 2 walkthrough up again when they open Quests.
+- Skip tutorial lifts these.
+- The Guild tab (Day 10, `GuildUpgrades.UNLOCK_DAY`) and Items (Day 5,
+  `ItemShop.UNLOCK_DAY`) are locked by day in every run, tutorial or not, and look the
+  same while locked: blank, greyed, no badge.
+- Locks come from the day and the saved skip flag, so saves are unchanged.
 
 ## Final battle, credits and freeplay
 
@@ -146,7 +176,8 @@ It doesn't fake colourblindness. When it's Off the rect is hidden and costs noth
 
 Both live on the Upgrades tab's **Facilities** half (`Scenes/Rows/Buildings/home_section.tscn`, one building plan each). The rules
 live in `Globals/guild_upgrades.gd` (`run_night()`, called by End Day before the quests
-are played out), and the tuning numbers sit at the top of that file.
+are played out), and the tuning numbers sit at the top of that file. Like building upgrades,
+both open with the Guild tab on Day 10 (`GuildUpgrades.UNLOCK_DAY`); before that, heroes heal at home.
 
 - **Training:** a hero in a slot gets +`TRAINING_STAT_GAIN` to the stat they picked each
   night. Slots stay filled from day to day. Heroes can be Healthy or Sore, but not in a bed.
@@ -234,7 +265,8 @@ sits next to "Save runs" above the warning, so it doesn't need a debug run eithe
 - **Wallet:** gold and standing steps (`HallDebug.GOLD_STEPS`, `STANDING_STEPS`).
 - **Guild:** add a free hero (needs a free bed), add a random item to the Inventory, heal
   everyone (the dead come back if there's a bed), max every building, reset upgrades.
-- **Run:** reroll today's quests and For Hire, skip the tutorial.
+- **Run:** reroll today's quests and For Hire, skip the tutorial, replay the intro crawl
+  (on any day; off while Pip is talking).
 
 None of it counts toward the Game Over ledger or the credits (`run_stats`).
 
@@ -316,10 +348,10 @@ in `Scripts/UI/X/`.
 - `Scripts/Hall/Save/`: `hall_save.gd`, `hall_save_transfer.gd`, `hall_settings.gd`, `hall_web_files.gd`: the saved run, backup codes, saved settings, moving a code on and off the device
 - `Scripts/Hall/Style/`: `hall_style.gd` (ink colours, stat / injury / odds tables, quest-type, building and item-icon tables, icon table, text helpers, restyles), `hall_fx.gd` (animations), `hall_font_scale.gd`
 - `Scripts/Hall/Web/`: web update checks and the Menu's build line. `Scripts/Hall/Debug/`: the Debug tools and the run logger
-- `Scenes/Shell/`: action bar, nav and toast; `Shell/Header/`: the header (day, Bone Drake countdown, counters, danger strip) and its gold and standing popups
+- `Scenes/Shell/`: nav and toast; `Shell/Header/`: the header (day, Bone Drake countdown, counters, danger strip) and its gold and standing popups
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
-- `Scenes/Overlays/`: `Day/` (End Day check, Day Report, Welcome; the tutorial coach is script-only), `Run End/` (Game Over, Final Battle credits), `Menu/` (Menu, Accessibility, Backup save, Debug, update prompt), `Items/` (equip picker, take-off confirm)
+- `Scenes/Overlays/`: `Day/` (End Day check, Day Report, Welcome, the Assign Party move popup; the tutorial coach is script-only), `Run End/` (Game Over, Final Battle credits), `Menu/` (Menu, Accessibility, Backup save, Debug, update prompt), `Items/` (equip picker, take-off confirm)
 - `Scenes/Rows/`: list rows. `Quests/` (quest row, Today note, quest tab, party seat, picker row), `Heroes/` (roster and hire cards, applicant peek), `Buildings/` (Training / Hospital card, row and heading, upgrade card), `Items/` (pack and shop tiles, equip picker row, gear row), `Day End/` (report entry, story line, plan row, upgrade suggestion, roll call)
 - `Scenes/Components/`: chip, portrait, stat strip, odds bar, divider, seal button, rolled-up scroll tag
 - `Scenes/Playtest/` + `Scripts/Playtest/`: scenes that start a run partway in

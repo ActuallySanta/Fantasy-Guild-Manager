@@ -8,12 +8,16 @@ extends TapPanel
 
 ## Adventurers who can't go fade back.
 const CANT_GO_OPACITY := 0.6
+## Adventurers already in another quest's party are greyed out this much
+## (0 = invisible, 1 = normal).
+const BUSY_OPACITY := 0.6
 ## SIMPLIFIED: the "to odds" caption under the "+12%" each adventurer adds.
 const SHOW_ADDS_CAPTION := false
 
 # ---- TEXT
 # Who they are
 const TEXT_ROLE := "the %s"
+const TEXT_INFO := "i"
 # Where they already are
 const TEXT_PICKED_FOR := "Picked for %s"
 const TEXT_SENT_ON := "Sent on %s"
@@ -22,7 +26,7 @@ const TEXT_TRAINING := "Training %s"
 # Right-hand column
 const TEXT_ADDS := "+%d%%"
 const TEXT_ADDS_SUB := "to odds"
-const TEXT_IN_PARTY := "Pinned"
+const TEXT_IN_PARTY := "Assigned"
 const TEXT_CANT_GO := "-"
 const TEXT_CANT_GO_SUB := "can't go"
 const TEXT_IN_BED_SUB := "in a bed"
@@ -42,9 +46,18 @@ const TEXT_TRAINING_SUB := "training"
 @onready var _adds_sub: Label = %AddSub
 
 
-func setup(hall: HallMain, entry: Dictionary, character: GuildCharacter) -> void:
-	pressed.connect(hall.toggle_in_party.bind(character))
+## hall: the main hall script; entry: the quest being assigned; character: who
+## this row shows. ask_to_move: called with `character` instead of pinning
+## them when they're in another quest's party (Assign Party's move popup);
+## left empty, the tap moves them straight away.
+func setup(hall: HallMain, entry: Dictionary, character: GuildCharacter,
+		ask_to_move: Callable = Callable()) -> void:
+	if _is_busy_elsewhere(hall, entry, character) and ask_to_move.is_valid():
+		pressed.connect(ask_to_move.bind(character))
+	else:
+		pressed.connect(hall.toggle_in_party.bind(character))
 	_info_button.pressed.connect(hall.open_character.bind(character))
+	HallStyle.set_locked(_info_button, hall.is_locked(OverlayTutorial.FEATURE_HERO_PAGE), TEXT_INFO)
 	_portrait.show_character(character)
 	_name.text = character.name
 	_role.text = TEXT_ROLE % HallStyle.role_name(character)
@@ -73,15 +86,23 @@ func _show_elsewhere(hall: HallMain, entry: Dictionary, character: GuildCharacte
 	HallStyle.set_font_color(_elsewhere_label, HallStyle.GREEN_TEXT if is_sent else HallStyle.BLUE_TEXT)
 
 
+## True when `character` is in a party for a quest other than `entry`'s
+## (picked or sent).
+func _is_busy_elsewhere(hall: HallMain, entry: Dictionary, character: GuildCharacter) -> bool:
+	var quest_index := hall.quest_index_of(character)
+	return quest_index >= 0 and hall.quest_entries[quest_index] != entry
+
+
 ## Right-hand column and paper tint: pinned to this party (green paper),
-## can't go (faded), or how much they'd add to the odds.
+## can't go (faded), or how much they'd add to the odds (greyed out when
+## they're already on another quest).
 func _show_pick_state(hall: HallMain, entry: Dictionary, character: GuildCharacter) -> void:
 	if entry.party.has(character):
 		_adds_value.text = TEXT_IN_PARTY
 		_adds_sub.visible = false
 		HallStyle.set_font_color(_adds_value, HallStyle.GREEN_TEXT)
 		HallStyle.style_panel(self, HallStyle.SENT_CARD_BG)
-		# just pinned: "Pinned" stamps onto the row
+		# just pinned: "Assigned" stamps onto the row
 		if hall.pending_fx.get("seat_in") == character:
 			HallFx.stamp_in(_adds_value, 1.6)
 	elif not hall.can_go_on_quests(character):
@@ -101,3 +122,7 @@ func _show_pick_state(hall: HallMain, entry: Dictionary, character: GuildCharact
 		_adds_sub.text = TEXT_ADDS_SUB
 		_adds_sub.visible = SHOW_ADDS_CAPTION
 		HallStyle.set_font_color(_adds_value, HallStyle.odds_look(chance_added).text_color)
+		# on another quest: grey paper, faded
+		if _is_busy_elsewhere(hall, entry, character):
+			HallStyle.style_panel(self, HallStyle.DENIED_CARD_BG)
+			modulate = Color(1, 1, 1, BUSY_OPACITY)

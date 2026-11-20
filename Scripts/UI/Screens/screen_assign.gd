@@ -2,13 +2,14 @@
 ## Scene: Scenes/Screens/screen_assign.tscn
 ##
 ## Top to bottom:
-##   strip   - back to the Board, then one little scroll per quest
+##   strip   - back to the Quests tab, then one little scroll per quest
 ##             (state-coloured); switching keeps every quest's picks
 ##   writ    - the quest as an unrolled scroll: type, title, reward, party
 ##             size, favored stat, the pinned party (tap to remove) and the
 ##             live success chance
-##   picker  - every adventurer, best fit first, with stats and what they add
-##   footer  - Deny / Seal & send (or Recall / Reconsider once decided)
+##   picker  - every adventurer, best fit first, with stats and what they add;
+##             pinning anyone sends the quest
+##   footer  - Deny or Recall / Back to Quests (Quests / Reconsider once denied)
 extends VBoxContainer
 
 const QuestTabScene := preload("uid://cp5084mci60mt")  # Scenes/Rows/Quests/quest_tab.tscn
@@ -34,6 +35,13 @@ const WRIT_STAMP_TILT := -0.16
 ## The odds circle's box (design px). Grown with the font scale so the big
 ## "87%" stays inside the circle art.
 const ODDS_STACK_SIZE := Vector2(210, 100)
+## Tapping an empty seat scrolls down to the adventurers: seconds the scroll
+## takes, and the gap (design px) left above the "Your adventurers" heading.
+const PICKER_SCROLL_SECONDS := 0.35
+const PICKER_SCROLL_GAP := 12
+## The footer's left button's normal minimum width (design px), matching the
+## scene. A locked (blank) Deny holds its labelled width instead of this.
+const LEFT_BUTTON_MIN_WIDTH := 200.0
 
 ## SIMPLIFIED: true = adventurers busy on another quest are hidden unless the
 ## "Show busy" toggle is on (with a "2 busy hidden" note). false = they're
@@ -75,12 +83,11 @@ const BUTTON_DENY := "Deny"
 const TEXT_DENY_COST := "-%d"
 ## Room kept on the Deny button's right for the shield.
 const DENY_COST_ROOM := 64.0
-const BUTTON_SEND := "Seal & send %s"
-const BUTTON_SEND_PARTY := "Seal & send party"
-const BUTTON_SEND_EMPTY := "Pin someone first"
 const BUTTON_RECALL := "Recall"
-const BUTTON_NEXT := "Next Quest"
-const BUTTON_BOARD := "Board"
+## The footer's right button on open and sent quests (pinning sends a quest).
+const BUTTON_BACK_TO_QUESTS := "Back to Quests"
+## The strip's back button and the footer's left button on a denied quest.
+const BUTTON_BOARD := "Quests"
 const BUTTON_RECONSIDER := "Reconsider"
 
 # ---- NODES
@@ -99,6 +106,7 @@ const BUTTON_RECONSIDER := "Reconsider"
 # Party
 @onready var _party_box: Control = %PartyBox
 @onready var _party_seats: VBoxContainer = %Slots
+@onready var _empty_seats: HFlowContainer = %EmptySeats
 @onready var _odds_value: Label = %OddsValue
 @onready var _odds_circle: TextureRect = %Circle
 @onready var _odds_word: Label = %OddsWord
@@ -118,6 +126,8 @@ const BUTTON_RECONSIDER := "Reconsider"
 @onready var _deny_cost: Control = %DenyCost
 @onready var _deny_cost_value: Label = %DenyCostValue
 @onready var _right_button: Button = %RightButton
+# Popup (top_level, over the whole screen)
+@onready var _move_confirm = %MoveConfirm      # overlay_move_confirm.gd
 
 ## The main hall script (state + actions), set in setup().
 var hall: HallMain
@@ -128,10 +138,13 @@ var _shown_chance := -1
 ## The SENT ink on the quest card (null = none) and which quest it's for.
 var _writ_stamp: Control
 var _writ_stamp_quest := -1
+## The No Roster Hire button's label from the scene, to restore once hiring unlocks.
+var _hire_label := ""
 
 
 func setup(main: HallMain) -> void:
 	hall = main
+	_hire_label = _hire_button.text
 	_back_button.pressed.connect(hall.close_screen)
 	_hire_button.pressed.connect(func(): hall.open_tab("guild", HallMain.GUILD_SECTION_HIRE))
 	_left_button.pressed.connect(_on_left_button_pressed)
@@ -139,6 +152,7 @@ func setup(main: HallMain) -> void:
 	_show_busy_toggle.toggled.connect(hall.set_show_busy_adventurers)
 	_show_busy_toggle.text = BUTTON_SHOW_BUSY
 	_back_button.text = BUTTON_BOARD
+	_move_confirm.setup(hall)
 	_make_room_for_deny_cost()
 
 
@@ -156,6 +170,20 @@ func _make_room_for_deny_cost() -> void:
 
 func scroll_to_top() -> void:
 	_scroll.scroll_vertical = 0
+
+
+## An empty seat's tap: slide the screen down so the "Your adventurers"
+## heading sits near the top, PICKER_SCROLL_GAP below it (snaps with Reduce
+## Motion on). The ScrollContainer stops at the bottom on its own.
+func scroll_to_picker() -> void:
+	var offset := _pick_header.global_position.y - _scroll.global_position.y
+	var target := int(_scroll.scroll_vertical + offset - HallFontScale.px(PICKER_SCROLL_GAP))
+	target = clampi(target, 0, int(_scroll.get_v_scroll_bar().max_value - _scroll.size.y))
+	if HallFx.reduce_motion:
+		_scroll.scroll_vertical = target
+		return
+	create_tween().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT) \
+			.tween_property(_scroll, "scroll_vertical", target, PICKER_SCROLL_SECONDS)
 
 
 func refresh() -> void:
@@ -205,19 +233,25 @@ func _show_quest_card(entry: Dictionary) -> void:
 
 # ---- party
 
-## Seats (pinned cards or empty) and the party's success chance, circled in
-## its ink. Hidden for denied quests.
+## Seats and the party's success chance, circled in its ink. Filled seats
+## stack in the column beside the odds; empty seats share one row under them
+## across the whole quest card (wrapping only when they don't fit). Hidden for
+## denied quests.
 func _show_party(entry: Dictionary) -> void:
 	_party_box.visible = entry.state != HallStyle.QUEST_STATE_DENIED
 
 	HallStyle.clear_children(_party_seats)
+	HallStyle.clear_children(_empty_seats)
 	for seat_index in hall.party_size_limit(entry):
 		var seated: GuildCharacter = entry.party[seat_index] if seat_index < entry.party.size() else null
-		var seat: Control = HallStyle.add_row(_party_seats, PartySlotScene)
-		seat.setup(hall, entry, seated)
+		var seat_list: Container = _party_seats if seated != null else _empty_seats
+		var seat: Control = HallStyle.add_row(seat_list, PartySlotScene)
+		seat.setup(hall, entry, seated, scroll_to_picker)
 		# the seat someone just left fades back to empty
 		if hall.pending_fx.get("seat_out", false) and seat_index == entry.party.size():
 			HallFx.fade_in(seat)
+	_party_seats.visible = not entry.party.is_empty()
+	_empty_seats.visible = _empty_seats.get_child_count() > 0
 
 	var chance: int = hall.success_chance(entry, entry.party)
 	var odds := HallStyle.odds_look(chance)
@@ -305,8 +339,10 @@ func shake_writ() -> void:
 # ---- picker
 
 ## Every living adventurer, best fit for this quest first (the dead are left out).
-## Adventurers in another quest's party (sent or picked) go at the bottom and
-## say which quest they're on. (With HIDE_BUSY_OPTION on, they're left out
+## Adventurers in another quest's party (sent or picked) come after the free
+## ones, greyed out, and say which quest they're on; tapping one asks before
+## moving them (overlay_move_confirm). Those who can't go (hospital bed,
+## training) come last. (With HIDE_BUSY_OPTION on, busy ones are left out
 ## unless "Show busy" is on.)
 func _show_picker(entry: Dictionary) -> void:
 	# split the roster into shown / hidden
@@ -320,16 +356,18 @@ func _show_picker(entry: Dictionary) -> void:
 		else:
 			shown_adventurers.append(character)
 
-	# free adventurers first, those on another quest last; most chance added first within each
+	# free adventurers first, then those on another quest, then those who can't
+	# go; most chance added first within each group
 	shown_adventurers.sort_custom(func(first, second):
-		var is_first_busy := _is_busy_elsewhere(entry, first)
-		if is_first_busy != _is_busy_elsewhere(entry, second):
-			return not is_first_busy
+		var first_group := _pick_group(entry, first)
+		var second_group := _pick_group(entry, second)
+		if first_group != second_group:
+			return first_group < second_group
 		return hall.chance_added_by(entry, first) > hall.chance_added_by(entry, second))
 
 	HallStyle.clear_children(_pick_list)
 	for character in shown_adventurers:
-		HallStyle.add_row(_pick_list, PickRowScene).setup(hall, entry, character)
+		HallStyle.add_row(_pick_list, PickRowScene).setup(hall, entry, character, _move_confirm.open)
 
 	# header, toggle and empty states
 	var can_pick: bool = entry.state != HallStyle.QUEST_STATE_DENIED
@@ -343,6 +381,7 @@ func _show_picker(entry: Dictionary) -> void:
 	_pick_list.visible = can_pick
 	_all_busy_label.visible = can_pick and shown_adventurers.is_empty() and hidden_busy_count > 0
 	_no_roster_box.visible = not has_roster
+	HallStyle.set_locked(_hire_button, hall.is_locked(OverlayTutorial.FEATURE_HIRE), _hire_label)
 
 
 ## True when `character` is in a party for a quest other than `entry`'s
@@ -352,39 +391,52 @@ func _is_busy_elsewhere(entry: Dictionary, character: GuildCharacter) -> bool:
 	return quest_index >= 0 and hall.quest_entries[quest_index] != entry
 
 
+## Which part of the picker `character` is listed in: 0 = free (or pinned
+## here), 1 = in another quest's party, 2 = can't go (hospital bed, training).
+## entry: the quest being assigned.
+func _pick_group(entry: Dictionary, character: GuildCharacter) -> int:
+	if not hall.can_go_on_quests(character):
+		return 2
+	if _is_busy_elsewhere(entry, character):
+		return 1
+	return 0
+
+
 # ---- footer
 
-## Left / right footer buttons depend on the quest's state:
-##   open   -> Deny [shield -N] | Seal & send <name>
-##   sent   -> Recall | Next Quest (or Board when nothing's left to decide)
-##   denied -> Board | Reconsider
-## The left button is always wood; the right one is the wax-sealed button.
+## Left / right footer buttons depend on the quest's state (pinning anyone
+## sends an open quest, so there's no Send button):
+##   open   -> Deny [shield -N] | Back to Quests
+##   sent   -> Recall (unpins everyone) | Back to Quests
+##   denied -> Quests | Reconsider
+## The left button is always wood; the right one is gold.
 func _show_footer(entry: Dictionary) -> void:
-	_right_button.disabled = false
 	_left_button.icon = null
 	_deny_cost.visible = false
+	_left_button.custom_minimum_size.x = LEFT_BUTTON_MIN_WIDTH
 	match entry.state:
 		HallStyle.QUEST_STATE_SENT:
-			_left_button.text = BUTTON_RECALL
-			_right_button.text = BUTTON_NEXT if hall.undecided_count() > 0 else BUTTON_BOARD
+			HallStyle.set_locked(_left_button, false, BUTTON_RECALL)
+			_right_button.text = BUTTON_BACK_TO_QUESTS
 		HallStyle.QUEST_STATE_DENIED:
-			_left_button.text = BUTTON_BOARD
+			HallStyle.set_locked(_left_button, false, BUTTON_BOARD)
 			_right_button.text = BUTTON_RECONSIDER
 		_:
-			_left_button.text = BUTTON_DENY
+			# Deny is blank, greyed and inert (no cost tag) until Pip teaches it
+			var deny_locked := hall.is_locked(OverlayTutorial.FEATURE_DENY)
+			# Measure Deny's labelled width, then hold it while locked so the
+			# blank button keeps its size and Back to Quests doesn't widen.
+			HallStyle.set_locked(_left_button, false, BUTTON_DENY)
 			_left_button.icon = HallStyle.icon_texture("x")
+			if deny_locked:
+				_left_button.custom_minimum_size.x = _left_button.get_combined_minimum_size().x
+				HallStyle.set_locked(_left_button, true, BUTTON_DENY)
 			_deny_cost_value.text = TEXT_DENY_COST % HallRules.standing_for_deny(entry.quest)
-			_deny_cost.visible = true
-			if entry.party.is_empty():
-				_right_button.text = BUTTON_SEND_EMPTY
-			elif entry.party.size() == 1:
-				_right_button.text = BUTTON_SEND % entry.party[0].name
-			else:
-				_right_button.text = BUTTON_SEND_PARTY
-			_right_button.disabled = entry.party.is_empty()
+			_deny_cost.visible = not deny_locked
+			_right_button.text = BUTTON_BACK_TO_QUESTS
 
 
-## Recall (sent) / Board (denied) / Deny (open).
+## Recall (sent) / Quests (denied) / Deny (open).
 func _on_left_button_pressed() -> void:
 	match hall.current_quest_entry().state:
 		HallStyle.QUEST_STATE_SENT:
@@ -395,15 +447,9 @@ func _on_left_button_pressed() -> void:
 			hall.deny_quest()
 
 
-## Next Quest or Board (sent) / Reconsider (denied) / Seal & send (open).
+## Reconsider (denied) / Back to Quests (open or sent).
 func _on_right_button_pressed() -> void:
-	match hall.current_quest_entry().state:
-		HallStyle.QUEST_STATE_SENT:
-			if hall.undecided_count() > 0:
-				hall.open_assign(hall.next_undecided_index(hall.active_screen.quest_index))
-			else:
-				hall.close_screen()
-		HallStyle.QUEST_STATE_DENIED:
-			hall.reconsider_quest()
-		_:
-			hall.send_party()
+	if hall.current_quest_entry().state == HallStyle.QUEST_STATE_DENIED:
+		hall.reconsider_quest()
+	else:
+		hall.close_screen()

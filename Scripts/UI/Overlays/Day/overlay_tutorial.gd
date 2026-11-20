@@ -1,5 +1,5 @@
 ## Tutorial coach: Pip the guild clerk walks a new player through the real
-## Mobile Hall UI on Days 1, 2, 3 and 5. Each step spotlights one control and
+## Mobile Hall UI on Days 1, 2, 5 and GuildUpgrades.UNLOCK_DAY (10). Each step spotlights one control and
 ## waits for the player to use it (or press Next on explain-only steps), so
 ## the player learns by doing instead of reading an intro screen. Every step
 ## asks for an action (only Day 1's welcome is a plain Next card); what used
@@ -9,11 +9,13 @@
 ##           player), reading a quest, picking a party, Send, End Day, the
 ##           Day Report
 ##   Day 2 - a hero's page (stats, Pluck, gear), odds and what a win grows
-##           (a trained stat or Pluck), Deny,
+##           (a trained stat or Pluck), Applicants (new heroes each
+##           morning, hiring; Pip steps back so the player can hire, and
+##           carries on when they open Quests), Deny,
 ##           how the guild can fall (HallMain.is_run_over)
-##   Day 3 - the Guild tab: upgrading a building, the Training Yard, the
-##           Hospital, and why posted heroes can't quest
 ##   Day 5 - the Shop: role-locked items, buying, equipping from a hero's page
+##   Day 10 (GuildUpgrades.UNLOCK_DAY) - the Guild tab: upgrading a building,
+##           the Training Yard, the Hospital, and why posted heroes can't quest
 ##   Freeplay - after the final battle is won (HallMain.start_freeplay): what
 ##           changes now the story is over (endless days, climbing quests,
 ##           the S++ rank). Runs even if the main tutorial was skipped.
@@ -31,6 +33,9 @@
 ##     to a small chip (tap to read the full line).
 ##   - "bare" steps hide the bubble: just the ring and the arrow, for steps
 ##     that only say "tap this".
+##   - "free" steps step back: no dim, no button locks and no Pip, so the
+##     player can use the whole hall (e.g. hire on Day 2's Applicants). Only
+##     the ring and arrow stay, marking where to go to carry on.
 ##
 ## HOW IT WORKS
 ##   hall_main emits tutorial_event(event, data) from its actions:
@@ -51,22 +56,49 @@
 ##             (e.g. a row's Info button that would leave the step)
 ##     bare    true = no bubble, just the ring and arrow. The text is still
 ##             kept: it shows (with Next) if the target goes missing.
+##     free    true = the hall stays fully usable while the step waits for
+##             `on`: no dim, no button locks, Pip hidden (like bare). The
+##             text is kept for the missing-target fallback, as with bare.
 ##   If a step's target can't be found for a moment, Next appears so the
 ##   player can never get stuck.
 ##
-## Tab pacing: while the tutorial is on, Guild (id "upgrades") unlocks on
-## Day 3 and Shop on Day 5. Skipping the tutorial lifts both locks.
+## Tab pacing: Guild (id "upgrades") is locked until GuildUpgrades.UNLOCK_DAY
+## and Items (id "shop") until ItemShop.UNLOCK_DAY in every run, tutorial or
+## not (HallMain.is_tab_locked). Their walkthroughs run on those days.
+## Feature pacing: while the tutorial is on, controls Pip hasn't taught yet
+## (Applicants, hero pages, Deny) are blank and greyed until their day (see
+## UNLOCK_DAY). Skip tutorial lifts those, but not the tab locks.
+## Locked controls look the same either way (HallStyle.set_locked).
 class_name OverlayTutorial
 extends Control
 
 
 ## Off = no coach, no tab locks, and the old Welcome card shows instead.
 const ENABLED := true
-const TUTORIAL_DAYS := [1, 2, 3, 5]
+## Days with a fixed tutorial script. The Guild walkthrough also runs, on
+## GuildUpgrades.UNLOCK_DAY (see _is_tutorial_day).
+const TUTORIAL_DAYS := [1, 2, 5]
+## Script key for the Guild tab walkthrough (run on GuildUpgrades.UNLOCK_DAY,
+## kept as its own key so the script doesn't move if that day is retuned).
+const GUILD_SCRIPT := 3
 ## Script key for the freeplay walkthrough (not a day: it starts on the
 ## "freeplay" event, whatever day that is).
 const FREEPLAY_SCRIPT := -1
-const UNLOCK_DAY := {"upgrades": 3, "shop": 5}
+## Features the tutorial holds back that aren't a tab (the Guild and Items
+## tabs are locked by day in every run instead: HallMain.is_tab_locked).
+const FEATURE_HIRE := "hire"
+const FEATURE_HERO_PAGE := "hero_page"
+const FEATURE_DENY := "deny"
+## The first day each feature is open while the tutorial is on (days).
+## A feature not listed here is never locked by the tutorial.
+const UNLOCK_DAY := {
+	## Applicants list and the Hire button; Pip teaches hiring on Day 2.
+	FEATURE_HIRE: 2,
+	## Hero detail pages (tapping a hero); Pip teaches them on Day 2.
+	FEATURE_HERO_PAGE: 2,
+	## The Deny button on Assign Party; Pip teaches it on Day 2.
+	FEATURE_DENY: 2,
+}
 
 # ---- SIMPLIFIED (Info-Chunking): set these back to true to restore
 ## Tapping Pip swaps the bubble between the top and bottom of the screen,
@@ -125,6 +157,14 @@ const PORTRAIT_FRAME := preload("uid://cscfv0x0mk446")  # Sprites/UI Textures/po
 const ARROW_ICON := preload("uid://c2nc04lk4jmw3")  # Sprites/Hall Icons/arrow_left.tres
 ## Ground behind Pip inside the frame (a parchment tint).
 const PIP_GROUND := Color("#E9DEC4")
+## Pip's portrait, drawn on the same 2160 x 1620 canvas as the heroes' icons.
+const PIP_ART := preload("uid://bwklr4hux7gdg")  # Sprites/Pip.png
+## Where Pip's art sits on the round mask, as anchors (x = left, y = top,
+## z = right, w = bottom; 0 and 1 are the mask's edges). The art keeps its
+## aspect, centred in that box. Wider than a hero's framing (the Art node in
+## Scenes/Components/portrait.tscn: -0.8, -0.3, 1.8, 1.3), so Pip's ears, fez
+## and bow tie all fit inside the circle.
+const PIP_ART_ANCHORS := Vector4(-0.33, -0.1, 1.28, 1.11)
 
 ## The main hall script (untyped: hall_main preloads this file).
 var hall: Control
@@ -197,30 +237,44 @@ func setup(main: Control) -> void:
 	# a run brought back from the save file picks up through resume_today() instead
 	if ENABLED and GameState.day == 1 and not hall.is_resumed_run:
 		hall.is_welcome_open = false
-		start.call_deferred(1)
+		# the intro story crawl goes first; its Begin button calls resume_today()
+		if not hall.is_intro_open():
+			start.call_deferred(1)
 
 
 ## A saved run was just loaded (HallSave.load_run restored is_skipped and done):
 ## if today has a tutorial script that wasn't finished, run it again from its
-## first step. Not while the night's report, the credits or Game Over is up.
+## first step. Not while the night's report, the credits or Game Over is up,
+## nor while the intro story crawl is (HallMain.close_intro calls this again).
 func resume_today() -> void:
 	var day := GameState.day
-	if not ENABLED or is_skipped or not TUTORIAL_DAYS.has(day) or done.get(day, false):
+	if not ENABLED or is_skipped or not _is_tutorial_day(day) or done.get(_script_for_day(day), false):
+		return
+	if hall.is_intro_open() or is_running():
 		return
 	if not (hall.shown_report.is_empty() and hall.shown_credits.is_empty() and hall.run_over_stats.is_empty()):
 		return
-	start.call_deferred(day)
+	start.call_deferred(day, _script_for_day(day))
 
 
-## Tabs held back until the tutorial gets to them.
-func is_tab_locked(tab_id: String) -> bool:
-	if not ENABLED or is_skipped or not UNLOCK_DAY.has(tab_id):
+## True while the tutorial holds `feature` (a FEATURE_* id) back. Tabs are
+## never locked here: HallMain.is_tab_locked handles them in every run.
+func is_locked(feature: String) -> bool:
+	if not ENABLED or is_skipped or not UNLOCK_DAY.has(feature):
 		return false
-	return GameState.day < UNLOCK_DAY[tab_id]
+	return GameState.day < UNLOCK_DAY[feature]
 
 
-func unlock_day(tab_id: String) -> int:
-	return UNLOCK_DAY.get(tab_id, 0)
+## True when `day` has a tutorial script: a TUTORIAL_DAYS day or the day the
+## Guild tab opens (GuildUpgrades.UNLOCK_DAY).
+func _is_tutorial_day(day: int) -> bool:
+	return TUTORIAL_DAYS.has(day) or day == GuildUpgrades.UNLOCK_DAY
+
+
+## The script key that runs on `day` (also its key in `done`): GUILD_SCRIPT on
+## GuildUpgrades.UNLOCK_DAY, otherwise the day itself.
+func _script_for_day(day: int) -> int:
+	return GUILD_SCRIPT if day == GuildUpgrades.UNLOCK_DAY else day
 
 
 func is_running() -> bool:
@@ -304,11 +358,11 @@ func _on_event(event: String, data: Variant = null) -> void:
 	_seen[event] = true
 	if event == "buy" and data is StandardItem:
 		_bought_item = data
-	# Day 3 and Day 5 begin when their morning starts
-	if event == "new_day" and ENABLED and not is_skipped and TUTORIAL_DAYS.has(int(data)) and not done.get(int(data), false):
+	# Day 5 and the Guild day begin when their morning starts
+	if event == "new_day" and ENABLED and not is_skipped and _is_tutorial_day(int(data)) and not done.get(_script_for_day(int(data)), false):
 		if is_running():
 			_finish()
-		start(int(data))
+		start(int(data), _script_for_day(int(data)))
 		return
 	# freeplay explains a new mode, so it runs even after Skip tutorial
 	if event == "freeplay" and ENABLED and not done.get(FREEPLAY_SCRIPT, false):
@@ -352,8 +406,19 @@ func _process(delta: float) -> void:
 	_lock_timer -= delta
 	if _lock_timer <= 0.0:
 		_lock_timer = LOCK_INTERVAL
-		_apply_locks(step, target)
+		# a free step hands every button back (and keeps doing so, since the
+		# hall rebuilds rows on refresh); other steps lock all but the spotlight
+		if _is_free(step):
+			_release_locks()
+		else:
+			_apply_locks(step, target)
 	_layout(step, target, delta)
+
+
+## A "free" step (see the header): the whole hall is usable while it waits.
+## A step being re-read after Back is never free (its action is already done).
+func _is_free(step: Dictionary) -> bool:
+	return step.get("free", false) and not _is_reviewing()
 
 
 ## Is the spotlit control meant to be used on this step?
@@ -416,16 +481,22 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 	var waits: bool = step.has("on") and not _is_reviewing()
 	var is_lost: bool = step.get("target") != null and target == null and _missing_for > MISSING_GRACE
 	var show_next: bool = not waits or is_lost
-	# bare steps: no bubble, just the ring and the arrow. The bubble comes back
-	# (with Next) if the target goes missing, so the player can't get stuck.
-	_bubble.visible = not step.get("bare", false) or is_lost
+	var is_free := _is_free(step)
+	# bare and free steps: no bubble (Pip is hidden), just the ring and the
+	# arrow. The bubble comes back (with Next) if the target goes missing, so
+	# the player can't get stuck.
+	_bubble.visible = not (step.get("bare", false) or is_free) or is_lost
 
 	# ---- the spotlight hole and the dim around it
 	var hole := Rect2()
 	if target != null:
 		var xf: Transform2D = get_global_transform().affine_inverse() * target.get_global_transform()
 		hole = Rect2(xf.origin, target.size * xf.get_scale()).grow(HOLE_PAD).intersection(Rect2(Vector2.ZERO, full))
-	if hole.has_area():
+	if is_free:
+		# no dim at all: every tap reaches the hall
+		for blocker in _blockers:
+			_set_rect(blocker, Rect2())
+	elif hole.has_area():
 		_set_rect(_blockers[0], Rect2(0, 0, full.x, hole.position.y))
 		_set_rect(_blockers[1], Rect2(0, hole.end.y, full.x, full.y - hole.end.y))
 		_set_rect(_blockers[2], Rect2(0, hole.position.y, hole.position.x, hole.size.y))
@@ -725,9 +796,9 @@ func _build() -> void:
 	foot.add_child(_skip_button)
 
 
-## Pip's portrait: the round portrait mask (parchment ground; its shape clips
-## Pip through HallStyle.mask_to) and
-## the round portrait frame on top, the same art as the heroes' portraits.
+## Pip's portrait: Pip's art (PIP_ART) on the round portrait mask (parchment
+## ground; its shape clips the art through HallStyle.mask_to) and the round
+## portrait frame on top, the same mask and frame as the heroes' portraits.
 func _build_portrait() -> Control:
 	var holder := Control.new()
 	holder.custom_minimum_size = Vector2(84, 84)
@@ -740,14 +811,23 @@ func _build_portrait() -> Control:
 	mask.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	HallStyle.tint_art(mask, PIP_GROUND)
 	holder.add_child(mask)
-	var pip := PipFace.new()
+	var pip := TextureRect.new()
+	pip.texture = PIP_ART
+	pip.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	pip.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	pip.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	pip.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# the art's box is bigger than the mask (PIP_ART_ANCHORS), like a hero's
+	pip.set_anchor(SIDE_LEFT, PIP_ART_ANCHORS.x)
+	pip.set_anchor(SIDE_TOP, PIP_ART_ANCHORS.y)
+	pip.set_anchor(SIDE_RIGHT, PIP_ART_ANCHORS.z)
+	pip.set_anchor(SIDE_BOTTOM, PIP_ART_ANCHORS.w)
 	mask.add_child(pip)
 	# clipped by the portrait mask shader, not clip_children (broken on iPhone
-	# Safari); Pip fills the mask, so the mask's rect is Pip's own rect
-	pip.resized.connect(func() -> void: HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(Vector2.ZERO, pip.size)))
-	HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(Vector2.ZERO, pip.size))
+	# Safari): the mask's rect in the art's own pixels, as in portrait.gd
+	var update_mask := func() -> void:
+		HallStyle.mask_to(pip, PORTRAIT_MASK, Rect2(-pip.position, mask.size))
+	pip.resized.connect(update_mask)
+	update_mask.call()
 	var frame := TextureRect.new()
 	frame.texture = PORTRAIT_FRAME
 	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -774,34 +854,6 @@ class Pointer extends Control:
 		draw_texture_rect(arrow, Rect2(-size / 2.0, size), false, tint)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
-
-## Pip: a goblin clerk with round glasses, drawn with shapes (no art asset yet;
-## the round portrait mask and frame around it are the project's art).
-class PipFace extends Control:
-	func _draw() -> void:
-		var s := size.x / 50.0
-		var ink := Color("#2A1A10")
-		var skin := Color("#7BC47F")
-		var body := StyleBoxFlat.new()
-		body.bg_color = Color("#9B72CF")
-		body.set_border_width_all(int(2.5 * s))
-		body.border_color = ink
-		body.set_corner_radius_all(int(9 * s))
-		draw_style_box(body, Rect2(Vector2(11, 38) * s, Vector2(28, 11) * s))
-		for side in [-1, 1]:
-			var ear := PackedVector2Array([Vector2(25 + 11 * side, 25) * s, Vector2(25 + 23 * side, 16) * s, Vector2(25 + 12 * side, 33) * s])
-			draw_colored_polygon(ear, skin)
-			ear.append(ear[0])
-			draw_polyline(ear, ink, 2.5 * s)
-		var head := Vector2(25, 28) * s
-		draw_circle(head, 12 * s, skin)
-		draw_arc(head, 12 * s, 0, TAU, 40, ink, 2.5 * s)
-		for side in [-1, 1]:
-			var lens := Vector2(25 + 4.5 * side, 27) * s
-			draw_circle(lens, 4.2 * s, Color("#FFFBF0"))
-			draw_arc(lens, 4.2 * s, 0, TAU, 24, ink, 2 * s)
-			draw_circle(lens, 1.5 * s, ink)
-		draw_arc(Vector2(25, 32.5) * s, 3 * s, 0.3, PI - 0.3, 12, ink, 2 * s)
 
 # ============================================================ FINDING TARGETS
 
@@ -841,6 +893,24 @@ func _row(root: Node, script_file: String, unique_child := "", filter := Callabl
 	return null
 
 
+## The Day Report overlay.
+func _report() -> Node:
+	return hall.get_node("%OverlayReport")
+
+
+## The first everyday (foldable) letter in the Day Report that is folded
+## (`folded` true) or open (false), or null.
+func _report_letter(folded: bool) -> Control:
+	return _row(_report(), "report_entry.gd", "", func(letter): return not letter.is_story and letter.is_folded == folded)
+
+
+## True when tonight's report has a letter that folds (story quests' letters
+## never fold, and a night with nobody out has no letters). Reads the report's
+## data, so it works before the letters are built.
+func _has_foldable_letter() -> bool:
+	return hall.shown_report.get("results", []).any(func(result): return not HallStyle.is_story_quest(result))
+
+
 func _training_section() -> Node:
 	return _u(_tab("upgrades"), "TrainingSection")
 
@@ -863,7 +933,7 @@ func _pick_text() -> String:
 	return "Tap on one of the adventurers to assign them on the quest."
 
 
-## Day 3's Facilities step: Training and Hospital in one line (their own steps
+## The Guild walkthrough's Facilities step: Training and Hospital in one line (their own steps
 ## can be skipped), plus a note when nothing could be built.
 func _tonight_text() -> String:
 	var text := "Now the [b]Facilities[/b] tab. The [b]Training Yard[/b] increases a stat and the [b]Hospital[/b] heals an adventurer faster."
@@ -915,7 +985,7 @@ func _steps_for(script: int) -> Array:
 			return _day_one()
 		2:
 			return _day_two()
-		3:
+		GUILD_SCRIPT:
 			return _day_three()
 		5:
 			return _day_five()
@@ -935,22 +1005,33 @@ func _day_one() -> Array:
 		# Uncle John's card gets its own spotlight step (it used to be dimmed
 		# behind the Board step's spotlight, so the player couldn't see him)
 		{"target": func(): return _row(_tab("guild"), "member_card.gd"),
-			"text": "Look! Here is [b]%s[/b], a priest and your first member. More heroes will appear each day under the Applicants tab." \
+			"text": "Look! Here is [b]%s[/b], a priest and your first member. More heroes will come looking for work starting tomorrow." \
 					% HallRules.STARTING_HERO_NAME},
 		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board",
-			"do": "Tap Board", "text": "Now find him work to do: open the [b]Board[/b] tab."},
+			"do": "Tap Quests", "text": "Now find him work to do: open the [b]Quests[/b] tab."},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign",
 			"do": "Tap the quest card", "text": "Here's a first quest! Quests show its rank, how much %s you will earn, party size, and the favoured stat for the quest. Tap it to send an adventurer!" % GOLD},
 		{"target": func(): return _u(_screen("assign"), "PickList"), "on": "pick", "when": func(d): return _party_ready(d),
 			"do": "Tap an adventurer row to assign them on the quest", "deny": ["InfoButton"], "text": func(): return _pick_text()},
-		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "send",
-			"do": "Tap Seal & Send", "text": "Low chances on a quest give a risk of failure and injuries. Click Seal & send on the bottom of screen to confirm your choice."},
-		{"target": func(): return hall.action_button(), "on": "end_check",
-			"do": "Tap End Day", "text": "Quick tip! This bar always shows your next step if you are ever stuck. Tap [b]End Day[/b] to send your quests off!"},
+		{"target": func(): return _u(_screen("assign"), "RightButton"), "on": "close",
+			"do": "Tap Back to Quests", "text": "Picking an adventurer sends them on the quest. Low chances give a risk of failure and injuries. Tap [b]Back to Quests[/b] to return."},
+		{"target": func(): return hall.end_day_button(), "on": "end_check",
+			"do": "Tap End Day", "text": "Tap [b]End Day[/b] to send your quests off!"},
 		{"target": func(): return _u(hall.get_node("%OverlayEndDay"), "EndButton"), "on": "end_day",
-			"do": "Tap End Day", "text": "Here you can check what quests you denied and accepted, as well as any available upgrades! Tap on end day to finish your choices. "},
-		{"target": func(): return _u(hall.get_node("%OverlayReport"), "ActionButton"), "on": "new_day",
-			"do": "Tap to start Day 2", "text": "Good Morning! This screen lets you see how the parties did. Tap on Open the Doors to move on."},
+			"do": "Tap End Day", "text": "Here you can check tonight's plan before the day ends. Tap [b]End Day[/b] to finish your choices."},
+		# the Day Report: the totals, then open a letter and read it
+		{"target": func(): return _u(_report(), "Totals"),
+			"text": "Good morning! This is the [b]Day Report[/b]. Up top: how many quests succeeded, the %s you earned, and anyone who got hurt." % GOLD},
+		{"target": func(): return _report_letter(true), "on": "read_letter",
+			"skip": func(): return not _has_foldable_letter(),
+			"do": "Tap the letter", "text": "Each quest sends a letter home. Tap it to open it and read what happened."},
+		# spotlight just the story lines: the whole open letter is too tall to
+		# leave Pip room above or below it
+		{"target": func(): return _u(_report_letter(false), "Beats"),
+			"skip": func(): return not _has_foldable_letter(),
+			"text": "Here's the story, one line per moment. The stamp up top says whether the quest succeeded, and the last line says what they brought home. Tap a letter again to fold it."},
+		{"target": func(): return _u(_report(), "ActionButton"), "on": "new_day",
+			"do": "Tap to start Day 2", "text": "That's the night! Tap [b]Open the Doors[/b] to start Day 2."},
 	]
 
 
@@ -968,18 +1049,23 @@ func _day_two() -> Array:
 			"text": "Here are your character's stats. Successful quests with high odds increase a stat. However risky successes grow %s which increases every stat." % PLK},
 		{"target": func(): return _u(_screen("character"), "BackButton"), "on": "close", "bare": true,
 			"do": "Tap Back", "text": "Tap back on the bottom of the screen to return."},
-		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board", "bare": true,
-			"do": "Tap Board", "text": "Open the [b]Board[/b]."},
+		{"target": func(): return _u(_tab("guild"), "SegHire"), "on": "tab", "when": func(d): return d.guild == "hire",
+			"do": "Tap Applicants", "text": "New heroes come looking for work every morning. Hiring costs %s, and your beds limit how many you can keep." % GOLD},
+		# Pip steps back here so the player can hire (or not) before moving on;
+		# the script carries on when they open the Quests tab
+		{"target": func(): return _nav("board"), "on": "tab", "when": func(d): return d.tab == "board", "free": true,
+			"do": "Hire if you like, then tap Quests",
+			"text": "Hire anyone who catches your eye, or save your %s for later. Open the [b]Quests[/b] tab when you're ready." % GOLD},
 		{"target": func(): return _row(_tab("board"), "quest_row.gd"), "on": "assign", "bare": true,
 			"do": "Tap a quest card",
-			"text": "Open a quest card. Tapping [b]Deny[/b] skips a quest at a cost for standing. Another thing, Adventurers can [b]die[/b], so pick your odds with care. See you on Day 3!"},
+			"text": "Open a quest card. Tapping [b]Deny[/b] skips a quest at a cost for standing. Another thing, Adventurers can [b]die[/b], so pick your odds with care. See you soon!"},
 	]
 
 
 func _day_three() -> Array:
 	return [
 		{"target": func(): return _nav("upgrades"), "on": "tab", "when": func(d): return d.tab == "upgrades",
-			"do": "Tap Guild", "text": "Day 3! The [b]Guild[/b] tab is open. Take a look."},
+			"do": "Tap Guild", "text": "Day %d! The Bone Drake is coming, and the [b]Guild[/b] tab is open. Take a look." % GuildUpgrades.UNLOCK_DAY},
 		{"target": func(): return _u(_tab("upgrades"), "SegBuild"), "on": "tab", "when": func(d): return d.upgrades == "build",
 			"skip": func(): return hall.upgrades_section == "build", "bare": true,
 			"do": "Tap Build", "text": "Open [b]Build[/b]."},
@@ -1018,7 +1104,7 @@ func _day_five() -> Array:
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
 			"skip": func(): return not _seen.get("buy", false) or _someone_fits_bought(),
 			"do": "Tap Members",
-			"text": func(): return "Nobody can use the %s yet. Open [b]Members[/b] and hire a [b]%s[/b] from Applicants. That's everything. Good luck!" % [_bought_name(), _bought_role()]},
+			"text": func(): return "Nobody can use the %s yet. Open [b]Members[/b] and hire a [b]%s[/b] from Applicants. Good luck!" % [_bought_name(), _bought_role()]},
 		{"target": func(): return _nav("guild"), "on": "tab", "when": func(d): return d.tab == "guild",
 			"skip": func(): return not _seen.get("buy", false) or not _someone_fits_bought(),
 			"do": "Tap Members", "text": "Gear goes on from a hero's page. Open [b]Members[/b]."},
@@ -1032,7 +1118,7 @@ func _day_five() -> Array:
 		{"target": func(): return _u(_screen("character"), "GearLines"), "tap": true, "on": "equip",
 			"skip": func(): return not _seen.get("buy", false) or not _someone_fits_bought(),
 			"do": "Tap Equip, then the item", "deny": ["SideButton"],
-			"text": func(): return "Tap [b]Equip[/b], then the %s. Its bonus counts on every quest. That's everything! More help is under Menu > How to play." % _bought_name()},
+			"text": func(): return "Tap [b]Equip[/b], then the %s. Its bonus counts on every quest. That's all until the [b]Guild[/b] tab opens on Day %d. More help is under Menu > How to play." % [_bought_name(), GuildUpgrades.UNLOCK_DAY]},
 	]
 
 

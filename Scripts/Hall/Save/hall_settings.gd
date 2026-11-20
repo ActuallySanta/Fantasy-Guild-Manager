@@ -13,9 +13,11 @@ const COLOR_FILTERS := ["Off", "Red-weak", "Green-weak", "Blue-yellow"]
 ## on top of the screen's own factor (HallFontScale). The last one, times
 ## HallFontScale.MAX_SCALE, must stay within HallFontScale.MAX_TOTAL_SCALE:
 ## that's the biggest text the scenes are checked to hold.
-const TEXT_SIZES := ["Small", "Normal", "Large", "Largest"]
-const TEXT_SIZE_FACTORS := [0.85, 1.0, 1.15, 1.33]
+const TEXT_SIZES := ["Small", "Normal", "Large"]
+const TEXT_SIZE_FACTORS := [0.85, 1.0, 1.15]
 ## The Text size a fresh install starts on (index into TEXT_SIZES): Normal.
+## A settings file saved with the old fourth size ("Largest", index 3) loads
+## as Large: load_settings() clamps the index into TEXT_SIZES.
 const DEFAULT_TEXT_SIZE := 1
 ## Where player settings are saved, and the section they're saved under.
 const PATH := "user://settings.cfg"

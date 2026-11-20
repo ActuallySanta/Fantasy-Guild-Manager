@@ -75,14 +75,14 @@ theme_override_constants/separation = 0
 layout_mode = 2
 theme_type_variation = &"TitleLabel"
 theme_override_font_sizes/font_size = 32
-text = "Board"
+text = "Quests"
 
 [node name="Body" type="Label" parent="Center/Sheet/Col/StepBoard/Text" unique_id=1228862905]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 23
-text = "Today's quests, all on one page. Tap one to pick its party. Your picks are kept until you send them."
+text = "Today's quests, all on one page. Tap one and pin an adventurer to send them."
 autowrap_mode = 3
 
 [node name="StepGuild" type="HBoxContainer" parent="Center/Sheet/Col" unique_id=573074822]
@@ -173,14 +173,14 @@ theme_override_constants/separation = 0
 layout_mode = 2
 theme_type_variation = &"TitleLabel"
 theme_override_font_sizes/font_size = 32
-text = "The big button"
+text = "End Day"
 
 [node name="Body" type="Label" parent="Center/Sheet/Col/StepThebigbutton/Text" unique_id=1085937320]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 theme_type_variation = &"ItalicLabel"
 theme_override_font_sizes/font_size = 23
-text = "At the bottom of the screen. It always shows what to do next."
+text = "At the bottom of the Quests tab. Tap it once every quest is sent or denied."
 autowrap_mode = 3
 
 [node name="StepFalls" type="HBoxContainer" parent="Center/Sheet/Col"]

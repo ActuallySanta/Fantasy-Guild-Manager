@@ -72,6 +72,9 @@ const RED_BG := Color("#F2DCD4")
 const GOLD := Color("#B8913A")
 const GOLD_TEXT := Color("#6B5A1E")
 const GOLD_BG := Color("#F3E7C6")
+## Bright gold for "look here" arrows (the Day Report's scroll arrow; the same
+## gold as Pip's spotlight ring and arrow, OverlayTutorial.RING_COLOR).
+const POINTER_GOLD := Color("#F6B93B")
 const GREEN := Color("#4A6B35")           ## success, sent, done
 const GREEN_TEXT := Color("#3D5A2A")
 const GREEN_BG := Color("#E0EBD3")
@@ -85,6 +88,8 @@ const STORY_INK := Color("#9C7426")
 const STORY_BG := Color("#F6E3B0")
 
 # ---- the end-of-story roll (overlay_credits.gd): ink on a dark backdrop
+## The intro story crawl (overlay_intro.gd): plain black, in the victory's gold ink.
+const INTRO_BG := Color.BLACK
 const CREDITS_BG := Color("#1B140F")      ## victory: a warm, near-black hall
 const CREDITS_INK := Color("#F3E2B0")     ## victory: candlelit gold text
 const CREDITS_INK_SOFT := Color("#C9B68A")  ## victory: captions, roles
@@ -106,13 +111,14 @@ const FINAL_TYPE_ID := 6
 ## (the Assign Party scroll), seal colour, short tag, and the icon (an
 ## ICON_FILES name) drawn on its seal. A type with no "icon" shows its tag
 ## on the seal instead; the tag is also used where there's no seal.
+## The BOSS seal (exclamation) is also the one on the header's Bone Drake countdown.
 const QUEST_TYPES := {
 	1: {"name": "Clear Dungeon", "writ": "Writ of Clearing", "color": Color("#4A5E32"), "tag": "DUN", "icon": "gate"},
 	2: {"name": "Escort", "writ": "Writ of Escort", "color": Color("#7A5236"), "tag": "ESC", "icon": "escort"},
 	3: {"name": "Scout Terrain", "writ": "Writ of Scouting", "color": Color("#3F5A74"), "tag": "SCT", "icon": "flag"},
 	4: {"name": "Gather Intel", "writ": "Writ of Intelligence", "color": Color("#5B4A7A"), "tag": "INT", "icon": "eye"},
-	MILESTONE_TYPE_ID: {"name": "Milestone", "writ": "Writ of the Drake", "color": Color("#7D2A26"), "tag": "BOSS"},
-	FINAL_TYPE_ID: {"name": "Final Battle", "writ": "Writ of the Last Stand", "color": Color("#3A1F3D"), "tag": "FINAL"},
+	MILESTONE_TYPE_ID: {"name": "Milestone", "writ": "Writ of the Drake", "color": Color("#7D2A26"), "tag": "BOSS", "icon": "exclamation"},
+	FINAL_TYPE_ID: {"name": "Final Battle", "writ": "Writ of the Last Stand", "color": Color("#3A1F3D"), "tag": "FINAL", "icon": "horned_skull"},
 }
 
 # ---- stats
@@ -486,6 +492,8 @@ const ICON_FILES := {
 	"escort": "uid://bkk0x60yoyngi",  # Sprites/Hall Icons/escort.tres
 	"flag": "uid://h5m6winn3vrf",  # Sprites/Hall Icons/flag.tres
 	"eye": "uid://2203hgt8y6l4",  # Sprites/Hall Icons/eye.tres
+	"exclamation": "uid://cw2umeq54y4yp",  # Sprites/Hall Icons/exclamation.tres (BOSS)
+	"horned_skull": "uid://dcpsq15tsp22n",  # Sprites/Hall Icons/horned_skull.tres (FINAL)
 	# item seals (ITEM_ICONS). Full-size art (96 x 96 PNGs with the drawing
 	# centred), not 16 x 16 PixelIcons, so they point at the PNG itself.
 	"item_sword": "uid://cfmenvuyddpqu",  # Sprites/Item Icons/sword_icon.png
@@ -566,6 +574,23 @@ static func style_button(button: Button, kind: String = "gold", font_size: int =
 	button.theme_type_variation = BUTTON_KINDS.get(kind, &"PaperButton")
 	if font_size > 0:
 		HallFontScale.set_size(button, "font_size", font_size)
+
+
+## The tint a locked control is greyed with (a feature Pip hasn't taught yet).
+const LOCKED_MODULATE := Color(0.55, 0.55, 0.55, 0.7)
+
+
+## Show a control as locked (blank, greyed, inert) or back to normal. A Button
+## loses its text and gets `disabled`; any Control gets LOCKED_MODULATE. Size
+## and layout never change, and icons stay (greyed by the tint). Callers hide
+## badges and extra labels themselves.
+## control: what to lock. is_locked: true locks, false restores.
+## label: the Button text to restore when unlocked ("" for an icon-only button).
+static func set_locked(control: Control, is_locked: bool, label: String = "") -> void:
+	if control is Button:
+		control.text = "" if is_locked else label
+		control.disabled = is_locked
+	control.modulate = LOCKED_MODULATE if is_locked else Color.WHITE
 
 
 ## A coloured seal (white art tinted `fill`) with a short tag on it (quest type, building).
@@ -650,6 +675,28 @@ static func mask_to(node: CanvasItem, mask: Texture2D, mask_rect: Rect2) -> void
 static func set_font_color(control: Control, font_color: Color) -> void:
 	control.add_theme_color_override("font_color", font_color)
 	control.add_theme_color_override("default_color", font_color)
+
+
+## A "›" caret label's turn (degrees, clockwise): CARET_DOWN points it down
+## (there's more to open), CARET_UP points it up (it's open).
+const CARET_DOWN := 90.0
+const CARET_UP := -90.0
+
+## Point a caret label (text "›") by turning it `degrees` clockwise about its
+## own centre. Put the caret in a plain Control (not a Container): containers
+## reset their children's rotation every time they lay them out. The pivot
+## follows the label's size. seconds > 0 turns it smoothly (it snaps with
+## Reduce Motion on).
+static func turn_caret(caret: Control, degrees: float, seconds: float = 0.0) -> void:
+	caret.pivot_offset = caret.size / 2.0
+	# keep the pivot centred when a container resizes it (hooked up once)
+	if not caret.has_meta(&"caret_pivot_hooked"):
+		caret.set_meta(&"caret_pivot_hooked", true)
+		caret.resized.connect(func() -> void: caret.pivot_offset = caret.size / 2.0)
+	if seconds <= 0.0 or HallFx.reduce_motion or not caret.is_inside_tree():
+		caret.rotation_degrees = degrees
+		return
+	caret.create_tween().tween_property(caret, "rotation_degrees", degrees, seconds)
 
 
 # ============================================================ SCENE HELPERS

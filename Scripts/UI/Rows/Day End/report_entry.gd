@@ -3,12 +3,16 @@
 ## died, what equipment was found, the story one line per beat, and a closing
 ## line signed by whoever came back.
 ##
-## Everyday letters start folded (just the head and its Hurt / Died / Found
-## tags); tap one to read the story and sign-off, tap again to fold it.
+## Everyday letters start folded (just the head, its Hurt / Died / Found
+## tags and a down caret); tap one to read the story and sign-off (the caret
+## flips up), tap again to fold it.
 ## Story quests (HallStyle.is_story_quest) never fold: they get gilt paper, a
 ## "Story Quest" ribbon, and a star beside the lines of the written story.
 ## Scene: Scenes/Rows/Day End/report_entry.tscn
 extends TapPanel
+
+## A folded letter was tapped open (the Day Report passes it on for Pip).
+signal opened
 
 const BeatRowScene := preload("uid://nm3rjurnk3x2")  # Scenes/Rows/Day End/beat_row.tscn
 const ChipScene := preload("uid://5khy5d8j40yo")  # Scenes/Components/chip.tscn
@@ -62,8 +66,19 @@ const BEAT_ICON_STORY := "star"
 
 ## Text size of the "tap to read" hint on everyday letters.
 const FOLD_HINT_FONT_SIZE := 22
+## Narrowest the hint may get (px) before it wraps, the same as the Title and
+## From labels' minimum in the scene.
+const FOLD_HINT_MIN_WIDTH := 40
 ## Seconds the story takes to fade in when a folded letter is opened.
 const UNFOLD_SECONDS := 0.18
+## The caret before the "tap to read" hint (down = folded, up = open): text
+## size and the square box it turns in (design px), gap to the hint (px), and
+## seconds it takes to flip.
+const FOLD_CARET_FONT_SIZE := 34
+const FOLD_CARET_BOX_SIZE := 26
+const FOLD_CARET_GAP := 8
+const FOLD_CARET_TURN_SECONDS := 0.15
+const TEXT_FOLD_CARET := "›"
 
 # ---- TEXT
 const TEXT_SUCCESS := "Success"
@@ -119,6 +134,8 @@ var is_folded := false
 var _story_ribbon: Control
 ## The "Tap to read / fold" hint under an everyday letter's title, or null.
 var _fold_hint: Label
+## The caret before that hint (points down while folded, up while open), or null.
+var _fold_caret: Label
 ## Whether this letter's quest succeeded (picks its reveal sound).
 var _is_success := false
 
@@ -179,14 +196,49 @@ func _show_story_look() -> void:
 	_story_ribbon.set_box(TEXT_STORY_RIBBON, HallStyle.STORY_INK, BEAT_ICON_STORY)
 
 
-## The soft "Tap to read the letter" line under the From line.
+## The soft "Tap to read the letter" line under the From line, led by a caret
+## that says the letter opens (set_folded points it).
 func _add_fold_hint() -> void:
+	var hint_row := HBoxContainer.new()
+	hint_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hint_row.add_theme_constant_override("separation", FOLD_CARET_GAP)
+	_head_text.add_child(hint_row)
+
+	# the caret sits in a plain box: the row would undo its turn (turn_caret)
+	var caret_box := Control.new()
+	caret_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	caret_box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var box_side := HallFontScale.px(FOLD_CARET_BOX_SIZE)
+	caret_box.custom_minimum_size = Vector2(box_side, box_side)
+	hint_row.add_child(caret_box)
+
+	_fold_caret = Label.new()
+	_fold_caret.text = TEXT_FOLD_CARET
+	_fold_caret.theme_type_variation = &"TitleLabel"
+	_fold_caret.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fold_caret.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_fold_caret.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	HallFontScale.set_size(_fold_caret, "font_size", FOLD_CARET_FONT_SIZE)
+	HallStyle.set_font_color(_fold_caret, HallStyle.TEXT_SOFT)
+	caret_box.add_child(_fold_caret)
+	_fold_caret.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	# the text is taller than the box: grow evenly so it stays centred on it
+	_fold_caret.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_fold_caret.grow_vertical = Control.GROW_DIRECTION_BOTH
+
 	_fold_hint = Label.new()
 	_fold_hint.theme_type_variation = &"ItalicLabel"
 	_fold_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fold_hint.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	# wraps like the Title and From lines above it: unwrapped, the hint alone
+	# was wider than the letter at the biggest Text sizes and pushed it off
+	# the right of the screen
+	_fold_hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_fold_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_fold_hint.custom_minimum_size.x = FOLD_HINT_MIN_WIDTH
 	HallFontScale.set_size(_fold_hint, "font_size", FOLD_HINT_FONT_SIZE)
 	HallStyle.set_font_color(_fold_hint, HallStyle.TEXT_SOFT)
-	_head_text.add_child(_fold_hint)
+	hint_row.add_child(_fold_hint)
 
 
 ## Fold (hide the story and sign-off) or unfold an everyday letter.
@@ -199,6 +251,9 @@ func set_folded(folded: bool) -> void:
 		node.visible = not folded
 	if _fold_hint:
 		_fold_hint.text = TEXT_TAP_TO_READ if folded else TEXT_TAP_TO_FOLD
+	if _fold_caret:
+		HallStyle.turn_caret(_fold_caret, HallStyle.CARET_DOWN if folded else HallStyle.CARET_UP,
+				FOLD_CARET_TURN_SECONDS)
 
 
 func toggle_folded() -> void:
@@ -206,6 +261,7 @@ func toggle_folded() -> void:
 	if not is_folded:
 		for node in _foldable:
 			HallFx.fade_in(node, 0.0, UNFOLD_SECONDS)
+		opened.emit()
 
 
 ## Play this letter in, starting `delay` seconds from now: it fades up, the

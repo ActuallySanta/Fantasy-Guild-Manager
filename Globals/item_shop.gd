@@ -20,6 +20,10 @@ signal gear_changed
 
 enum EquipResult { OK, NOT_OWNED, ALREADY_ON, WRONG_ROLE, SLOTS_FULL, DEAD }
 
+## The day the Items tab (Pack + Shop) opens. Locked before this whether or
+## not the tutorial is on (HallMain.is_tab_locked); Pip's Shop walkthrough
+## runs on Day 5 (OverlayTutorial.TUTORIAL_DAYS).
+const UNLOCK_DAY := 5
 ## How many goods are on the counter each day (the Shop tab's 3 x 2 grid).
 const STOCK_SIZE := 6
 ## Item metadata: Vector2i(stat, amount) this item added to its wearer's stats.

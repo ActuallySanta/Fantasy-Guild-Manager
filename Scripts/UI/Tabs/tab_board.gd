@@ -1,6 +1,9 @@
 ## Board tab: the home screen. Three pinned "Today" notes (recruits,
 ## quests decided, upgrades), then every quest of the day as a scroll in one
 ## list so they can be compared at a glance. Tap a quest to pick its party.
+## Under the list, the End Day button (the only way to end the day): it opens
+## the End Day check, or the next undecided quest if any are left
+## (hall.open_end_check).
 ## Scene: Scenes/Tabs/tab_board.tscn
 extends ScrollContainer
 
@@ -9,7 +12,7 @@ const QuestRowScene := preload("uid://dxhtjf067jytf")  # Scenes/Rows/Quests/ques
 # ---- TEXT
 # Today note titles
 const TODAY_RECRUITS := "Recruits"
-const TODAY_QUESTS := "Decided"
+const TODAY_QUESTS := "Decided Quests"
 const TODAY_UPGRADES := "Upgrades"
 # Today note values
 const RECRUITS_NEW := "%d new"
@@ -18,12 +21,12 @@ const RECRUITS_IN_GUILD := "%d / %d hired"
 const QUESTS_DECIDED := "%d / %d"
 const UPGRADES_READY := "%d ready"
 const UPGRADES_NONE := "none yet"
-## While Pip still holds the Guild tab back (HallMain.is_tab_locked).
-const UPGRADES_LOCKED := "opens Day %d"
 # Quest list
 const HEADING := "Today's Quests"
 const HEADING_MILESTONE := "The Bone Drake"
 const HEADING_FINAL := "The Final Battle"
+# End Day
+const BUTTON_END_DAY := "End Day %d"
 
 # ---- NODES
 @onready var _today_recruits = %TodayRecruits     # today_item.gd
@@ -31,6 +34,7 @@ const HEADING_FINAL := "The Final Battle"
 @onready var _today_upgrades = %TodayUpgrades     # today_item.gd
 @onready var _heading: Label = %Heading
 @onready var _quest_list: VBoxContainer = %QuestList
+@onready var _end_day_button: Button = %EndDayButton
 
 ## The main hall script (state + actions), set in setup().
 var hall: HallMain
@@ -41,15 +45,22 @@ func setup(main: HallMain) -> void:
 	_today_recruits.pressed.connect(func(): hall.open_tab("guild", HallMain.GUILD_SECTION_HIRE))
 	_today_quests.pressed.connect(_on_today_quests_pressed)
 	_today_upgrades.pressed.connect(func(): hall.open_tab("upgrades", HallMain.UPGRADES_SECTION_BUILD))
+	_end_day_button.pressed.connect(hall.open_end_check)
 
 
 func scroll_to_top() -> void:
 	scroll_vertical = 0
 
 
+## The End Day button, for Pip to point at (hall.end_day_button).
+func end_day_button() -> Button:
+	return _end_day_button
+
+
 func refresh() -> void:
 	_show_today_checklist()
 	_show_quest_list()
+	_end_day_button.text = BUTTON_END_DAY % GameState.day
 
 
 # ---- Today checklist
@@ -62,6 +73,9 @@ func _show_today_checklist() -> void:
 
 
 func _show_recruits_box() -> void:
+	if hall.is_locked(OverlayTutorial.FEATURE_HIRE):
+		_today_recruits.set_item("", "", "nav_characters", "locked")
+		return
 	var roster_size: int = CharacterContainer.living_count()
 	if hall.is_roster_full():
 		_today_recruits.set_item(TODAY_RECRUITS, RECRUITS_FULL, "nav_characters", "idle")
@@ -81,7 +95,7 @@ func _show_quests_box() -> void:
 
 func _show_upgrades_box() -> void:
 	if hall.is_tab_locked("upgrades"):
-		_today_upgrades.set_item(TODAY_UPGRADES, UPGRADES_LOCKED % hall.tab_unlock_day("upgrades"), "nav_upgrades", "idle")
+		_today_upgrades.set_item("", "", "nav_upgrades", "locked")
 		return
 	var affordable_count := hall.affordable_buildings().size()
 	var value := UPGRADES_READY % affordable_count if affordable_count > 0 else UPGRADES_NONE
@@ -92,7 +106,7 @@ func _show_upgrades_box() -> void:
 ## The Decided note jumps to the next undecided quest (does nothing once all are decided).
 func _on_today_quests_pressed() -> void:
 	if hall.undecided_count() > 0:
-		hall.do_next_step()
+		hall.open_assign(hall.next_undecided_index(0))
 
 
 # ---- quest list

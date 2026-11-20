@@ -14,19 +14,20 @@ full-screen in portrait and works offline after the first visit.
 
 ## How to play
 
-Each day follows the same loop:
+A new run opens with a short story crawl about how you inherited the guild. After that,
+each day follows the same loop:
 
-1. **Board.** See every quest on offer today, with its reward, rank, party size and odds.
+1. **Quests.** See every quest on offer today, with its reward, rank, party size and odds.
 2. **Guild.** Hire applicants, check on your heroes, and train or heal them.
 3. **Assign Party.** Pick a party for each quest you want to take on (or deny it), and
-   watch the odds change as you add heroes.
+   watch the odds change as you add heroes. Pinning a hero sends the quest.
 4. **End Day.** The parties set out. The Day Report tells you how each quest went: gold
    earned, injuries and story.
 5. **Upgrades and Items.** Spend gold on buildings (Armory, Barracks, Training Yard,
    Hospital) and gear from the Shop.
 
-The run ends if the guild can never send anyone out again. The big button above the
-bottom bar always shows the next step, and Pip, the tutorial guide, walks you through
+The run ends if the guild can never send anyone out again. The End Day button sits
+at the bottom of the Quests tab, and Pip, the tutorial guide, walks you through
 the first few days.
 
 ## Running it from source

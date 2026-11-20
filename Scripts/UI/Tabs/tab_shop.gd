@@ -5,8 +5,8 @@
 ##              scrolls away with the goods (it used to stay pinned above them
 ##              and left only a small window for the grid)
 ##   Goods    - a 3 x 2 grid of today's goods with prices; sold-out items grey out
-##   Buy bar  - the picked item's name, what it does, and Buy (sits where the
-##              action bar normally is; hall_main hides the action bar here)
+##   Buy bar  - the picked item's name, what it does, and Buy (sits just
+##              above the nav)
 ##
 ## The goods come from the ItemShop autoload (generated items, new stock every
 ## dawn). Bought items go into the guild's pack, and heroes put them on from

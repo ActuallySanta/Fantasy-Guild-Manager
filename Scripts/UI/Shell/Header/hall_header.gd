@@ -16,6 +16,11 @@ extends VBoxContainer
 const DRAKE_WARNING_DAYS := 2
 ## Times the Bone Drake note pulses on a morning inside DRAKE_WARNING_DAYS.
 const DRAKE_PULSES := 3
+## Padding inside the Bone Drake note's torn paper (design px), left/right and
+## top/bottom. Kept small so the note hugs its seal and number (the shared
+## TornNote style pads 14-16 px).
+const DRAKE_NOTE_PADDING_X := 8.0
+const DRAKE_NOTE_PADDING_Y := 6.0
 ## Seconds the gold / standing numbers take to roll to a new value.
 const COUNTER_ROLL_SECONDS := 0.5
 ## How big the counter grows when its number changes (1 = no pop).
@@ -51,11 +56,18 @@ const EARNINGS_DELAY := 0.2
 
 ## The day number on the DAY tile.
 const HEADER_DAY := "%d"
-## The countdown note (BBCode); the days left are in red ink, and the whole
-## note turns red once DRAKE_WARNING_DAYS or fewer are left.
-const HEADER_DRAKE := "Bone Drake in [color=#%s]%d %s[/color]"
-const HEADER_DRAKE_TODAY := "Bone Drake [color=#%s]attacks today![/color]"
-const HEADER_DRAKE_GONE := "Bone Drake has passed"
+## The countdown note: the boss quest's seal, then the days left as a big
+## number over a small "days" label. The number is in red ink; the label
+## turns red too once DRAKE_WARNING_DAYS or fewer are left.
+const HEADER_DRAKE_DAYS := "%d"
+const HEADER_DRAKE_UNIT_ONE := "day"
+const HEADER_DRAKE_UNIT_MANY := "days"
+## On the Bone Drake's day: "!" over "today".
+const HEADER_DRAKE_TODAY := "!"
+const HEADER_DRAKE_TODAY_UNIT := "today"
+## After the Bone Drake's day: a dash over "passed".
+const HEADER_DRAKE_GONE := "-"
+const HEADER_DRAKE_GONE_UNIT := "passed"
 ## The warning strip under the header (see HallLedger.is_one_death_from_falling).
 ## DANGER_GOLD when gold is the problem, DANGER_STANDING when standing is.
 const DANGER_TITLE := "Last hero standing"
@@ -83,7 +95,11 @@ var _shown_day := -1
 # ============================================================ NODES
 
 @onready var _day_value: Label = %DayValue
-@onready var _drake_value: RichTextLabel = %DrakeValue
+@onready var _drake_seal: PanelContainer = %DrakeSeal
+@onready var _drake_tag: Label = %DrakeTag
+@onready var _drake_icon: TextureRect = %DrakeIcon
+@onready var _drake_days: Label = %DrakeDays
+@onready var _drake_days_label: Label = %DrakeDaysLabel
 @onready var _gold_value: Label = %GoldValue
 @onready var _standing_value: Label = %StandingValue
 @onready var _day_tile: Control = %DayTile
@@ -106,10 +122,49 @@ var _shown_day := -1
 func setup(main: HallMain) -> void:
 	hall = main
 	_menu_button.pressed.connect(hall.open_menu)
+	_trim_drake_note_padding()
 	_gold_popup.setup(main)
 	_standing_popup.setup(main)
 	_gold_box.gui_input.connect(_on_counter_input.bind(_gold_popup, _gold_box))
 	_standing_box.gui_input.connect(_on_counter_input.bind(_standing_popup, _standing_box))
+
+
+## Give the Bone Drake note its own copy of the torn-paper style with
+## DRAKE_NOTE_PADDING_X / _Y padding (the shared style stays as it is).
+func _trim_drake_note_padding() -> void:
+	var box := _drake_note.get_theme_stylebox("panel")
+	if box == null:
+		return
+	box = box.duplicate()
+	box.content_margin_left = DRAKE_NOTE_PADDING_X
+	box.content_margin_right = DRAKE_NOTE_PADDING_X
+	box.content_margin_top = DRAKE_NOTE_PADDING_Y
+	box.content_margin_bottom = DRAKE_NOTE_PADDING_Y
+	_drake_note.add_theme_stylebox_override("panel", box)
+
+
+## The Bone Drake countdown: the boss quest's seal (the same one its quest
+## card wears), then the days left over a "days" label. The number is always
+## red ink; the label joins it once DRAKE_WARNING_DAYS or fewer are left.
+func _refresh_drake_countdown() -> void:
+	var boss_type: Dictionary = HallStyle.QUEST_TYPES[HallStyle.MILESTONE_TYPE_ID]
+	HallStyle.style_icon_tag(_drake_seal, _drake_tag, _drake_icon, boss_type.tag,
+			boss_type.get("icon", ""), boss_type.color)
+
+	var days_left := hall.days_until_drake()
+	if days_left > 0:
+		_drake_days.text = HEADER_DRAKE_DAYS % days_left
+		_drake_days_label.text = HallStyle.pick_plural(days_left, HEADER_DRAKE_UNIT_ONE, HEADER_DRAKE_UNIT_MANY)
+	elif days_left == 0:
+		_drake_days.text = HEADER_DRAKE_TODAY
+		_drake_days_label.text = HEADER_DRAKE_TODAY_UNIT
+	else:
+		_drake_days.text = HEADER_DRAKE_GONE
+		_drake_days_label.text = HEADER_DRAKE_GONE_UNIT
+	var is_drake_close := days_left >= 0 and days_left <= DRAKE_WARNING_DAYS
+	var is_drake_gone := days_left < 0
+	HallStyle.set_font_color(_drake_days, HallStyle.TEXT_SOFT if is_drake_gone else HallStyle.RED)
+	HallStyle.set_font_color(_drake_days_label, HallStyle.RED if is_drake_close else HallStyle.TEXT_SOFT)
 
 
 ## Redraw the day, the countdown, the counters and the danger strip.
@@ -117,19 +172,7 @@ func refresh() -> void:
 	# grows with the font scale (here, not in setup, so a Text size change follows)
 	_standing_box.custom_minimum_size = HallFontScale.px_vec(STANDING_BOX_SIZE, STANDING_MAX_FACTOR)
 	_refresh_day_tile()
-
-	# the days left are always in red ink; in the last days the whole note is
-	var days_left := hall.days_until_drake()
-	var red_ink := HallStyle.RED.to_html(false)
-	if days_left > 0:
-		_drake_value.text = HEADER_DRAKE % [red_ink, days_left, HallStyle.pick_plural(days_left, "day", "days")]
-	elif days_left == 0:
-		_drake_value.text = HEADER_DRAKE_TODAY % red_ink
-	else:
-		_drake_value.text = HEADER_DRAKE_GONE
-	var is_drake_close := days_left >= 0 and days_left <= DRAKE_WARNING_DAYS
-	HallStyle.set_font_color(_drake_value, HallStyle.RED if is_drake_close else HallStyle.TEXT_MAIN)
-
+	_refresh_drake_countdown()
 	_update_counter("gold")
 	_update_counter("standing")
 	_refresh_danger_strip()
