@@ -8,6 +8,7 @@ check() { # name, condition result (0 = pass)
 	if [ "$2" -eq 0 ]; then echo "PASS: $1"; else echo "FAIL: $1"; FAILS=$((FAILS + 1)); fi
 }
 "$TOOLS/prepare.sh" "$TMP/pt" >/dev/null
+grep -q '(Playtest)' "$TMP/pt/project.godot"; check "scratch project renamed (Playtest)" $?
 "$TOOLS/launch.sh" "$TMP/pt" "$TMP/b1" --headless -- --bridge-dir="$(cygpath -m "$TMP/b1")" --mode=rules --seed=1
 check "launch reached ready" $?
 OUT="$("$TOOLS/bridge.sh" "$TMP/b1" ping)"; echo "$OUT"

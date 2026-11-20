@@ -15,6 +15,9 @@ git ls-files -co --exclude-standard -z | while IFS= read -r -d '' f; do
 	mkdir -p "$DEST/$(dirname "$f")"
 	cp -p "$f" "$DEST/$f"
 done
-sed -i 's|^config/name="\(.*\)"$|config/name="\1 (Playtest)"|' "$DEST/project.godot"
-"$GODOT_BIN" --headless --path "$(cygpath -w "$DEST")" --import >/dev/null 2>&1 || true
+sed -i -E 's/^config\/name="(.*)"(\r?)$/config\/name="\1 (Playtest)"\2/' "$DEST/project.godot"
+grep -q '(Playtest)' "$DEST/project.godot" || { echo "prepare: could not rename project in $DEST/project.godot" >&2; exit 1; }
+if ! "$GODOT_BIN" --headless --path "$(cygpath -w "$DEST")" --import >"$DEST/import.log" 2>&1; then
+	echo "prepare: warning, godot --import exited non-zero; see $DEST/import.log" >&2
+fi
 echo "prepared $DEST"
