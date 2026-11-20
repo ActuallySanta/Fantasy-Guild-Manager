@@ -30,6 +30,8 @@ const AI_CSV_PATH := "user://run_log_ai.csv"
 ## The tab AI rows land in. Documentation only: the Apps Script owns the name.
 const AI_SHEET_NAME := "AI Raw"
 ## Seconds before a send gives up (it retries with the next row).
+## Keep it above LOCK_WAIT_MS plus the write time in the Apps Script (5 s), so the
+## server answers "busy" before this gives up; otherwise a resend duplicates rows.
 const TIMEOUT := 10.0
 ## Print each send and Google's answer to the Output panel.
 const DEBUG := false

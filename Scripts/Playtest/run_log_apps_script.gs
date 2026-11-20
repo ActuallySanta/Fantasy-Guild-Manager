@@ -16,7 +16,10 @@
 const SHEET_ID = "1YN1BRbHZNM5ZyHxs8oSd4T0L0wtOcbYK4MuKLQNC8QM";
 const TOKEN = "goobers";   // must match TOKEN in run_logger.gd
 const AI_SHEET_NAME = "AI Raw";   // the AI playtest tab
-const LOCK_WAIT_MS = 20000;   // longest a post waits for another post to finish
+// Longest a post waits for another post to finish. Must stay well under
+// TIMEOUT in run_logger.gd (10 s): the lock wait plus the write has to end before
+// the client gives up, or it resends rows this script still appends (duplicates).
+const LOCK_WAIT_MS = 5000;
 
 function doPost(e) {
   const data = JSON.parse(e.postData.contents);
