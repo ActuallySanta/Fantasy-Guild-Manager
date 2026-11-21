@@ -51,19 +51,27 @@ const BARRACKS_MAX_HEROES := [4, 6, 8, 10, 12]
 const UNLOCK_DAY := 10
 ## Gold to reach level N is UPGRADE_GOLD_COST[N - 1]. Level 1 is free (owned at start).
 ## Tuned so an average run maxes every implemented building (4 of them; the
-## Office isn't yet) around Day 40: ~11,300 gold per building, ~45,000 in all.
+## Office isn't yet) around Day 40, and flawless play no sooner than about
+## Day 30: 25,000 gold per building, 100,000 in all.
+## Why gold sets the earliest day: the board holds at most 5 quests a day
+## (HallRules.QUESTS_PER_DAY_LATE) and pay tops out at rank S, so income has a
+## ceiling. Winning every quest on the board from Day 1 earns ~100k by the
+## start of Day 30 (before hiring), so nobody can buy everything sooner.
 ## Income compounds: wins raise standing by their rank + 1, standing raises the
-## quest rank (HallRules.standing_rank_for), and rank raises the gold. That
-## growth flattens once standing reaches the top rank (HallRules.TOP_STANDING_RANK),
-## around Day 20-25 for a solid run, so late income is high but steady. From the
-## run log (Guild Manager Run Log sheet, Nov 2026): ~150-550 gold a day through
-## Day 10; modelled on from there, an average run banks ~40-55k for buildings
-## by Day 40 after hiring and gear. Each level costs ~1.6-2x the last to match.
-## If the Office gets implemented, the total rises by a quarter: retune.
-const UPGRADE_GOLD_COST := [0, 900, 1900, 3300, 5200]
+## quest rank (HallRules.standing_rank_for), and rank raises the gold. A lost
+## quest pays no standing and only its bonus gold, so the win rate matters twice.
+## Modelled (Nov 2026) for an average player who denies ~15% of quests and
+## wins 80-85% of the rest: ~100-106k earned by Day 40 after ~150 gold a day on
+## hires and gear, maxing out on Day 40-42. The old 45k total was maxed by
+## Day 25-27 in the AI playtests (Docs/playtests/2026-11-20-run.md).
+## Each level costs ~1.7-2x the last. If the Office gets implemented, the
+## total rises by a quarter: retune.
+const UPGRADE_GOLD_COST := [0, 2000, 4000, 7000, 12000]
 ## Standing needed to buy level N. Spread out so the top levels also wait on
-## a strong reputation, not just a full purse (level 5 = rank-B quests territory).
-const UPGRADE_STANDING_REQ := [0, 8, 18, 30, 45]
+## a strong reputation, not just a full purse: level 4 opens around Day 15-17
+## and level 5 around Day 23-25 for an average run, before gold allows them,
+## so they space the levels out without being what holds a run back.
+const UPGRADE_STANDING_REQ := [0, 10, 40, 100, 200]
 
 # ---- Economy: the wallet a new run starts with, and the standing floor for recruits ----
 const STARTING_GOLD := 0
