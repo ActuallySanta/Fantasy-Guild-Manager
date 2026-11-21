@@ -16,6 +16,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 
 - **Run the game:** the main scene is `Scenes/hall_main.tscn`.
 - **Playtest scenarios:** run `Scenes/Playtest/scenario_*.tscn`, which start the hall from a preset day, gold, standing, and roster (`Scripts/Playtest/playtest_scenario.gd`).
+- **AI playtesters:** `/playtest` (`.claude/skills/playtest/`) runs persona agents through the bridge scene in `tools/playtest/` and writes `Docs/playtests/` reports. The bridge scene and scripts are excluded from exports.
 - **Headless behavior tests:** write a throwaway `extends Node` script plus a `.tscn` and run it with `--headless --path <project> res://that_test.tscn`. Running a scene loads the autoloads.
   - Do this in a scratch copy of the project, so `--import` and `.uid` churn don't land in the repo.
   - Don't trust `--check-only --script`: it doesn't load autoloads, so every script reports false "Identifier not found: GameState/ExternalContentContainer/…" errors.
@@ -45,7 +46,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 
 **The UI** (the "Mobile Hall") is split by file type, and the same subfolder names are used on both sides, so a scene and its script sit at matching paths (`Scenes/Rows/Quests/quest_row.tscn` ↔ `Scripts/UI/Rows/Quests/quest_row.gd`):
 - `Scenes/`: `hall_main.tscn`, then `Tabs/`, `Screens/`, `Components/`, `Shell/` (and `Shell/Header/`), `Overlays/{Day,Run End,Menu,Items}/`, `Rows/{Quests,Heroes,Buildings,Items,Day End}/`, and `Playtest/`.
-- `Scripts/UI/`: the script for each of those scenes. `Scripts/Hall/`: `hall_main.gd` plus the scene-less hall scripts in `Rules/`, `Save/`, `Style/`, `Web/` and `Debug/`. `Scripts/Playtest/`: `playtest_scenario.gd`.
+- `Scripts/UI/`: the script for each of those scenes. `Scripts/Hall/`: `hall_main.gd` plus the scene-less hall scripts in `Rules/`, `Save/`, `Style/`, `Web/` and `Debug/`. `Scripts/Playtest/`: `playtest_scenario.gd`, plus `agent_bridge*.gd` (the AI playtest bridge, excluded from exports).
 - Art and looks: `Sprites/` (`Hall Icons/`, `UI Textures/`, and its `README.md` on swapping art), `Fonts/`, `Themes/` (`hall_theme.tres` and the StyleBoxes in `Styles/`). `Data/credits.tres` holds the team credits.
 - Save files store the `res://` path of hero and item icons (`HallSave` `REF_TEXTURE`), so moving or renaming `Sprites/Character Icons/` or `Sprites/Item Icons/` breaks old saves.
 
@@ -68,7 +69,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 - Comment new code thoroughly. Tunables get `##` doc comments with units, functions get doc comments covering their params and return value, and non-obvious logic gets `#` comments. This matches the style of the newer files (`item_shop.gd`, `guild_upgrades.gd`, the hall and UI scripts).
 - Tuning numbers go in named, documented variables or constants at the top of the file that owns them, not inline.
 - Keep each script to one job, so no new "master script" grows the way `hall_main.gd` once did (1,900 lines).
-  - Soft limit: about 800 lines per script. Past that, find a piece to pull out before adding more. `hall_main.gd` is already near 1,350, so new hall code goes in another file and `hall_main` just calls it.
+  - Soft limit: about 800 lines per script. Past that, find a piece to pull out before adding more. `hall_main.gd` is already about 1,830, so new hall code goes in another file and `hall_main` just calls it.
   - Game rules that don't touch nodes (quest generation, payouts, run-over checks) go in a script of static functions with a `class_name`, like `HallRules` and `HallLedger`. They take what they need as parameters.
   - A part of the screen with its own nodes and refresh code becomes its own authored scene with `setup(hall)` and `refresh()`, like the tabs, overlays, and `Scenes/Shell/` pieces. Don't add inline nodes to `hall_main.tscn` for `hall_main.gd` to draw.
   - `hall_main.gd` keeps only the day's state, the actions that change it, thin query wrappers, and refresh orchestration.

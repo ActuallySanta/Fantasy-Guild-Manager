@@ -51,6 +51,15 @@ The window starts in portrait (720 × 1280), like a phone. You can resize it.
 standing and roster (for example, right before the Bone Drake, or on the Game Over
 screen). Open one and press **F6** (Run Current Scene).
 
+### AI playtesters
+
+Eight AI personas can play the game and report back: four read the game's numbers
+(min-maxer, cautious-planner, reckless-gambler, typical-player) and four play by
+screenshot and tap only (first-timer, skimmer, accessibility, genre-veteran). In Claude
+Code, run `/playtest` (arguments: `personas=`, `runs=`, `seed=`, `label=`, `days=`). It
+works in a scratch copy of the project and writes `Docs/playtests/<date>-<label>.md`
+(see `Docs/playtests/README.md`). The scripts are in `tools/playtest/`.
+
 ### Saving while developing
 
 By default every launch starts a fresh Day 1. To keep your run between launches, open
@@ -77,7 +86,8 @@ build.
 | `Sprites/` | Every image: UI textures and icons, character and item icons, the Shop tab's art. Its [README](Sprites/README.md) covers swapping art. |
 | `Fonts/`, `Themes/` | The fonts, and the UI theme with one StyleBox per surface. |
 | `Data/` | The team credits shown in the credits roll. |
-| `Docs/` | [hall_design.md](Docs/hall_design.md): the UI's design and rules. |
+| `Docs/` | [hall_design.md](Docs/hall_design.md): the UI's design and rules; `playtests/` holds the AI playtest reports. |
+| `tools/` | `playtest/`: the shell scripts and tests behind the AI playtesters (`/playtest`). |
 | `Audio/` | Sound effects (drop-in folder; see its README). |
 | `Builds/` | Committed desktop builds from earlier iterations. |
 

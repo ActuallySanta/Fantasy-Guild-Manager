@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://c4k8agentbrg1x"]
+
+[ext_resource type="Script" uid="uid://dg3ragentbrdg2" path="res://Scripts/Playtest/agent_bridge.gd" id="1_brg"]
+[ext_resource type="PackedScene" uid="uid://dtw7iu2s1gibm" path="res://Scenes/hall_main.tscn" id="2_hall"]
+
+[node name="AgentBridge" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_brg")
+
+[node name="HallMain" parent="." instance=ExtResource("2_hall")]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

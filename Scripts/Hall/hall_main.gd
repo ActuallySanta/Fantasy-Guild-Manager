@@ -316,6 +316,10 @@ var is_debug_run := false
 ## game itself (the scene root). A playtest scenario wraps the hall in its own
 ## scene, so its preset day never loads or overwrites the player's real run.
 var uses_save_file := false
+## True when the intro crawl should show on Day 1 even though this hall doesn't use
+## the save file. Only the AI playtest bridge (--intro) sets it, so a persona sees
+## the same first screen a new player does.
+var shows_intro_without_save := false
 ## True when start-up brought back a saved run (no Welcome card, a welcome-back toast).
 var is_resumed_run := false
 ## While End Day's dusk falls, the report (or credits) about to show:
@@ -868,7 +872,7 @@ func close_welcome() -> void:
 ## game (uses_save_file), so playtest scenarios skip it. Also while Debug
 ## tools' Replay intro has it open.
 func is_intro_open() -> bool:
-	return is_intro_replay or (uses_save_file and not is_intro_seen and GameState.day == 1)
+	return is_intro_replay or ((uses_save_file or shows_intro_without_save) and not is_intro_seen and GameState.day == 1)
 
 
 ## The crawl's Begin button: never show it again on this save, then start

@@ -9,6 +9,10 @@
 ## and posts with a threaded HTTPRequest, so the game never waits on the
 ## network. Rows that fail to send stay queued and go out with the next day.
 ##
+## AI playtests: the bridge calls configure_ai, which switches the logger to its
+## own CSV (user://run_log_ai.csv), the sheet's "AI Raw" tab, and a one-time
+## redeploy check of the Apps Script (ai_sheet_status). Human logging is unchanged.
+##
 ## UI only, like the tutorial: hall_main._ready adds it; it reads hall state
 ## and never changes it.
 class_name RunLogger
@@ -22,7 +26,16 @@ const SHEET_URL := "https://script.google.com/macros/s/AKfycbynU-kngD_D_4h6dDVLo
 ## Must match TOKEN in the Apps Script (stops random posts to the sheet).
 const TOKEN := "goobers"
 const CSV_PATH := "user://run_log.csv"
+## Extra columns on AI playtest rows only, appended after COLUMNS (see
+## configure_ai). Human rows never have them.
+const AI_COLUMNS := ["persona", "seed", "run_number", "mode"]
+## Where AI playtest rows go locally, so they never mix into run_log.csv.
+const AI_CSV_PATH := "user://run_log_ai.csv"
+## The tab AI rows land in. Documentation only: the Apps Script owns the name.
+const AI_SHEET_NAME := "AI Raw"
 ## Seconds before a send gives up (it retries with the next row).
+## Keep it above LOCK_WAIT_MS plus the write time in the Apps Script (5 s), so the
+## server answers "busy" before this gives up; otherwise a resend duplicates rows.
 const TIMEOUT := 10.0
 ## Print each send and Google's answer to the Output panel.
 const DEBUG := false
@@ -56,6 +69,15 @@ var _http: HTTPRequest
 var _is_sending := false
 ## Rows in the request in flight (dropped from the queue once it lands).
 var _sending_count := 0
+## True once configure_ai switched this logger to the AI target.
+var _is_ai := false
+## Extra cells on every AI row (persona, seed, run_number, mode), set by configure_ai.
+var _ai_extras := {}
+## Where the AI sheet check stands: "off" (not AI, or not posting), "checking",
+## "ready" (the redeployed script answered), "not_redeployed" (the old script
+## answered), or "offline" (the check failed). Only "ready" allows posting.
+var ai_sheet_status := "off"
+var _check_http: HTTPRequest
 
 
 func setup(main: HallMain) -> void:
@@ -73,6 +95,62 @@ func setup(main: HallMain) -> void:
 		_http.request_completed.connect(_on_sent)
 		if SEND_TEST_ROW_ON_START:
 			_log.call_deferred("test", [])
+
+
+## Switches this logger to the AI playtest target: rows go to AI_CSV_PATH with
+## AI_COLUMNS appended, and are posted with "sheet":"ai" so they land in the
+## "AI Raw" tab. Posting only starts once a GET of SHEET_URL answers with
+## ai_tab:true (the redeployed script); the old script would write AI rows
+## into the human tab, so then nothing is posted. Call before the first row.
+## new_run_id: unique per run (the bridge builds it). persona/seed_value/run_number/mode:
+## the extra cells. can_post: false (--no-sheet) keeps everything local.
+func configure_ai(new_run_id: String, persona: String, seed_value: int, run_number: int, mode: String, can_post: bool) -> void:
+	if not ENABLED:
+		return
+	_is_ai = true
+	_run_id = new_run_id
+	_ai_extras = {"persona": persona, "seed": seed_value, "run_number": run_number, "mode": mode}
+	_queue.clear()
+	if not can_post or SHEET_URL == "" or _http == null:
+		ai_sheet_status = "off"
+		return
+	ai_sheet_status = "checking"
+	_check_http = HTTPRequest.new()
+	_check_http.use_threads = not OS.has_feature("web")
+	_check_http.timeout = TIMEOUT
+	add_child(_check_http)
+	_check_http.request_completed.connect(_on_sheet_checked)
+	if _check_http.request(SHEET_URL) != OK:
+		ai_sheet_status = "offline"
+
+
+## Rows logged but not yet accepted by the sheet.
+func pending_rows() -> int:
+	return _queue.size()
+
+
+## This run's id (the bridge reports it in status).
+func run_id() -> String:
+	return _run_id
+
+
+## Tries to send what is queued (the bridge calls it while quitting).
+func flush() -> void:
+	_send()
+
+
+## The GET answer: only the redeployed script says ai_tab:true.
+func _on_sheet_checked(result: int, _code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	if result != HTTPRequest.RESULT_SUCCESS:
+		ai_sheet_status = "offline"
+		return
+	var answer: Variant = JSON.parse_string(body.get_string_from_utf8())
+	if answer is Dictionary and answer.get("ok", false) and answer.get("ai_tab", false):
+		ai_sheet_status = "ready"
+		_send()
+	else:
+		ai_sheet_status = "not_redeployed"
+		_queue.clear()
 
 
 func _on_event(event: String, data: Variant = null) -> void:
@@ -154,8 +232,12 @@ func _log(kind: String, results: Array) -> void:
 		"max_pluck": max_pluck,
 	}
 	_last_standing = GuildUpgrades.standing
+	if _is_ai:
+		row.merge(_ai_extras)
 	_write_csv(row)
-	if _http != null:
+	# AI rows are only held for posting while the sheet check may still pass
+	var can_queue := ai_sheet_status in ["checking", "ready"] if _is_ai else true
+	if _http != null and can_queue:
 		_queue.append(row)
 		while _queue.size() > MAX_QUEUE:
 			_queue.pop_front()
@@ -177,51 +259,66 @@ func _avg_hire_total() -> float:
 	return snappedf(float(total) / count, 0.01) if count > 0 else 0.0
 
 
+## The columns this logger writes: COLUMNS, plus AI_COLUMNS for AI rows.
+func _active_columns() -> Array:
+	return COLUMNS + AI_COLUMNS if _is_ai else COLUMNS
+
+
 func _write_csv(row: Dictionary) -> void:
-	_retire_old_csv()
-	var is_new := not FileAccess.file_exists(CSV_PATH)
-	var file := FileAccess.open(CSV_PATH, FileAccess.READ_WRITE if not is_new else FileAccess.WRITE)
+	var columns := _active_columns()
+	var path := AI_CSV_PATH if _is_ai else CSV_PATH
+	_retire_old_csv(path, columns)
+	var is_new := not FileAccess.file_exists(path)
+	var file := FileAccess.open(path, FileAccess.READ_WRITE if not is_new else FileAccess.WRITE)
 	if file == null:
 		return
 	file.seek_end()
 	if is_new:
-		file.store_csv_line(PackedStringArray(COLUMNS))
+		file.store_csv_line(PackedStringArray(columns))
 	var line := PackedStringArray()
-	for column in COLUMNS:
+	for column in columns:
 		line.append(str(row[column]))
 	file.store_csv_line(line)
 	file.close()
 
 
-## A CSV started before COLUMNS last changed has the old header, so new rows
-## wouldn't line up: move it aside to run_log_old.csv (replacing an older one)
-## and let _write_csv start a fresh file.
-func _retire_old_csv() -> void:
-	if not FileAccess.file_exists(CSV_PATH):
+## A CSV started before its columns last changed has the old header, so new
+## rows wouldn't line up: move it aside to <name>_old.csv (replacing an older
+## one) and let _write_csv start a fresh file.
+## path: the CSV to check. columns: the header it should have.
+func _retire_old_csv(path: String, columns: Array) -> void:
+	if not FileAccess.file_exists(path):
 		return
-	var file := FileAccess.open(CSV_PATH, FileAccess.READ)
+	var file := FileAccess.open(path, FileAccess.READ)
 	if file == null:
 		return
 	var header := file.get_csv_line()
 	file.close()
-	if header == PackedStringArray(COLUMNS):
+	if header == PackedStringArray(columns):
 		return
-	var old_path := CSV_PATH.get_basename() + "_old.csv"
+	var old_path := path.get_basename() + "_old.csv"
 	DirAccess.remove_absolute(old_path)
-	DirAccess.rename_absolute(CSV_PATH, old_path)
+	DirAccess.rename_absolute(path, old_path)
 
 
 ## Post every queued row in one request (one at a time; the next waits).
 func _send() -> void:
 	if _is_sending or _queue.is_empty():
 		return
+	# AI rows never post until the redeployed script answered the check
+	if _is_ai and ai_sheet_status != "ready":
+		return
+	var columns := _active_columns()
 	var rows := []
 	for row in _queue:
 		var values := []
-		for column in COLUMNS:
+		for column in columns:
 			values.append(row[column])
 		rows.append(values)
-	var body := JSON.stringify({"token": TOKEN, "columns": COLUMNS, "rows": rows})
+	var payload := {"token": TOKEN, "columns": columns, "rows": rows}
+	if _is_ai:
+		payload["sheet"] = "ai"
+	var body := JSON.stringify(payload)
 	# text/plain keeps a web build's request "simple" (no CORS preflight)
 	var error := _http.request(SHEET_URL, ["Content-Type: text/plain;charset=utf-8"], HTTPClient.METHOD_POST, body)
 	if error == OK:
