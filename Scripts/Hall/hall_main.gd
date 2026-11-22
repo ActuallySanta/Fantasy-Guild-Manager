@@ -284,6 +284,8 @@ var final_battle_lost := false
 ##   items_found:  equipment brought back from quests, found or rewarded (int)
 ##   final_result: FINAL_RESULT_NONE | _WON | _LOST
 ##   final_party:  the GuildCharacters sent to the final battle (Array)
+##   failed_by_day: day -> quests lost that day (Dictionary of int to int; old saves
+##                 don't have it, so read it with .get, see HallLedger.trouble_reason)
 var run_stats := {
 	"gold_earned": 0,
 	"quests_sent": 0,
@@ -295,6 +297,7 @@ var run_stats := {
 	"items_found": 0,
 	"final_result": FINAL_RESULT_NONE,
 	"final_party": [],
+	"failed_by_day": {},
 }
 
 # ---- player choices
@@ -553,6 +556,17 @@ func is_run_over() -> bool:
 ## end the run (see HallLedger). Drives the header's warning strip.
 func is_one_death_from_falling() -> bool:
 	return HallLedger.is_one_death_from_falling()
+
+
+## Why the guild is "in trouble" ("failures", "injuries"), or "" when it isn't
+## (see HallLedger.trouble_reason). Drives the header's second warning strip.
+func trouble_reason() -> String:
+	return HallLedger.trouble_reason(run_stats, roster(), GameState.day)
+
+
+## Quests lost over the last HallLedger.TROUBLE_WINDOW_DAYS days.
+func recent_failures() -> int:
+	return HallLedger.recent_failures(run_stats, GameState.day)
 
 
 ## The one living member of the guild, or null if there isn't exactly one.
@@ -1598,6 +1612,11 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 	run_stats.gold_earned += result.gold
 	if result.succeeded:
 		run_stats.quests_won += 1
+	else:
+		# old saves have no failed_by_day, so make it before counting
+		var failed_by_day: Dictionary = run_stats.get("failed_by_day", {})
+		failed_by_day[GameState.day] = failed_by_day.get(GameState.day, 0) + 1
+		run_stats["failed_by_day"] = failed_by_day
 	# only the Bone Drake counts here (the later bosses are milestone entries too)
 	if entry.milestone and GameState.day == MILESTONE_DAY:
 		run_stats.drake_result = DRAKE_RESULT_SLAIN if result.succeeded else DRAKE_RESULT_LOST

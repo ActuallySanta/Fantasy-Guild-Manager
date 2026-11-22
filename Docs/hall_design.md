@@ -114,6 +114,12 @@ in today's For Hire is affordable, and either tomorrow's recruit price is more t
 gold or standing is within `DANGER_STANDING_MARGIN` of the floor. The Welcome card's
 "Don't run out of heroes" row explains the rule.
 
+A milder gold **Guild in trouble** strip uses the same spot when the red one isn't showing
+(`HallMain.trouble_reason`, rules in `HallLedger.trouble_reason`). It shows when
+`TROUBLE_FAILURES` (2) or more quests were lost over the last `TROUBLE_WINDOW_DAYS` (2) played
+days, or half or more of the living roster is Hurt or worse. The failure count is kept in
+`run_stats.failed_by_day` (read with `.get`, so old saves just show no strip).
+
 Tapping the gold coin or the standing shield in the header drops a parchment card
 from it (`HeaderPopup`; tap anywhere else to close it). The **gold** card shows what
 the quests sent tonight pay if they all win and about how much at today's odds, then

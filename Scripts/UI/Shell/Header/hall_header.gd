@@ -67,6 +67,10 @@ const HEADER_DRAKE_TODAY := "!"
 const HEADER_DRAKE_TODAY_UNIT := "today"
 ## The warning strip under the header (see HallLedger.is_one_death_from_falling).
 ## DANGER_GOLD when gold is the problem, DANGER_STANDING when standing is.
+## The milder gold strip: shown only when the red one isn't (see HallLedger.trouble_reason).
+const TROUBLE_TITLE := "Guild in trouble"
+const TROUBLE_FAILURES_TEXT := "%d quests lost in two days. Pick safer quests for a while."
+const TROUBLE_INJURIES_TEXT := "Half the guild is hurt. Rest or heal before sending more."
 const DANGER_TITLE := "Last hero standing"
 const DANGER_GOLD := "Recruits cost %d gold and you have %d. Lose %s and the guild falls."
 const DANGER_STANDING := "Standing is nearly too low for recruits. Lose %s and the guild falls."
@@ -195,11 +199,23 @@ func _on_counter_input(event: InputEvent, popup: HeaderPopup, anchor: Control) -
 func _refresh_danger_strip() -> void:
 	var hero := hall.last_living_hero()
 	var was_shown := _danger_strip.visible
-	_danger_strip.visible = hall.run_over_stats.is_empty() and hero != null and hall.is_one_death_from_falling()
+	var is_danger: bool = hall.run_over_stats.is_empty() and hero != null and hall.is_one_death_from_falling()
+	var trouble: String = "" if (is_danger or not hall.run_over_stats.is_empty()) else hall.trouble_reason()
+	_danger_strip.visible = is_danger or trouble != ""
 	if not _danger_strip.visible:
 		return
 	if not was_shown:
 		Sfx.play(&"danger_warning")
+	if not is_danger:
+		HallStyle.style_panel(_danger_strip, HallStyle.GOLD_BG)
+		_danger_icon.modulate = HallStyle.GOLD
+		_danger_title.text = TROUBLE_TITLE
+		HallStyle.set_font_color(_danger_title, HallStyle.GOLD_TEXT)
+		if trouble == "failures":
+			_danger_text.text = TROUBLE_FAILURES_TEXT % hall.recent_failures()
+		else:
+			_danger_text.text = TROUBLE_INJURIES_TEXT
+		return
 	HallStyle.style_panel(_danger_strip, HallStyle.RED_BG)
 	_danger_icon.modulate = HallStyle.RED
 	_danger_title.text = DANGER_TITLE
