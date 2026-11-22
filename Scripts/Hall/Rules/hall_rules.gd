@@ -61,8 +61,11 @@ const BOSS_TWO_DAYS := [20, 40]
 ## The first day the difficulty staircase starts climbing; before it every
 ## quest asks for its base stats (scale 1.0).
 const DIFFICULTY_START_DAY := 5
-## Requirement growth for each day from DIFFICULTY_START_DAY on (0.01 = +1% a day).
-const DIFFICULTY_DRIFT_PER_DAY := 0.01
+## Requirement growth for each day from DIFFICULTY_START_DAY on (0.015 = +1.5% a
+## day). Raised from 0.01 after playtest round 1 (seed 4417): mid-game odds sat
+## at 80-200% for typical players and 85-135% for the min-maxer, above the
+## 85-95% target.
+const DIFFICULTY_DRIFT_PER_DAY := 0.015
 ## Requirement growth added for each boss already past (0.15 = +15% per boss).
 const DIFFICULTY_STEP_PER_BOSS := 0.15
 ## Extra requirement multiplier on a boss quest, on top of the day's scale.

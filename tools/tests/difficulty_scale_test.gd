@@ -16,7 +16,7 @@ func _ready() -> void:
 
 
 func _test_scale_values() -> void:
-	var expected := {4: 1.0, 5: 1.01, 9: 1.05, 10: 1.06, 11: 1.22, 21: 1.47, 31: 1.72, 41: 1.97, 49: 2.05}
+	var expected := {4: 1.0, 5: 1.015, 9: 1.075, 10: 1.09, 11: 1.255, 21: 1.555, 31: 1.855, 41: 2.155, 49: 2.275}
 	for day: int in expected:
 		check_near(HallRules.difficulty_scale(day), expected[day], TOLERANCE, "difficulty_scale(%d)" % day)
 	check_near(HallRules.difficulty_scale(50), HallRules.difficulty_scale(70), TOLERANCE, "scale frozen after day 50")
@@ -33,7 +33,7 @@ func _test_boss_schedule() -> void:
 
 
 func _test_requirement_scale() -> void:
-	check_near(HallRules.requirement_scale(10, true, false), 1.06 * 1.35, TOLERANCE, "day 10 boss")
+	check_near(HallRules.requirement_scale(10, true, false), 1.09 * 1.35, TOLERANCE, "day 10 boss")
 	check_near(HallRules.requirement_scale(50, true, true), HallRules.difficulty_scale(50) * 1.15, TOLERANCE, "final boss")
 	check_near(HallRules.requirement_scale(60, false, false), HallRules.difficulty_scale(50) * 1.2, TOLERANCE, "freeplay day 60")
 

@@ -67,11 +67,14 @@ const UNLOCK_DAY := 10
 ## Each level costs ~1.7-2x the last. If the Office gets implemented, the
 ## total rises by a quarter: retune.
 const UPGRADE_GOLD_COST := [0, 2000, 4000, 7000, 12000]
-## Standing needed to buy level N. Spread out so the top levels also wait on
-## a strong reputation, not just a full purse: level 4 opens around Day 15-17
-## and level 5 around Day 23-25 for an average run, before gold allows them,
-## so they space the levels out without being what holds a run back.
-const UPGRADE_STANDING_REQ := [0, 10, 40, 100, 200]
+## Standing needed to buy level N. Gold (about 100k in all) sets the pace; these
+## gates must never be what holds an average run back. They were [0, 10, 40, 100,
+## 200], but failures and denials now cost standing, and in playtest round 1
+## (Docs/playtests, seed 4417) average and cautious players peaked at only 45-133
+## standing, so buildings stalled at level 2-3 and the Barracks cap of 6 made the
+## 8-slot Demon King impossible to field. Now low enough that a steady run clears
+## each gate as soon as it can pay for the level.
+const UPGRADE_STANDING_REQ := [0, 5, 15, 30, 50]
 
 # ---- Economy: the wallet a new run starts with, and the standing floor for recruits ----
 const STARTING_GOLD := 0
