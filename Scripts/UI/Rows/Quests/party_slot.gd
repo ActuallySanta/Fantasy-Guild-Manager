@@ -38,7 +38,8 @@ func setup(hall: HallMain, entry: Dictionary, seated: GuildCharacter,
 		_portrait.show_character(seated)
 		_name.text = seated.name
 		_hint.text = TEXT_ROLE % HallStyle.role_name(seated)
-		_favored_chip.set_stat(seated, HallStyle.favored_stat_index(entry.quest), true)
+		# the seat's chip shows the hero's first favored stat (Pluck on a Pluck quest)
+		_favored_chip.set_stat(seated, HallStyle.favored_components(entry.quest)[0], true)
 		pressed.connect(hall.toggle_in_party.bind(seated))
 		# just pinned: their portrait slams into the seat
 		if hall.pending_fx.get("seat_in") == seated:

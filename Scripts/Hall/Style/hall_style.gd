@@ -111,7 +111,7 @@ const FINAL_TYPE_ID := 6
 ## (the Assign Party scroll), seal colour, short tag, and the icon (an
 ## ICON_FILES name) drawn on its seal. A type with no "icon" shows its tag
 ## on the seal instead; the tag is also used where there's no seal.
-## The BOSS seal (exclamation) is also the one on the header's Bone Drake countdown.
+## The BOSS seal (exclamation) is also the one on the header's next-boss countdown.
 const QUEST_TYPES := {
 	1: {"name": "Clear Dungeon", "writ": "Writ of Clearing", "color": Color("#4A5E32"), "tag": "DUN", "icon": "gate"},
 	2: {"name": "Escort", "writ": "Writ of Escort", "color": Color("#7A5236"), "tag": "ESC", "icon": "escort"},
@@ -334,9 +334,32 @@ static func quest_type_info(entry: Dictionary) -> Dictionary:
 	return QUEST_TYPES.get(quest_type_id(entry), QUEST_TYPES[1])
 
 
-## Index into STATS for the stat a quest favors.
-static func favored_stat_index(quest: CreatedQuest) -> int:
-	return clampi(int(quest.favStat), 0, STAT_COUNT - 1)
+## The STATS indexes a quest favors, Pluck included (PLUCK_INDEX), in digit
+## order: a combo like 23 gives [2, 3]. Never empty.
+static func favored_components(quest: CreatedQuest) -> Array[int]:
+	var indexes: Array[int] = []
+	for component in quest.favored_components():
+		indexes.append(clampi(component, 0, STAT_COUNT - 1))
+	return indexes
+
+
+## The StatType indexes (0-3) a quest favors, for highlighting hero stats.
+## Pluck isn't a stat, so it's dropped: a Pluck-only quest returns [].
+static func favored_stat_indexes(quest: CreatedQuest) -> Array[int]:
+	var indexes: Array[int] = []
+	for index in favored_components(quest):
+		if index != PLUCK_INDEX:
+			indexes.append(index)
+	return indexes
+
+
+## The favored stats' full names joined with " + " ("Power + Defense",
+## "Pluck"). Pluck counts here even though it isn't highlighted.
+static func favored_label(quest: CreatedQuest) -> String:
+	var names: Array[String] = []
+	for index in favored_components(quest):
+		names.append(STATS[index].name)
+	return " + ".join(names)
 
 
 ## Rank letter for a quest ("F" ... "S", or "S++" in freeplay).

@@ -227,8 +227,8 @@ func _show_quest_card(entry: Dictionary) -> void:
 	_standing_chip.set_chip(TEXT_STANDING % [HallRules.standing_for_win(quest), HallRules.standing_for_loss(quest)], HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "shield")
 	var size_text := TEXT_PARTY_SIZE_SOLO if size_limit == 1 else TEXT_PARTY_SIZE % size_limit
 	_party_size_chip.set_chip(size_text, HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "person")
-	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_stat_index(quest)]
-	_favored_chip.set_chip(TEXT_FAVORED % favored_stat.name, favored_stat.bg, favored_stat.color, "", true)
+	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_components(quest)[0]]
+	_favored_chip.set_chip(TEXT_FAVORED % HallStyle.favored_label(quest), favored_stat.bg, favored_stat.color, "", true)
 
 
 # ---- party

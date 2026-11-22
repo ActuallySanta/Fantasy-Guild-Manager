@@ -93,10 +93,10 @@ func _show_quest_facts(hall: HallMain, entry: Dictionary) -> void:
 	else:
 		_gold_chip.set_chip(TEXT_GOLD % entry.quest.goldReward, HallStyle.GOLD_BG, HallStyle.TEXT_MAIN, "coins")
 	_party_size_chip.set_chip(TEXT_PARTY_SIZE % hall.party_size_limit(entry), HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "person")
-	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_stat_index(entry.quest)]
+	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_components(entry.quest)[0]]
 	# SIMPLIFIED: the full stat name ("Defense"), not the short one ("Def").
 	# Was: favored_stat.short
-	_favored_chip.set_chip(favored_stat.name, favored_stat.bg, favored_stat.color, "", true)
+	_favored_chip.set_chip(HallStyle.favored_label(entry.quest), favored_stat.bg, favored_stat.color, "", true)
 
 
 ## Gilt paper and a "Story Quest" ribbon above the title.

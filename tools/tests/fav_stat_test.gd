@@ -39,6 +39,21 @@ func _ready() -> void:
 	pluck_quest.favStat = 4
 	check(pluck_quest.trained_stat_options() == [pluck_quest.region_favored_stat()], "pluck falls back to region")
 
+	# the "Favors X" label and highlights for Pluck and combo quests
+	var labelled := CreatedQuest.new(1, 5)
+	labelled.favStat = 4
+	check(HallStyle.favored_label(labelled).contains("Pluck"), "favStat 4 label has Pluck")
+	check(HallStyle.favored_stat_indexes(labelled).is_empty(), "favStat 4 highlights no stat")
+	labelled.favStat = 10
+	check(HallStyle.favored_label(labelled).contains("Power") and HallStyle.favored_label(labelled).contains("Defense"), "favStat 10 label has Power and Defense")
+	labelled.favStat = 23
+	check(HallStyle.favored_stat_indexes(labelled) == [2, 3], "favStat 23 highlights Wisdom and Sleaze")
+	labelled.favStat = 40
+	check(HallStyle.favored_stat_indexes(labelled) == [0], "favStat 40 highlights Power only")
+	for value: int in FAV_VALUES:
+		labelled.favStat = value
+		check(not HallStyle.favored_label(labelled).is_empty(), "favStat %d has a label" % value)
+
 	for day: int in BOARD_DAYS:
 		GameState.day = day
 		for entry in HallRules.build_day_quests(day, 60, false):

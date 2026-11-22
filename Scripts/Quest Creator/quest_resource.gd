@@ -276,7 +276,7 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 
 		# the favored stat's components count once each (Pluck alone counts twice,
 		# like a single stat); a Pluck component counts the hero's pluck value
-		for component in _fav_components():
+		for component in favored_components():
 			if component == PLUCK_COMPONENT:
 				statTotal += adventurer.pluck * (2 if int(favStat) == PLUCK_COMPONENT else 1)
 			else:
@@ -294,8 +294,8 @@ func region_favored_stat() -> int:
 ## The favored stat's components. A value under 10 is one component (a
 ## GuildCharacter.StatType index 0-3, or PLUCK_COMPONENT); a two-digit value is
 ## a combo of its two digits, e.g. 12 = Defense + Wisdom, 40 = Pluck + Power.
-## Returns an Array[int].
-func _fav_components() -> Array[int]:
+## Returns an Array[int] (PLUCK_COMPONENT = Pluck, which is not a StatType).
+func favored_components() -> Array[int]:
 	var value := int(favStat)
 	var components: Array[int] = []
 	if value < 10:
@@ -312,7 +312,7 @@ func _fav_components() -> Array[int]:
 ## stat when nothing trainable is left. Returns an Array of StatType indexes.
 func trained_stat_options() -> Array[int]:
 	var options: Array[int] = []
-	for component in _fav_components():
+	for component in favored_components():
 		if component != PLUCK_COMPONENT and not options.has(component):
 			options.append(component)
 	if not options.has(region_favored_stat()):
@@ -325,7 +325,7 @@ func trained_stat_options() -> Array[int]:
 ## otherwise the region's. Returns a GuildCharacter.StatType index (0-3).
 func roll_trained_stat() -> int:
 	var favored: Array[int] = []
-	for component in _fav_components():
+	for component in favored_components():
 		if component != PLUCK_COMPONENT:
 			favored.append(component)
 	if not favored.is_empty() and randf_range(0.0, 100.0) < trained_stat_quest_chance:

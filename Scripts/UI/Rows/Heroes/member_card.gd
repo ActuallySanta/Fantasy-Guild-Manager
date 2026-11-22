@@ -56,7 +56,7 @@ func setup(hall: HallMain, character: GuildCharacter) -> void:
 	_name.text = character.name
 	_role.text = TEXT_ROLE % HallStyle.role_name(character)
 	_stats.show_health(character)
-	_stats.show_stats(character, -1, false, SHOWN_STAT_COUNT)
+	_stats.show_stats(character, [], false, SHOWN_STAT_COUNT)
 	_show_task(hall, character)
 	_show_status(hall, character)
 
