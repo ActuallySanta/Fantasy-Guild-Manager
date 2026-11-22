@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://b5eattapsc3n1"]
+
+[ext_resource type="Script" uid="uid://c5eattapt3st1" path="res://tools/tests/seat_tap_test.gd" id="1_seat"]
+
+[node name="seat_tap_test" type="Node"]
+script = ExtResource("1_seat")
