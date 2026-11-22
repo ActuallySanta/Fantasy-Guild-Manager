@@ -57,6 +57,20 @@ const FINAL_QUEST_RANK := CreatedQuest.QuestDifficulty.S
 ## Day 75 quests ask for and pay 1.5x). Linear and without a cap.
 const FREEPLAY_SCALE_PER_DAY := 0.02
 
+## Days that end in a boss quest (the last is HallMain.FINAL_DAY).
+const BOSS_DAYS := [10, 20, 30, 40, 50]
+## The first day the difficulty staircase starts climbing; before it every
+## quest asks for its base stats (scale 1.0).
+const DIFFICULTY_START_DAY := 5
+## Requirement growth for each day from DIFFICULTY_START_DAY on (0.01 = +1% a day).
+const DIFFICULTY_DRIFT_PER_DAY := 0.01
+## Requirement growth added for each boss already past (0.15 = +15% per boss).
+const DIFFICULTY_STEP_PER_BOSS := 0.15
+## Extra requirement multiplier on a boss quest, on top of the day's scale.
+const BOSS_SPIKE := 1.35
+## Extra requirement multiplier on the final battle, on top of the day's scale.
+const FINAL_BOSS_SPIKE := 1.15
+
 
 # ============================================================ STARTING HERO
 
@@ -155,21 +169,74 @@ static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Arra
 				noRepeatQuests = true
 			18, 20:
 				quest = CreatedQuest.new(rank, GameState.day)
+				_scale_normal_quest(quest, day, is_freeplay)
 				entries.append(new_entry(quest, false))
 				quest = CreatedQuest.new(rank, -1 * GameState.day)
+				_scale_normal_quest(quest, day, is_freeplay)
 				entries.append(new_entry(quest, false))
 				return entries
 		
-		if is_freeplay:
-			quest.apply_freeplay_scaling(freeplay_scale(day))
+		_scale_normal_quest(quest, day, is_freeplay)
 		entries.append(new_entry(quest, false))
 	return entries
+
+
+## Applies the day's requirement scale to a normal (non-boss) quest, and
+## freeplay's gold scaling when `is_freeplay`.
+static func _scale_normal_quest(quest: CreatedQuest, day: int, is_freeplay: bool) -> void:
+	quest.requirement_multiplier = requirement_scale(day, false, false)
+	if is_freeplay:
+		quest.apply_freeplay_gold(freeplay_scale(day))
 
 
 ## Freeplay's multiplier on quest requirements and rewards on `day`: 1.0 on
 ## HallMain.FINAL_DAY, then FREEPLAY_SCALE_PER_DAY more for each day after it.
 static func freeplay_scale(day: int) -> float:
 	return 1.0 + FREEPLAY_SCALE_PER_DAY * maxi(day - HallMain.FINAL_DAY, 0)
+
+
+## Whether `day` is one of BOSS_DAYS.
+static func is_boss_day(day: int) -> bool:
+	return BOSS_DAYS.has(day)
+
+
+## How many BOSS_DAYS come before `day` (strictly less than it).
+static func bosses_before(day: int) -> int:
+	var count := 0
+	for boss_day: int in BOSS_DAYS:
+		if boss_day < day:
+			count += 1
+	return count
+
+
+## The first boss day on or after `day`, or -1 when none is left.
+static func next_boss_day(day: int) -> int:
+	for boss_day: int in BOSS_DAYS:
+		if boss_day >= day:
+			return boss_day
+	return -1
+
+
+## The staircase multiplier on quest requirements on `day`: 1.0 before
+## DIFFICULTY_START_DAY, then a steady drift per day plus a step per boss
+## passed. Frozen from HallMain.FINAL_DAY on (freeplay_scale takes over).
+static func difficulty_scale(day: int) -> float:
+	if day < DIFFICULTY_START_DAY:
+		return 1.0
+	var capped_day := mini(day, HallMain.FINAL_DAY)
+	return 1.0 		+ DIFFICULTY_DRIFT_PER_DAY * (capped_day - (DIFFICULTY_START_DAY - 1)) 		+ DIFFICULTY_STEP_PER_BOSS * bosses_before(capped_day)
+
+
+## The full multiplier on a quest's stat requirement on `day`: the staircase,
+## times the boss spike (BOSS_SPIKE, or FINAL_BOSS_SPIKE for the final battle),
+## times freeplay's climb.
+static func requirement_scale(day: int, is_boss: bool, is_final: bool) -> float:
+	var spike := 1.0
+	if is_final:
+		spike = FINAL_BOSS_SPIKE
+	elif is_boss:
+		spike = BOSS_SPIKE
+	return difficulty_scale(day) * spike * freeplay_scale(day)
 
 
 ## How many quests the board gets on `day` (see QUESTS_PER_DAY_BY_DAY).

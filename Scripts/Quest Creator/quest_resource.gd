@@ -233,7 +233,14 @@ func _init(diff := 0, dayNum := 0) -> void:
 ## half again the gold (see HallRules.FREEPLAY_SCALE_PER_DAY).
 func apply_freeplay_scaling(multiplier: float) -> void:
 	requirement_multiplier = multiplier
+	apply_freeplay_gold(multiplier)
+
+
+## Scales only the gold reward (goldReward and startingGoldReward), leaving the
+## stat requirement alone. multiplier: 1.0 = unchanged.
+func apply_freeplay_gold(multiplier: float) -> void:
 	goldReward = roundi(goldReward * multiplier)
+	startingGoldReward = roundi(startingGoldReward * multiplier)
 
 
 func calcSuccessChance(_questingAdventurers: Array) -> int:

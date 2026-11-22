@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c8d4n1r5y6xp"]
+
+[ext_resource type="Script" path="res://tools/tests/difficulty_scale_test.gd" id="1_difficulty_scale"]
+
+[node name="difficulty_scale_test" type="Node"]
+script = ExtResource("1_difficulty_scale")

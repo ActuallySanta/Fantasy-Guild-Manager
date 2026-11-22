@@ -231,6 +231,10 @@ Looks come from the theme, not from overrides: a label is `TitleLabel`, `CapsLab
 `PaperButton` or `SealButton`. Pick one in the inspector (*Theme > Type Variation*) rather
 than overriding colours or styles on the node, so a reskin reaches it.
 
+## Difficulty
+
+Quest requirements climb on a staircase (`HallRules.difficulty_scale`). Before day 5 they are at base. From day 5 they drift up 1% a day, and each boss passed (days 10, 20, 30, 40, 50) adds a 15% step, so day 11 asks 1.22x and day 49 asks 2.05x. The scale freezes at day 50; freeplay then keeps climbing through `freeplay_scale`. Boss quests get a further spike on top (1.35x, or 1.15x for the final battle). Gold rewards do not scale with the staircase, only the stats a quest asks for, and the player sees the effect as lower odds on Assign Party.
+
 ## Gear rarity
 
 Shop stock and quest gear (reward items and finds) roll their rarity in
