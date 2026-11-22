@@ -69,7 +69,7 @@ static func _hire(character: GuildCharacter) -> Dictionary:
 		"id": id_of(character),
 		"name": character.name,
 		"role": GuildCharacter.CharacterRole.keys()[character.role],
-		"cost": character.cost,
+		"cost": CharacterContainer.hire_price(character),
 		"stats": _stats(character.stats),
 	}
 

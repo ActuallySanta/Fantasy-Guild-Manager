@@ -49,7 +49,7 @@ static func last_living_hero(roster: Array) -> GuildCharacter:
 ## Someone in today's For Hire costs no more than the gold in hand.
 static func can_afford_a_recruit_today() -> bool:
 	for character in CharacterContainer.hireable_characters:
-		if character.cost <= GameState.gold:
+		if CharacterContainer.hire_price(character) <= GameState.gold:
 			return true
 	return false
 

@@ -28,6 +28,11 @@ const PRICE_PER_POINT := 10
 ## The spread of a recruit's stats (GuildCharacter.stat_deviation) per stat
 ## point of budget: 2 at the old 17 points, so the spread grows with the budget.
 const DEVIATION_PER_POINT := 2.0 / 17.0
+## Fraction (0-1+) added to a recruit's price for each living hero above
+## HIRE_PRICE_FREE_HEROES, so a big guild pays more for its next hire.
+const HIRE_PRICE_PER_HERO := 0.15
+## Living heroes the guild can have before recruits start costing extra.
+const HIRE_PRICE_FREE_HEROES := 3
 
 
 # ============================================================ BUDGET
@@ -90,3 +95,13 @@ static func recruit_cost(day: int, standing: int, points: int) -> int:
 	if day_price <= 0:
 		return 0
 	return day_price + PRICE_PER_POINT * maxi(0, points - standing_floor(standing))
+
+
+## What a recruit costs the guild right now: the base price raised by
+## HIRE_PRICE_PER_HERO for each living hero above HIRE_PRICE_FREE_HEROES.
+## Free recruits (base 0) stay free.
+## base_cost: the recruit's saved price (GuildCharacter.cost), in gold;
+## living_heroes: CharacterContainer.living_count().
+static func roster_price(base_cost: int, living_heroes: int) -> int:
+	var extra_heroes := maxi(0, living_heroes - HIRE_PRICE_FREE_HEROES)
+	return roundi(base_cost * (1.0 + HIRE_PRICE_PER_HERO * extra_heroes))

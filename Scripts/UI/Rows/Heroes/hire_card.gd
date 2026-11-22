@@ -6,7 +6,7 @@ extends PanelContainer
 
 
 # ---- TEXT
-## Hiring costs the recruit's price (GuildCharacter.cost), in gold; it's free
+## Hiring costs the recruit's price (CharacterContainer.hire_price: the base cost plus the roster-size surcharge), in gold; it's free
 ## on the first days (cost 0).
 const TEXT_HIRE := "Hire · %dg"
 const TEXT_HIRE_FREE := "Hire · free"
@@ -54,8 +54,8 @@ func setup(hall: HallMain, recruit: GuildCharacter, _letter_index: int = 0) -> v
 	var no_beds := hall.is_roster_full()
 	if no_beds:
 		_hire_button.text = TEXT_NO_BEDS
-	elif recruit.cost > 0:
-		_hire_button.text = TEXT_HIRE % recruit.cost
+	elif CharacterContainer.hire_price(recruit) > 0:
+		_hire_button.text = TEXT_HIRE % CharacterContainer.hire_price(recruit)
 	else:
 		_hire_button.text = TEXT_HIRE_FREE
 	_hire_button.disabled = no_beds

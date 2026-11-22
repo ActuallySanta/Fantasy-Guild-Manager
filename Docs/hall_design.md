@@ -233,6 +233,11 @@ Each morning's new applicants keep up with the guild (`HireScaling`, tuning at t
 - **Price:** the day's price (`GuildCharacter.recruit_cost_for_day`) plus `PRICE_PER_POINT`
   (10g) per point over the standing floor. Days 1-2 stay free. The day's price is the
   cheapest a recruit can be, so the Game Over check still uses it.
+- **Roster surcharge:** each living hero above `HIRE_PRICE_FREE_HEROES` (3) adds
+  `HIRE_PRICE_PER_HERO` (15%) to a recruit's price (`HireScaling.roster_price`, read through
+  `CharacterContainer.hire_price`). The hire card, the hero screen and the charge all use that
+  one number, taken at the moment of the tap. Free recruits stay free. The saved `cost` is
+  still the base price.
 - Released heroes who come back keep their own stats and their 2× price.
 
 ## Quest growth

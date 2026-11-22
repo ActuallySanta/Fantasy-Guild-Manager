@@ -100,6 +100,13 @@ func living_count() -> int:
 		return character.injury_level < GuildCharacter.InjuryLevel.DEAD).size()
 
 
+## What this recruit costs to hire right now, in gold: their base price
+## (character.cost) raised for the current roster size (HireScaling.roster_price).
+## Everything that shows or charges a hire price uses this.
+func hire_price(character: GuildCharacter) -> int:
+	return HireScaling.roster_price(character.cost, living_count())
+
+
 ## True when there's a bed for one more living member.
 func has_free_bed() -> bool:
 	return living_count() < max_characters
@@ -120,9 +127,10 @@ func add_character_to_guild(_character: GuildCharacter) -> bool:
 		return false
 	
 	# anyone with a price pays it (returning heroes cost gold even on days 1-2)
-	if(_character.cost > 0 && GameState.gold >= _character.cost):
-		GameState.add_gold(-(_character.cost))
-	elif(_character.cost > 0):
+	var price := hire_price(_character)
+	if(price > 0 && GameState.gold >= price):
+		GameState.add_gold(-price)
+	elif(price > 0):
 		return false
 	
 	active_characters.append(_character)

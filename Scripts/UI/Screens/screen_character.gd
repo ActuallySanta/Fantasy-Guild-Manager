@@ -155,8 +155,8 @@ func refresh() -> void:
 
 	_hire_button.visible = is_recruit
 	_hire_button.disabled = hall.is_roster_full()
-	if character.cost > 0:
-		_hire_button.text = BUTTON_HIRE_COST % character.cost
+	if CharacterContainer.hire_price(character) > 0:
+		_hire_button.text = BUTTON_HIRE_COST % CharacterContainer.hire_price(character)
 	else:
 		_hire_button.text = BUTTON_HIRE
 	_release_button.visible = not is_recruit
