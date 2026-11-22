@@ -136,6 +136,8 @@ const TOAST_RECALLED := "Party recalled"
 const TOAST_RECONSIDER := "Back on the quest list: %s"
 const TOAST_MOVED := "%s moved from %s"
 const TOAST_PARTY_FULL := "Party is full"
+## Shown when Deny is tried on the final battle (HallRules.can_deny).
+const TOAST_FINAL_NOT_DENIABLE := "The final battle cannot be denied"
 const TOAST_DEAD := "%s can't go on quests anymore."
 const TOAST_HIRED := "%s joined the guild!"
 const TOAST_ROSTER_FULL := "No free beds. Upgrade the Barracks."
@@ -576,6 +578,11 @@ func build_credits(result: Dictionary) -> Dictionary:
 # ---- quests
 
 
+## True when `entry` may be denied (false for the final battle).
+func can_deny_quest(entry: Dictionary) -> bool:
+	return HallRules.can_deny(entry)
+
+
 ## Quests still needing Send or Deny.
 func undecided_count() -> int:
 	return quest_entries.filter(func(entry): return entry.state == HallStyle.QUEST_STATE_OPEN).size()
@@ -995,6 +1002,9 @@ func deny_quest() -> void:
 		return
 	var entry := current_quest_entry()
 	if entry.is_empty():
+		return
+	if not HallRules.can_deny(entry):
+		show_error_toast(TOAST_FINAL_NOT_DENIABLE)
 		return
 	entry.party.clear()
 	entry.state = HallStyle.QUEST_STATE_DENIED

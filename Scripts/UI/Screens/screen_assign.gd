@@ -406,13 +406,15 @@ func _pick_group(entry: Dictionary, character: GuildCharacter) -> int:
 
 ## Left / right footer buttons depend on the quest's state (pinning anyone
 ## sends an open quest, so there's no Send button):
-##   open   -> Deny [shield -N] | Back to Quests
+##   open   -> Deny [shield -N] | Back to Quests (the final has no Deny)
 ##   sent   -> Recall (unpins everyone) | Back to Quests
 ##   denied -> Quests | Reconsider
 ## The left button is always wood; the right one is gold.
 func _show_footer(entry: Dictionary) -> void:
 	_left_button.icon = null
 	_deny_cost.visible = false
+	# the final battle can't be denied (HallRules.can_deny): no Deny button on it
+	_left_button.visible = entry.state != HallStyle.QUEST_STATE_OPEN or hall.can_deny_quest(entry)
 	_left_button.custom_minimum_size.x = LEFT_BUTTON_MIN_WIDTH
 	match entry.state:
 		HallStyle.QUEST_STATE_SENT:

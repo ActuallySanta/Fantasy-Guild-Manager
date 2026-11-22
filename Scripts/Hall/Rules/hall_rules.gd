@@ -273,6 +273,14 @@ static func standing_for_deny(quest: CreatedQuest) -> int:
 	return maxi(quest.difficulty, 1)
 
 
+## Whether a quest entry may be denied. The final battle never can: denying
+## it would let day 50 pass with no credits and no defeat, so the run would
+## never end. Bosses and every other quest can be denied.
+## entry: a new_entry() Dictionary. Returns false only for the final.
+static func can_deny(entry: Dictionary) -> bool:
+	return not entry.get("final", false)
+
+
 ## A normally distributed random number (Box-Muller transform).
 ## mean: the center; standard_deviation: the spread. Returns the sample.
 static func rand_bell_curve(mean: float = 0.0, standard_deviation: float = 1.0) -> float:

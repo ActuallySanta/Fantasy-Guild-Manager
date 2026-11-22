@@ -216,6 +216,8 @@ static func _deny(hall: HallMain, quest: int) -> String:
 		return "no such quest"
 	if hall.quest_entries[quest].state == HallStyle.QUEST_STATE_DENIED:
 		return "already denied"
+	if not hall.can_deny_quest(hall.quest_entries[quest]):
+		return "the final battle cannot be denied"
 	hall.open_assign(quest)
 	hall.deny_quest()
 	return "" if hall.quest_entries[quest].state == HallStyle.QUEST_STATE_DENIED else "cannot deny"
