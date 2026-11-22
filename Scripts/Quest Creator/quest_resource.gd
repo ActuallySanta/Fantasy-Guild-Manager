@@ -40,6 +40,7 @@ enum FavoredStat {
 	DefenseAndWisdom = 12,
 	DefenseAndSleaze = 13,
 	WisdomAndSleaze = 23,
+	PowerAndPluck = 40,
 }
 
 enum QuestStyle {
@@ -53,6 +54,10 @@ enum QuestStyle {
 ## Sleaze, Ashen Wastes -> Power, Glass Mountains -> Wisdom. calcSuccessChance
 ## counts it twice, and a good-odds win can train it (roll_trained_stat).
 const REGION_FAVORED_STAT := [1, 3, 0, 2]
+
+## The favored-stat component that means Pluck (not a StatType, so it's never
+## read with get_quest_stat or trained).
+const PLUCK_COMPONENT := 4
 
 #enum for modifiers if we ever choose to do them
 
@@ -260,36 +265,13 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 		# the region's favored stat counts twice
 		statTotal += adventurer.get_quest_stat(region_favored_stat())
 
-		match favStat:
-			0:
-				statTotal += adventurer.get_quest_stat(0)
-			1:
-				statTotal += adventurer.get_quest_stat(1)
-			2:
-				statTotal += adventurer.get_quest_stat(2)
-			3:
-				statTotal += adventurer.get_quest_stat(3)
-			10:
-				statTotal += adventurer.get_quest_stat(0)
-				statTotal += adventurer.get_quest_stat(1)
-			20:
-				statTotal += adventurer.get_quest_stat(0)
-				statTotal += adventurer.get_quest_stat(2)
-			30:
-				statTotal += adventurer.get_quest_stat(0)
-				statTotal += adventurer.get_quest_stat(3)
-			12:
-				statTotal += adventurer.get_quest_stat(1)
-				statTotal += adventurer.get_quest_stat(2)
-			13:
-				statTotal += adventurer.get_quest_stat(1)
-				statTotal += adventurer.get_quest_stat(3)
-			23:
-				statTotal += adventurer.get_quest_stat(2)
-				statTotal += adventurer.get_quest_stat(3)
-			4:
-				statTotal += adventurer.get_quest_stat(4)
-				statTotal += adventurer.get_quest_stat(4)
+		# the favored stat's components count once each (Pluck alone counts twice,
+		# like a single stat); a Pluck component counts the hero's pluck value
+		for component in _fav_components():
+			if component == PLUCK_COMPONENT:
+				statTotal += adventurer.pluck * (2 if int(favStat) == PLUCK_COMPONENT else 1)
+			else:
+				statTotal += adventurer.get_quest_stat(component)
 
 	return (snapped((statTotal / statHitNum), 0.01) * 100)
 
@@ -300,23 +282,45 @@ func region_favored_stat() -> int:
 	return REGION_FAVORED_STAT[regionNum]
 
 
+## The favored stat's components. A value under 10 is one component (a
+## GuildCharacter.StatType index 0-3, or PLUCK_COMPONENT); a two-digit value is
+## a combo of its two digits, e.g. 12 = Defense + Wisdom, 40 = Pluck + Power.
+## Returns an Array[int].
+func _fav_components() -> Array[int]:
+	var value := int(favStat)
+	var components: Array[int] = []
+	if value < 10:
+		components.append(value)
+	else:
+		components.append(value / 10)
+		components.append(value % 10)
+	return components
+
+
 ## The one or two stats a good-odds win on this quest can train: the quest's
-## favored stat, then the region's. Only one when they're the same stat.
-## Returns an Array of GuildCharacter.StatType indexes.
+## favored stat's trainable components (GuildCharacter.StatType 0-3; Pluck isn't
+## a stat, so it's dropped), then the region's. Falls back to just the region's
+## stat when nothing trainable is left. Returns an Array of StatType indexes.
 func trained_stat_options() -> Array[int]:
-	var options: Array[int] = [int(favStat)]
-	if region_favored_stat() != int(favStat):
+	var options: Array[int] = []
+	for component in _fav_components():
+		if component != PLUCK_COMPONENT and not options.has(component):
+			options.append(component)
+	if not options.has(region_favored_stat()):
 		options.append(region_favored_stat())
 	return options
 
 
-## Pick the stat a good-odds win trains: the quest's favored stat
-## trained_stat_quest_chance percent of the time, otherwise the region's.
-## Returns a GuildCharacter.StatType index (the same one either way when the
-## quest and region favor the same stat).
+## Pick the stat a good-odds win trains: one of the quest's trainable favored
+## stats trained_stat_quest_chance percent of the time (when it has any),
+## otherwise the region's. Returns a GuildCharacter.StatType index (0-3).
 func roll_trained_stat() -> int:
-	if randf_range(0.0, 100.0) < trained_stat_quest_chance:
-		return int(favStat)
+	var favored: Array[int] = []
+	for component in _fav_components():
+		if component != PLUCK_COMPONENT:
+			favored.append(component)
+	if not favored.is_empty() and randf_range(0.0, 100.0) < trained_stat_quest_chance:
+		return favored.pick_random()
 	return region_favored_stat()
 
 
