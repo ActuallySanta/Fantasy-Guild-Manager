@@ -49,9 +49,6 @@ const TRAIN_ODDS_PER_RANK := 5
 const TRAIN_ODDS_TOP_RANK := CreatedQuest.QuestDifficulty.S
 ## Stat points each party member gains in the trained stat on a good-odds win.
 const TRAIN_STAT_GAIN := 1
-## Rank of the placeholder final quest (a CreatedQuest.QuestDifficulty), until
-## the real final quest is written (see build_day_quests).
-const FINAL_QUEST_RANK := CreatedQuest.QuestDifficulty.S
 ## Freeplay difficulty climb: each day past HallMain.FINAL_DAY adds this share
 ## to every new quest's stat requirement and gold reward (0.02 = +2% a day, so
 ## Day 75 quests ask for and pay 1.5x). Linear and without a cap.
@@ -59,6 +56,8 @@ const FREEPLAY_SCALE_PER_DAY := 0.02
 
 ## Days that end in a boss quest (the last is HallMain.FINAL_DAY).
 const BOSS_DAYS := [10, 20, 30, 40, 50]
+## The BOSS_DAYS with two bosses to fight (the second uses the negative day number).
+const BOSS_TWO_DAYS := [20, 40]
 ## The first day the difficulty staircase starts climbing; before it every
 ## quest asks for its base stats (scale 1.0).
 const DIFFICULTY_START_DAY := 5
@@ -124,26 +123,10 @@ static func new_entry(quest: CreatedQuest, is_milestone: bool) -> Dictionary:
 ## is_freeplay: GameState.is_freeplay.
 ## Returns an Array of new_entry() Dictionaries, in board order.
 static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Array:
-	if day == HallMain.MILESTONE_DAY:
-		return [new_entry(CreatedQuest.new(2, 10), true)]
-
-	if day == HallMain.FINAL_DAY and not is_freeplay:
-		# ==== FINAL QUEST CONTENT ===========================================
-		# PLACEHOLDER: the final battle is a random quest at FINAL_QUEST_RANK
-		# for now. To give it its own content, replace the quest built below
-		# with the real one, the same way the Bone Drake does it:
-		#   1. In quest_resource.gd, add a FINAL_DAY (50) case to _init that
-		#      calls a new _initFinalVars() (like _initMilestoneVars: difficulty,
-		#      maxAdventurers, questNum, location, goldReward, favStat, questTitle).
-		#   2. Add its story rows to External Content and a reader for them in
-		#      ExternalContentContainer (like get_Milestone_story).
-		#   3. Build it here with CreatedQuest.new(<rank>, HallMain.FINAL_DAY).
-		#   4. Play its story out in play_quest (see FINAL QUEST STORY there).
-		# Keep `final_entry.final = true`: it's what rolls the credits.
-		var final_entry := new_entry(CreatedQuest.new(FINAL_QUEST_RANK, HallMain.FINAL_DAY), false)
-		final_entry.final = true
-		return [final_entry]
-		# ==== END FINAL QUEST CONTENT =======================================
+	# boss days: only the day's boss entries (not in freeplay, which only
+	# repeats the final day's number as a normal day)
+	if is_boss_day(day) and not (is_freeplay and day == HallMain.FINAL_DAY):
+		return _build_boss_entries(day)
 
 	var standing_rank := standing_rank_for(standing)
 	# the highest rank a quest can roll: S, or S++ once freeplay has begun
@@ -167,7 +150,7 @@ static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Arra
 		match(GameState.day): #set the boolean
 			2, 4, 7, 9, 12, 15:
 				noRepeatQuests = true
-			18, 20:
+			18:
 				quest = CreatedQuest.new(rank, GameState.day)
 				_scale_normal_quest(quest, day, is_freeplay)
 				entries.append(new_entry(quest, false))
@@ -178,6 +161,26 @@ static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Arra
 		
 		_scale_normal_quest(quest, day, is_freeplay)
 		entries.append(new_entry(quest, false))
+	return entries
+
+
+## The boss entries for a boss day (see BOSS_DAYS): one or two quests built from
+## the written boss stories (CreatedQuest._initMilestoneVars), all milestone
+## entries, with the day's boss requirement scale. HallMain.FINAL_DAY's entry
+## is also marked final (it rolls the credits).
+## day: a BOSS_DAYS day (GameState.day should equal it, quests read it).
+## Returns an Array of new_entry() Dictionaries.
+static func _build_boss_entries(day: int) -> Array:
+	var entries := []
+	# the second boss of a two-boss day uses the negative day number
+	var variants: Array = [day, -day] if BOSS_TWO_DAYS.has(day) else [day]
+	for variant in variants:
+		var quest := CreatedQuest.new(0, variant)
+		var is_final := day == HallMain.FINAL_DAY
+		quest.requirement_multiplier = requirement_scale(day, true, is_final)
+		var entry := new_entry(quest, true)
+		entry.final = is_final
+		entries.append(entry)
 	return entries
 
 

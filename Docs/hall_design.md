@@ -231,6 +231,25 @@ Looks come from the theme, not from overrides: a label is `TitleLabel`, `CapsLab
 `PaperButton` or `SealButton`. Pick one in the inspector (*Theme > Type Variation*) rather
 than overriding colours or styles on the node, so a reskin reaches it.
 
+## Bosses
+
+`HallRules.BOSS_DAYS` (10, 20, 30, 40, 50) are boss days: the board shows only the day's boss quests
+(`HallRules._build_boss_entries`), all `milestone` entries, built from the written stories in
+`External Content/Quest Stuff (Test)/Milestone Story Parts.txt` by `CreatedQuest._initMilestoneVars`.
+Every boss has the boss requirement spike (`requirement_scale`) and pays 300 + 150 x rank gold.
+
+| Day | Boss | Seats | Rank | Favored stat | Region |
+|---|---|---|---|---|---|
+| 10 | Bone Drake | 3 | C | Defense | Boglands |
+| 20 | Resurrected Bone Drake, and the Necromancer | 3 and 3 | B | Power / Wisdom | Ashen Wastes / Glass Mountains |
+| 30 | Demon General at the Blood Moon Cult's portal | 5 | B | Sleaze | Ashen Wastes |
+| 40 | King Bernard and King Alastair, two Demon Generals | 4 and 5 | A | Power and Defense / Wisdom and Sleaze | Boglands / Glass Mountains |
+| 50 | THE DEMON KING (the final battle, `final`) | 8 | S | Pluck | Windswept Meadows |
+
+Bigger parties need more: the requirement scales with seats / 2. The Assign screen lists empty seats in a
+flow container (they wrap) and seated heroes in a column, so eight seats fit at 720 wide. The Demon King's
+last story line ends the main story with a victory. Only day 10's result feeds the Game Over "Bone Drake" stat.
+
 ## Difficulty
 
 Quest requirements climb on a staircase (`HallRules.difficulty_scale`). Before day 5 they are at base. From day 5 they drift up 1% a day, and each boss passed (days 10, 20, 30, 40, 50) adds a 15% step, so day 11 asks 1.22x and day 49 asks 2.05x. The scale freezes at day 50; freeplay then keeps climbing through `freeplay_scale`. Boss quests get a further spike on top (1.35x, or 1.15x for the final battle). Gold rewards do not scale with the staircase, only the stats a quest asks for, and the player sees the effect as lower odds on Assign Party.

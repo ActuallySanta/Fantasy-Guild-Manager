@@ -130,7 +130,7 @@ var trained_stat_quest_chance: float = 50.0
 
 func _init(diff := 0, dayNum := 0) -> void:
 	match(dayNum):
-		1, 2, 4, 7, 9, 10, 12, 15, 18, -18:
+		1, 2, 4, 7, 9, 10, 12, 15, 18, -18, 20, -20, 30, 40, -40, 50:
 			_initMilestoneVars(dayNum)
 			return
 
@@ -770,6 +770,25 @@ func _get_reward_item_names() -> PackedStringArray:
 	return reward_names
 
 
+## Fills in a boss quest read from the Milestone Story Parts rows (the days
+## 30, 40 and 50 bosses). Gold is the same 300 + 150 per rank as the others.
+## rank: difficulty; slots: maxAdventurers; story_row: row of Milestone Story
+## Parts.txt; region: index into QuestManager.world_regions; favored: the
+## FavoredStat; title: the quest's title on the board.
+func _init_boss_vars(rank: int, slots: int, story_row: int, region: int, favored: FavoredStat, title: String) -> void:
+	difficulty = rank
+	maxAdventurers = slots
+	questNum = story_row
+	type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
+	regionNum = region
+	location = QuestManager.world_regions[regionNum].returnName(type)
+	goldReward = 300 + (150 * difficulty)
+	startingGoldReward = 300 + (150 * difficulty)
+	favStat = favored
+	questTitle = title
+	styleOfQuest = 2
+
+
 func _initMilestoneVars(dayNum: int):
 	match dayNum:
 		10:
@@ -808,6 +827,22 @@ func _initMilestoneVars(dayNum: int):
 			favStat = FavoredStat.Wisdom
 			questTitle = str("Pursue a NECROMANCER and defeat him!")
 			styleOfQuest = 2
+		30:
+			# Blood Moon Cult's portal, the first Demon General
+			_init_boss_vars(3, 5, 3, 2, FavoredStat.Sleaze, # region 2 = Ashen Wastes
+					"Close the Blood Moon Cult's portal and defeat the DEMON GENERAL!")
+		40:
+			# King Bernard, the Power and Defense general
+			_init_boss_vars(4, 4, 4, 1, FavoredStat.PowerAndDefense, # region 1 = Boglands
+					"Unmask and defeat the DEMON GENERAL KING BERNARD!")
+		-40:
+			# King Alastair, the Wisdom and Sleaze general
+			_init_boss_vars(4, 5, 5, 3, FavoredStat.WisdomAndSleaze, # region 3 = Glass Mountains
+					"Unmask and defeat the DEMON GENERAL KING ALASTAIR!")
+		50:
+			# THE DEMON KING, the final battle
+			_init_boss_vars(5, 8, 6, 0, FavoredStat.Pluck, # region 0 = Windswept Meadows
+					"Face THE DEMON KING!")
 		_:
 			var storyNum = 0
 			match dayNum:

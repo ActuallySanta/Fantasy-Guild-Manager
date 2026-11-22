@@ -1559,7 +1559,8 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 	run_stats.gold_earned += result.gold
 	if result.succeeded:
 		run_stats.quests_won += 1
-	if entry.milestone:
+	# only the Bone Drake counts here (the later bosses are milestone entries too)
+	if entry.milestone and GameState.day == MILESTONE_DAY:
 		run_stats.drake_result = DRAKE_RESULT_SLAIN if result.succeeded else DRAKE_RESULT_LOST
 	if entry.final:
 		run_stats.final_result = FINAL_RESULT_WON if result.succeeded else FINAL_RESULT_LOST
