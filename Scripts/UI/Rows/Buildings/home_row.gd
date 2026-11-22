@@ -203,6 +203,8 @@ func show_fallen(main: HallMain, hero: GuildCharacter) -> void:
 	if GuildUpgrades.can_revive() and not hall.is_roster_full():
 		_set_note(TEXT_REVIVE_READY, HallStyle.GREEN_TEXT)
 		_set_button(_main_button, BUTTON_REVIVE, "green", hall.revive.bind(character))
+		# the revived hero takes a bed, so the guild needs tonight's bed fee
+		_main_button.disabled = GameState.gold < GuildUpgrades.nightly_fee()
 	elif GuildUpgrades.can_revive():
 		# revive is ready, but every bed is taken by a living hero
 		_set_note(TEXT_REVIVE_NO_BED)

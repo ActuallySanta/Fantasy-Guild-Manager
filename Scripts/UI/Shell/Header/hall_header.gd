@@ -65,12 +65,12 @@ const HEADER_DRAKE_UNIT_MANY := "days"
 ## On a boss day: "!" over "today". Once no boss is left the note hides.
 const HEADER_DRAKE_TODAY := "!"
 const HEADER_DRAKE_TODAY_UNIT := "today"
-## The warning strip under the header (see HallLedger.is_one_death_from_falling).
-## DANGER_GOLD when gold is the problem, DANGER_STANDING when standing is.
 ## The milder gold strip: shown only when the red one isn't (see HallLedger.trouble_reason).
 const TROUBLE_TITLE := "Guild in trouble"
-const TROUBLE_FAILURES_TEXT := "%d quests lost in two days. Pick safer quests for a while."
+const TROUBLE_FAILURES_TEXT := "%d quests lost in %d days. Pick safer quests for a while."
 const TROUBLE_INJURIES_TEXT := "Half the guild is hurt. Rest or heal before sending more."
+## The warning strip under the header (see HallLedger.is_one_death_from_falling).
+## DANGER_GOLD when gold is the problem, DANGER_STANDING when standing is.
 const DANGER_TITLE := "Last hero standing"
 const DANGER_GOLD := "Recruits cost %d gold and you have %d. Lose %s and the guild falls."
 const DANGER_STANDING := "Standing is nearly too low for recruits. Lose %s and the guild falls."
@@ -212,7 +212,7 @@ func _refresh_danger_strip() -> void:
 		_danger_title.text = TROUBLE_TITLE
 		HallStyle.set_font_color(_danger_title, HallStyle.GOLD_TEXT)
 		if trouble == "failures":
-			_danger_text.text = TROUBLE_FAILURES_TEXT % hall.recent_failures()
+			_danger_text.text = TROUBLE_FAILURES_TEXT % [hall.recent_failures(), HallLedger.TROUBLE_WINDOW_DAYS]
 		else:
 			_danger_text.text = TROUBLE_INJURIES_TEXT
 		return

@@ -227,7 +227,7 @@ both open with the Guild tab on Day 10 (`GuildUpgrades.UNLOCK_DAY`); before that
   in the order heroes were admitted; when gold runs out, that patient and every later one
   go home to heal there, and gold never goes below 0. The Admit button reads
   "Admit · N gold/night" (disabled without the gold), a bed row shows the rate, and the Day
-  Report lists "Hospital: −N gold" and who "went home: no gold for a bed".
+  Report lists "Hospital: −N gold" and who "went home: no gold for a bed". Revive needs the fee too.
 - **Revive:** Hospital level 5 brings one fallen hero back per run, Gravely hurt and in a bed.
 - The Day Report's header has an "At home" line with who trained and who healed.
 

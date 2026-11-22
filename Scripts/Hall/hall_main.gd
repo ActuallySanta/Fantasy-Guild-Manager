@@ -1287,6 +1287,10 @@ func stop_training(character: GuildCharacter) -> void:
 
 ## Put a hurt hero in a Hospital bed (they leave any party or training slot).
 func admit(character: GuildCharacter) -> void:
+	# a guild that can't pay the bed fee keeps the hero where they are
+	if GameState.gold < GuildUpgrades.nightly_fee():
+		queue_refresh()
+		return
 	_leave_quest(character)
 	if GuildUpgrades.admit(character):
 		pending_fx.home_row = character
@@ -1533,7 +1537,9 @@ func end_day() -> void:
 	Sfx.play(&"night_fall")
 	_header.hold_counters()
 	# training and healing happen first, so nobody heals the night they're hurt
+	var gold_before_night: int = GameState.gold
 	var home := GuildUpgrades.run_night()
+	_count_spent(gold_before_night) # the Hospital bill counts as gold spent
 	var results := []
 	for entry in sent_entries():
 		results.append(_run_quest(entry))

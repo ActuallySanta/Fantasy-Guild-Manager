@@ -388,6 +388,9 @@ func revive(character: GuildCharacter) -> bool:
 	# the dead don't take a bed, so coming back needs a free one
 	if not CharacterContainer.has_free_bed():
 		return false
+	# the revived hero takes a bed, which is paid for tonight like any other
+	if gold < nightly_fee():
+		return false
 	character.injury_level = GuildCharacter.InjuryLevel.GRAVELY_INJURED
 	character.died_on_day = -1
 	character.died_on_quest = ""
