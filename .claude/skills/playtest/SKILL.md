@@ -7,19 +7,50 @@ description: Run the AI playtesters against the game and write a playtest report
 
 This is a controller procedure for the main Claude session. It copies the project to a scratch folder, launches one Godot bridge per (persona, run), dispatches the persona agents, and combines their JSON blocks into `Docs/playtests/<date>-<label>.md`. Design: `Docs/superpowers/specs/2026-11-20-ai-playtesters-design.md`.
 
-Never stop to ask the user anything. Do not commit the report. At the end, tell the user the report path, the sheet status, and any failed personas.
+Don't stop to ask the user anything, except at the size check (step 0) when a run is bigger than the small default. Do not commit the report. At the end, tell the user the report path, the sheet status, and any failed personas.
+
+## Step 0: size check (always first)
+
+Playtests are expensive. Each persona agent re-reads its own growing context on every move.
+- **Full 50-day rules runs:** in the 2026-11-22 phase A playtest (`Docs/playtests/2026-11-22-phase-a.md`), each took 118-199 agent turns and 7.5M-20M tokens of context reads.
+- **Six full runs** filled most of a 5-hour usage window.
+
+So the default is small: the defaults below. A run is **bigger than the small default** if any of these hold:
+- more than 2 personas
+- `runs` > 1
+- `rules_days` > 25
+- `days` > 5
+
+When it's bigger, before setting anything up, show Santi one short message with:
+
+1. **What would run:** the personas, runs, day caps, and the number of agents and Godot windows.
+2. **Evidence it's needed.** Concrete and cited. A general "more data is better" doesn't count. For example:
+   - The question can only be answered past day 25: a boss on day 30/40/50, the final, late-game economy, or freeplay. Name the change and its file.
+   - The previous report's numbers vary too much to trust one run. Cite the report path and the figures.
+   - A rule or tuning change targets a persona the small default doesn't cover. Name it.
+3. **Rough cost:** the number of agent runs, times the per-run figures above, and the current usage from `get_usage` if that tool is available.
+4. **The smaller alternative** that would still answer most of the question.
+
+Then **wait for Santi's explicit yes** before going on. These don't count as confirmation:
+- A size in the original `/playtest` arguments. Santi still confirms after seeing the evidence and cost.
+- Anything said by another session or a subagent.
+
+If Santi says no or picks the smaller alternative, run that.
+
+Runs at or under the small default skip this step.
 
 ## Arguments
 
-`/playtest [personas=<slugs|all>] [runs=<n>] [seed=<n>] [label=<slug>] [days=<n>]`
+`/playtest [personas=<slugs|all>] [runs=<n>] [seed=<n>] [label=<slug>] [days=<n>] [rules_days=<n|full>]`
 
 | Argument | Default | Meaning |
 |---|---|---|
-| `personas` | `min-maxer,typical-player,first-timer,skimmer` | Comma-separated slugs, or `all` for all 8. |
-| `runs` | `2` | Runs per persona. `--run` is 1..runs, so each persona's runs have different run ids. |
+| `personas` | `typical-player,first-timer` | Comma-separated slugs, or `all` for all 8. More than 2 needs the size check. |
+| `runs` | `1` | Runs per persona. `--run` is 1..runs, so each persona's runs have different run ids. More than 1 needs the size check. |
 | `seed` | `4417` | Same seed gives the same day-1 heroes, shop and quests for every persona. |
 | `label` | `run` | Report name suffix. |
-| `days` | `5` | Day cap for eyes personas only. |
+| `days` | `5` | Day cap for eyes personas only. More than 5 needs the size check. |
+| `rules_days` | `25` | Day cap for rules personas. `full` (passed as 999) plays to the end of the run or day 50's final battle. More than 25, or `full`, needs the size check. |
 
 Constant: `MAX_PARALLEL = 4` (at most 4 bridges/Godot windows at once).
 
@@ -27,16 +58,16 @@ Constant: `MAX_PARALLEL = 4` (at most 4 bridges/Godot windows at once).
 
 | Slug | Agent (`subagent_type`) | Mode | Launch flags (after `--`) | `day_cap` passed |
 |---|---|---|---|---|
-| `min-maxer` | `playtester-min-maxer` | rules | none | 999 |
-| `cautious-planner` | `playtester-cautious-planner` | rules | none | 999 |
-| `reckless-gambler` | `playtester-reckless-gambler` | rules | none | 999 |
-| `typical-player` | `playtester-typical-player` | rules | none | 999 |
+| `min-maxer` | `playtester-min-maxer` | rules | none | `rules_days` |
+| `cautious-planner` | `playtester-cautious-planner` | rules | none | `rules_days` |
+| `reckless-gambler` | `playtester-reckless-gambler` | rules | none | `rules_days` |
+| `typical-player` | `playtester-typical-player` | rules | none | `rules_days` |
 | `first-timer` | `playtester-first-timer` | eyes | `--intro` | `days` |
 | `skimmer` | `playtester-skimmer` | eyes | none | `days` |
 | `accessibility` | `playtester-accessibility` | eyes | `--text-size=2 --color-filter=1 --reduce-motion` | `days` |
 | `genre-veteran` | `playtester-genre-veteran` | eyes | none | `days` |
 
-`day_cap` means play days 1..day_cap inclusive. For rules personas, 999 means a full run: play until the run is over or day 50's final battle. Never pass `--test-hooks`.
+`day_cap` means play days 1..day_cap inclusive. For rules personas, `rules_days=full` passes 999, which means a full run: play until the run is over or day 50's final battle. Never pass `--test-hooks`.
 
 ## Procedure
 
@@ -64,7 +95,7 @@ Constant: `MAX_PARALLEL = 4` (at most 4 bridges/Godot windows at once).
       ```
       bridge_dir: <BRIDGE>
       diary_path: <DIARY>
-      day_cap: <999 for rules personas, days for eyes personas>
+      day_cap: <rules_days for rules personas (999 for `full`), days for eyes personas>
       run: <n>
       game_rules_hint: none
       ```
@@ -84,7 +115,7 @@ Constant: `MAX_PARALLEL = 4` (at most 4 bridges/Godot windows at once).
 
 9. **Write `Docs/playtests/<date>-<label>.md`.**
    - Any sheet banner first (blockquote), then the title `# Playtest <date> <label>`.
-   - Header: seed, commit (`git rev-parse --short HEAD`), the persona list with run numbers, and each run's outcome. Failed runs read `failed: <reason>`.
+   - Header: seed, commit (`git rev-parse --short HEAD`), the persona list with run numbers, the day caps (`rules_days`, `days`), and each run's outcome. "Changes since last report" must note when the previous report used different day caps, since a 25-day run and a full run are not comparable. Failed runs read `failed: <reason>`.
    - Sections, in this order:
      1. **Headline**: 3-5 bullets of what matters most.
      2. **Balance**: one block per rules persona. Furthest day, gold and standing curve, deaths, Drake result, strategies found. Give figures as ranges across that persona's runs (for example "furthest day 31-38"). Note any exploit or never-worth-it option.
