@@ -144,7 +144,7 @@ var trained_stat_quest_chance: float = 50.0
 
 func _init(diff := 0, dayNum := 0) -> void:
 	match(dayNum):
-		1, 2, 4, 7, 9, 10, 12, 15, 18, -18, 20, -20, 30, 40, -40, 50, 22, 24, 26, 28, 32, 33, 34, 36, 38, 39, 42, 45, 48:
+		1, 2, 4, 7, 9, 10, 12, 15, 18, -18, 20, -20, 30, 40, -40, 50, 23, 26, 28, -28, 32, 34, 37, -37, 3737, 43, 45, -45, 48:
 			_initMilestoneVars(dayNum)
 			return
 
@@ -903,32 +903,29 @@ func _initMilestoneVars(dayNum: int):
 					storyNum = 7
 				-18:
 					storyNum = 8
-				# lead-up side quests (MinorVariables rows 9-21) building to the bosses.
-				# The three "AWOL Advisor" quests: row 15 reveals Bernard, 17 reveals
-				# Alastair, and 16 (both) comes last, just before day 40.
-				22:
+				23:
 					storyNum = 9
-				24:
-					storyNum = 10
 				26:
-					storyNum = 11
+					storyNum = 10
 				28:
+					storyNum = 11
+				-28:
 					storyNum = 12
 				32:
 					storyNum = 13
-				33:
-					storyNum = 14
 				34:
+					storyNum = 14
+				37:
 					storyNum = 15
-				36:
-					storyNum = 17
-				38:
+				-37:
 					storyNum = 16
-				39:
+				3737:
+					storyNum = 17
+				43:
 					storyNum = 18
-				42:
-					storyNum = 19
 				45:
+					storyNum = 19
+				-45:
 					storyNum = 20
 				48:
 					storyNum = 21

@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://c4k8agentbrg1x"]
+[gd_scene format=3 uid="uid://x1ioyoi6pk3t"]
 
 [ext_resource type="Script" uid="uid://dg3ragentbrdg2" path="res://Scripts/Playtest/agent_bridge.gd" id="1_brg"]
 [ext_resource type="PackedScene" uid="uid://dtw7iu2s1gibm" path="res://Scenes/hall_main.tscn" id="2_hall"]

@@ -151,9 +151,9 @@ static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Arra
 		if(noRepeatQuests): #if a minor quest has already been created, create only standard quests
 			quest = CreatedQuest.new(rank, 5)
 		match(GameState.day): #set the boolean
-			2, 4, 7, 9, 12, 15, 22, 24, 26, 28, 32, 33, 34, 36, 38, 39, 42, 45, 48:
+			2, 4, 7, 9, 12, 15, 23, 26, 32, 34, 43, 48:
 				noRepeatQuests = true
-			18:
+			18, 28, 45:
 				quest = CreatedQuest.new(rank, GameState.day)
 				_scale_normal_quest(quest, day, is_freeplay)
 				entries.append(new_entry(quest, false))
@@ -161,7 +161,18 @@ static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Arra
 				_scale_normal_quest(quest, day, is_freeplay)
 				entries.append(new_entry(quest, false))
 				return entries
-		
+			37:
+				quest = CreatedQuest.new(rank, GameState.day)
+				_scale_normal_quest(quest, day, is_freeplay)
+				entries.append(new_entry(quest, false))
+				quest = CreatedQuest.new(rank, -1 * GameState.day)
+				_scale_normal_quest(quest, day, is_freeplay)
+				entries.append(new_entry(quest, false))
+				quest = CreatedQuest.new(rank, 3737)
+				_scale_normal_quest(quest, day, is_freeplay)
+				entries.append(new_entry(quest, false))
+				return entries
+
 		_scale_normal_quest(quest, day, is_freeplay)
 		entries.append(new_entry(quest, false))
 	return entries
