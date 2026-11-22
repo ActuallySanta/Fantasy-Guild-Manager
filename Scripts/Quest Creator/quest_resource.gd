@@ -91,6 +91,15 @@ var questNum: int:
 
 var dead_adventurers : Array[GuildCharacter]
 
+## Whether this run of generateResults fails the quest. Rolled once at the
+## start (same odds as the old end-of-quest roll) so the fights know whether a
+## hero can die. Not saved: it only matters while the story is generated.
+var _will_fail: bool = false
+
+## Each hero's injury_level when generateResults began (hero -> level). A hero
+## who set out Hurt (LIGHTLY_INJURED) or worse can die even on a won quest.
+var _starting_levels: Dictionary = {}
+
 ## Freeplay scaling on the stat total this quest asks for (1.0 = none).
 ## Set by apply_freeplay_scaling; calcSuccessChance multiplies statHitNum by it.
 var requirement_multiplier: float = 1.0
@@ -331,6 +340,13 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 
 	numAdventurers = _questingAdventurers.size()
 
+	# roll the outcome up front (same probability as the old end-of-quest roll)
+	# so the fights know whether a hero is allowed to die
+	_will_fail = randi_range(0, 100) >= _successChance
+	_starting_levels.clear()
+	for hero in _questingAdventurers:
+		_starting_levels[hero] = hero.injury_level
+
 	var data = { "location": location }
 	returnString = str(returnString, "[b]", _questingAdventurers[0].name,)
 			
@@ -423,9 +439,8 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					returnString = str(returnString, _search(_questingAdventurers, _successChance))
 			loopbreaker = loopbreaker - 1
 
-	var successDetermination = randi_range(0, 100)
 	match true:
-		_ when successDetermination >= _successChance:
+		_ when _will_fail:
 				returnString = str(returnString, "[b]", _questingAdventurers[0].name,)
 				for i in range(numAdventurers - 2):
 					returnString = str( returnString, ", ", _questingAdventurers[i + 1].name,)
@@ -442,6 +457,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					2:
 						returnString = str(returnString, ExternalContentContainer.get_Milestone_story(questNum, 4).c_unescape().format(data),)
 
+				returnString = str(returnString, _retreat(_questingAdventurers))
 				returnString = str(returnString, "[b]Summary[/b]: The quest was [color=red][b]NOT SUCCESSFUL[/b][/color]. Your guild failed to obtain the reward.\n")
 				questSummary = str(questSummary, "[b]Summary[/b]: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
 
@@ -496,6 +512,49 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	#once the loop moves on we are done here
 	return returnString
 
+## Whether a hero may die from the next hit: on a failed quest, or when they
+## set out Hurt (LIGHTLY_INJURED) or worse. Heroes who set out Healthy or Sore
+## on a won quest stop at Gravely injured.
+func _can_die(hero: GuildCharacter) -> bool:
+	return _will_fail or _starting_levels.get(hero, 0) >= GuildCharacter.InjuryLevel.LIGHTLY_INJURED
+
+
+## Heroes the next fight hit could still change: alive, and not already at the
+## Gravely cap while protected from dying.
+func _hittable_heroes(party: Array[GuildCharacter]) -> Array[GuildCharacter]:
+	var hittable: Array[GuildCharacter] = []
+	for hero in party:
+		if hero.injury_level >= GuildCharacter.InjuryLevel.DEAD:
+			continue
+		if not _can_die(hero) and hero.injury_level >= GuildCharacter.InjuryLevel.GRAVELY_INJURED:
+			continue
+		hittable.append(hero)
+	return hittable
+
+
+## Injures a hero from a fight and records a death.
+func _injure_in_fight(hero: GuildCharacter) -> void:
+	var died: bool = hero.injure_character(_can_die(hero))
+	if died and not dead_adventurers.has(hero):
+		dead_adventurers.append(hero)
+
+
+## Every hero takes one more injury after a failed quest's fights (can die).
+## Returns the story line for it, or "" when nobody could be hurt further.
+func _retreat(party: Array[GuildCharacter]) -> String:
+	var anyone_hurt := false
+	for hero in party:
+		if hero.injury_level >= GuildCharacter.InjuryLevel.DEAD:
+			continue
+		anyone_hurt = true
+		var died: bool = hero.injure_character(true)
+		if died and not dead_adventurers.has(hero):
+			dead_adventurers.append(hero)
+	if not anyone_hurt:
+		return ""
+	return "[b]The party was beaten back[/b] and everyone was [color=FD0000][b]INJURED[/b][/color] in the retreat.\n"
+
+
 func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
 	var combatChance = _successChance / 100.0
 	combatChance *= combatChance
@@ -506,7 +565,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 
 	var returnString = ""
 	var successDetermination = randi_range(0, 100)
-	
+
 	var monster = QuestManager.world_regions[regionNum].returnMonster()
 	if(styleOfQuest == 1):
 		match(questNum):
@@ -519,87 +578,63 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 			1, 2:
 				monster = QuestManager._returnQuestMonster(2)
 
-	if combatChance >= successDetermination:
-		var succComDet = randi_range(1, 100)
-		if(1 <= succComDet && succComDet <= 25):
-				returnString = str(
-					"[b]The Party[/b] was ATTACKED by a group of ",
-					monster,
-					"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n"
-				)
-		elif (26 <= succComDet && succComDet <= 50):
-				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
-				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
-					monster,
-					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
-					)
-		elif (51 <= succComDet && succComDet <= 75):
-				returnString = str(
-					"[b]The Party[/b] was ATTACKED by a group of ",
-					monster,
-					"s. They defeated them [color=green][b]without sustaining any injuries[/b][/color].\n"
-					)
-		elif (76 <= succComDet && succComDet <= 90):
-				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
-				var extraGold = randi_range(11, 29)
-				goldReward += extraGold
-				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
-					monster,
-					", and defeated it, finding [color=FFE700][b] ", extraGold," gold [/b][/color]on its corpse.\n"
-					)
-		elif (91 <= succComDet && succComDet <= 100):
-				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
-				var extraGold = randi_range(11, 29)
-				goldReward += extraGold
-				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
-					monster, ", and defeated it, finding [color=FFE700][b] ", extraGold, 
-					" gold [/b][/color]on its corpse. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
-					)
-				var died : bool = attackedAdventurer.injure_character()
-				
-				if(died and not dead_adventurers.has(attackedAdventurer)):
-					dead_adventurers.append(attackedAdventurer)
-		successfulChecks += 1
-	else:
-		var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
-		var succComDet = randi_range(1, 100)
-		
-		if(1 <= succComDet && succComDet <= 25):
-			returnString = str(
-			"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ", monster,
-			". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
-			)
-		elif (26 <= succComDet && succComDet <= 50):
-			returnString = str(
-					"[b]The Party[/b] was ATTACKED by a group of ", monster,
-					"s. They managed to defeat them, but not before [color=FD0000][b]", attackedAdventurer.name, " was INJURED[/b][/color] in the process.\n"
-					)
-		elif (51 <= succComDet && succComDet <= 75):
-			returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ", monster,
-					", and defeated it. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
-					)
-		elif (76 <= succComDet && succComDet <= 90):
-			returnString = str(
-					"[b]The Party[/b] was ATTACKED by a group of ",
-					monster,
-					"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n"
-				)
-		elif (91 <= succComDet && succComDet <= 100):
-				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
-					monster,
-					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
-					)
-		
-		if(succComDet <=75):
-			var died : bool = attackedAdventurer.injure_character()
+	# whether the fight hurts someone is set by the quest's odds, not by who
+	# won the fight, so the average wear per hero matches the injury table
+	var hurt_hero: GuildCharacter = null
+	var hittable := _hittable_heroes(_questingAdventurers)
+	var injury_chance := QuestInjuries.injury_chance_per_encounter(
+		_successChance, difficulty, _questingAdventurers.size())
+	if not hittable.is_empty() and randf() < injury_chance:
+		hurt_hero = hittable.pick_random()
 
-			if(died and not dead_adventurers.has(attackedAdventurer)):
-				dead_adventurers.append(attackedAdventurer)
+	var won_fight: bool = combatChance >= successDetermination
+	# a won fight sometimes turns up gold on the monster's corpse
+	var corpse_gold := 0
+	if won_fight and randi_range(1, 100) > 75:
+		corpse_gold = randi_range(11, 29)
+		goldReward += corpse_gold
+	var gold_text := str("[color=FFE700][b] ", corpse_gold, " gold [/b][/color]")
+	var any_hero: GuildCharacter = _questingAdventurers.pick_random()
+	var variant := randi_range(1, 3)
+
+	if hurt_hero != null:
+		var hurt_name: String = hurt_hero.name
+		if corpse_gold > 0:
+			returnString = str(
+				"[b]", hurt_name, "[/b] was ATTACKED by a(n) ", monster, ", and defeated it, finding ",
+				gold_text, "on its corpse. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n")
+		elif variant == 1:
+			returnString = str(
+				"[b]", hurt_name, "[/b] was ATTACKED by a(n) ", monster,
+				". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n")
+		elif variant == 2:
+			returnString = str(
+				"[b]The Party[/b] was ATTACKED by a group of ", monster,
+				"s. They managed to defeat them, but not before [color=FD0000][b]", hurt_name, " was INJURED[/b][/color] in the process.\n")
+		else:
+			returnString = str(
+				"[b]", hurt_name, "[/b] was ATTACKED by a(n) ", monster,
+				", and defeated it. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n")
+		_injure_in_fight(hurt_hero)
+	elif corpse_gold > 0:
+		returnString = str(
+			"[b]", any_hero.name, "[/b] was ATTACKED by a(n) ", monster,
+			", and defeated it, finding ", gold_text, "on its corpse.\n")
+	elif variant == 1:
+		returnString = str(
+			"[b]The Party[/b] was ATTACKED by a group of ", monster,
+			"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n")
+	elif variant == 2:
+		returnString = str(
+			"[b]", any_hero.name, "[/b] was ATTACKED by a(n) ", monster,
+			", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n")
+	else:
+		returnString = str(
+			"[b]The Party[/b] was ATTACKED by a group of ", monster,
+			"s. They defeated them [color=green][b]without sustaining any injuries[/b][/color].\n")
+
+	if won_fight:
+		successfulChecks += 1
 	return returnString
 
 func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
@@ -651,7 +686,7 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 	else:
 		var succSearDet = randi_range(1, 100)
 		if(1 <= succSearDet && succSearDet <= 15):
-			returnString = str(returnString, "[b]", searchingAdventurer.name, "[/b] tripped on a rock and gained [color=FD0000][b]1 INJURY[/b][/color].\n")
+			returnString = str(returnString, "[b]", searchingAdventurer.name, "[/b] tripped on a rock and came back [color=FD0000][b]empty-handed and bruised in spirit[/b][/color].\n")
 		elif(16 <= succSearDet && succSearDet <= 45):
 			returnString = str(returnString, "[b]The Party[/b] discovered a hidden room containing multiple chests, but [color=FD0000][b]NOTHING OF VALUE[/b][/color] was inside.\n")
 		elif(46 <= succSearDet && succSearDet <= 75):
@@ -662,7 +697,7 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 			goldReward += extraGold
 			returnString = str(returnString, "[b]", searchingAdventurer.name, 
 			"[/b] found an old chest containing [color=FFE700][b]", extraGold, " gold[/b][/color]. However, the chest was trapped and [b]", searchingAdventurer.name,
-			"[/b] was [color=FD0000][b]INJURED 1 TIME[/b][/color].\n")
+			"[/b] [color=FD0000][b]barely got away with the coins[/b][/color].\n")
 		elif(91 <= succSearDet && succSearDet <= 100):
 			goldReward += 1
 			returnString = str(returnString, "[b]The Party[/b] unearthed a lockbox that contained [color=FFE700][b]1 gold[/b][/color].\n")

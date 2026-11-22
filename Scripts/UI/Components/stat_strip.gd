@@ -8,8 +8,14 @@
 extends HFlowContainer
 
 
+# ---- TEXT
+## Tag beside the health chip of a hero who is Hurt or worse: a hit can kill
+## them even on a won quest.
+const TEXT_AT_RISK := "At risk"
+
 # ---- NODES
 @onready var _health_chip = %Health           # chip.gd
+@onready var _at_risk_chip = %AtRisk          # chip.gd
 
 
 ## favored_stat_index = index into hall_style STATS (-1 = none).
@@ -32,9 +38,14 @@ func show_stats(character: GuildCharacter, favored_stat_index: int = -1, include
 
 
 ## Show the health chip at the head of the strip (hidden until this is called).
-func show_health(character: GuildCharacter) -> void:
+## show_at_risk: also tag a hero who is Hurt or worse (and alive) "At risk",
+## because they can die on any quest, won or lost.
+func show_health(character: GuildCharacter, show_at_risk: bool = false) -> void:
 	_health_chip.visible = true
 	_health_chip.set_health(character)
+	_at_risk_chip.visible = show_at_risk and character.injury_level >= GuildCharacter.InjuryLevel.LIGHTLY_INJURED 		and not HallStyle.is_dead(character)
+	if _at_risk_chip.visible:
+		_at_risk_chip.set_chip(TEXT_AT_RISK, HallStyle.RED_BG, HallStyle.RED, "", true)
 
 
 ## The `count` strongest quest stats, as STATS indexes.

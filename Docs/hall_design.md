@@ -78,6 +78,23 @@ cost 3; G costs 1). The loss never sinks standing below `GuildUpgrades.MINIMUM_S
 standing chip reads "Win +N · Fail -M standing", and a failed quest's letter in the Day
 Report gets a red "-M standing" tag.
 
+## Injuries, the retreat and deaths
+
+Fight injuries follow the quest's odds, not its rank (`QuestInjuries`, `Scripts/Quest Creator/quest_injuries.gd`).
+Each combat encounter hurts someone with chance `target(odds) x party size / the rank's average encounter
+count`, so the average fight injuries **per hero** match `INJURIES_BY_ODDS`: 0.1 at 130% or more, 0.2 at 100%,
+0.35 at 90%, 0.5 at 80%, 0.7 at 70%, 0.9 at 60%, 1.2 at 50% or less (linear between). A solo hero is no likelier to
+be hurt than each member of a party. The encounter counts (`EXPECTED_COMBATS_BY_RANK`) are measured from
+`generateResults`' loops, so re-measure them if those loops change. The story matches: a fight says "INJURED" only
+when `injure_character` actually ran, and the two `_search` failure lines no longer claim an injury.
+
+- **The retreat:** on a failed quest every living hero takes one more injury after the fights
+  ("The party was beaten back and everyone was INJURED in the retreat").
+- **Deaths:** `generateResults` rolls win or loss before the fights. A hero who set out Healthy or Sore can't die
+  on a won quest: `injure_character(false)` stops them at Gravely hurt. On a lost quest, or for a hero who set out
+  Hurt or worse, four injuries in total still kill. Assign Party's picker tags a hero who is Hurt or worse with a red
+  "At risk" chip next to their health chip.
+
 ## Game Over
 
 The run ends when the guild can never send anyone out again (`HallMain.is_run_over`):
