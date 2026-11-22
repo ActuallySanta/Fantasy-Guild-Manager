@@ -69,6 +69,15 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Menu | How to play, last night's report, Accessibility, reset upgrades (debug), abandon run |
 | Accessibility | Text size (Small / Normal / Large, applied live by `HallFontScale.set_text_factor`), colorblind filter (Off / Red-weak / Green-weak / Blue-yellow), reduced motion; each button taps to the next choice, saved to `user://settings.cfg` |
 
+## Failed quests cost standing
+
+A win pays `HallRules.standing_for_win` (rank + 1). A failed quest costs half of that,
+rounded up (`HallRules.standing_for_loss`: ranks F and D cost 1, C and B cost 2, A and S
+cost 3; G costs 1). The loss never sinks standing below `GuildUpgrades.MINIMUM_STANDING`:
+`play_quest` clamps it, so the Day Report shows only what was actually lost. Assign Party's
+standing chip reads "Win +N · Fail -M standing", and a failed quest's letter in the Day
+Report gets a red "-M standing" tag.
+
 ## Game Over
 
 The run ends when the guild can never send anyone out again (`HallMain.is_run_over`):

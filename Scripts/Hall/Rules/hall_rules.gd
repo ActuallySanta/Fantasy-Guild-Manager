@@ -261,6 +261,12 @@ static func standing_for_win(quest: CreatedQuest) -> int:
 	return quest.difficulty + 1
 
 
+## Standing a failed quest costs: half a win's, rounded up (rank 0-1 = 1,
+## 2-3 = 2, 4-5 = 3). Never less than 1, so the G rank (-1) costs 1 too.
+static func standing_for_loss(quest: CreatedQuest) -> int:
+	return maxi(ceili((quest.difficulty + 1) / 2.0), 1)
+
+
 ## Standing lost for denying a quest: its rank, but never less than 1, so
 ## even an F-Rank quest costs something to turn down.
 static func standing_for_deny(quest: CreatedQuest) -> int:
@@ -311,7 +317,7 @@ static func trains_stat(chance: float, rank: int) -> bool:
 ## (hall_main.gd _tally_quest).
 ## entry: a quest entry (see new_entry); day: GameState.day.
 ## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, pluck, trained_stat, stat_gain, injured, died, items, reward_items, milestone, final}
+##   {quest, party, story, succeeded, chance, gold, standing (negative on a loss), pluck, trained_stat, stat_gain, injured, died, items, reward_items, milestone, final}
 ## (pluck = what each party member gained, 0 on a failure or a trained win;
 ## trained_stat = the GuildCharacter.StatType index the party trained, -1 if
 ## none; stat_gain = how much each party member gained in it)
@@ -342,7 +348,14 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 	story = entry.quest.generateResults(party, chance)
 	var succeeded: bool = QuestScoring.did_succeed(story)
 	var gold_earned: int = QuestScoring.get_gold_earned(entry.quest, succeeded)
-	var standing_earned: int = standing_for_win(entry.quest) if succeeded else 0
+	var standing_earned: int = 0
+	if succeeded:
+		standing_earned = standing_for_win(entry.quest)
+	else:
+		# a loss costs standing, but never sinks the guild past its floor
+		# (GuildUpgrades.add_standing doesn't clamp, so the clamp lives here)
+		var room_above_floor := maxi(GameState.standing - GuildUpgrades.MINIMUM_STANDING, 0)
+		standing_earned = -mini(standing_for_loss(entry.quest), room_above_floor)
 	GameState.add_gold(gold_earned)
 	GameState.add_standing(standing_earned)
 

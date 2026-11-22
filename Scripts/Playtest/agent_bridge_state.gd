@@ -90,6 +90,8 @@ static func _quests(hall: HallMain) -> Array:
 			"slots": hall.party_size_limit(entry),
 			"party": entry.party.map(func(character): return id_of(character)),
 			"chance": hall.success_chance(entry, entry.party),
+			"standing_win": HallRules.standing_for_win(entry.quest),
+			"standing_fail": HallRules.standing_for_loss(entry.quest),
 			"decided": entry.state != HallStyle.QUEST_STATE_OPEN,
 			"denied": entry.state == HallStyle.QUEST_STATE_DENIED,
 		})
