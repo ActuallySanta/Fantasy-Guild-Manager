@@ -17,6 +17,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 - **Run the game:** the main scene is `Scenes/hall_main.tscn`.
 - **Playtest scenarios:** run `Scenes/Playtest/scenario_*.tscn`, which start the hall from a preset day, gold, standing, and roster (`Scripts/Playtest/playtest_scenario.gd`).
 - **AI playtesters:** `/playtest` (`.claude/skills/playtest/`) runs persona agents through the bridge scene in `tools/playtest/` and writes `Docs/playtests/` reports. The bridge scene and scripts are excluded from exports.
+- **Repeatable headless tests:** `bash tools/tests/run_test.sh <name>` runs `tools/tests/<name>_test.tscn` (a script that `extends TestCase`, which has `check`, `check_near` and `finish`) in a scratch copy and prints `TEST` lines (exit 0 on pass). A scratch copy takes minutes on first run; set `TEST_SCRATCH=<dir>` to reuse one. `tools/` is excluded from exports.
 - **Headless behavior tests:** write a throwaway `extends Node` script plus a `.tscn` and run it with `--headless --path <project> res://that_test.tscn`. Running a scene loads the autoloads.
   - Do this in a scratch copy of the project, so `--import` and `.uid` churn don't land in the repo.
   - Don't trust `--check-only --script`: it doesn't load autoloads, so every script reports false "Identifier not found: GameState/ExternalContentContainer/…" errors.
