@@ -245,10 +245,9 @@ func apply_freeplay_gold(multiplier: float) -> void:
 
 func calcSuccessChance(_questingAdventurers: Array) -> int:
 	var statHitNum = 60.0 + (20 * difficulty)
-	if (maxAdventurers == 1):
-		statHitNum = (statHitNum / 2)
-	elif(maxAdventurers == 3):
-		statHitNum *= 1.5
+	# The requirement scales with party size, 2 slots being the baseline
+	# (1 slot x0.5, 3 slots x1.5, 5 slots x2.5, 8 slots x4).
+	statHitNum *= QuestScoring.get_slot_count(self) / 2.0
 	statHitNum *= requirement_multiplier
 	var statTotal = 0.0
 
