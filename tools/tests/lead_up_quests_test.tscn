@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c8m3e5x7j2vr"]
+
+[ext_resource type="Script" path="res://tools/tests/lead_up_quests_test.gd" id="1_lead"]
+
+[node name="lead_up_quests_test" type="Node"]
+script = ExtResource("1_lead")
