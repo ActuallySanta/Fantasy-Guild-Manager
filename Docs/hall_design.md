@@ -47,7 +47,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 ## Layout
 
 ```
-┌ header ─ Day · Bone Drake countdown (BOSS seal + days left) · gold · standing · menu ┐
+┌ header ─ Day · next-boss countdown (BOSS seal, or FINAL before day 50, plus days left; hidden after day 50) · gold · standing · menu ┐
 │ warning strip ─ "Last hero standing" (only when one death from falling) │
 │ content ─ Board | Guild | Upgrades | Items  (or a screen over them) │
 └ nav ─ Quests (undecided) · Members (new recruits) · Guild (affordable) · Items ┘
@@ -407,7 +407,7 @@ in `Scripts/UI/X/`.
 - `Scripts/Hall/Save/`: `hall_save.gd`, `hall_save_transfer.gd`, `hall_settings.gd`, `hall_web_files.gd`: the saved run, backup codes, saved settings, moving a code on and off the device
 - `Scripts/Hall/Style/`: `hall_style.gd` (ink colours, stat / injury / odds tables, quest-type, building and item-icon tables, icon table, text helpers, restyles), `hall_fx.gd` (animations), `hall_font_scale.gd`
 - `Scripts/Hall/Web/`: web update checks and the Menu's build line. `Scripts/Hall/Debug/`: the Debug tools and the run logger
-- `Scenes/Shell/`: nav and toast; `Shell/Header/`: the header (day, Bone Drake countdown, counters, danger strip) and its gold and standing popups
+- `Scenes/Shell/`: nav and toast; `Shell/Header/`: the header (day, next-boss countdown, counters, danger strip) and its gold and standing popups
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
 - `Scenes/Overlays/`: `Day/` (End Day check, Day Report, Welcome, the Assign Party move popup; the tutorial coach is script-only), `Run End/` (Game Over, Final Battle credits), `Menu/` (Menu, Accessibility, Backup save, Debug, update prompt), `Items/` (equip picker, take-off confirm)

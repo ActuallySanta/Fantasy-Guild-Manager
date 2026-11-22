@@ -696,9 +696,20 @@ func affordable_buildings() -> Array:
 		return GuildUpgrades.get_upgrade_status(building) == GuildUpgrades.UpgradeStatus.READY)
 
 
-## Days left before the Bone Drake (0 = today, negative = already happened).
+## Days left before the next boss day (0 = today, -1 = no boss is left).
+func days_until_next_boss() -> int:
+	var boss_day := HallRules.next_boss_day(GameState.day)
+	return boss_day - GameState.day if boss_day >= 0 else -1
+
+
+## True when the next boss day is the final battle (HallMain.FINAL_DAY).
+func next_boss_is_final() -> bool:
+	return HallRules.next_boss_day(GameState.day) == FINAL_DAY
+
+
+## Older name for days_until_next_boss(), kept for the playtest bridge.
 func days_until_drake() -> int:
-	return MILESTONE_DAY - GameState.day
+	return days_until_next_boss()
 
 
 # ============================================================ ACTIONS

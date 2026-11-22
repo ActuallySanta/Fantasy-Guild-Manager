@@ -26,6 +26,7 @@ static func build(hall: HallMain) -> Dictionary:
 	return {
 		"day": GameState.day,
 		"days_until_drake": hall.days_until_drake(),
+		"next_boss_day": HallRules.next_boss_day(GameState.day),
 		"gold": GameState.gold,
 		"standing": GameState.standing,
 		"run_over": AgentBridgeActions.is_run_over(hall),
