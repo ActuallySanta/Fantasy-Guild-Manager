@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bakk5e3uhltne" path="res://Scenes/Components/stat_tile.tscn" id="2_tile"]
 [ext_resource type="PackedScene" uid="uid://0ruw74gtfe6k" path="res://Scenes/Components/divider.tscn" id="3_divider"]
 [ext_resource type="Texture2D" uid="uid://bswbe5m6msbdj" path="res://Sprites/UI Textures/connector.png" id="4_connector"]
+[ext_resource type="PackedScene" uid="uid://b4crwlsect0n2" path="res://Scenes/Components/crawl_sections.tscn" id="5_sections"]
 
 [node name="OverlayCredits" type="Control"]
 layout_mode = 3
@@ -51,67 +52,9 @@ custom_minimum_size = Vector2(0, 1000)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Title" type="Label" parent="Scroll/Margin/Roll"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-theme_type_variation = &"HeadingLight"
-theme_override_font_sizes/font_size = 66
-text = "The Final Battle"
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="Sub" type="Label" parent="Scroll/Margin/Roll"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-theme_type_variation = &"ItalicLight"
-theme_override_font_sizes/font_size = 30
-text = "Day 50 · Victory"
-horizontal_alignment = 1
-autowrap_mode = 3
-
-[node name="StoryGap" type="Control" parent="Scroll/Margin/Roll"]
-custom_minimum_size = Vector2(0, 60)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="StoryHeading" type="Label" parent="Scroll/Margin/Roll"]
+[node name="Sections" parent="Scroll/Margin/Roll" instance=ExtResource("5_sections")]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"CapsLight"
-theme_override_font_sizes/font_size = 28
-text = "The Battle"
-horizontal_alignment = 1
-uppercase = true
-custom_minimum_size = Vector2(40, 0)
-autowrap_mode = 3
-
-[node name="Story" type="VBoxContainer" parent="Scroll/Margin/Roll"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 26
-
-[node name="PartyGap" type="Control" parent="Scroll/Margin/Roll"]
-custom_minimum_size = Vector2(0, 60)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="PartyHeading" type="Label" parent="Scroll/Margin/Roll"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_type_variation = &"CapsLight"
-theme_override_font_sizes/font_size = 28
-text = "Who Stood at the End"
-horizontal_alignment = 1
-uppercase = true
-custom_minimum_size = Vector2(40, 0)
-autowrap_mode = 3
-
-[node name="Party" type="VBoxContainer" parent="Scroll/Margin/Roll"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 6
 
 [node name="LedgerGap" type="Control" parent="Scroll/Margin/Roll"]
 custom_minimum_size = Vector2(0, 60)
