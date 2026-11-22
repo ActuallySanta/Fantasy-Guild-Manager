@@ -37,8 +37,8 @@ const OFFICE_HIGHEST_RANK := ["D", "C", "B", "A", "S"]
 const TRAINING_SLOTS := [1, 2, 3, 4, 5]
 const TRAINING_STAT_GAIN := [1, 1, 2, 2, 3]
 ## Injury stages (Sore, Hurt, Gravely hurt) a patient heals each night.
-## There are only 3 stages, so level 3+ heals anyone in one night.
-const HOSPITAL_STAGES_PER_NIGHT := [1, 2, 3, 3, 3]
+## Level 3+ heals 2 stages a night, so Gravely hurt takes 2 nights.
+const HOSPITAL_STAGES_PER_NIGHT := [1, 1, 2, 2, 2]
 ## x = STRENGTH (ATK) bonus, y = DEFENSE bonus
 const ARMORY_BONUS := [Vector2i(1, 1), Vector2i(2, 1), Vector2i(2, 2), Vector2i(3, 2), Vector2i(3, 3)]
 const BARRACKS_MAX_HEROES := [4, 6, 8, 10, 12]
