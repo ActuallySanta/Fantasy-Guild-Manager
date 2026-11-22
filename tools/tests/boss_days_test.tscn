@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b7k2d9w4h6tq"]
 
-[ext_resource type="Script" path="res://tools/tests/boss_days_test.gd" id="1_boss"]
+[ext_resource type="Script" uid="uid://b4e0k1waoprm8" path="res://tools/tests/boss_days_test.gd" id="1_boss"]
 
 [node name="boss_days_test" type="Node"]
 script = ExtResource("1_boss")

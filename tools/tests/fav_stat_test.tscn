@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d4n8f2y6k1ws"]
 
-[ext_resource type="Script" path="res://tools/tests/fav_stat_test.gd" id="1_fav"]
+[ext_resource type="Script" uid="uid://de55qjks2xwav" path="res://tools/tests/fav_stat_test.gd" id="1_fav"]
 
 [node name="fav_stat_test" type="Node"]
 script = ExtResource("1_fav")

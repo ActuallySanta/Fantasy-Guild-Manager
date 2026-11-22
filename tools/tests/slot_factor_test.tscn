@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c8m4n1r5y3sq"]
 
-[ext_resource type="Script" path="res://tools/tests/slot_factor_test.gd" id="1_slot"]
+[ext_resource type="Script" uid="uid://dkvt4w623hj1b" path="res://tools/tests/slot_factor_test.gd" id="1_slot"]
 
 [node name="slot_factor_test" type="Node"]
 script = ExtResource("1_slot")

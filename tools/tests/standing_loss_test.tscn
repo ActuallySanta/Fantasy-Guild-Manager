@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c5s7l2w9d4ng"]
 
-[ext_resource type="Script" path="res://tools/tests/standing_loss_test.gd" id="1_standing"]
+[ext_resource type="Script" uid="uid://dd4lh73nhybev" path="res://tools/tests/standing_loss_test.gd" id="1_standing"]
 
 [node name="standing_loss_test" type="Node"]
 script = ExtResource("1_standing")

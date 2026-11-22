@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://d9b0sfinaldeny1"]
 
-[ext_resource type="Script" path="res://tools/tests/final_deny_test.gd" id="1_fd"]
+[ext_resource type="Script" uid="uid://enscnevyhp0o" path="res://tools/tests/final_deny_test.gd" id="1_fd"]
 
 [node name="final_deny_test" type="Node"]
 script = ExtResource("1_fd")
