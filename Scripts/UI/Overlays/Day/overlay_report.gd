@@ -61,6 +61,8 @@ const TEXT_NOBODY_WENT := "Nobody went out. Quests are the only way to earn gold
 const TEXT_HOME := "At home: %s"
 const TEXT_TRAINED := "%s +%d %s"
 const TEXT_HEALED := "%s %s → %s"
+const TEXT_HOSPITAL_BILL := "Hospital: −%d gold"
+const TEXT_SENT_HOME_UNPAID := "%s went home: no gold for a bed"
 const TEXT_RELEASED := "Left the guild: %s"
 const TEXT_RELEASED_COST := "%s (-%d standing)"
 const TEXT_RELEASED_FALLEN := "%s (fallen)"
@@ -76,6 +78,7 @@ const BUTTON_CLOSE := "Close"
 @onready var _injured_chip = %HurtChip        # chip.gd
 @onready var _dead_chip = %DeadChip           # chip.gd
 @onready var _home_note: Label = %HomeNote
+@onready var _hospital_note: Label = %HospitalNote
 @onready var _released_note: Label = %ReleasedNote
 # Letters
 @onready var _scroll: ScrollContainer = %Scroll
@@ -160,6 +163,7 @@ func refresh() -> void:
 	_letters_note.visible = SHOW_LETTERS_NOTE
 	_show_totals(results)
 	_show_home(report.get("home", {}))
+	_show_hospital(report.get("home", {}))
 	_show_released(report.get("released", []))
 	_show_entries(results)
 
@@ -184,7 +188,7 @@ func _play_reveal() -> void:
 			HallFx.stamp_in(chip, 1.6, at)
 			at += REVEAL_CHIP_GAP
 	HallFx.count(_gold_chip.get_node("Row/Text"), 0, _total_gold, REVEAL_GOLD_SECONDS, _gold_format, REVEAL_START)
-	for note in [_home_note, _released_note]:
+	for note in [_home_note, _hospital_note, _released_note]:
 		if note.visible:
 			HallFx.fade_in(note, at)
 			at += REVEAL_CHIP_GAP
@@ -242,6 +246,20 @@ func _show_home(home: Dictionary) -> void:
 		parts.append(TEXT_HEALED % [healed.character.name, from_label, to_label])
 	_home_note.text = TEXT_HOME % " · ".join(parts)
 	_home_note.visible = SHOW_HOME_NOTE and not parts.is_empty()
+
+
+## The night's Hospital bill, and anyone sent home because gold ran out
+## (see GuildUpgrades.run_night's hospital_bill and sent_home_unpaid).
+func _show_hospital(home: Dictionary) -> void:
+	var lines := PackedStringArray()
+	var bill: int = home.get("hospital_bill", 0)
+	if bill > 0:
+		lines.append(TEXT_HOSPITAL_BILL % bill)
+	for hero in home.get("sent_home_unpaid", []):
+		lines.append(TEXT_SENT_HOME_UNPAID % hero.name)
+	_hospital_note.text = "
+".join(lines)
+	_hospital_note.visible = not lines.is_empty()
 
 
 ## One line for heroes released today (see HallMain.released_today), with the

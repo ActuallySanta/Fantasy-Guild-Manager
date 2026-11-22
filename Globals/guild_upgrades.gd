@@ -94,6 +94,10 @@ const TRAINING_MAX_INJURY := GuildCharacter.InjuryLevel.SORE
 ## Hospital level that unlocks reviving, and how many revives a run gets.
 const REVIVE_LEVEL := 5
 const REVIVES_PER_RUN := 1
+## Gold a Hospital bed costs per night, multiplied by the guild's standing rank
+## plus one (so 20 at rank F, 120 at rank S). Charged for every patient at End
+## Day; discharging a hero beforehand stops the charge.
+const HOSPITAL_FEE_PER_NIGHT := 20
 ## Character metadata: Vector2i(injury level, nights spent healing it).
 const RECOVERY_META := "recovery_nights"
 
@@ -350,8 +354,16 @@ func get_nights_until_healthy(character: GuildCharacter, in_hospital: bool) -> i
 	return maxi(total - _recovery_progress(character), 1)
 
 
+## Gold one Hospital bed costs tonight, per patient: HOSPITAL_FEE_PER_NIGHT
+## times (standing rank + 1).
+func nightly_fee() -> int:
+	return HOSPITAL_FEE_PER_NIGHT * (HallRules.standing_rank_for(standing) + 1)
+
+
+## Puts a hurt hero in a bed. Returns false if they don't need care, are
+## already a patient, or the guild couldn't pay tonight's fee.
 func admit(character: GuildCharacter) -> bool:
-	if not needs_care(character) or is_patient(character):
+	if not needs_care(character) or is_patient(character) or gold < nightly_fee():
 		return false
 	patients.append(character)
 	training.erase(character)
@@ -392,9 +404,25 @@ func revive(character: GuildCharacter) -> bool:
 ## Call once when the day ends, before the quests are played out (so nobody
 ## heals the same night they get hurt). Returns what happened, for the report:
 ##   {trained: [{character, stat, gain}],
-##    healed:  [{character, from, to, in_hospital}]}
+##    healed:  [{character, from, to, in_hospital}],
+##    hospital_bill: gold paid for beds tonight,
+##    sent_home_unpaid: [GuildCharacter] patients sent home because gold ran out}
+## Beds are paid in the order patients were admitted; once gold can't cover
+## another bed, that patient and everyone admitted after them go home to heal
+## there (gold never goes negative).
 func run_night() -> Dictionary:
 	_forget_missing_heroes()
+
+	var hospital_bill := 0
+	var sent_home_unpaid: Array[GuildCharacter] = []
+	var fee := nightly_fee()
+	for character in patients.duplicate():
+		if gold >= fee:
+			add_gold(-fee)
+			hospital_bill += fee
+		else:
+			patients.erase(character)
+			sent_home_unpaid.append(character)
 
 	var trained := []
 	var gain := get_training_gain()
@@ -429,7 +457,12 @@ func run_night() -> Dictionary:
 			patients.erase(character)
 
 	home_changed.emit()
-	return {"trained": trained, "healed": healed}
+	return {
+		"trained": trained,
+		"healed": healed,
+		"hospital_bill": hospital_bill,
+		"sent_home_unpaid": sent_home_unpaid,
+	}
 
 
 ## Nights already spent healing the hero's current level. Stored with the

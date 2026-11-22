@@ -28,7 +28,7 @@ const TEXT_PICKED_FOR := "Picked for #%d"
 const TEXT_SENT_ON := "Sent on #%d"
 const TEXT_TOO_HURT := "Too hurt to train"
 const TEXT_IN_BED := "In a Hospital bed"
-const TEXT_NIGHTS_IN_BED := "Healthy in %s"
+const TEXT_NIGHTS_IN_BED := "Healthy in %s · %d gold/night"
 const TEXT_NIGHTS_COMPARE := "Healthy in %s at home, %s in a bed"
 const TEXT_REVIVE_READY := "One revive available"
 const TEXT_REVIVE_LOCKED := "Revive at Hospital Lv %d"
@@ -39,8 +39,8 @@ const BUTTON_ADD := "Add"
 const BUTTON_MOVE := "Move here"
 const BUTTON_FULL := "Full"
 const BUTTON_DISCHARGE := "Discharge"
-const BUTTON_ADMIT := "Admit"
-const BUTTON_PULL_ADMIT := "Pull & admit"
+const BUTTON_ADMIT := "Admit · %d gold/night"
+const BUTTON_PULL_ADMIT := "Pull & admit · %d gold/night"
 const BUTTON_REVIVE := "Revive"
 
 # ---- NODES
@@ -180,7 +180,7 @@ func show_patient(main: HallMain, hero: GuildCharacter) -> void:
 	_fill(main, hero)
 	_task_chip.visible = false
 	var nights := GuildUpgrades.get_nights_until_healthy(character, true)
-	_set_note(TEXT_NIGHTS_IN_BED % _nights_text(nights), HallStyle.INJURY_LOOKS[2].text)
+	_set_note(TEXT_NIGHTS_IN_BED % [_nights_text(nights), GuildUpgrades.nightly_fee()], HallStyle.INJURY_LOOKS[2].text)
 	_set_button(_main_button, BUTTON_DISCHARGE, "paper", hall.discharge.bind(character))
 	HallStyle.style_panel(self, HOSPITAL_CARD_BG, HOSPITAL_BORDER, 3, 16)
 
@@ -191,7 +191,10 @@ func show_needs_care(main: HallMain, hero: GuildCharacter) -> void:
 	var in_bed := GuildUpgrades.get_nights_until_healthy(character, true)
 	_set_note(TEXT_NIGHTS_COMPARE % [_nights_text(at_home), _nights_text(in_bed)])
 	var is_busy := hall.quest_index_of(character) >= 0 or GuildUpgrades.is_training(character)
-	_set_button(_main_button, BUTTON_PULL_ADMIT if is_busy else BUTTON_ADMIT, "paper" if is_busy else "blue", hall.admit.bind(character))
+	var label := BUTTON_PULL_ADMIT if is_busy else BUTTON_ADMIT
+	_set_button(_main_button, label % GuildUpgrades.nightly_fee(), "paper" if is_busy else "blue", hall.admit.bind(character))
+	# the bed is paid for tonight, so a guild without the gold can't admit
+	_main_button.disabled = GameState.gold < GuildUpgrades.nightly_fee()
 
 
 func show_fallen(main: HallMain, hero: GuildCharacter) -> void:

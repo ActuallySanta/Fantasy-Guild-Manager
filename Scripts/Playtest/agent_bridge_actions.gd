@@ -305,7 +305,15 @@ static func _home(raw: Dictionary) -> Dictionary:
 			"to": GuildCharacter.InjuryLevel.keys()[entry.to],
 			"in_hospital": entry.in_hospital,
 		})
-	return {"trained": trained, "healed": healed}
+	var sent_home: Array = []
+	for hero in raw.get("sent_home_unpaid", []):
+		sent_home.append(hero.name)
+	return {
+		"trained": trained,
+		"healed": healed,
+		"hospital_bill": raw.get("hospital_bill", 0),
+		"sent_home_unpaid": sent_home,
+	}
 
 
 ## Story text without its BBCode tags. text: BBCode. Returns plain text.

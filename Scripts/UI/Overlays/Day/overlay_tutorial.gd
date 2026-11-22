@@ -1087,7 +1087,7 @@ func _day_three() -> Array:
 			"skip": func(): return not _seen.get("train", false),
 			"do": "Tap a stat", "text": "Pick the stat to drill."},
 		{"target": func(): return _row(_hospital_section(), "home_row.gd", "MainButton", func(b): return b.text.contains("dmit")), "on": "admit",
-			"skip": func(): return hall.hurt_waiting_count() == 0,
+			"skip": func(): return hall.hurt_waiting_count() == 0 or GameState.gold < GuildUpgrades.nightly_fee(),
 			"do": "Tap Admit", "text": "Someone's hurt. [b]Admit[/b] them."},
 	]
 

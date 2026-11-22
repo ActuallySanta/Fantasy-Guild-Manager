@@ -8,6 +8,7 @@ func _ready() -> void:
 	var hero := GuildCharacter.new()
 	CharacterContainer.active_characters.append(hero)
 	GuildUpgrades.levels[GuildUpgrades.Building.HOSPITAL] = 5
+	GuildUpgrades.gold = 1000 # beds cost gold a night
 	hero.injury_level = GuildCharacter.InjuryLevel.GRAVELY_INJURED
 	check(GuildUpgrades.admit(hero), "a Gravely hurt hero can be admitted")
 

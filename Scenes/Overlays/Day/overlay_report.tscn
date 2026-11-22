@@ -114,6 +114,16 @@ theme_override_font_sizes/font_size = 23
 text = "At home: Sela +1 Pow · Pip Hurt → Sore"
 autowrap_mode = 3
 
+[node name="HospitalNote" type="Label" parent="Layout/HomeMargin/Notes"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 23
+text = "Hospital: −120 gold"
+autowrap_mode = 3
+
 [node name="ReleasedNote" type="Label" parent="Layout/HomeMargin/Notes"]
 unique_name_in_owner = true
 visible = false

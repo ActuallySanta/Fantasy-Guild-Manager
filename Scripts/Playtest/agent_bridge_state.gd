@@ -28,6 +28,7 @@ static func build(hall: HallMain) -> Dictionary:
 		"days_until_drake": hall.days_until_drake(),
 		"next_boss_day": HallRules.next_boss_day(GameState.day),
 		"gold": GameState.gold,
+		"hospital_fee": GuildUpgrades.nightly_fee(),
 		"standing": GameState.standing,
 		"run_over": AgentBridgeActions.is_run_over(hall),
 		"locked": _locked(hall),
