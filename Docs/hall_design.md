@@ -76,8 +76,8 @@ A win pays `HallRules.standing_for_win` (rank + 1). A failed quest costs half of
 rounded up (`HallRules.standing_for_loss`: ranks F and D cost 1, C and B cost 2, A and S
 cost 3; G costs 1). The loss never sinks standing below `GuildUpgrades.MINIMUM_STANDING`:
 `play_quest` clamps it, so the Day Report shows only what was actually lost. Assign Party's
-standing chip reads "Win +N · Fail -M standing", and a failed quest's letter in the Day
-Report gets a red "-M standing" tag.
+standing chip reads "Win +N · Fail −M standing", and a failed quest's letter in the Day
+Report gets a red "−M standing" tag.
 
 ## Injuries, the retreat and deaths
 
@@ -212,9 +212,9 @@ both open with the Guild tab on Day 10 (`GuildUpgrades.UNLOCK_DAY`); before that
   pulls a hero out of a quest party and into a slot.
 - **Healing:** at home injuries heal one level at a time, each taking
   `HOME_HEAL_NIGHTS` (Sore 2, Hurt 4, Gravely 6). In a Hospital bed a hero heals
-  `HOSPITAL_STAGES_PER_NIGHT` stages every night (levels 1-2: one stage,
-  level 3+: two, so Gravely hurt takes two nights). Heroes in a bed can't go on quests, and they go home on their
-  own once they're Healthy.
+  `HOSPITAL_STAGES_PER_NIGHT` stages every night (levels 1-2: one stage, level 3+: two,
+  so Gravely hurt takes two nights). Heroes in a bed can't go on quests, and they go
+  home on their own once they're Healthy.
 - **Revive:** Hospital level 5 brings one fallen hero back per run, Gravely hurt and in a bed.
 - The Day Report's header has an "At home" line with who trained and who healed.
 
@@ -279,7 +279,9 @@ last story line ends the main story with a victory. Only day 10's result feeds t
 
 ## Difficulty
 
-Quest requirements climb on a staircase (`HallRules.difficulty_scale`). Before day 5 they are at base. From day 5 they drift up 1.5% a day, and each boss passed (days 10, 20, 30, 40, 50) adds a 15% step, so day 11 asks 1.255x and day 49 asks 2.275x. The scale freezes at day 50; freeplay then keeps climbing through `freeplay_scale`. Boss quests get a further spike on top (1.35x, or 1.15x for the final battle). Gold rewards do not scale with the staircase, only the stats a quest asks for, and the player sees the effect as lower odds on Assign Party.
+Quest requirements climb on a staircase (`HallRules.difficulty_scale`). Before day 5 they are at base. From day 5 they drift up 1.5% a day, and each boss passed (days 10, 20, 30, 40, 50) adds a 15% step, so day 11 asks 1.255x and day 49 asks 2.275x. The scale freezes at day 50; freeplay then keeps climbing through `freeplay_scale`. Boss quests get a further spike on top (1.35x, or 1.15x for the final battle). Gold rewards do not scale with the staircase, only the stats a quest asks for, and the player sees the effect as lower odds on Assign Party. Freeplay is the exception: `freeplay_scale` still scales gold as well as requirements.
+
+Building upgrades are gated by standing (`GuildUpgrades.UPGRADE_STANDING_REQ`): levels 2 to 5 need standing 5, 15, 30 and 50.
 
 ## Gear rarity
 

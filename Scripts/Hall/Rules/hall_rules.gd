@@ -230,7 +230,9 @@ static func difficulty_scale(day: int) -> float:
 	if day < DIFFICULTY_START_DAY:
 		return 1.0
 	var capped_day := mini(day, HallMain.FINAL_DAY)
-	return 1.0 		+ DIFFICULTY_DRIFT_PER_DAY * (capped_day - (DIFFICULTY_START_DAY - 1)) 		+ DIFFICULTY_STEP_PER_BOSS * bosses_before(capped_day)
+	return (1.0
+			+ DIFFICULTY_DRIFT_PER_DAY * (capped_day - (DIFFICULTY_START_DAY - 1))
+			+ DIFFICULTY_STEP_PER_BOSS * bosses_before(capped_day))
 
 
 ## The full multiplier on a quest's stat requirement on `day`: the staircase,

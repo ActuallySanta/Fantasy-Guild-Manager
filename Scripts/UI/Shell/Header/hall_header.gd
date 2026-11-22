@@ -1,4 +1,4 @@
-## Header: the DAY tile, the Bone Drake countdown, the gold and standing
+## Header: the DAY tile, the next-boss countdown, the gold and standing
 ## counters, the Menu button, and the red "last hero standing" strip under it.
 ## Also owns the counters' motion: numbers roll to new values, coins fly to
 ## what you paid for, and the night's earnings land at dawn. Tapping the coin
@@ -12,9 +12,9 @@ extends VBoxContainer
 
 # ============================================================ SETTINGS
 
-## The Bone Drake countdown turns red when this many days (or fewer) are left.
+## The next-boss countdown turns red when this many days (or fewer) are left.
 const DRAKE_WARNING_DAYS := 2
-## Times the Bone Drake note pulses on a morning inside DRAKE_WARNING_DAYS.
+## Times the next-boss note pulses on a morning inside DRAKE_WARNING_DAYS.
 const DRAKE_PULSES := 3
 ## Padding inside the Bone Drake note's torn paper (design px), left/right and
 ## top/bottom. Kept small so the note hugs its seal and number (the shared

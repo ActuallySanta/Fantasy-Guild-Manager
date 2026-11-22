@@ -3,9 +3,9 @@
 A phone-first fantasy management game made in Godot 4.7. You run an adventurers' guild:
 hire heroes, put together parties for each day's quests, and spend the gold they bring
 back on gear and building upgrades. Heroes get hurt, rest up, train and sometimes don't
-come back. Bosses arrive on set days (the Bone Drake on day 10, the Necromancer on 20, the Demon
-Generals on 30 and 40), and the story ends with the Demon King on day 50. Win it and the game rolls credits, then opens an endless freeplay mode with
-harder quests.
+come back. Bosses arrive on set days (the Bone Drake on day 10, the Necromancer on 20,
+the Demon Generals on 30 and 40), and the story ends with the Demon King on day 50. Win
+it and the game rolls credits, then opens an endless freeplay mode with harder quests.
 
 **Play it in your browser:** <https://www.santibenfer.com/Fantasy-Guild-Manager/>
 
@@ -87,7 +87,7 @@ build.
 | `Fonts/`, `Themes/` | The fonts, and the UI theme with one StyleBox per surface. |
 | `Data/` | The team credits shown in the credits roll. |
 | `Docs/` | [hall_design.md](Docs/hall_design.md): the UI's design and rules; `playtests/` holds the AI playtest reports. |
-| `tools/` | `playtest/`: the shell scripts and tests behind the AI playtesters (`/playtest`). |
+| `tools/` | `playtest/`: the shell scripts and tests behind the AI playtesters (`/playtest`). `tests/`: the headless test runner (`run_test.sh`) and its tests. |
 | `Audio/` | Sound effects (drop-in folder; see its README). |
 | `Builds/` | Committed desktop builds from earlier iterations. |
 

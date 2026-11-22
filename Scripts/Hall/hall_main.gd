@@ -3,7 +3,7 @@
 ## Scene: Scenes/hall_main.tscn
 ##
 ## Shell, top to bottom:
-##   header      - day, Bone Drake countdown, gold, standing, menu button
+##   header      - day, next-boss countdown, gold, standing, menu button
 ##   content     - one of four tabs (Board, Members, Guild, Items), or a screen
 ##                 over them (Assign Party, Character)
 ##   nav         - Board / Members / Guild / Items with badges, always visible
