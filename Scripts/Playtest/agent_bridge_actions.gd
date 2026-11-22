@@ -244,6 +244,9 @@ static func end_day(hall: HallMain, tree: SceneTree) -> Dictionary:
 		if Time.get_ticks_msec() > deadline:
 			return {"ok": false, "error": "night did not settle in %d seconds" % MAX_SETTLE_SECONDS}
 		await tree.process_frame
+	# a boss night's crawl is only presentation: Continue opens the report
+	if not hall.shown_boss_crawl.is_empty():
+		hall.close_boss_crawl()
 	# the credits keep their night in previous_report, the Day Report in shown_report
 	var raw_report: Dictionary = hall.shown_report if not hall.shown_report.is_empty() else hall.previous_report
 	var response := {"ok": true, "report": _report(raw_report)}
@@ -259,7 +262,8 @@ static func end_day(hall: HallMain, tree: SceneTree) -> Dictionary:
 static func _is_settled(hall: HallMain) -> bool:
 	if hall.is_night_falling:
 		return false
-	return not hall.shown_report.is_empty() or not hall.shown_credits.is_empty()
+	return not hall.shown_report.is_empty() or not hall.shown_credits.is_empty() \
+			or not hall.shown_boss_crawl.is_empty()
 
 
 ## The JSON-ready report. raw: a Day Report dictionary (HallMain.end_day).

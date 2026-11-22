@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://b5bossc0rawl3"]
+
+[ext_resource type="Script" uid="uid://c6bossc0rawl4" path="res://Scripts/UI/Overlays/Day/overlay_boss_crawl.gd" id="1_crawl"]
+[ext_resource type="PackedScene" uid="uid://b4crwlsect0n2" path="res://Scenes/Components/crawl_sections.tscn" id="2_sections"]
+[ext_resource type="Texture2D" uid="uid://bswbe5m6msbdj" path="res://Sprites/UI Textures/connector.png" id="3_connector"]
+
+[node name="OverlayBossCrawl" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_crawl")
+
+[node name="Bg" type="ColorRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.105882, 0.0784314, 0.0588235, 1)
+
+[node name="Scroll" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="Margin" type="MarginContainer" parent="Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/margin_left = 36
+theme_override_constants/margin_right = 36
+
+[node name="Roll" type="VBoxContainer" parent="Scroll/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="TopSpace" type="Control" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 1000)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Sections" parent="Scroll/Margin/Roll" instance=ExtResource("2_sections")]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="BottomSpace" type="Control" parent="Scroll/Margin/Roll"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 520)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Footer" type="MarginContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -180.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 26
+
+[node name="Col" type="VBoxContainer" parent="Footer"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+alignment = 2
+
+[node name="Connector" type="TextureRect" parent="Footer/Col"]
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("3_connector")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ContinueButton" type="Button" parent="Footer/Col"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+focus_mode = 0
+theme_type_variation = &"GoldButton"
+theme_override_font_sizes/font_size = 46
+text = "Continue"
+autowrap_mode = 3

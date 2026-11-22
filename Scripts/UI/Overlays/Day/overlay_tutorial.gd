@@ -252,7 +252,8 @@ func resume_today() -> void:
 		return
 	if hall.is_intro_open() or is_running():
 		return
-	if not (hall.shown_report.is_empty() and hall.shown_credits.is_empty() and hall.run_over_stats.is_empty()):
+	if not (hall.shown_report.is_empty() and hall.shown_credits.is_empty() and hall.run_over_stats.is_empty() \
+			and hall.shown_boss_crawl.is_empty()):
 		return
 	start.call_deferred(day, _script_for_day(day))
 

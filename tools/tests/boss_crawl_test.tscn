@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://d9b0sscrawl7q"]
+
+[ext_resource type="Script" path="res://tools/tests/boss_crawl_test.gd" id="1_crawl"]
+
+[node name="boss_crawl_test" type="Node"]
+script = ExtResource("1_crawl")

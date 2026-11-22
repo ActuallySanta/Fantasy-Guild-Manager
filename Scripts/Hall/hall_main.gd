@@ -224,6 +224,12 @@ var active_screen := {}
 ##    home: Dictionary (see GuildUpgrades.run_night), released: Array (see released_today)}
 ## starts_next_day is true right after End Day: closing it starts the next day.
 var shown_report := {}
+## The boss crawl being shown after End Day on a boss day (not the final), or {}
+## when hidden: {day: int, results: Array (the boss fights' _run_quest results)}.
+## Its Continue button (close_boss_crawl) opens the Day Report, kept in
+## _pending_report meanwhile. Never saved: night_save holds the report as
+## already showing, so a reload during the crawl skips straight to the report.
+var shown_boss_crawl := {}
 ## Heroes released today, for the Day Report. Each entry is a Dictionary:
 ##   {character: GuildCharacter, standing: int (standing it cost), fallen: bool}
 ## Cleared when the next day starts.
@@ -327,6 +333,8 @@ var is_resumed_run := false
 ## "previous_report": Dictionary}. HallSave saves them as already showing, so
 ## closing the game mid-dusk can't replay the night. {} the rest of the time.
 var night_save := {}
+## The night's Day Report, waiting behind the boss crawl until Continue.
+var _pending_report := {}
 
 # ---- motion
 
@@ -378,6 +386,7 @@ var tutorial: Control
 @onready var _debug_overlay: Control = %OverlayDebug
 @onready var _game_over_overlay: Control = %OverlayGameOver
 @onready var _credits_overlay: Control = %OverlayCredits
+@onready var _boss_crawl_overlay: Control = %OverlayBossCrawl
 @onready var _intro_overlay: Control = %OverlayIntro
 
 # ---- colorblind filter
@@ -1517,13 +1526,22 @@ func end_day() -> void:
 	night_save = {"shown_report": report}
 	save_now()
 
+	# a boss night (not the final) plays the boss crawl first; Continue opens the report
+	var boss_results := results.filter(func(result): return result.milestone and not result.final)
 	var show_report := func() -> void:
 		is_night_falling = false
 		is_end_check_open = false
 		training_picker_open = false
 		active_screen = {}
-		shown_report = report
-		night_save = {}
+		if boss_results.is_empty():
+			shown_report = report
+			night_save = {}
+		else:
+			# night_save stays until Continue, so a save during the crawl holds the report
+			_pending_report = report
+			shown_boss_crawl = {"day": GameState.day, "results": boss_results}
+			var is_all_won := boss_results.all(func(result): return result.succeeded)
+			Sfx.play(&"victory" if is_all_won else &"defeat")
 		queue_refresh()
 		tutorial_event.emit("end_day", results)
 	HallFx.curtain(fx_layer, DUSK_INK, show_report, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
@@ -1578,6 +1596,18 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 		run_stats.final_party = entry.party.duplicate()
 	run_stats.items_found += result.items.size() + result.reward_items.size()
 	return result
+
+
+## The boss crawl's Continue button: closes the crawl and opens the night's Day Report.
+func close_boss_crawl() -> void:
+	if shown_boss_crawl.is_empty():
+		return
+	shown_boss_crawl = {}
+	shown_report = _pending_report
+	_pending_report = {}
+	night_save = {}
+	Sfx.play(&"page_close")
+	queue_refresh()
 
 
 ## The Day Report's "New Day" button. Keeps tonight's report for the Menu and opens on the Board.
@@ -1805,10 +1835,13 @@ func end_day_button() -> Button:
 func _refresh_overlays() -> void:
 	var is_credits_open := not shown_credits.is_empty()
 	_credits_overlay.visible = is_credits_open
+	# the boss crawl hides the report and the other overlays like the credits do
+	var is_crawl_open := not shown_boss_crawl.is_empty() and not is_credits_open
+	_boss_crawl_overlay.visible = is_crawl_open
 	var is_game_over := not run_over_stats.is_empty() and not is_credits_open
 	_game_over_overlay.visible = is_game_over
-	var is_report_open := not shown_report.is_empty() or is_game_over or is_credits_open
-	_report_overlay.visible = not shown_report.is_empty() and not is_game_over and not is_credits_open
+	var is_report_open := not shown_report.is_empty() or is_game_over or is_credits_open or is_crawl_open
+	_report_overlay.visible = not shown_report.is_empty() and not is_game_over and not is_credits_open and not is_crawl_open
 	_end_check_overlay.visible = not is_report_open and is_end_check_open
 	_menu_overlay.visible = not is_report_open and is_menu_open
 	_accessibility_overlay.visible = not is_report_open and is_accessibility_open
@@ -1824,7 +1857,7 @@ func _refresh_overlays() -> void:
 
 
 func _all_overlays() -> Array:
-	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _backup_overlay, _debug_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay, _intro_overlay]
+	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _backup_overlay, _debug_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay, _boss_crawl_overlay, _intro_overlay]
 
 
 # ============================================================ TOAST
