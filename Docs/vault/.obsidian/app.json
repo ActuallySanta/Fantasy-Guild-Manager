@@ -1,0 +1,9 @@
+{
+  "useMarkdownLinks": false,
+  "newLinkFormat": "shortest",
+  "showFrontmatter": true,
+  "userIgnoreFilters": [
+    "_meta/function_index.json",
+    "Templates/"
+  ]
+}

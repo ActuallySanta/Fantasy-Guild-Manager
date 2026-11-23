@@ -20,6 +20,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 - **Headless behavior tests:** write a throwaway `extends Node` script plus a `.tscn` and run it with `--headless --path <project> res://that_test.tscn`. Running a scene loads the autoloads.
   - Do this in a scratch copy of the project, so `--import` and `.uid` churn don't land in the repo.
   - Don't trust `--check-only --script`: it doesn't load autoloads, so every script reports false "Identifier not found: GameState/ExternalContentContainer/…" errors.
+- **Code docs vault:** `Docs/vault/` is an Obsidian vault documenting every script, function and scene, plus system flow diagrams (Mermaid). `/docs-vault` (`.claude/skills/docs-vault/`) updates it with the `docs-writer` agent from what changed since the last pass. `python tools/docs/index_functions.py --check [prefix]` lists the functions, scenes and links the vault is missing.
 - **Formatting:** the GDQuest GDScript formatter editor plugin (`addons/GDQuest_GDScript_formatter`) is enabled. It runs from inside the editor.
 - **Exports** (`export_presets.cfg`) write to `Builds/`, which is committed. Don't regenerate builds unless asked.
   - Every preset has `include_filter="External Content/*.txt"`. The quest `.txt` files aren't resources, so without it they're left out of the export and quests break.
