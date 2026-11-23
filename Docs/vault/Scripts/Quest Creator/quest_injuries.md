@@ -3,7 +3,7 @@ source: Scripts/Quest Creator/quest_injuries.gd
 class_name: QuestInjuries
 extends: RefCounted
 scene: null
-systems: []
+systems: ["[[Quest Resolution and Injuries]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---

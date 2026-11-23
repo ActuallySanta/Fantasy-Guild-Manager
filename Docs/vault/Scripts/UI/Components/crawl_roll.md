@@ -3,7 +3,7 @@ source: Scripts/UI/Components/crawl_roll.gd
 class_name: CrawlRoll
 extends: Node
 scene: ""
-systems: ["[[UI Motion and Feedback]]", "[[Run End]]"]
+systems: ["[[UI Motion and Feedback]]", "[[Run End]]", "[[UI Architecture and Refresh]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -42,7 +42,7 @@ Hooks up the overlay's nodes, connects the vertical scrollbar's `value_changed` 
 
 **Returns:** nothing.
 
-**Called by:** [[overlay_boss_crawl#setup]] (`overlay_boss_crawl.gd:68`), [[overlay_intro#setup]] (`overlay_intro.gd:82`), [[overlay_credits#setup]] (`overlay_credits.gd:123`).
+**Called by:** [[overlay_boss_crawl#setup]] (`overlay_boss_crawl.gd:68`), [[overlay_intro#setup]] (`overlay_intro.gd:79`), [[overlay_credits#setup]] (`overlay_credits.gd:123`).
 
 ### start
 `func start(speed: float, top_space_share: float, bottom_space: float) -> void` · `Scripts/UI/Components/crawl_roll.gd:59`
@@ -60,7 +60,7 @@ Back to the top with the footer hidden, then (motion allowed) wait and roll. Set
 
 **Side effects:** hides the footer, resets scroll, enables `_process` when auto-scrolling.
 
-**Called by:** [[overlay_boss_crawl#refresh]] (`overlay_boss_crawl.gd:90`), [[overlay_intro#refresh]] (`overlay_intro.gd:92`), [[overlay_credits#_start_roll]] (`overlay_credits.gd:160`).
+**Called by:** [[overlay_boss_crawl#refresh]] (`overlay_boss_crawl.gd:90`), [[overlay_intro#refresh]] (`overlay_intro.gd:89`), [[overlay_credits#_start_roll]] (`overlay_credits.gd:160`).
 
 **Calls:** [[crawl_roll#_check_fits]].
 

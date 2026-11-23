@@ -35,13 +35,13 @@ Stores the hall, connects every button, sets up the update popup, builds the ste
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `main` | `HallMain` | The hall | `self` in `view.setup(self)` ([[hall_main#_ready]], `hall_main.gd:424`) |
+| `main` | `HallMain` | The hall | `self` in `view.setup(self)` ([[hall_main#_ready]], `hall_main.gd:427`) |
 
 **Returns:** nothing.
 
 **Side effects:** connects `pressed` on `%EnableButton` to [[hall_main#enable_debug_tools]], `%SkipButton` to [[hall_main#debug_skip_day]], `%HeroButton` to [[hall_main#debug_add_hero]], `%ItemButton` to [[hall_main#debug_add_item]], `%HealButton` to [[hall_main#debug_heal_everyone]], `%MaxButton` to [[hall_main#debug_max_buildings]], `%ResetButton` to [[hall_main#reset_upgrades]], `%RerollButton` to [[hall_main#debug_reroll_today]], `%TutorialButton` to [[hall_main#debug_skip_tutorial]], `%IntroButton` to [[hall_main#debug_replay_intro]], `toggled` on `%SaveCheckBox` to [[hall_main#set_save_enabled]], `%BackButton` to [[hall_main#close_debug]], `%UpdateButton` to [[overlay_debug#_on_update_pressed]], `gui_input` on `%Dim` to [[overlay_debug#_on_dim_input]]. Each generated jump button is bound to [[hall_main#debug_jump_to_day]] with its day, gold buttons to [[hall_main#debug_add_gold]], standing buttons to [[hall_main#debug_add_standing]]. `visibility_changed` closes the update popup when the sheet hides.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[overlay_update_confirm#setup]] (`overlay_debug.gd:95`), [[overlay_update_confirm#close]] (`:99`), [[overlay_debug#_make_button]], [[hall_style#style_button]].
 
@@ -52,7 +52,7 @@ Until `hall.is_debug_run` is true, shows only the warning note, Enable and the S
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1866`) while visible.
+**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1891`) while visible.
 
 **Calls:** [[hall_debug#can_skip_day]], [[hall_debug#can_jump_to]], [[character_container#has_free_bed]].
 

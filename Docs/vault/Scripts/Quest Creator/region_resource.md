@@ -3,7 +3,7 @@ source: Scripts/Quest Creator/region_resource.gd
 class_name: Region
 extends: Resource
 scene: null
-systems: []
+systems: ["[[Quest Generation and Difficulty]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script, resource]
 ---
@@ -57,7 +57,7 @@ A random location for a quest type: dungeon names for types 1 and 5, escort loca
 
 **Side effects:** consumes the RNG.
 
-**Called by:** [[quest_resource#_init]] (`quest_resource.gd:159`), [[quest_resource#_init_boss_vars]] (`:823`), [[quest_resource#_initMilestoneVars]] (`:839`, `:851`, `:863`, `:941`). Each is `QuestManager.world_regions[regionNum].returnName(type)`, a `Region`.
+**Called by:** [[quest_resource#_init]] (`quest_resource.gd:159`), [[quest_resource#_init_boss_vars]] (`:823`), [[quest_resource#_initMilestoneVars]] (`:839`, `:851`, `:863`, `:938`). Each is `QuestManager.world_regions[regionNum].returnName(type)`, a `Region`.
 
 **Calls:** none.
 

@@ -3,8 +3,8 @@ source: Scripts/Quest Creator/quest_resource.gd
 class_name: CreatedQuest
 extends: Resource
 scene: null
-systems: []
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+systems: ["[[Party Drafting and Assignment]]", "[[Success Chance]]", "[[Quest Generation and Difficulty]]", "[[Quest Resolution and Injuries]]", "[[Items and Shop]]"]
+last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
 tags: [script, resource]
 ---
 
@@ -50,7 +50,7 @@ tags: [script, resource]
 ### _init
 `func _init(diff := 0, dayNum := 0) -> void` · `Scripts/Quest Creator/quest_resource.gd:145`
 
-Constructor. For `dayNum` in the scripted list (1, 2, 4, 7, 9, 10, 12, 15, 18, -18, 20, -20, 30, 40, -40, 50, 22, 24, 26, 28, 32, 33, 34, 36, 38, 39, 42, 45, 48) it calls [[quest_resource#_initMilestoneVars]] and returns. Otherwise it builds a random standard quest: `maxAdventurers` 1-2 (1-3 after day 5), a random region 0-3, a random story row 0-15, the type from that row, a location, the gold by party size and difficulty (1 slot `100 + 125*d`, 2 slots `150 + 175*d`, 3 slots `200 + 225*d`), and a title and `favStat` by type. When `dayNum == 0`, it may instead become an item quest ([[quest_resource#_get_item_reward_chance]]): `reward_items` is rolled and gold set to 0.
+Constructor. For `dayNum` in the scripted list (1, 2, 4, 7, 9, 10, 12, 15, 18, -18, 20, -20, 30, 40, -40, 50, 23, 26, 28, -28, 32, 34, 37, -37, 3737, 43, 45, -45, 48) it calls [[quest_resource#_initMilestoneVars]] and returns. Otherwise it builds a random standard quest: `maxAdventurers` 1-2 (1-3 after day 5), a random region 0-3, a random story row 0-15, the type from that row, a location, the gold by party size and difficulty (1 slot `100 + 125*d`, 2 slots `150 + 175*d`, 3 slots `200 + 225*d`), and a title and `favStat` by type. When `dayNum == 0`, it may instead become an item quest ([[quest_resource#_get_item_reward_chance]]): `reward_items` is rolled and gold set to 0.
 
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
@@ -62,7 +62,7 @@ Constructor. For `dayNum` in the scripted list (1, 2, 4, 7, 9, 10, 12, 15, 18, -
 
 **Side effects:** consumes the global RNG; reads `GameState.day` (through [[quest_resource#_get_item_reward_chance]]), `ExternalContentContainer` and `QuestManager.world_regions`; prints debug lines (`print(regionNum, " ", location)`).
 
-**Called by:** [[hall_rules#build_day_quests]] (`hall_rules.gd:150`, `:152`, `:157`, `:160`), [[hall_rules#_build_boss_entries]] (`hall_rules.gd:181`), the `RefReader` inner class of [[hall_save]] (`hall_save.gd:467`, `CreatedQuest.new()`, fields overwritten after), [[quest_Manager#_ready]] (`quest_Manager.gd:32`).
+**Called by:** [[hall_rules#build_day_quests]] (`hall_rules.gd:150`, `:152`, `:157`, `:160`), [[hall_rules#_build_boss_entries]] (`hall_rules.gd:192`), the `RefReader` inner class of [[hall_save]] (`hall_save.gd:467`, `CreatedQuest.new()`, fields overwritten after), [[quest_Manager#_ready]] (`quest_Manager.gd:32`).
 
 **Calls:** [[quest_resource#_initMilestoneVars]], [[external_content_container#get_Quest_Story]], [[region_resource#returnName]], [[quest_resource#_get_item_reward_chance]], [[quest_resource#_roll_reward_items]].
 
@@ -98,7 +98,7 @@ Scales only `goldReward` and `startingGoldReward` (rounded), leaving the stat re
 
 **Side effects:** writes the two gold fields.
 
-**Called by:** [[hall_rules#_scale_normal_quest]] (`hall_rules.gd:195`), [[quest_resource#apply_freeplay_scaling]] (`quest_resource.gd:250`).
+**Called by:** [[hall_rules#_scale_normal_quest]] (`hall_rules.gd:206`), [[quest_resource#apply_freeplay_scaling]] (`quest_resource.gd:250`).
 
 **Calls:** none.
 
@@ -116,7 +116,7 @@ The party's success chance in percent. The requirement is `(60 + 20 * difficulty
 
 **Side effects:** rebuilds each hero's `temp_stats` ([[character_resource#reset_temp_stats]]).
 
-**Called by:** [[hall_main#success_chance]] (`hall_main.gd:634`), [[hall_main#chance_added_by]] (`hall_main.gd:657`), [[quest_scoring#get_success_chance]] (`quest_scoring.gd:22`), [[quest_Manager#_ready]] (`quest_Manager.gd:40`).
+**Called by:** [[hall_main#success_chance]] (`hall_main.gd:648`), [[hall_main#chance_added_by]] (`hall_main.gd:671`), [[quest_scoring#get_success_chance]] (`quest_scoring.gd:22`), [[quest_Manager#_ready]] (`quest_Manager.gd:40`).
 
 **Calls:** [[quest_scoring#get_slot_count]], [[character_resource#reset_temp_stats]], [[character_resource#get_quest_stat]], [[quest_resource#region_favored_stat]], [[quest_resource#favored_components]].
 
@@ -161,7 +161,7 @@ The one or two stats a good-odds win can train: the trainable favored components
 
 **Side effects:** none.
 
-**Called by:** [[hall_main#trained_stat_options]] (`hall_main.gd:652`).
+**Called by:** [[hall_main#trained_stat_options]] (`hall_main.gd:666`).
 
 **Calls:** [[quest_resource#favored_components]], [[quest_resource#region_favored_stat]].
 
@@ -176,7 +176,7 @@ Picks the stat a good-odds win trains: a random trainable favored stat `trained_
 
 **Side effects:** consumes the global RNG.
 
-**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:394`).
+**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:405`).
 
 **Calls:** [[quest_resource#favored_components]], [[quest_resource#region_favored_stat]].
 
@@ -195,7 +195,7 @@ Plays the quest and returns the BBCode story. It rolls `_will_fail = randi_range
 
 **Side effects:** changes `goldReward`, `successfulChecks`, `questSummary`, `found_items`, `dead_adventurers`, the party's injuries; sets `numAdventurers`, `_will_fail`, `_starting_levels`.
 
-**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:361`), [[quest_Manager#_ready]] (`quest_Manager.gd:42`).
+**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:372`), [[quest_Manager#_ready]] (`quest_Manager.gd:42`).
 
 **Calls:** [[external_content_container#get_Quest_Story]], [[external_content_container#get_Minor_Story]], [[external_content_container#get_Milestone_story]], [[quest_resource#_combatEncounter]], [[quest_resource#_search]], [[quest_resource#_retreat]], [[quest_resource#pays_in_items]], [[quest_resource#_get_reward_item_names]], [[quest_resource#_get_found_items_lines]], [[quest_resource#_deathLines]].
 
@@ -376,7 +376,7 @@ True if the quest pays in equipment (`reward_items`) instead of gold.
 
 **Side effects:** none.
 
-**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:379`), [[quest_row#_show_quest_facts]] (`quest_row.gd:91`), [[quest_resource#generateResults]] (`quest_resource.gd:488`), [[quest_resource#get_reward_text]] (`quest_resource.gd:765`).
+**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:390`), [[quest_row#_show_quest_facts]] (`quest_row.gd:91`), [[quest_resource#generateResults]] (`quest_resource.gd:488`), [[quest_resource#get_reward_text]] (`quest_resource.gd:765`).
 
 **Calls:** none.
 
@@ -466,7 +466,7 @@ Fills in a boss quest read from the Milestone Story Parts rows (days 30, 40 and 
 ### _initMilestoneVars
 `func _initMilestoneVars(dayNum: int)` · `Scripts/Quest Creator/quest_resource.gd:831`
 
-Fills in a scripted quest for a day. Days 10, 20 and -20 (Bone Drake, resurrected drake, Necromancer) set the fields inline (style 2). Days 30, 40, -40 and 50 go through [[quest_resource#_init_boss_vars]]. Every other listed day (1, 2, 4, ... 48 and -18) reads a row of the minor story variables by a fixed day-to-row table (style 1: difficulty, slots, story row, region, gold, favored stat, title).
+Fills in a scripted quest for a day. Days 10, 20 and -20 (Bone Drake, resurrected drake, Necromancer) set the fields inline (style 2). Days 30, 40, -40 and 50 go through [[quest_resource#_init_boss_vars]]. Every other listed day reads a row of the minor story variables by a fixed day-to-row table (style 1: difficulty, slots, story row, region, gold, favored stat, title). The table: 1->0, 2->1, 4->2, 7->3, 9->4, 12->5, 15->6, 18->7, -18->8, 23->9, 26->10, 28->11, -28->12, 32->13, 34->14, 37->15, -37->16, 3737->17, 43->18, 45->19, -45->20, 48->21. A negative day is the second quest of a two-quest day, and 3737 is day 37's third quest (see [[hall_rules#build_day_quests]]).
 
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
@@ -482,7 +482,7 @@ Fills in a scripted quest for a day. Days 10, 20 and -20 (Bone Drake, resurrecte
 **Calls:** [[quest_resource#_init_boss_vars]], [[external_content_container#get_Milestone_story]], [[external_content_container#get_Minor_Story]], [[external_content_container#get_Minor_Story_Variables]], [[region_resource#returnName]].
 
 ### _deathLines
-`func _deathLines() -> String` · `Scripts/Quest Creator/quest_resource.gd:956`
+`func _deathLines() -> String` · `Scripts/Quest Creator/quest_resource.gd:953`
 
 One "succumbed to their injuries" line per hero in `dead_adventurers`, also appended to `questSummary`.
 
@@ -497,7 +497,7 @@ One "succumbed to their injuries" line per hero in `dead_adventurers`, also appe
 **Calls:** none.
 
 ### generatePartyDuo
-`func generatePartyDuo() -> Array[GuildCharacter]` · `Scripts/Quest Creator/quest_resource.gd:964`
+`func generatePartyDuo() -> Array[GuildCharacter]` · `Scripts/Quest Creator/quest_resource.gd:961`
 
 Makes two random heroes. Debug helper for [[quest_Manager#_ready]].
 

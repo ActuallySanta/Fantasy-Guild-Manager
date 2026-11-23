@@ -3,8 +3,8 @@ source: Scripts/UI/Shell/Header/hall_header.gd
 class_name: HallHeader
 extends: VBoxContainer
 scene: "[[hall_header (scene)]]"
-systems: ["[[Economy and Wallet]]", "[[UI Motion and Feedback]]", "[[UI Architecture and Refresh]]"]
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+systems: ["[[Economy and Wallet]]", "[[UI Motion and Feedback]]", "[[UI Architecture and Refresh]]", "[[Day Cycle]]", "[[Run End]]"]
+last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
 tags: [script]
 ---
 
@@ -27,6 +27,7 @@ The top of the screen: the DAY tile, the next-boss countdown note, the gold and 
 | `STANDING_MAX_FACTOR` | const | Cap on how far the font scale grows the standing box (1.5). |
 | `FLY_ICON_SIZE` / `FLY_SECONDS` | const | Size (px) and flight time (s) of flying coins and shields (44 / 0.5). |
 | `EARNINGS_COIN_COUNT` / `EARNINGS_COIN_GAP` / `EARNINGS_DELAY` | const | Coins that fly in at dawn (5), seconds between them (0.07) and before the first (0.2). |
+| `TROUBLE_TITLE`, `TROUBLE_FAILURES_TEXT`, `TROUBLE_INJURIES_TEXT` | const | The milder gold "Guild in trouble" strip: title, "%d quests lost in %d days..." text and "Half the guild is hurt..." text. |
 | `HEADER_*`, `DANGER_*`, `DELTA_GAIN`, `DELTA_LOSS` | const | Text formats for the day, countdown, danger strip and floating numbers. |
 | `hall` | var | The [[hall_main]] reference, set in `setup`. |
 | `_shown_counters` | var | Gold / standing number on screen now (-1 = not drawn yet). |
@@ -38,7 +39,7 @@ The top of the screen: the DAY tile, the next-boss countdown note, the gold and 
 ## Functions
 
 ### setup
-`func setup(main: HallMain) -> void` · `Scripts/UI/Shell/Header/hall_header.gd:119`
+`func setup(main: HallMain) -> void` · `Scripts/UI/Shell/Header/hall_header.gd:123`
 
 Stores the hall, wires the Menu button and the counter taps, and sets up the two popups.
 
@@ -51,12 +52,12 @@ Stores the hall, wires the Menu button and the counter taps, and sets up the two
 
 **Side effects:** connects `pressed` on `%MenuButton` to `hall.open_menu` ([[hall_main#open_menu]]); connects `gui_input` on `%GoldValueBox` and `%StandingValueBox` to [[hall_header#_on_counter_input]]; calls [[header_popup#setup]] on both popups.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[hall_header#_trim_drake_note_padding]], [[header_popup#setup]], [[hall_main#open_menu]].
 
 ### _trim_drake_note_padding
-`func _trim_drake_note_padding() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:131`
+`func _trim_drake_note_padding() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:135`
 
 Gives the boss note its own copy of the torn-paper style with `DRAKE_NOTE_PADDING_X/Y` padding (the shared style stays as it is).
 
@@ -64,12 +65,12 @@ Gives the boss note its own copy of the torn-paper style with `DRAKE_NOTE_PADDIN
 
 **Side effects:** `add_theme_stylebox_override("panel", ...)` on `%DrakeNote`.
 
-**Called by:** [[hall_header#setup]] (`hall_header.gd:122`).
+**Called by:** [[hall_header#setup]] (`hall_header.gd:126`).
 
 **Calls:** none.
 
 ### _refresh_drake_countdown
-`func _refresh_drake_countdown() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:147`
+`func _refresh_drake_countdown() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:151`
 
 The countdown to the next boss day: that boss quest's seal (BOSS, or FINAL for the last battle), then the days left over a "days" label. The number is always red; the label joins it at `DRAKE_WARNING_DAYS` or fewer.
 
@@ -77,12 +78,12 @@ The countdown to the next boss day: that boss quest's seal (BOSS, or FINAL for t
 
 **Side effects:** sets visibility, texts and colors of the drake nodes.
 
-**Called by:** [[hall_header#refresh]] (`hall_header.gd:173`).
+**Called by:** [[hall_header#refresh]] (`hall_header.gd:177`).
 
 **Calls:** [[hall_main#days_until_next_boss]], [[hall_main#next_boss_is_final]], [[hall_style#style_icon_tag]], [[hall_style#pick_plural]], [[hall_style#set_font_color]].
 
 ### refresh
-`func refresh() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:169`
+`func refresh() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:173`
 
 Redraws the day, the countdown, the counters and the danger strip, and refreshes any open popup.
 
@@ -90,12 +91,12 @@ Redraws the day, the countdown, the counters and the danger strip, and refreshes
 
 **Side effects:** resizes `%StandingValueBox` with [[hall_font_scale#px_vec]] (here, not in `setup`, so a text-size change follows).
 
-**Called by:** [[hall_main#refresh]] (`hall_main.gd:1767`, `_header.refresh()`).
+**Called by:** [[hall_main#refresh]] (`hall_main.gd:1792`, `_header.refresh()`).
 
 **Calls:** [[hall_font_scale#px_vec]], [[hall_header#_refresh_day_tile]], [[hall_header#_refresh_drake_countdown]], [[hall_header#_update_counter]], [[hall_header#_refresh_danger_strip]], [[header_popup#is_open]], [[popup_gold#refresh]], [[popup_standing#refresh]].
 
 ### _on_counter_input
-`func _on_counter_input(event: InputEvent, popup: HeaderPopup, anchor: Control) -> void` · `Scripts/UI/Shell/Header/hall_header.gd:183`
+`func _on_counter_input(event: InputEvent, popup: HeaderPopup, anchor: Control) -> void` · `Scripts/UI/Shell/Header/hall_header.gd:187`
 
 A left mouse press on the coin or shield drops its popup and closes the other one.
 
@@ -110,25 +111,25 @@ A left mouse press on the coin or shield drops its popup and closes the other on
 
 **Side effects:** [[header_popup#close]] on the other popup, [[header_popup#open]] on this one, `accept_event()`.
 
-**Called by:** `gui_input` on `%GoldValueBox` and `%StandingValueBox` (connected at `hall_header.gd:125` and `:126`).
+**Called by:** `gui_input` on `%GoldValueBox` and `%StandingValueBox` (connected at `hall_header.gd:129` and `:130`).
 
 **Calls:** [[header_popup#close]], [[header_popup#open]].
 
 ### _refresh_danger_strip
-`func _refresh_danger_strip() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:195`
+`func _refresh_danger_strip() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:199`
 
-Shows the red "last hero standing" strip only while the guild is one death from falling and the Game Over ledger isn't up.
+Shows the warning strip under the header. Red "last hero standing" while the guild is one death from falling (and the Game Over ledger isn't up). Otherwise, with no ledger up, a milder gold "Guild in trouble" strip when [[hall_main#trouble_reason]] is `"failures"` (text shows [[hall_main#recent_failures]] and `HallLedger.TROUBLE_WINDOW_DAYS`) or `"injuries"`. The red strip wins when both apply.
 
 **Returns:** nothing.
 
-**Side effects:** sets strip visibility, style and texts; plays `Sfx` `danger_warning` the moment it appears. Text depends on [[hall_ledger#is_short_of_recruit_gold]]: gold shortfall (price from `GuildCharacter.recruit_cost_for_day(GameState.day + 1)`) or low standing.
+**Side effects:** sets strip visibility, style and texts; plays `Sfx` `danger_warning` the moment it appears (either colour); the gold strip sets `GOLD_BG`, a `GOLD` icon and `GOLD_TEXT` title, the red one `RED_BG`/`RED`. Text depends on [[hall_ledger#is_short_of_recruit_gold]]: gold shortfall (price from `GuildCharacter.recruit_cost_for_day(GameState.day + 1)`) or low standing.
 
-**Called by:** [[hall_header#refresh]] (`hall_header.gd:176`).
+**Called by:** [[hall_header#refresh]] (`hall_header.gd:180`).
 
-**Calls:** [[hall_main#last_living_hero]], [[hall_main#is_one_death_from_falling]], [[hall_style#style_panel]], [[hall_style#set_font_color]], [[hall_ledger#is_short_of_recruit_gold]], [[character_resource#recruit_cost_for_day]].
+**Calls:** [[hall_main#last_living_hero]], [[hall_main#is_one_death_from_falling]], [[hall_main#trouble_reason]], [[hall_main#recent_failures]], [[hall_style#style_panel]], [[hall_style#set_font_color]], [[hall_ledger#is_short_of_recruit_gold]], [[character_resource#recruit_cost_for_day]].
 
 ### _refresh_day_tile
-`func _refresh_day_tile() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:217`
+`func _refresh_day_tile() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:233`
 
 Draws the day number. A new day flips the tile (the number changes edge-on, once the dawn wash has cleared) and, inside `DRAKE_WARNING_DAYS`, pulses the boss note.
 
@@ -136,23 +137,23 @@ Draws the day number. A new day flips the tile (the number changes edge-on, once
 
 **Side effects:** [[hall_fx#flip]] on `%DayTile`, [[hall_fx#pulse]] on `%DrakeNote`.
 
-**Called by:** [[hall_header#refresh]] (`hall_header.gd:172`).
+**Called by:** [[hall_header#refresh]] (`hall_header.gd:176`).
 
 **Calls:** [[hall_fx#flip]], [[hall_fx#pulse]], [[hall_main#days_until_next_boss]].
 
 ### hold_counters
-`func hold_counters() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:235`
+`func hold_counters() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:251`
 
 End Day: holds both counters still until [[hall_header#land_earnings]] at dawn.
 
 **Returns:** nothing. **Side effects:** sets `_held_counters` gold and standing to true.
 
-**Called by:** [[hall_main#end_day]] (`hall_main.gd:1520`, `_header.hold_counters()`).
+**Called by:** [[hall_main#end_day]] (`hall_main.gd:1538`, `_header.hold_counters()`).
 
 **Calls:** none.
 
 ### land_earnings
-`func land_earnings() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:243`
+`func land_earnings() -> void` · `Scripts/UI/Shell/Header/hall_header.gd:259`
 
 Dawn: releases the held counters. A gain flies in from the middle of the screen as a few coins / shields and the counter rolls up as the last one lands; a loss or no change just rolls.
 
@@ -160,12 +161,12 @@ Dawn: releases the held counters. A gain flies in from the middle of the screen 
 
 **Side effects:** per counter plays `coin_land` / `standing_land` through `Sfx.play` (reduced motion, one clink) or `Sfx.play_after` (per flying coin); [[hall_fx#fly]] up to `EARNINGS_COIN_COUNT` icons from the center of `hall.fx_layer`; the last one's landing calls [[hall_header#_release_counter]].
 
-**Called by:** [[hall_main#start_new_day]] (`hall_main.gd:1648`, `_header.land_earnings()`).
+**Called by:** [[hall_main#start_new_day]] (`hall_main.gd:1673`, `_header.land_earnings()`).
 
 **Calls:** [[hall_header#_counter_value]], [[hall_header#_counter_art]], [[hall_header#_release_counter]], [[hall_fx#fly]].
 
 ### pay_fx
-`func pay_fx(kind: String) -> void` · `Scripts/UI/Shell/Header/hall_header.gd:268`
+`func pay_fx(kind: String) -> void` · `Scripts/UI/Shell/Header/hall_header.gd:284`
 
 Gold or standing just paid for what the player tapped: a coin or shield flies from the counter to the tap point (the counter drops at once).
 
@@ -178,32 +179,32 @@ Gold or standing just paid for what the player tapped: a coin or shield flies fr
 
 **Side effects:** `Sfx` `gold_spend` or `standing_lose`; [[hall_fx#fly]] from the art to [[hall_main#tap_point]].
 
-**Called by:** [[hall_main#deny_quest]] (`hall_main.gd:1012`, `"standing"`), [[hall_main#hire]] (`:1094`, `"gold"`), [[hall_main#release]] (`:1136`, `"standing"`), [[hall_main#upgrade_building]] (`:1156`, `"gold"`), [[hall_main#buy_item]] (`:1176`, `"gold"`).
+**Called by:** [[hall_main#deny_quest]] (`hall_main.gd:1026`, `"standing"`), [[hall_main#hire]] (`:1108`, `"gold"`), [[hall_main#release]] (`:1150`, `"standing"`), [[hall_main#upgrade_building]] (`:1170`, `"gold"`), [[hall_main#buy_item]] (`:1190`, `"gold"`).
 
 **Calls:** [[hall_header#_counter_art]], [[hall_fx#fly]], [[hall_main#tap_point]].
 
 ### _counter_value
-`func _counter_value(kind: String) -> int` · `Scripts/UI/Shell/Header/hall_header.gd:274`
+`func _counter_value(kind: String) -> int` · `Scripts/UI/Shell/Header/hall_header.gd:290`
 
 **Returns:** `GameState.gold` for `"gold"`, else `GameState.standing`. **Called by:** [[hall_header#land_earnings]], [[hall_header#_update_counter]]. **Calls:** none.
 
 ### _counter_label
-`func _counter_label(kind: String) -> Label` · `Scripts/UI/Shell/Header/hall_header.gd:278`
+`func _counter_label(kind: String) -> Label` · `Scripts/UI/Shell/Header/hall_header.gd:294`
 
 **Returns:** `%GoldValue` or `%StandingValue`. **Called by:** [[hall_header#_update_counter]]. **Calls:** none.
 
 ### _counter_box
-`func _counter_box(kind: String) -> Control` · `Scripts/UI/Shell/Header/hall_header.gd:283`
+`func _counter_box(kind: String) -> Control` · `Scripts/UI/Shell/Header/hall_header.gd:299`
 
 The counter's box (what pops). **Returns:** `%GoldValueBox` or `%StandingValueBox`. **Called by:** [[hall_header#_update_counter]]. **Calls:** none.
 
 ### _counter_art
-`func _counter_art(kind: String) -> TextureRect` · `Scripts/UI/Shell/Header/hall_header.gd:287`
+`func _counter_art(kind: String) -> TextureRect` · `Scripts/UI/Shell/Header/hall_header.gd:303`
 
 The counter's art (coin / shield, what flies). **Returns:** `%Coin` or `%Shield`. **Called by:** [[hall_header#land_earnings]], [[hall_header#pay_fx]]. **Calls:** none.
 
 ### _update_counter
-`func _update_counter(kind: String) -> void` · `Scripts/UI/Shell/Header/hall_header.gd:294`
+`func _update_counter(kind: String) -> void` · `Scripts/UI/Shell/Header/hall_header.gd:310`
 
 Draws a counter. A changed value rolls, pops, flashes green (gain) or red (loss), and a "+40" / "-2" floats under it. A held counter (with a value already drawn) waits.
 
@@ -216,12 +217,12 @@ Draws a counter. A changed value rolls, pops, flashes green (gain) or red (loss)
 
 **Side effects:** updates `_shown_counters`; [[hall_fx#count]], [[hall_fx#pop]], [[hall_fx#flash_text]], [[hall_fx#float_text]] (on `hall.fx_layer`). First draw or an unchanged value only sets the text.
 
-**Called by:** [[hall_header#refresh]] (`hall_header.gd:174`, `:175`), [[hall_header#_release_counter]] (`:317`).
+**Called by:** [[hall_header#refresh]] (`hall_header.gd:178`, `:179`), [[hall_header#_release_counter]] (`:333`).
 
 **Calls:** [[hall_header#_counter_value]], [[hall_header#_counter_label]], [[hall_header#_counter_box]], [[hall_fx#count]], [[hall_fx#pop]], [[hall_fx#flash_text]], [[hall_fx#float_text]], [[hall_font_scale#px_vec]].
 
 ### _release_counter
-`func _release_counter(kind: String) -> void` · `Scripts/UI/Shell/Header/hall_header.gd:315`
+`func _release_counter(kind: String) -> void` · `Scripts/UI/Shell/Header/hall_header.gd:331`
 
 Lets a held counter catch up to the real value.
 
@@ -232,7 +233,7 @@ Lets a held counter catch up to the real value.
 
 **Returns:** nothing. **Side effects:** clears the held flag, then [[hall_header#_update_counter]].
 
-**Called by:** [[hall_header#land_earnings]] (`hall_header.gd:252`, directly; `:259`, bound as the last coin's landing callback).
+**Called by:** [[hall_header#land_earnings]] (`hall_header.gd:268`, directly; `:275`, bound as the last coin's landing callback).
 
 **Calls:** [[hall_header#_update_counter]].
 

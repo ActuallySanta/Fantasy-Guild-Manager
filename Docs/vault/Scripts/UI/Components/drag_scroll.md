@@ -33,7 +33,7 @@ Fixes every control inside every ScrollContainer under `root`.
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#refresh]] (`hall_main.gd:1773`, `DragScroll.fix_tree(self)`).
+**Called by:** [[hall_main#refresh]] (`hall_main.gd:1798`, `DragScroll.fix_tree(self)`).
 
 **Calls:** [[drag_scroll#_fix_children]].
 

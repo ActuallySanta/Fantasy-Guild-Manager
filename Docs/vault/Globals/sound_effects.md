@@ -3,7 +3,7 @@ source: Globals/sound_effects.gd
 class_name: null
 extends: Node
 scene: null
-systems: []
+systems: ["[[Boot and Autoload Order]]", "[[UI Motion and Feedback]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script, autoload]
 ---
@@ -50,7 +50,7 @@ Plays a sound now. Unknown names warn (in `_play_now`), and names with no file p
 
 **Returns:** nothing.
 
-**Called by:** [[sound_effects#play_after]] (line 135 when `seconds <= 0`), 43 sites in [[hall_main]] (for example [[hall_main#open_tab]] `hall_main.gd:745`, [[hall_main#hire]] `:1097`), 3 in [[hall_header]] (for example [[hall_header#land_earnings]]), and 1 in [[overlay_tutorial]].
+**Called by:** [[sound_effects#play_after]] (line 135 when `seconds <= 0`), 43 sites in [[hall_main]] (for example [[hall_main#open_tab]] `hall_main.gd:759`, [[hall_main#hire]] `:1111`), 3 in [[hall_header]] (for example [[hall_header#land_earnings]]), and 1 in [[overlay_tutorial]].
 
 **Calls:** [[sound_effects#_play_now]].
 
@@ -64,7 +64,7 @@ Plays a sound `seconds` from now, to line up with an animation. With `seconds <=
 | `sound_name` | `StringName` | A key of `SOUNDS` | literal in the caller |
 | `seconds` | `float` | Delay in seconds | the reveal animation's timing in [[report_entry#reveal]] and [[hall_header#land_earnings]] |
 
-**Called by:** [[report_entry#reveal]] (`report_entry.gd:291`, `:301`), [[hall_header#land_earnings]] (`hall_header.gd:261`).
+**Called by:** [[report_entry#reveal]] (`report_entry.gd:291`, `:301`), [[hall_header#land_earnings]] (`hall_header.gd:277`).
 
 **Calls:** [[sound_effects#play]], [[sound_effects#_play_now]].
 
@@ -73,7 +73,7 @@ Plays a sound `seconds` from now, to line up with an animation. With `seconds <=
 
 Drops every sound still waiting in `play_after` (for example the Day Report's reveal when the player skips ahead) by bumping `_schedule_batch`.
 
-**Called by:** [[hall_main#start_new_day]] (`hall_main.gd:1636`), [[hall_main#close_report]] (`hall_main.gd:1734`).
+**Called by:** [[hall_main#start_new_day]] (`hall_main.gd:1661`), [[hall_main#close_report]] (`hall_main.gd:1759`).
 
 ### has_sound
 `func has_sound(sound_name: StringName) -> bool` · `Globals/sound_effects.gd:150`

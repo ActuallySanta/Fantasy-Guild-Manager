@@ -4,7 +4,7 @@ class_name: ""
 extends: PanelContainer
 scene: "[[hire_card (scene)]]"
 systems: ["[[Hiring Characters]]", "[[UI Architecture and Refresh]]"]
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
 tags: [script]
 ---
 
@@ -16,7 +16,7 @@ One applicant on the Guild tab, written as a letter of introduction: who they ar
 ## State
 | Name | Kind | Meaning (units) |
 |---|---|---|
-| `TEXT_HIRE` | const | "Hire · %dg": hiring costs the recruit's price (`GuildCharacter.cost`) in gold. |
+| `TEXT_HIRE` | const | "Hire · %dg": hiring costs the recruit's price in gold ([[character_container#hire_price]]: the base `GuildCharacter.cost` plus the roster-size surcharge). |
 | `TEXT_HIRE_FREE` | const | Shown when cost is 0 (free on the first days). |
 | `TEXT_NO_BEDS` | const | Shown, with the button disabled, when the roster is full. |
 | `_portrait`, `_name`, `_role`, `_stat_columns`, `_total`, `_drop_cap`, `_blurb`, `_hire_button` | onready | Scene nodes `%Portrait` ([[portrait]]), `%Name`, `%Role`, `%Stats`, `%Total`, `%DropCap`, `%Blurb`, `%HireButton` ([[seal_button (scene)]]). |
@@ -50,7 +50,7 @@ Writes the letter: portrait, name, role, the five stat boxes and their quest-sta
 
 **Called by:** [[tab_guild#_show_for_hire]] (`tab_guild.gd:186`, `top_card.setup(hall, recruits[_top_letter], _top_letter)`).
 
-**Calls:** [[portrait#show_character]], [[hall_style#role_name]], [[hall_style#stat_value]], [[hall_style#quest_stat_total]], [[hall_style#clean_backstory]], [[hall_main#is_roster_full]].
+**Calls:** [[portrait#show_character]], [[hall_style#role_name]], [[hall_style#stat_value]], [[hall_style#quest_stat_total]], [[hall_style#clean_backstory]], [[hall_main#is_roster_full]], [[character_container#hire_price]] (button text: price in gold, or "Hire · free" when 0).
 
 ### _on_hire_pressed
 `func _on_hire_pressed(hall: HallMain, recruit: GuildCharacter) -> void` · `Scripts/UI/Rows/Heroes/hire_card.gd:65`

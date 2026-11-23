@@ -14,7 +14,7 @@ tags: [scene]
 The 'How to Play' sheet. Its authored rows are the Basics page (shown as 'Welcome, Guildmaster' on a fresh run with the tutorial off); the script wraps them into a topic menu and builds the other topic pages. See [[overlay_welcome]].
 
 ## Parent scenes
-- **Placed in editor:** [[hall_main (scene)]] at node `OverlayWelcome`. Shown or hidden by [[hall_main#_refresh_overlays]] (`hall_main.gd:1845`).
+- **Placed in editor:** [[hall_main (scene)]] at node `OverlayWelcome`. Shown or hidden by [[hall_main#_refresh_overlays]] (`hall_main.gd:1870`).
 - No runtime parents.
 
 ## Child scenes

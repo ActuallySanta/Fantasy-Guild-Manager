@@ -3,7 +3,7 @@ source: Scripts/UI/Shell/Header/popup_gold.gd
 class_name: ""
 extends: HeaderPopup
 scene: "[[popup_gold (scene)]]"
-systems: ["[[Economy and Wallet]]"]
+systems: ["[[Economy and Wallet]]", "[[UI Motion and Feedback]]", "[[UI Architecture and Refresh]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -37,7 +37,7 @@ Fills the card from the game: gold, the earnings box, the red recruit warning, a
 
 **Side effects:** sets label texts and price tag styles.
 
-**Called by:** [[header_popup#open]] (`header_popup.gd:72`), [[hall_header#refresh]] (`hall_header.gd:179`, while open).
+**Called by:** [[header_popup#open]] (`header_popup.gd:72`), [[hall_header#refresh]] (`hall_header.gd:183`, while open).
 
 **Calls:** [[popup_gold#_refresh_earnings]], [[hall_wallet#recruit_price]], [[character_resource#recruit_cost_for_day]], [[hall_ledger#is_short_of_recruit_gold]], [[hall_wallet#are_recruits_blocked]], [[hall_wallet#cheapest_gear_price]], [[hall_wallet#cheapest_upgrade]], [[popup_gold#_set_price]].
 

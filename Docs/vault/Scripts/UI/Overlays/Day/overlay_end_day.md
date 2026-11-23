@@ -3,7 +3,7 @@ source: Scripts/UI/Overlays/Day/overlay_end_day.gd
 class_name: ""
 extends: Control
 scene: "[[overlay_end_day (scene)]]"
-systems: ["[[Day Cycle]]", "[[UI Architecture and Refresh]]"]
+systems: ["[[Day Cycle]]", "[[UI Architecture and Refresh]]", "[[Party Drafting and Assignment]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -36,13 +36,13 @@ Stores the hall, connects the buttons and the dim, sets texts and styles the but
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `main` | `HallMain` | The hall | `self` in [[hall_main#_ready]] (`hall_main.gd:424`) |
+| `main` | `HallMain` | The hall | `self` in [[hall_main#_ready]] (`hall_main.gd:427`) |
 
 **Returns:** nothing.
 
 **Side effects:** connects `pressed` on `%BackButton` to [[hall_main#close_end_check]], `pressed` on `%EndButton` to [[hall_main#end_day]], and `gui_input` on `%Dim` to [[overlay_end_day#_on_dim_input]].
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[hall_style#style_button]].
 
@@ -53,7 +53,7 @@ Redraws the title, plan and suggestions from hall queries. Does nothing while `h
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1866`) while visible.
+**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1891`) while visible.
 
 **Calls:** [[overlay_end_day#_show_tonights_plan]], [[overlay_end_day#_show_upgrade_suggestions]].
 

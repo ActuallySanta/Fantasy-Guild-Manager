@@ -3,7 +3,7 @@ source: Scripts/UI/Shell/Header/popup_standing.gd
 class_name: ""
 extends: HeaderPopup
 scene: "[[popup_standing (scene)]]"
-systems: ["[[Economy and Wallet]]"]
+systems: ["[[Economy and Wallet]]", "[[UI Motion and Feedback]]", "[[UI Architecture and Refresh]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -37,7 +37,7 @@ Fills the card: the standing value and rank letter, the red half (room above the
 
 **Side effects:** sets label texts, `value` of `%LossBar` and `%GainBar`, and the warning's visibility.
 
-**Called by:** [[header_popup#open]] (`header_popup.gd:72`), [[hall_header#refresh]] (`hall_header.gd:179`, while open).
+**Called by:** [[header_popup#open]] (`header_popup.gd:72`), [[hall_header#refresh]] (`hall_header.gd:183`, while open).
 
 **Calls:** [[hall_wallet#standing_rank_letter]], [[hall_wallet#standing_above_floor]], [[hall_wallet#loss_fill]], [[hall_wallet#next_standing_milestone]], [[hall_wallet#gain_fill]], [[popup_standing#_milestone_text]], [[hall_ledger#is_standing_near_floor]], [[hall_style#count_text]].
 

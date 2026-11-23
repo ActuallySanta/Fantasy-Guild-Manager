@@ -16,7 +16,7 @@ One quest in the Day Report, written as a letter home: type seal, title, who sen
 ## State
 | Name | Kind | Meaning (units) |
 |---|---|---|
-| `opened` | signal | A folded letter was tapped open. Listener: `entry.opened.connect(hall.report_letter_opened)` ([[hall_main#report_letter_opened]]) in [[overlay_report#_show_entries]] (`overlay_report.gd:271`). |
+| `opened` | signal | A folded letter was tapped open. Listener: `entry.opened.connect(hall.report_letter_opened)` ([[hall_main#report_letter_opened]]) in [[overlay_report#_show_entries]] (`overlay_report.gd:289`). |
 | `BeatRowScene` | preload | `Scenes/Rows/Day End/beat_row.tscn` ([[beat_row (scene)]]), one per story line. |
 | `ChipScene` | preload | `Scenes/Components/chip.tscn` ([[chip (scene)]]), the story ribbon. |
 | `REVEAL_LETTER_SECONDS`, `REVEAL_STAMP_DELAY` | const | Seconds the letter takes to fade up, then before its stamp slams down (0.25, 0.18). |
@@ -55,7 +55,7 @@ Fills the whole letter from one quest result (`succeeded`, `quest`, `party`, `ch
 
 **Side effects:** connects `pressed` to [[report_entry#toggle_folded]] (everyday letters); adds hint nodes to the head.
 
-**Called by:** [[overlay_report#_show_entries]] (`overlay_report.gd:269`).
+**Called by:** [[overlay_report#_show_entries]] (`overlay_report.gd:287`).
 
 **Calls:** [[hall_style#is_story_quest]], [[hall_font_scale#px_vec]], [[hall_style#quest_type_info]], [[hall_style#style_icon_tag]], [[hall_style#join_names]], [[hall_style#tint_art]], [[hall_style#set_font_color]], [[hall_style#story_lines]], [[report_entry#_build_story_beats]], [[report_entry#_closing_text]], [[report_entry#_show_story_look]], [[report_entry#_add_fold_hint]], [[report_entry#set_folded]].
 
@@ -120,11 +120,11 @@ Plays this letter in, starting `delay` seconds from now: fade up, the Success / 
 |---|---|---|---|
 | `delay` | `float` | Seconds from now to start | running total `at` in [[overlay_report#_play_reveal]] |
 
-**Returns:** `float`, how long the reveal takes in seconds (0.0 with reduced motion), so the report can start the next letter. [[overlay_report#_play_reveal]] adds `reveal(at) * REVEAL_LETTER_OVERLAP` to its clock (`overlay_report.gd:192`).
+**Returns:** `float`, how long the reveal takes in seconds (0.0 with reduced motion), so the report can start the next letter. [[overlay_report#_play_reveal]] adds `reveal(at) * REVEAL_LETTER_OVERLAP` to its clock (`overlay_report.gd:196`).
 
 **Side effects:** [[hall_fx#fade_in]], [[hall_fx#stamp_in]], [[hall_fx#shake]] tweens; scheduled sounds `letter_success` / `letter_fail`, `hero_hurt`, `hero_died`, `item_found` via [[sound_effects#play_after]].
 
-**Called by:** [[overlay_report#_play_reveal]] (`overlay_report.gd:192`).
+**Called by:** [[overlay_report#_play_reveal]] (`overlay_report.gd:196`).
 
 **Calls:** [[hall_fx#fade_in]], [[hall_fx#stamp_in]], [[sound_effects#play_after]], [[hall_fx#shake]].
 

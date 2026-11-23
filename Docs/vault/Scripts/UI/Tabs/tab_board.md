@@ -40,7 +40,7 @@ Stores the hall and connects the three Today notes and the End Day button.
 
 **Side effects:** `pressed` on `%TodayRecruits` opens the Guild tab's hire section ([[hall_main#open_tab]] with `GUILD_SECTION_HIRE`); `pressed` on `%TodayQuests` runs [[tab_board#_on_today_quests_pressed]]; `pressed` on `%TodayUpgrades` opens the Upgrades tab's build section; `pressed` on `%EndDayButton` calls [[hall_main#open_end_check]].
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[hall_main#open_tab]], [[hall_main#open_end_check]].
 
@@ -49,23 +49,23 @@ Stores the hall and connects the three Today notes and the End Day button.
 
 Sets `scroll_vertical = 0`.
 
-**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1826`, `shown_view.scroll_to_top()` when the view key changes). **Calls:** none.
+**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1851`, `shown_view.scroll_to_top()` when the view key changes). **Calls:** none.
 
 ### end_day_button
 `func end_day_button() -> Button` · `Scripts/UI/Tabs/tab_board.gd:56`
 
 The End Day button, for Pip (the tutorial) to point at.
 
-**Returns:** `%EndDayButton`. Used by [[hall_main#end_day_button]] (`hall_main.gd:1838`), which the tutorial calls at `overlay_tutorial.gd:1019`.
+**Returns:** `%EndDayButton`. Used by [[hall_main#end_day_button]] (`hall_main.gd:1863`), which the tutorial calls at `overlay_tutorial.gd:1019`.
 
-**Called by:** [[hall_main#end_day_button]] (`hall_main.gd:1838`). **Calls:** none.
+**Called by:** [[hall_main#end_day_button]] (`hall_main.gd:1863`). **Calls:** none.
 
 ### refresh
 `func refresh() -> void` · `Scripts/UI/Tabs/tab_board.gd:60`
 
 Redraws the checklist, the quest list, and the End Day label (`"End Day <day>"`).
 
-**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1818`, `shown_view.refresh()` while the Board is the active tab).
+**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1843`, `shown_view.refresh()` while the Board is the active tab).
 
 **Calls:** [[tab_board#_show_today_checklist]], [[tab_board#_show_quest_list]].
 

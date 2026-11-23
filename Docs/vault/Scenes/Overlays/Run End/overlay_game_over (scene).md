@@ -14,7 +14,7 @@ tags: [scene]
 The Game Over ledger the player sees when the guild has no living hero and no affordable recruit: a Days tile, a grid of the run's numbers (with the Bone Drake result), the roll call, and "Found a New Guild". See [[overlay_game_over]].
 
 ## Parent scenes
-- **Placed in editor:** [[hall_main (scene)]] at node `OverlayGameOver`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1852`).
+- **Placed in editor:** [[hall_main (scene)]] at node `OverlayGameOver`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1877`).
 - No runtime parents.
 
 ## Child scenes

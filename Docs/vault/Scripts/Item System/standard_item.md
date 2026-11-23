@@ -3,7 +3,7 @@ source: Scripts/Item System/standard_item.gd
 class_name: StandardItem
 extends: Resource
 scene: null
-systems: []
+systems: ["[[Items and Shop]]", "[[Economy and Wallet]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script, resource]
 ---

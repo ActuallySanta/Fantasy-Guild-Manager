@@ -3,7 +3,7 @@ source: Scripts/UI/Overlays/Run End/overlay_credits.gd
 class_name: ""
 extends: Control
 scene: "[[overlay_credits (scene)]]"
-systems: ["[[Run End]]", "[[UI Motion and Feedback]]"]
+systems: ["[[Run End]]", "[[UI Motion and Feedback]]", "[[UI Architecture and Refresh]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -42,11 +42,11 @@ Stores the hall, connects `pressed` on `%ActionButton` to [[overlay_credits#_on_
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `main` | `HallMain` | The hall | `self` in `view.setup(self)` ([[hall_main#_ready]], `hall_main.gd:424`) |
+| `main` | `HallMain` | The hall | `self` in `view.setup(self)` ([[hall_main#_ready]], `hall_main.gd:427`) |
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[hall_style#style_button]], [[crawl_roll#setup]].
 
@@ -57,7 +57,7 @@ Builds the roll from `hall.shown_credits` once (nothing if empty or equal to `_b
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1866`) while visible (visible whenever `shown_credits` is non-empty, `hall_main.gd:1846-1847`).
+**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1891`) while visible (visible whenever `shown_credits` is non-empty, `hall_main.gd:1871-1847`).
 
 **Calls:** [[overlay_credits#_show_titles]], [[overlay_credits#_show_fight]], [[overlay_credits#_show_stats]], [[overlay_credits#_show_records]], [[overlay_credits#_show_roll_call]], [[overlay_credits#_show_team]], [[overlay_credits#_start_roll]].
 

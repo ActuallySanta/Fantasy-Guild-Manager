@@ -3,7 +3,7 @@ source: Scripts/Quest Creator/quest_scoring.gd
 class_name: QuestScoring
 extends: RefCounted
 scene: null
-systems: []
+systems: ["[[Party Drafting and Assignment]]", "[[Success Chance]]", "[[Quest Resolution and Injuries]]", "[[Economy and Wallet]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -36,7 +36,7 @@ The party's chance to win the quest, in percent. Forwards to [[quest_resource#ca
 
 **Side effects:** none directly (`calcSuccessChance` rebuilds the party's temp stats).
 
-**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:351`), [[hall_wallet#tonight_earnings]] (`hall_wallet.gd:112`).
+**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:362`), [[hall_wallet#tonight_earnings]] (`hall_wallet.gd:112`).
 
 **Calls:** [[quest_resource#calcSuccessChance]].
 
@@ -54,7 +54,7 @@ Whether a played-out quest was won: `not story.contains(FAIL_MARKER)`.
 
 **Side effects:** none.
 
-**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:362`).
+**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:373`).
 
 **Calls:** none.
 
@@ -73,7 +73,7 @@ How much gold the guild actually gets. A win pays the full `goldReward`. A loss 
 
 **Side effects:** none.
 
-**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:363`), [[hall_wallet#tonight_earnings]] (`hall_wallet.gd:114`, twice).
+**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:374`), [[hall_wallet#tonight_earnings]] (`hall_wallet.gd:114`, twice).
 
 **Calls:** none.
 
@@ -91,7 +91,7 @@ How many heroes a quest takes: its `maxAdventurers`, or `DEFAULT_PARTY_SIZE` whe
 
 **Side effects:** none.
 
-**Called by:** [[hall_main#party_size_limit]] (`hall_main.gd:627`), [[quest_resource#calcSuccessChance]] (`quest_resource.gd:264`).
+**Called by:** [[hall_main#party_size_limit]] (`hall_main.gd:641`), [[quest_resource#calcSuccessChance]] (`quest_resource.gd:264`).
 
 **Calls:** none.
 

@@ -39,19 +39,19 @@ Stores the hall, connects and labels the folder tabs, and sets up the two facili
 
 **Side effects:** `pressed` on `%SegTonight` / `%SegBuild` calls [[hall_main#show_upgrades_section]] with `UPGRADES_SECTION_TONIGHT` / `UPGRADES_SECTION_BUILD`; [[home_section#setup]] for the Training Yard (`GuildUpgrades.Building.TRAINING_YARD`) and the Hospital (`Building.HOSPITAL`).
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`). **Calls:** [[hall_main#show_upgrades_section]], [[home_section#setup]].
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`). **Calls:** [[hall_main#show_upgrades_section]], [[home_section#setup]].
 
 ### scroll_to_top
 `func scroll_to_top() -> void` · `Scripts/UI/Tabs/tab_upgrades.gd:65`
 
-Sets `%Scroll`'s `scroll_vertical` to 0. **Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1826`). **Calls:** none.
+Sets `%Scroll`'s `scroll_vertical` to 0. **Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1851`). **Calls:** none.
 
 ### refresh
 `func refresh() -> void` · `Scripts/UI/Tabs/tab_upgrades.gd:69`
 
 Shows the open section. Facilities refreshes both [[home_section]]s; Build redraws the wallet, building cards and coming-soon row.
 
-**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1818`).
+**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1843`).
 
 **Calls:** [[hall_main#affordable_buildings]], [[tab_upgrades#_show_section_buttons]], [[home_section#refresh]], [[tab_upgrades#_show_wallet]], [[tab_upgrades#_show_building_cards]], [[tab_upgrades#_show_coming_soon]].
 

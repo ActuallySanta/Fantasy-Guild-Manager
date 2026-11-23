@@ -14,7 +14,7 @@ tags: [scene]
 The Debug tools sheet reached from the Menu: a warning with Enable, the Save runs checkbox, Check for update, and the grouped cheats (Time, Wallet, Guild, Run). See [[overlay_debug]].
 
 ## Parent scenes
-- **Placed in editor:** [[hall_main (scene)]] at node `OverlayDebug`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1859`).
+- **Placed in editor:** [[hall_main (scene)]] at node `OverlayDebug`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1884`).
 - No runtime parents.
 
 ## Child scenes

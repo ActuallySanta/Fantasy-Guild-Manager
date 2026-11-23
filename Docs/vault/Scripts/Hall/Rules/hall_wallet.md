@@ -3,7 +3,7 @@ source: Scripts/Hall/Rules/hall_wallet.gd
 class_name: HallWallet
 extends: null
 scene: null
-systems: []
+systems: ["[[Success Chance]]", "[[Economy and Wallet]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
