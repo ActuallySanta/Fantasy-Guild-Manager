@@ -48,9 +48,9 @@ Stores the hall, sets up both sub-tabs, and connects the folder buttons.
 
 The Shop sub-tab (the tutorial points at its nodes).
 
-**Returns:** `%TabShop`. Used by the tutorial's target lambdas for the shop's `Grid` and `BuyButton` ([[overlay_tutorial]], `overlay_tutorial.gd:1099`, `:1102`).
+**Returns:** `%TabShop`. Used by the tutorial's target lambdas for the shop's `Grid` and `BuyButton` ([[overlay_tutorial]], `overlay_tutorial.gd:1133`, `:1136`).
 
-**Called by:** [[overlay_tutorial]] (`overlay_tutorial.gd:1099`, `:1102`, on `_tab("shop")`). **Calls:** none.
+**Called by:** [[overlay_tutorial]] (`overlay_tutorial.gd:1133`, `:1136`, on `_tab("shop")`). **Calls:** none.
 
 ### pack_view
 `func pack_view() -> Control` · `Scripts/UI/Tabs/tab_items.gd:51`

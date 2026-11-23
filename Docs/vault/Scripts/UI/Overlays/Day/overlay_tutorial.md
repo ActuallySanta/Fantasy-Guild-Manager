@@ -4,7 +4,7 @@ class_name: OverlayTutorial
 extends: Control
 scene: ""
 systems: ["[[UI Architecture and Refresh]]"]
-last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
+last_verified: 09fb5be52b944b5c58c0af1ab3e1c06c0e747443
 tags: [script]
 ---
 
@@ -15,7 +15,7 @@ The tutorial coach: Pip the guild clerk walks a new player through the real hall
 
 **Steps** are dictionaries: `text` (String or Callable, BBCode), `do` (instruction line), `target` (Callable returning the Control to spotlight), `on` (the `tutorial_event` name that finishes the step; absent = Next button), `when` (Callable(data) -> bool that must hold), `reject` (toast when `on` fires but `when` is false; the opened screen is closed again), `skip` (Callable -> bool checked when the step comes up), `tap` (spotlit control usable on a Next step), `deny` (node names inside the spotlight kept disabled), `bare` (no bubble, only ring and arrow), `free` (hall fully usable, no dim, no Pip). If a target can't be found for `MISSING_GRACE` seconds, Next appears so the player can't get stuck.
 
-**Events** come from `hall_main.tutorial_event(event, data)`: tab, hire, character, close, assign, pick, send, deny, end_check, end_day, read_letter, new_day, upgrade, training_picker, train, admit, buy, equip, freeplay (also game_over). Listeners of that signal: this script (`overlay_tutorial.gd:236`) and `run_logger.gd:89`.
+**Events** come from `hall_main.tutorial_event(event, data)`: tab, hire, character, close, assign, pick, send, deny, end_check, end_day, read_letter, new_day, upgrade, training_picker, train, admit, buy, equip, freeplay (also game_over). Listeners of that signal: this script (`overlay_tutorial.gd:248`) and `run_logger.gd:89`.
 
 **Tab and feature pacing:** Guild and Items tabs are locked by day in every run ([[hall_main#is_tab_locked]]); while the tutorial is on, Applicants, hero pages and Deny stay locked until `UNLOCK_DAY` (day 2). Skip tutorial lifts the feature locks but not the tab locks.
 
@@ -32,6 +32,7 @@ The tutorial coach: Pip the guild clerk walks a new player through the real hall
 | `TUTORIAL_Z_INDEX` | const | Draw order (20), above overlays and raised tab art. |
 | `RING_COLOR` | const | Gold of the ring and arrow. |
 | `HOLE_PAD`, `BUBBLE_MARGIN`, `BUBBLE_CLEARANCE` | const | Spotlight padding, bubble screen margin, and gap kept between bubble and spotlight (px). |
+| `DOCK_HYSTERESIS` | const | 20.0 design px. How far the spotlight must move past a dock cut-off before Pip changes side or shape mid-step. Without it, a spotlight the player scrolled to sit right on a cut-off flipped Pip top <-> bottom every frame. Used in [[overlay_tutorial#_layout]]; guarded by `tools/tests/tutorial_dock_test.gd`. |
 | `MISSING_GRACE` | const | Seconds a target may be missing before Next shows. |
 | `LOCK_INTERVAL` | const | Seconds between re-disabling outside buttons (the hall rebuilds rows on refresh). |
 | `DIM_COLOR` | const | Translucent black wash (alpha 0.55). |
@@ -47,6 +48,8 @@ The tutorial coach: Pip the guild clerk walks a new player through the real hall
 | `_missing_for`, `_last_target`, `_time`, `_shake_until`, `_shown_text`, `_lock_timer` | var | Per-frame step state. |
 | `_locked` | var | Buttons this coach disabled, mapped to their own `disabled` value. |
 | `_dock_bottom`, `_dock_forced`, `_expanded`, `_bubble_goal` | var | Bubble docking state. |
+| `_shown_full` | var (bool) | Pip's full bubble (not the chip) was docked clear of a spotlight last frame. Set at the end of [[overlay_tutorial#_layout]], cleared in [[overlay_tutorial#_reset_step]]. |
+| `_dock_settled` | var (bool) | Pip has picked a side for this step's spotlight; from then on the dock cut-offs are sticky (`DOCK_HYSTERESIS`). Set in `_layout` once a spotlight has area, cleared in `_reset_step`. |
 | `_history`, `_forward`, `_reached` | var | Back/Next retracing and the furthest step reached (earlier steps are read-only). |
 | `_blockers`, `_cover`, `_ring`, `_pointer`, `_bubble`, `_face`, `_counter`, `_text`, `_do_label`, `_hint`, `_next_button`, `_back_button`, `_skip_button` | var | Nodes built in `_build`. |
 
@@ -55,7 +58,7 @@ No signals declared.
 ## Functions
 
 ### setup
-`func setup(main: Control) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:228`
+`func setup(main: Control) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:240`
 
 Stores the hall, fills the screen, builds the nodes, hides itself, and listens to `tutorial_event`. On a fresh Day 1 run (not resumed) it also turns the Welcome card off and starts the Day 1 script, unless the intro crawl is open (then [[hall_main#close_intro]] calls `resume_today`).
 
@@ -73,7 +76,7 @@ Stores the hall, fills the screen, builds the nodes, hides itself, and listens t
 **Calls:** [[overlay_tutorial#_build]], [[hall_main#is_intro_open]], [[overlay_tutorial#start]].
 
 ### resume_today
-`func resume_today() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:249`
+`func resume_today() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:261`
 
 After a saved run loads (or the intro closes): if today has a tutorial script not yet done, run it from its first step. Does nothing when disabled, skipped, not a tutorial day, already done or running, while the intro is open, or while a report, credits, Game Over or boss crawl is up.
 
@@ -84,7 +87,7 @@ After a saved run loads (or the intro closes): if today has a tutorial script no
 **Calls:** [[overlay_tutorial#_is_tutorial_day]], [[overlay_tutorial#_script_for_day]], [[overlay_tutorial#is_running]], [[hall_main#is_intro_open]], [[overlay_tutorial#start]] (deferred).
 
 ### is_locked
-`func is_locked(feature: String) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:263`
+`func is_locked(feature: String) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:275`
 
 True while the tutorial holds `feature` back: enabled, not skipped, the feature is in `UNLOCK_DAY`, and `GameState.day` is earlier than its day.
 
@@ -98,7 +101,7 @@ True while the tutorial holds `feature` back: enabled, not skipped, the feature 
 **Called by:** [[hall_main#is_locked]] (`hall_main.gd:699`).
 
 ### _is_tutorial_day
-`func _is_tutorial_day(day: int) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:271`
+`func _is_tutorial_day(day: int) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:283`
 
 True if `day` is in `TUTORIAL_DAYS` or equals `GuildUpgrades.UNLOCK_DAY`.
 
@@ -112,7 +115,7 @@ True if `day` is in `TUTORIAL_DAYS` or equals `GuildUpgrades.UNLOCK_DAY`.
 **Called by:** [[overlay_tutorial#resume_today]], [[overlay_tutorial#_on_event]].
 
 ### _script_for_day
-`func _script_for_day(day: int) -> int` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:277`
+`func _script_for_day(day: int) -> int` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:289`
 
 The script key for `day`: `GUILD_SCRIPT` on `GuildUpgrades.UNLOCK_DAY`, otherwise the day itself. It is also the key in `done`.
 
@@ -126,7 +129,7 @@ The script key for `day`: `GUILD_SCRIPT` on `GuildUpgrades.UNLOCK_DAY`, otherwis
 **Called by:** [[overlay_tutorial#resume_today]], [[overlay_tutorial#_on_event]].
 
 ### is_running
-`func is_running() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:281`
+`func is_running() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:293`
 
 True while a script is active (`_index >= 0`).
 
@@ -135,7 +138,7 @@ True while a script is active (`_index >= 0`).
 **Called by:** [[hall_main#debug_skip_tutorial]] (`hall_main.gd:1493`); [[hall_main#_show_final_credits]] (`hall_main.gd:1601`); [[hall_main#_check_run_over]] (`hall_main.gd:1690`); [[overlay_debug#refresh]] (`overlay_debug.gd:148`, `:150`, which enables its tutorial and intro buttons); [[overlay_tutorial#resume_today]], [[overlay_tutorial#_on_event]], [[overlay_tutorial#_process]].
 
 ### start
-`func start(day: int, script: int = day) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:288`
+`func start(day: int, script: int = day) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:300`
 
 Runs a script: resets step state, shows the overlay, enables `_process`, parks the bubble below the screen and advances to the first step.
 
@@ -147,12 +150,12 @@ Runs a script: resets step state, shows the overlay, enables `_process`, parks t
 
 **Returns:** nothing.
 
-**Called by:** [[overlay_tutorial#setup]] (`overlay_tutorial.gd:242`, deferred), [[overlay_tutorial#resume_today]] (`:258`, deferred), [[overlay_tutorial#_on_event]] (`:366`, `:372`).
+**Called by:** [[overlay_tutorial#setup]] (`overlay_tutorial.gd:254`, deferred), [[overlay_tutorial#resume_today]] (`:270`, deferred), [[overlay_tutorial#_on_event]] (`:380`, `:386`).
 
 **Calls:** [[overlay_tutorial#_steps_for]], [[overlay_tutorial#_advance]].
 
 ### _advance
-`func _advance() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:303`
+`func _advance() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:315`
 
 Moves to the next step: records history, retraces `_forward` after a Back, otherwise skips steps whose `skip` returns true, and finishes after the last.
 
@@ -163,7 +166,7 @@ Moves to the next step: records history, retraces `_forward` after a Back, other
 **Calls:** [[overlay_tutorial#_reset_step]], [[overlay_tutorial#_finish]].
 
 ### _go_back
-`func _go_back() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:321`
+`func _go_back() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:333`
 
 Shows the previous step again, read-only.
 
@@ -174,7 +177,7 @@ Shows the previous step again, read-only.
 **Calls:** [[overlay_tutorial#_reset_step]].
 
 ### _is_reviewing
-`func _is_reviewing() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:330`
+`func _is_reviewing() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:342`
 
 True when the current step is before the furthest reached (its action is already done).
 
@@ -183,16 +186,16 @@ True when the current step is before the furthest reached (its action is already
 **Called by:** [[overlay_tutorial#_on_event]], [[overlay_tutorial#_is_free]], [[overlay_tutorial#_is_live]], [[overlay_tutorial#_layout]].
 
 ### _reset_step
-`func _reset_step() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:334`
+`func _reset_step() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:346`
 
-Clears the per-step state (missing timer, last target, shown text, dock force, expanded chip, lock timer).
+Clears the per-step state (missing timer, last target, shown text, dock force, expanded chip, `_shown_full`, `_dock_settled`, lock timer).
 
 **Returns:** nothing.
 
 **Called by:** [[overlay_tutorial#_advance]], [[overlay_tutorial#_go_back]].
 
 ### _finish
-`func _finish() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:343`
+`func _finish() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:357`
 
 Marks the script `done`, goes idle, hides, stops processing, releases locks and asks the hall for a refresh.
 
@@ -205,7 +208,7 @@ Marks the script `done`, goes idle, hides, stops processing, releases locks and 
 **Calls:** [[overlay_tutorial#_release_locks]], [[hall_main#queue_refresh]].
 
 ### skip_tutorial
-`func skip_tutorial() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:353`
+`func skip_tutorial() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:367`
 
 Sets `is_skipped` (which also lifts the feature locks) and finishes the running script.
 
@@ -216,7 +219,7 @@ Sets `is_skipped` (which also lifts the feature locks) and finishes the running 
 **Calls:** [[overlay_tutorial#_finish]].
 
 ### _on_event
-`func _on_event(event: String, data: Variant = null) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:358`
+`func _on_event(event: String, data: Variant = null) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:372`
 
 Handles every `tutorial_event`. Records it in `_seen`; remembers a bought item; starts the day's script on `new_day` (tutorial days not yet done) and the freeplay script on `freeplay` (even after Skip). Otherwise, if the current step waits for this event and its `when` holds, advances; if `when` fails and the step has `reject`, shows an error toast and closes the screen.
 
@@ -228,12 +231,12 @@ Handles every `tutorial_event`. Records it in `_seen`; remembers a bought item; 
 
 **Returns:** nothing.
 
-**Called by:** signal `tutorial_event` on [[hall_main]] (connected in [[overlay_tutorial#setup]], `overlay_tutorial.gd:236`).
+**Called by:** signal `tutorial_event` on [[hall_main]] (connected in [[overlay_tutorial#setup]], `overlay_tutorial.gd:248`).
 
 **Calls:** [[overlay_tutorial#start]], [[overlay_tutorial#_finish]], [[overlay_tutorial#_advance]], [[hall_main#show_error_toast]], [[hall_main#close_screen]] (deferred).
 
 ### _process
-`func _process(delta: float) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:389`
+`func _process(delta: float) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:403`
 
 Engine callback each frame while a script runs. Finds the step's target (must be a valid, visible Control), scrolls it into view when it changes, counts how long it has been missing, re-applies or releases button locks every `LOCK_INTERVAL`, then lays out.
 
@@ -249,7 +252,7 @@ Engine callback each frame while a script runs. Finds the step's target (must be
 **Calls:** [[overlay_tutorial#is_running]], [[overlay_tutorial#_scroll_into_view]], [[overlay_tutorial#_is_free]], [[overlay_tutorial#_release_locks]], [[overlay_tutorial#_apply_locks]], [[overlay_tutorial#_layout]].
 
 ### _is_free
-`func _is_free(step: Dictionary) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:421`
+`func _is_free(step: Dictionary) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:435`
 
 A `free` step (no dim, no locks, no Pip). A step re-read after Back is never free.
 
@@ -263,7 +266,7 @@ A `free` step (no dim, no locks, no Pip). A step re-read after Back is never fre
 **Called by:** [[overlay_tutorial#_process]], [[overlay_tutorial#_layout]].
 
 ### _is_live
-`func _is_live(step: Dictionary) -> bool`  · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:426`
+`func _is_live(step: Dictionary) -> bool`  · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:440`
 
 Is the spotlit control meant to be used: not reviewing, and the step has `on` or `tap`.
 
@@ -277,7 +280,7 @@ Is the spotlit control meant to be used: not reviewing, and the step has `on` or
 **Called by:** [[overlay_tutorial#_apply_locks]], [[overlay_tutorial#_layout]].
 
 ### _apply_locks
-`func _apply_locks(step: Dictionary, target: Control) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:435`
+`func _apply_locks(step: Dictionary, target: Control) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:449`
 
 Disables every button in the hall except those inside a live spotlight (and not named in `deny`), remembering each button's own `disabled` value in `_locked`. If the hall re-enabled a locked button in a refresh, that becomes its remembered state. Rows that are tap panels are stopped by the dim blockers instead.
 
@@ -296,7 +299,7 @@ Disables every button in the hall except those inside a live spotlight (and not 
 **Calls:** [[overlay_tutorial#_is_live]], [[overlay_tutorial#_collect_buttons]].
 
 ### _collect_buttons
-`func _collect_buttons(node: Node, out: Array) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:458`
+`func _collect_buttons(node: Node, out: Array) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:472`
 
 Appends every `BaseButton` under `node` to `out`, skipping this overlay and any `CanvasLayer`.
 
@@ -311,21 +314,21 @@ Appends every `BaseButton` under `node` to `out`, skipping this overlay and any 
 **Called by:** [[overlay_tutorial#_apply_locks]] (and itself).
 
 ### _is_enabled
-`func _is_enabled(button: BaseButton) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:468`
+`func _is_enabled(button: BaseButton) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:482`
 
 A button's own enabled state, ignoring this coach's locks.
 
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `button` | `BaseButton` | A button | the filter callables in the Guild script's steps (`overlay_tutorial.gd:1073`, `:1081`) |
+| `button` | `BaseButton` | A button | the filter callables in the Guild script's steps (`overlay_tutorial.gd:1107`, `:1115`) |
 
 **Returns:** `bool`. Used as a `_row` filter so the step points at an enabled button.
 
 **Called by:** the target/filter lambdas in [[overlay_tutorial#_day_three]].
 
 ### _release_locks
-`func _release_locks() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:472`
+`func _release_locks() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:486`
 
 Restores every locked button's own `disabled` value and clears `_locked`.
 
@@ -334,9 +337,9 @@ Restores every locked button's own `disabled` value and clears `_locked`.
 **Called by:** [[overlay_tutorial#_finish]], [[overlay_tutorial#_process]] (free steps).
 
 ### _layout
-`func _layout(step: Dictionary, target: Control, delta: float) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:480`
+`func _layout(step: Dictionary, target: Control, delta: float) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:494`
 
-Per frame: computes the spotlight hole, positions the four dim blockers around it (none on free steps), the cover over explain-only holes, and the pulsing ring; sets the bubble's text, counter ("Day N · i/n"), instruction line and Next/Back text; picks the top or bottom dock clear of the hole (or shrinks to a chip); glides the bubble there (with a shake after a blocked tap); and places the arrow just outside the hole.
+Per frame: computes the spotlight hole, positions the four dim blockers around it (none on free steps), the cover over explain-only holes, and the pulsing ring; sets the bubble's text, counter ("Day N · i/n"), instruction line and Next/Back text; picks the top or bottom dock clear of the hole (or shrinks to a chip), with hysteresis so scrolling inside a live spotlight can't make Pip flicker; glides the bubble there (with a shake after a blocked tap); and places the arrow just outside the hole.
 
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
@@ -353,8 +356,15 @@ Per frame: computes the spotlight hole, positions the four dim blockers around i
 
 **Calls:** [[overlay_tutorial#_is_free]], [[overlay_tutorial#_is_reviewing]], [[overlay_tutorial#_is_live]], [[overlay_tutorial#_set_rect]], [[overlay_tutorial#_set_compact]], [[overlay_tutorial#_measure_bubble]].
 
+> [!note] Dock hysteresis (new)
+> Pip's bubble can sit at the top or bottom, in full or as a small chip. Every cut-off is sticky by `DOCK_HYSTERESIS` (20 px):
+> - **Full bubble clear test:** a side counts as clear when its rect misses the spotlight grown by `BUBBLE_CLEARANCE`. The side Pip already sits on in full (`_shown_full`) only needs the smaller gap `BUBBLE_CLEARANCE - DOCK_HYSTERESIS`, so it stays put; a new side needs the whole clearance.
+> - **Choosing a side:** `margin` is `DOCK_HYSTERESIS` once `_dock_settled`, else 0 (a new step picks freely). If only the other side is clear Pip moves there. If both are clear Pip moves only when the spotlight's centre is more than `margin` px into Pip's own half of the screen.
+> - **Chip corner (neither side clear):** Pip changes corner only when the other corner overlaps the spotlight by clearly less (by a `DOCK_HYSTERESIS`-tall strip of the chip), or on the first frame of a step when it's merely less.
+> - At the end, `_shown_full = hole.has_area() and fits` and `_dock_settled |= hole.has_area()`.
+
 ### _set_compact
-`func _set_compact(is_compact: bool) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:601`
+`func _set_compact(is_compact: bool) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:633`
 
 Full bubble or a chip (Pip plus the instruction): hides text, counter and Skip when compact and sets the hint text.
 
@@ -368,7 +378,7 @@ Full bubble or a chip (Pip plus the instruction): hides text, counter and Skip w
 **Called by:** [[overlay_tutorial#_layout]].
 
 ### _measure_bubble
-`func _measure_bubble(width: float) -> float`  · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:611`
+`func _measure_bubble(width: float) -> float`  · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:643`
 
 Sets the bubble's width and returns its minimum height.
 
@@ -382,7 +392,7 @@ Sets the bubble's width and returns its minimum height.
 **Called by:** [[overlay_tutorial#_layout]].
 
 ### _set_rect
-`func _set_rect(control: Control, rect: Rect2) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:616`
+`func _set_rect(control: Control, rect: Rect2) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:648`
 
 Sets a control's position and size, visible only when the rect has area.
 
@@ -397,7 +407,7 @@ Sets a control's position and size, visible only when the rect has area.
 **Called by:** [[overlay_tutorial#_layout]].
 
 ### _scroll_into_view
-`func _scroll_into_view(target: Control) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:623`
+`func _scroll_into_view(target: Control) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:655`
 
 Walks up from the target to the first `ScrollContainer` below the hall and centres the target in it (deferred).
 
@@ -413,7 +423,7 @@ Walks up from the target to the first `ScrollContainer` below the hall and centr
 **Calls:** [[overlay_tutorial#_center_in_scroll]] (deferred).
 
 ### _center_in_scroll
-`func _center_in_scroll(scroll: ScrollContainer, target: Control) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:632`
+`func _center_in_scroll(scroll: ScrollContainer, target: Control) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:664`
 
 Sets `scroll.scroll_vertical` so the target sits in the middle (skips freed nodes).
 
@@ -428,7 +438,7 @@ Sets `scroll.scroll_vertical` so the target sits in the middle (skips freed node
 **Called by:** [[overlay_tutorial#_scroll_into_view]] (deferred).
 
 ### _on_blocked_input
-`func _on_blocked_input(event: InputEvent) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:639`
+`func _on_blocked_input(event: InputEvent) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:671`
 
 A tap on the dim or cover makes the bubble shake for 0.35 s.
 
@@ -444,7 +454,7 @@ A tap on the dim or cover makes the bubble shake for 0.35 s.
 **Calls:** [[overlay_tutorial#_is_press]].
 
 ### _on_face_input
-`func _on_face_input(event: InputEvent) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:646`
+`func _on_face_input(event: InputEvent) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:678`
 
 Tap Pip: opens the compact chip, or (only with `PIP_CAN_MOVE`) swaps top and bottom; otherwise closes an opened chip.
 
@@ -460,7 +470,7 @@ Tap Pip: opens the compact chip, or (only with `PIP_CAN_MOVE`) swaps top and bot
 **Calls:** [[overlay_tutorial#_is_press]].
 
 ### _is_press
-`func _is_press(event: InputEvent) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:660`
+`func _is_press(event: InputEvent) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:692`
 
 True for a left mouse press or a screen touch press.
 
@@ -474,7 +484,7 @@ True for a left mouse press or a screen touch press.
 **Called by:** [[overlay_tutorial#_on_blocked_input]], [[overlay_tutorial#_on_face_input]].
 
 ### _build
-`func _build() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:665`
+`func _build() -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:697`
 
 Builds every node in code: four dim blockers, the cover, the gold ring (stamp stylebox), the arrow `Pointer`, and Pip's bubble (portrait, hint, name, step counter, rich text, instruction label, Back / Next / Skip tutorial buttons).
 
@@ -487,7 +497,7 @@ Builds every node in code: four dim blockers, the cover, the gold ring (stamp st
 **Calls:** [[overlay_tutorial#_build_portrait]], [[hall_style#tint_art]], [[hall_style#set_look]], [[hall_style#style_button]], [[hall_font_scale#set_size]], [[hall_style#set_font_color]].
 
 ### _build_portrait
-`func _build_portrait() -> Control` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:803`
+`func _build_portrait() -> Control` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:835`
 
 Pip's portrait: art on the round mask (parchment ground, clipped by [[hall_style#mask_to]]), with the round frame on top, like the heroes' portraits.
 
@@ -498,7 +508,7 @@ Pip's portrait: art on the round mask (parchment ground, clipped by [[hall_style
 **Calls:** [[hall_style#tint_art]], [[hall_style#mask_to]].
 
 ### Pointer._draw
-`func _draw() -> void` (inner class `Pointer extends Control`) · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:849`
+`func _draw() -> void` (inner class `Pointer extends Control`) · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:881`
 
 Draws the left-pointing arrow icon rotated to point down (`points_down`) or up, tinted gold. `Pointer` has the vars `points_down`, `arrow`, `tint`.
 
@@ -507,7 +517,7 @@ Draws the left-pointing arrow icon rotated to point down (`points_down`) or up, 
 **Called by:** the engine (redraw requested by `_layout` via `queue_redraw`).
 
 ### _tab
-`func _tab(tab_id: String) -> Node` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:861`
+`func _tab(tab_id: String) -> Node` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:893`
 
 The hall's tab node for `tab_id` (reads `hall._tabs`).
 
@@ -521,7 +531,7 @@ The hall's tab node for `tab_id` (reads `hall._tabs`).
 **Called by:** [[overlay_tutorial#_training_section]], [[overlay_tutorial#_hospital_section]], and the step lambdas in [[overlay_tutorial#_day_one]], [[overlay_tutorial#_day_two]], [[overlay_tutorial#_day_three]], [[overlay_tutorial#_day_five]].
 
 ### _screen
-`func _screen(kind: String) -> Node` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:865`
+`func _screen(kind: String) -> Node` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:897`
 
 The hall's screen node for `kind` ("assign", "character"; reads `hall._screens`).
 
@@ -535,7 +545,7 @@ The hall's screen node for `kind` ("assign", "character"; reads `hall._screens`)
 **Called by:** step lambdas in [[overlay_tutorial#_day_one]], [[overlay_tutorial#_day_two]], [[overlay_tutorial#_day_five]].
 
 ### _nav
-`func _nav(tab_id: String) -> Control` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:869`
+`func _nav(tab_id: String) -> Control` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:901`
 
 A nav button via [[hall_main#nav_button]].
 
@@ -551,7 +561,7 @@ A nav button via [[hall_main#nav_button]].
 **Calls:** [[hall_main#nav_button]].
 
 ### _u
-`func _u(node: Node, unique_name: String) -> Control` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:874`
+`func _u(node: Node, unique_name: String) -> Control` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:906`
 
 A scene-unique node (`%Name`) inside `node`'s scene, or null.
 
@@ -566,7 +576,7 @@ A scene-unique node (`%Name`) inside `node`'s scene, or null.
 **Called by:** [[overlay_tutorial#_row]], [[overlay_tutorial#_training_section]], [[overlay_tutorial#_hospital_section]], step lambdas.
 
 ### _row
-`func _row(root: Node, script_file: String, unique_child := "", filter := Callable()) -> Control` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:882`
+`func _row(root: Node, script_file: String, unique_child := "", filter := Callable()) -> Control` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:914`
 
 Breadth-first search under `root` for the first visible control whose script file name is `script_file` (e.g. `member_card.gd`), or its `%unique_child`, that passes `filter`.
 
@@ -585,7 +595,7 @@ Breadth-first search under `root` for the first visible control whose script fil
 **Calls:** [[overlay_tutorial#_u]].
 
 ### _report
-`func _report() -> Node` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:898`
+`func _report() -> Node` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:930`
 
 The Day Report overlay (`hall.get_node("%OverlayReport")`, i.e. [[overlay_report (scene)]]).
 
@@ -594,7 +604,7 @@ The Day Report overlay (`hall.get_node("%OverlayReport")`, i.e. [[overlay_report
 **Called by:** [[overlay_tutorial#_report_letter]], [[overlay_tutorial#_day_one]].
 
 ### _report_letter
-`func _report_letter(folded: bool) -> Control` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:904`
+`func _report_letter(folded: bool) -> Control` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:936`
 
 The first everyday (non-story) letter in the report that is folded (`folded` true) or open.
 
@@ -610,7 +620,7 @@ The first everyday (non-story) letter in the report that is folded (`folded` tru
 **Calls:** [[overlay_tutorial#_row]], [[overlay_tutorial#_report]].
 
 ### _has_foldable_letter
-`func _has_foldable_letter() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:911`
+`func _has_foldable_letter() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:943`
 
 True when tonight's report has a non-story letter (reads `hall.shown_report`, so it works before the letters are built).
 
@@ -621,7 +631,7 @@ True when tonight's report has a non-story letter (reads `hall.shown_report`, so
 **Calls:** [[hall_style#is_story_quest]].
 
 ### _training_section
-`func _training_section() -> Node` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:915`
+`func _training_section() -> Node` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:947`
 
 The Guild tab's `%TrainingSection`.
 
@@ -632,7 +642,7 @@ The Guild tab's `%TrainingSection`.
 **Calls:** [[overlay_tutorial#_u]], [[overlay_tutorial#_tab]].
 
 ### _hospital_section
-`func _hospital_section() -> Node` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:919`
+`func _hospital_section() -> Node` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:951`
 
 The Guild tab's `%HospitalSection`.
 
@@ -643,7 +653,7 @@ The Guild tab's `%HospitalSection`.
 **Calls:** [[overlay_tutorial#_u]], [[overlay_tutorial#_tab]].
 
 ### _party_ready
-`func _party_ready(entry: Dictionary) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:925`
+`func _party_ready(entry: Dictionary) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:957`
 
 Day 1's party is ready with two heroes, or fewer if the quest or roster is smaller (at least 1).
 
@@ -659,7 +669,7 @@ Day 1's party is ready with two heroes, or fewer if the quest or roster is small
 **Calls:** [[hall_main#party_size_limit]], [[hall_main#roster]].
 
 ### _pick_text
-`func _pick_text() -> String`  · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:930`
+`func _pick_text() -> String`  · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:962`
 
 Pick-step text: "This quest requires one adventurer only." for one-slot quests, otherwise the tap instruction.
 
@@ -670,7 +680,7 @@ Pick-step text: "This quest requires one adventurer only." for one-slot quests, 
 **Calls:** [[hall_main#current_quest_entry]], [[hall_main#party_size_limit]].
 
 ### _tonight_text
-`func _tonight_text() -> String` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:939`
+`func _tonight_text() -> String` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:971`
 
 The Facilities step text: Training Yard and Hospital in one line, prefixed with a "Nothing you can build yet!" note when no `upgrade` event was seen.
 
@@ -679,7 +689,7 @@ The Facilities step text: Training Yard and Hospital in one line, prefixed with 
 **Called by:** [[overlay_tutorial#_day_three]].
 
 ### _shop_open_text
-`func _shop_open_text() -> String` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:947`
+`func _shop_open_text() -> String` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:979`
 
 Day 5's first step text, with a heads-up when nothing in the Shop is affordable.
 
@@ -690,7 +700,7 @@ Day 5's first step text, with a heads-up when nothing in the Shop is affordable.
 **Calls:** [[overlay_tutorial#_any_affordable]].
 
 ### _anyone_can_train
-`func _anyone_can_train() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:954`
+`func _anyone_can_train() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:986`
 
 True if any roster hero is not training and can train.
 
@@ -701,7 +711,7 @@ True if any roster hero is not training and can train.
 **Calls:** [[hall_main#roster]], [[guild_upgrades#is_training]], [[guild_upgrades#can_train]].
 
 ### _any_affordable
-`func _any_affordable() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:959`
+`func _any_affordable() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:991`
 
 True if any item in `ItemShop.stock` can be bought now.
 
@@ -712,7 +722,7 @@ True if any item in `ItemShop.stock` can be bought now.
 **Calls:** [[item_shop#can_buy]].
 
 ### _bought_role
-`func _bought_role() -> String` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:966`
+`func _bought_role() -> String` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:998`
 
 The role name that can use the item bought on Day 5, or "".
 
@@ -723,7 +733,7 @@ The role name that can use the item bought on Day 5, or "".
 **Calls:** [[hall_style#item_role_name]].
 
 ### _bought_name
-`func _bought_name() -> String` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:970`
+`func _bought_name() -> String` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1002`
 
 The bought item's display name, or "item".
 
@@ -734,7 +744,7 @@ The bought item's display name, or "item".
 **Calls:** [[hall_style#item_look]].
 
 ### _fits_bought
-`func _fits_bought(character: Variant) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:974`
+`func _fits_bought(character: Variant) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1006`
 
 True if `character` is a `GuildCharacter` whose role matches the bought item's role.
 
@@ -750,7 +760,7 @@ True if `character` is a `GuildCharacter` whose role matches the bought item's r
 **Calls:** [[hall_style#role_name]].
 
 ### _someone_fits_bought
-`func _someone_fits_bought() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:978`
+`func _someone_fits_bought() -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1010`
 
 True if a living roster hero can use the bought item.
 
@@ -761,7 +771,7 @@ True if a living roster hero can use the bought item.
 **Calls:** [[hall_main#roster]], [[overlay_tutorial#_fits_bought]], [[hall_style#is_dead]].
 
 ### _steps_for
-`func _steps_for(script: int) -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:983`
+`func _steps_for(script: int) -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1015`
 
 Returns the step list for a script key: 1, 2, `GUILD_SCRIPT`, 5 or `FREEPLAY_SCRIPT`; otherwise empty.
 
@@ -777,9 +787,9 @@ Returns the step list for a script key: 1, 2, `GUILD_SCRIPT`, 5 or `FREEPLAY_SCR
 **Calls:** [[overlay_tutorial#_day_one]], [[overlay_tutorial#_day_two]], [[overlay_tutorial#_day_three]], [[overlay_tutorial#_day_five]], [[overlay_tutorial#_freeplay]].
 
 ### _day_one
-`func _day_one() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:998`
+`func _day_one() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1030`
 
-Day 1 script: welcome card, open Members and Your Guild, meet [[hall_rules]] `STARTING_HERO_NAME`, open Quests, pick a quest and a party, Back to Quests, End Day (button then sheet), then the Day Report totals, a letter, its story, and "Open the Doors" (`new_day`).
+Day 1 script: welcome card, open Members and Your Guild, meet [[hall_rules]] `STARTING_HERO_NAME`, open Quests, pick a quest and a party, Back to Quests, End Day (button then sheet), then the Day Report totals, a letter, its story, and "Open the Doors" (`new_day`). The last step is now a `free` step ("Read the report, then tap to start Day 2"): Pip steps back (no dim, no locks, no bubble) so the player can scroll the whole report and open other letters; only the ring on the Day 2 button stays.
 
 **Returns:** `Array` of steps.
 
@@ -788,7 +798,7 @@ Day 1 script: welcome card, open Members and Your Guild, meet [[hall_rules]] `ST
 **Calls:** [[overlay_tutorial#_nav]], [[overlay_tutorial#_u]], [[overlay_tutorial#_tab]], [[overlay_tutorial#_screen]], [[overlay_tutorial#_row]], [[overlay_tutorial#_party_ready]], [[overlay_tutorial#_pick_text]], [[overlay_tutorial#_report]], [[overlay_tutorial#_report_letter]], [[overlay_tutorial#_has_foldable_letter]], [[hall_main#end_day_button]].
 
 ### _day_two
-`func _day_two() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1039`
+`func _day_two() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1073`
 
 Day 2 script: open a hero's page and its stats, Back, Applicants (a `free` step where the player may hire), then Quests and Deny/death warning.
 
@@ -799,9 +809,9 @@ Day 2 script: open a hero's page and its stats, Back, Applicants (a `free` step 
 **Calls:** [[overlay_tutorial#_nav]], [[overlay_tutorial#_u]], [[overlay_tutorial#_tab]], [[overlay_tutorial#_screen]], [[overlay_tutorial#_row]].
 
 ### _day_three
-`func _day_three() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1066`
+`func _day_three() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1100`
 
-The Guild-tab script (key `GUILD_SCRIPT`, runs on `GuildUpgrades.UNLOCK_DAY`; the name is historical): Guild tab, Build section, building an upgrade, Facilities, Training Yard (add a hero, pick a stat) and Hospital (admit). The Admit step is skipped when nobody is hurt and waiting, or when the guild can't pay tonight's bed fee (`GameState.gold < GuildUpgrades.nightly_fee()`).
+The Guild-tab script (key `GUILD_SCRIPT`, runs on `GuildUpgrades.UNLOCK_DAY`; the name is historical): Guild tab, Build section, building an upgrade, Facilities, Training Yard (add a hero, pick a stat) and Hospital (admit). The admit step is skipped when no hero is hurt and waiting, or when `GameState.gold < GuildUpgrades.nightly_fee()` (the guild couldn't pay for the bed; [[guild_upgrades#nightly_fee]]).
 
 **Returns:** `Array` of steps.
 
@@ -810,7 +820,7 @@ The Guild-tab script (key `GUILD_SCRIPT`, runs on `GuildUpgrades.UNLOCK_DAY`; th
 **Calls:** [[overlay_tutorial#_nav]], [[overlay_tutorial#_u]], [[overlay_tutorial#_tab]], [[overlay_tutorial#_row]], [[overlay_tutorial#_is_enabled]], [[overlay_tutorial#_training_section]], [[overlay_tutorial#_hospital_section]], [[overlay_tutorial#_tonight_text]], [[overlay_tutorial#_anyone_can_train]], [[hall_main#affordable_buildings]], [[hall_main#hurt_waiting_count]], [[guild_upgrades#has_free_training_slot]], [[guild_upgrades#nightly_fee]].
 
 ### _day_five
-`func _day_five() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1095`
+`func _day_five() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1129`
 
 Day 5 script: open Items, compare items, buy, then (if a living hero can use it) open Members and the right hero and equip; otherwise tell the player to hire the right role.
 
@@ -821,7 +831,7 @@ Day 5 script: open Items, compare items, buy, then (if a living hero can use it)
 **Calls:** [[overlay_tutorial#_nav]], [[overlay_tutorial#_u]], [[overlay_tutorial#_tab]], [[overlay_tutorial#_screen]], [[overlay_tutorial#_shop_open_text]], [[overlay_tutorial#_any_affordable]], [[overlay_tutorial#_someone_fits_bought]], [[overlay_tutorial#_fits_bought]], [[overlay_tutorial#_bought_role]], [[overlay_tutorial#_bought_name]].
 
 ### _freeplay
-`func _freeplay() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1127`
+`func _freeplay() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1161`
 
 The single freeplay card shown after the final battle is won.
 
@@ -830,6 +840,6 @@ The single freeplay card shown after the final battle is won.
 **Called by:** [[overlay_tutorial#_steps_for]].
 
 ## Suspected issues
-- `overlay_tutorial.gd:169`: the comment says "untyped: hall_main preloads this file", but hall_main now reaches it by `class_name` (`OverlayTutorial.new()`, `hall_main.gd:449`).
-- `overlay_tutorial.gd:1066`: `_day_three` is the Guild-tab script (key 3 = `GUILD_SCRIPT`, day 10), a leftover name from when it ran on Day 3.
+- `overlay_tutorial.gd:176`: the comment says "untyped: hall_main preloads this file", but hall_main now reaches it by `class_name` (`OverlayTutorial.new()`, `hall_main.gd:449`).
+- `overlay_tutorial.gd:1100`: `_day_three` is the Guild-tab script (key 3 = `GUILD_SCRIPT`, day 10), a leftover name from when it ran on Day 3.
 - The header says "Days 1, 2, 5 and ... (10)" and `_freeplay` is documented in the header, but the `game_over` event is emitted by hall_main (`hall_main.gd:1694`) and not handled here (only `run_logger.gd` and `_seen` see it).

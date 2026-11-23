@@ -33,8 +33,8 @@ One quest in the Day Report, written as a letter home: type seal, title, who sen
 | `TEXT_*` | const | UI strings: result stamp, from line, Hurt / Died / Found / standing tags, the win / loss sign-offs (gold, items, Pluck, trained-stat variants), ribbon, tap hints. |
 | `_type_seal` ... `_standing_text`, `_beat_list`, `_closing_line`, `_head_text` | onready | Scene nodes `%TypeSeal`, `%TypeTag`, `%TypeIcon`, `%Title`, `%From`, `%Stamp`, `%StampText`, `%StampRoom`, `%HurtTag`, `%HurtText`, `%DiedTag`, `%DiedText`, `%FoundTag`, `%FoundText`, `%StandingTag`, `%StandingText`, `%Beats`, `%Closing`; `_head_text` is `%Title`'s parent. |
 | `_foldable` | onready | `[$Col/Divider, _beat_list, $Col/Divider2, _closing_line]`: what a folded letter hides. |
-| `is_story` | var | True for a story quest's letter (never folds). Read by `overlay_tutorial.gd:905` ([[overlay_tutorial#_report_letter]]). |
-| `is_folded` | var | True while the story and sign-off are hidden. Read by `overlay_tutorial.gd:905`. |
+| `is_story` | var | True for a story quest's letter (never folds). Read by `overlay_tutorial.gd:937` ([[overlay_tutorial#_report_letter]]). |
+| `is_folded` | var | True while the story and sign-off are hidden. Read by `overlay_tutorial.gd:937`. |
 | `_story_ribbon`, `_fold_hint`, `_fold_caret` | var | The story ribbon chip, the hint label, and the caret label (each null when not used). |
 | `_is_success` | var | Whether the quest succeeded; picks the reveal sound. |
 
