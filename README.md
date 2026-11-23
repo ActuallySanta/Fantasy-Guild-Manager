@@ -86,8 +86,8 @@ build.
 | `Sprites/` | Every image: UI textures and icons, character and item icons, the Shop tab's art. Its [README](Sprites/README.md) covers swapping art. |
 | `Fonts/`, `Themes/` | The fonts, and the UI theme with one StyleBox per surface. |
 | `Data/` | The team credits shown in the credits roll. |
-| `Docs/` | [hall_design.md](Docs/hall_design.md): the UI's design and rules; `playtests/` holds the AI playtest reports. |
-| `tools/` | `playtest/`: the shell scripts and tests behind the AI playtesters (`/playtest`). `tests/`: the headless test runner (`run_test.sh`) and its tests. |
+| `Docs/` | [hall_design.md](Docs/hall_design.md): the UI's design and rules; `playtests/` holds the AI playtest reports; `vault/` is an Obsidian vault of code docs (every script, function and scene, plus system flow diagrams), kept current with `/docs-vault`. |
+| `tools/` | `playtest/`: the shell scripts and tests behind the AI playtesters (`/playtest`). `docs/`: `index_functions.py`, the function and scene index behind `Docs/vault`. |
 | `Audio/` | Sound effects (drop-in folder; see its README). |
 | `Builds/` | Committed desktop builds from earlier iterations. |
 
