@@ -17,3 +17,8 @@ run_log.csv
 
 # Godot editor scene-save temp files
 *.tscn*.tmp
+
+# Obsidian per-user state in the code docs vault
+Docs/vault/.obsidian/workspace*.json
+Docs/vault/.obsidian/cache
+Docs/vault/_meta/function_index.json
