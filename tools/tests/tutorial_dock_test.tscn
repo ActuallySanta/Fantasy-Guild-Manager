@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c8tdock7flip2"]
+
+[ext_resource type="Script" uid="uid://268eys66yp1g" path="res://tools/tests/tutorial_dock_test.gd" id="1_dock"]
+
+[node name="tutorial_dock_test" type="Node"]
+script = ExtResource("1_dock")

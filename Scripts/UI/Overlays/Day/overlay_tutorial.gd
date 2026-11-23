@@ -28,7 +28,9 @@
 ##     and swallows taps; every button outside the spotlight is disabled
 ##   - a gold ring and a bouncing arrow on the one thing to tap
 ##   - Pip's bubble docks at the top or bottom, whichever is clear of the
-##     spotlight, and glides there when the spotlight moves. (Tapping Pip to
+##     spotlight, and glides there when the spotlight moves. Mid-step it only
+##     moves once the spotlight is clearly past a cut-off (DOCK_HYSTERESIS),
+##     so scrolling inside a spotlight can't make it flicker. (Tapping Pip to
 ##     swap sides is off: PIP_CAN_MOVE.) If neither side is clear, Pip shrinks
 ##     to a small chip (tap to read the full line).
 ##   - "bare" steps hide the bubble: just the ring and the arrow, for steps
@@ -119,6 +121,10 @@ const HOLE_PAD := 10.0
 const BUBBLE_MARGIN := 16.0
 ## Gap kept between Pip's bubble and the spotlight.
 const BUBBLE_CLEARANCE := 24.0
+## How far (design px) the spotlight must move past a cut-off before Pip
+## changes side or shape mid-step. Without it, a spotlight the player scrolled
+## to sit right on a cut-off flipped Pip top <-> bottom every frame.
+const DOCK_HYSTERESIS := 20.0
 ## Seconds a step's target may be missing before Next shows up.
 const MISSING_GRACE := 0.6
 ## How often (seconds) buttons outside the spotlight are re-disabled,
@@ -198,6 +204,11 @@ var _dock_bottom := true
 var _dock_forced := false
 ## Compact chip opened up by tapping it.
 var _expanded := false
+## Pip's full bubble was docked clear of a spotlight last frame (not the chip).
+var _shown_full := false
+## Pip has picked a side for this step's spotlight; from then on the dock
+## cut-offs are sticky (DOCK_HYSTERESIS).
+var _dock_settled := false
 var _bubble_goal := Vector2.ZERO
 ## Steps shown so far this script (for Back), newest last.
 var _history: Array[int] = []
@@ -338,6 +349,8 @@ func _reset_step() -> void:
 	_shown_text = ""
 	_dock_forced = false
 	_expanded = false
+	_shown_full = false
+	_dock_settled = false
 	_lock_timer = 0.0
 
 
@@ -546,17 +559,28 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 	var full_height: float = _measure_bubble(width)
 	var top_rect := Rect2(BUBBLE_MARGIN, BUBBLE_MARGIN, width, full_height)
 	var bottom_rect := Rect2(BUBBLE_MARGIN, full.y - full_height - BUBBLE_MARGIN, width, full_height)
+	# Every cut-off below is sticky (DOCK_HYSTERESIS): the player can scroll
+	# inside a live spotlight, and a spotlight held right on a cut-off used to
+	# flip Pip between top and bottom (or full and chip) every frame.
+	# The side Pip already sits on in full only has to stay off the spotlight
+	# by the smaller gap; a new side needs the whole BUBBLE_CLEARANCE.
 	var keep_clear := hole.grow(BUBBLE_CLEARANCE)
-	var top_ok := not hole.has_area() or not top_rect.intersects(keep_clear)
-	var bottom_ok := not hole.has_area() or not bottom_rect.intersects(keep_clear)
+	var stay_clear := hole.grow(maxf(BUBBLE_CLEARANCE - DOCK_HYSTERESIS, 0.0))
+	var top_ok := not hole.has_area() or not top_rect.intersects(stay_clear if (_shown_full and not _dock_bottom) else keep_clear)
+	var bottom_ok := not hole.has_area() or not bottom_rect.intersects(stay_clear if (_shown_full and _dock_bottom) else keep_clear)
+	# a new step picks freely; after that Pip only moves when it has to
+	var margin := DOCK_HYSTERESIS if _dock_settled else 0.0
 	if not _dock_forced:
-		if top_ok and not bottom_ok:
-			_dock_bottom = false
-		elif bottom_ok and not top_ok:
-			_dock_bottom = true
-		elif top_ok and bottom_ok and hole.has_area():
-			# both clear: sit on the far side from the spotlight
-			_dock_bottom = hole.get_center().y < full.y * 0.5
+		var here_ok: bool = bottom_ok if _dock_bottom else top_ok
+		var there_ok: bool = top_ok if _dock_bottom else bottom_ok
+		if there_ok and not here_ok:
+			_dock_bottom = not _dock_bottom
+		elif here_ok and there_ok and hole.has_area():
+			# both clear: sit on the far side from the spotlight. How far (px)
+			# the spotlight's centre is into Pip's half of the screen:
+			var into_pips_half := (hole.get_center().y - full.y * 0.5) * (1.0 if _dock_bottom else -1.0)
+			if into_pips_half > margin:
+				_dock_bottom = not _dock_bottom
 	var fits: bool = bottom_ok if _dock_bottom else top_ok
 	var goal: Vector2
 	if not hole.has_area():
@@ -572,8 +596,15 @@ func _layout(step: Dictionary, target: Control, delta: float) -> void:
 		var top_overlap := chip_top.intersection(hole).get_area()
 		var bottom_overlap := chip_bottom.intersection(hole).get_area()
 		if not _dock_forced:
-			_dock_bottom = bottom_overlap <= top_overlap
+			# move corners only when the other one is clearly better (by a
+			# DOCK_HYSTERESIS-tall strip of the chip), not on a pixel's difference
+			var here_overlap := bottom_overlap if _dock_bottom else top_overlap
+			var there_overlap := top_overlap if _dock_bottom else bottom_overlap
+			if there_overlap < here_overlap - width * margin or (not _dock_settled and there_overlap < here_overlap):
+				_dock_bottom = not _dock_bottom
 		goal = chip_bottom.position if _dock_bottom else chip_top.position
+	_shown_full = hole.has_area() and fits
+	_dock_settled = _dock_settled or hole.has_area()
 	var shake := 0.0
 	if _time < _shake_until:
 		shake = sin(_time * 60.0) * 10.0
