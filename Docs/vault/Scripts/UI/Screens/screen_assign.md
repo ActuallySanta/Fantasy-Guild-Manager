@@ -49,7 +49,7 @@ Stores the hall, wires the buttons, and sets up the move-confirm overlay.
 
 **Side effects:** `pressed` on `%BackButton` calls [[hall_main#close_screen]]; `pressed` on `%HireButton` calls [[hall_main#open_tab]] (`"guild"`, `GUILD_SECTION_HIRE`); `pressed` on `%LeftButton` / `%RightButton` runs [[screen_assign#_on_left_button_pressed]] / [[screen_assign#_on_right_button_pressed]]; `toggled` on `%BusyToggle` calls [[hall_main#set_show_busy_adventurers]]; calls [[overlay_move_confirm#setup]].
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`). **Calls:** [[screen_assign#_make_room_for_deny_cost]], [[overlay_move_confirm#setup]].
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`). **Calls:** [[screen_assign#_make_room_for_deny_cost]], [[overlay_move_confirm#setup]].
 
 ### _make_room_for_deny_cost
 `func _make_room_for_deny_cost() -> void` · `Scripts/UI/Screens/screen_assign.gd:161`
@@ -61,7 +61,7 @@ The Deny button's shield sits on its right edge: pads the right content margin o
 ### scroll_to_top
 `func scroll_to_top() -> void` · `Scripts/UI/Screens/screen_assign.gd:171`
 
-Sets `%Scroll`'s `scroll_vertical` to 0. **Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1826`). **Calls:** none.
+Sets `%Scroll`'s `scroll_vertical` to 0. **Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1851`). **Calls:** none.
 
 ### scroll_to_picker
 `func scroll_to_picker() -> void` · `Scripts/UI/Screens/screen_assign.gd:178`
@@ -79,7 +79,7 @@ Redraws the whole screen from `hall.current_quest_entry()`. Returns early (after
 
 **Side effects:** sets `%Circle`'s parent minimum size with [[hall_font_scale#px_vec]] (here, not in `setup`, so a Text size change follows).
 
-**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1818`, while the Assign screen is active).
+**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1843`, while the Assign screen is active).
 
 **Calls:** [[hall_main#current_quest_entry]], [[screen_assign#_show_quest_tabs]], [[screen_assign#_show_quest_card]], [[screen_assign#_show_writ_stamp]], [[screen_assign#_show_party]], [[screen_assign#_show_picker]], [[screen_assign#_show_footer]].
 
@@ -168,16 +168,16 @@ A sent quest has SENT inked on it: animated right after Send (`hall.pending_fx.w
 
 Where hall_main lands the DENIED stamp: the middle of the quest title, clamped inside the visible part of the scroll.
 
-**Returns:** `Vector2` global position. Used by [[hall_main#deny_quest]] (`hall_main.gd:1017`) as the `HallFx.stamp_mark` position.
+**Returns:** `Vector2` global position. Used by [[hall_main#deny_quest]] (`hall_main.gd:1031`) as the `HallFx.stamp_mark` position.
 
-**Called by:** [[hall_main#deny_quest]] (`hall_main.gd:1017`). **Calls:** none.
+**Called by:** [[hall_main#deny_quest]] (`hall_main.gd:1031`). **Calls:** none.
 
 ### shake_writ
 `func shake_writ() -> void` · `Scripts/UI/Screens/screen_assign.gd:335`
 
 Deny: the quest writ shakes its head ([[hall_fx#shake]] with `DENY_SHAKE`).
 
-**Called by:** [[hall_main#deny_quest]] (`hall_main.gd:1016`). **Calls:** [[hall_fx#shake]].
+**Called by:** [[hall_main#deny_quest]] (`hall_main.gd:1030`). **Calls:** [[hall_fx#shake]].
 
 ### _show_picker
 `func _show_picker(entry: Dictionary) -> void` · `Scripts/UI/Screens/screen_assign.gd:347`

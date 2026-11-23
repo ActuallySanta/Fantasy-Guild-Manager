@@ -78,7 +78,7 @@ Clears `_request` and hides the sheet.
 
 **Returns:** `true` while a request is pending.
 
-**Called by:** nobody found. The `popup.is_open()` at `hall_header.gd:178` is on the header's gold/standing popups, not this overlay.
+**Called by:** nobody found. The `popup.is_open()` at `hall_header.gd:182` is on the header's gold/standing popups, not this overlay.
 
 ### _show
 `func _show() -> void` · `Scripts/UI/Overlays/Items/overlay_gear_confirm.gd:82`
@@ -161,5 +161,5 @@ A mouse press on the dim emits `closed`.
 **Called by:** `gui_input` on `%Dim`.
 
 ## Suspected issues
-- `is_open()` has no real caller (dead code). The index's `hall_header.gd:178` match is a different object.
+- `is_open()` has no real caller (dead code). The index's `hall_header.gd:182` match is a different object.
 - The `refresh` doc says "closes itself if the gear moved meanwhile", but it does so only by emitting `closed` from `_show_take_off` / `_show_swap`; `tab_pack` turns that into `close()`.

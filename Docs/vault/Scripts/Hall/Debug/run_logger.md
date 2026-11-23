@@ -3,7 +3,7 @@ source: Scripts/Hall/Debug/run_logger.gd
 class_name: RunLogger
 extends: Node
 scene: null
-systems: []
+systems: ["[[Playtest Bridge]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -60,7 +60,7 @@ Stores the hall, makes the run id (`YYYYMMDDTHHMMSS-NNNN` from the system time p
 
 **Side effects:** adds `_http` as a child; connects signals.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:465`). The other `.setup(` matches in the index are on other objects (views, overlays, the tutorial) and are not callers.
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:468`). The other `.setup(` matches in the index are on other objects (views, overlays, the tutorial) and are not callers.
 
 **Calls:** [[run_logger#_log]] (deferred, only with `SEND_TEST_ROW_ON_START`).
 
@@ -152,7 +152,7 @@ Handler for `HallMain.tutorial_event`. On `"end_day"` it logs a row with kind `d
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `event` | `String` | Event name | `tutorial_event.emit(...)` in [[hall_main]] (`"end_day"` at `hall_main.gd:1556`, `"game_over"` at `hall_main.gd:1669`) |
+| `event` | `String` | Event name | `tutorial_event.emit(...)` in [[hall_main]] (`"end_day"` at `hall_main.gd:1576`, `"game_over"` at `hall_main.gd:1694`) |
 | `data` | `Variant` | For `end_day`, the quest results Array | `results` in [[hall_main#end_day]] |
 
 **Returns:** nothing.

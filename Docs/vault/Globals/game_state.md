@@ -3,7 +3,7 @@ source: Globals/game_state.gd
 class_name: null
 extends: Node
 scene: null
-systems: []
+systems: ["[[Boot and Autoload Order]]", "[[Day Cycle]]", "[[Hiring Characters]]", "[[Economy and Wallet]]", "[[Quest Resolution and Injuries]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script, autoload]
 ---
@@ -39,7 +39,7 @@ Adds 1 to `day`, refreshes the For Hire pool, rebuilds every hero's temp stats, 
 
 **Side effects:** changes `day`, the hire pool, hero `temp_stats`, emits `day_started`.
 
-**Called by:** [[hall_main#start_new_day]] (`hall_main.gd:1634`).
+**Called by:** [[hall_main#start_new_day]] (`hall_main.gd:1659`).
 
 **Calls:** [[character_container#refresh_hireable_characters]], [[game_state#_refresh_temp_stats]].
 
@@ -48,7 +48,7 @@ Adds 1 to `day`, refreshes the For Hire pool, rebuilds every hero's temp stats, 
 
 Back to day 1 and `is_freeplay = false` for a new run. It doesn't emit `day_started`: the hall scene is reloaded right after and builds day 1 itself.
 
-**Called by:** [[hall_main#reset_autoloads]] (`hall_main.gd:1689`).
+**Called by:** [[hall_main#reset_autoloads]] (`hall_main.gd:1714`).
 
 ### _refresh_temp_stats
 `func _refresh_temp_stats()` · `Globals/game_state.gd:52`
@@ -66,18 +66,18 @@ Forwards to `GuildUpgrades.add_gold`.
 
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `amount` | `int` | Gold to add (negative spends) | hero price in [[character_container#add_character_to_guild]]; quest payout in [[hall_rules#play_quest]] (`hall_rules.gd:372`) |
+| `amount` | `int` | Gold to add (negative spends) | hero price in [[character_container#add_character_to_guild]]; quest payout in [[hall_rules#play_quest]] (`hall_rules.gd:383`) |
 
-**Called by:** [[character_container#add_character_to_guild]] (`character_container.gd:124`), [[hall_rules#play_quest]] (`hall_rules.gd:372`).
+**Called by:** [[character_container#add_character_to_guild]] (`character_container.gd:131`), [[hall_rules#play_quest]] (`hall_rules.gd:383`).
 
 **Calls:** [[guild_upgrades#add_gold]].
 
 ### add_standing
 `func add_standing(amount: int) -> void` · `Globals/game_state.gd:61`
 
-Forwards to `GuildUpgrades.add_standing`. `amount` is the standing earned by a quest, from [[hall_rules#play_quest]] (`hall_rules.gd:373`).
+Forwards to `GuildUpgrades.add_standing`. `amount` is the standing earned by a quest, from [[hall_rules#play_quest]] (`hall_rules.gd:384`).
 
-**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:373`).
+**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:384`).
 
 **Calls:** [[guild_upgrades#add_standing]].
 
@@ -86,7 +86,7 @@ Forwards to `GuildUpgrades.add_standing`. `amount` is the standing earned by a q
 
 Forwards to `GuildUpgrades.reduce_standing`. `amount` is a standing penalty chosen by the hall.
 
-**Called by:** [[hall_main#deny_quest]] (`hall_main.gd:1013`), [[hall_main#release]] (`hall_main.gd:1137`).
+**Called by:** [[hall_main#deny_quest]] (`hall_main.gd:1027`), [[hall_main#release]] (`hall_main.gd:1151`).
 
 **Calls:** [[guild_upgrades#reduce_standing]].
 

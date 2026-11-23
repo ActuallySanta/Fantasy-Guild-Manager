@@ -14,7 +14,7 @@ tags: [scene]
 The End Day check sheet: who goes out tonight, the denied quests, and affordable upgrade suggestions, with Not yet and End Day buttons. See [[overlay_end_day]].
 
 ## Parent scenes
-- **Placed in editor:** [[hall_main (scene)]] at node `OverlayEndDay`. Shown or hidden by [[hall_main#_refresh_overlays]] (`hall_main.gd:1845`).
+- **Placed in editor:** [[hall_main (scene)]] at node `OverlayEndDay`. Shown or hidden by [[hall_main#_refresh_overlays]] (`hall_main.gd:1870`).
 - No runtime parents.
 
 ## Child scenes

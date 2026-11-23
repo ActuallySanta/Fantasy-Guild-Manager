@@ -14,7 +14,7 @@ tags: [scene]
 The final battle's credits roll: the story and party scroll up like film credits over a warm (victory) or cold (defeat) background, then the parchment ledger, the team credits and a closing line, with a pinned "Begin Freeplay" / "Found a New Guild" button. See [[overlay_credits]].
 
 ## Parent scenes
-- **Placed in editor:** [[hall_main (scene)]] at node `OverlayCredits`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1847`).
+- **Placed in editor:** [[hall_main (scene)]] at node `OverlayCredits`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1872`).
 - No runtime parents.
 
 ## Child scenes

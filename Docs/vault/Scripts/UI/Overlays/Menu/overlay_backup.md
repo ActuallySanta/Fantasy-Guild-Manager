@@ -35,13 +35,13 @@ Stores the hall, connects the buttons, sets texts and styles (paper, wood for Ba
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `main` | `HallMain` | The hall | `self` in `view.setup(self)` ([[hall_main#_ready]], `hall_main.gd:424`) |
+| `main` | `HallMain` | The hall | `self` in `view.setup(self)` ([[hall_main#_ready]], `hall_main.gd:427`) |
 
 **Returns:** nothing.
 
 **Side effects:** connects `pressed` on `%SaveFileButton` to [[overlay_backup#_on_save_file_pressed]], `%CopyCodeButton` to [[overlay_backup#_on_copy_code_pressed]], `%LoadFileButton` and `%PasteCodeButton` to [[overlay_backup#_on_import_pressed]] (button bound), `%BackButton` to [[hall_main#close_backup]], `gui_input` on `%Dim` to [[overlay_backup#_on_dim_input]]; `visibility_changed` on itself to a lambda that clears `_armed_button`.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[hall_style#style_button]].
 
@@ -52,7 +52,7 @@ Sets the Load and Paste labels: `BUTTON_CONFIRM` ("Tap again to replace this gui
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1866`) while visible, [[overlay_backup#_on_import_pressed]], [[overlay_backup#_disarm]].
+**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1891`) while visible, [[overlay_backup#_on_import_pressed]], [[overlay_backup#_disarm]].
 
 ### _on_save_file_pressed
 `func _on_save_file_pressed() -> void` · `Scripts/UI/Overlays/Menu/overlay_backup.gd:71`

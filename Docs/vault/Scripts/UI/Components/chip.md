@@ -51,7 +51,7 @@ Text in a square ink outline ("RANK F", the report's totals, the Story Quest rib
 
 **Returns:** nothing.
 
-**Called by:** [[overlay_report#_show_totals]] (`overlay_report.gd:213`, `220`, `223`, `225`, `230`), [[quest_row#_show_quest_facts]] (`quest_row.gd:89`), [[quest_row#_show_story_look]] (`quest_row.gd:110`), [[report_entry#_show_story_look]] (`report_entry.gd:206`).
+**Called by:** [[overlay_report#_show_totals]] (`overlay_report.gd:217`, `220`, `223`, `225`, `230`), [[quest_row#_show_quest_facts]] (`quest_row.gd:89`), [[quest_row#_show_story_look]] (`quest_row.gd:110`), [[report_entry#_show_story_look]] (`report_entry.gd:206`).
 
 **Calls:** [[chip#_set_ink]].
 

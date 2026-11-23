@@ -33,13 +33,13 @@ Stores the hall, connects the buttons straight to hall actions and styles them (
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `main` | `HallMain` | The hall | `self` in `view.setup(self)` over `_all_overlays()` ([[hall_main#_ready]], `hall_main.gd:424`) |
+| `main` | `HallMain` | The hall | `self` in `view.setup(self)` over `_all_overlays()` ([[hall_main#_ready]], `hall_main.gd:427`) |
 
 **Returns:** nothing.
 
 **Side effects:** connects `pressed` on `%TextSizeButton` to [[hall_main#cycle_text_size]], on `%ColorButton` to [[hall_main#cycle_color_filter]], on `%MotionButton` to [[hall_main#toggle_reduce_motion]], on `%BackButton` to [[hall_main#close_accessibility]]; `gui_input` on `%Dim` to [[overlay_accessibility#_on_dim_input]].
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[hall_style#style_button]].
 
@@ -50,7 +50,7 @@ Rewrites the three button labels from `hall.text_size`, `hall.color_filter` and 
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1866`), only while the overlay is visible.
+**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1891`), only while the overlay is visible.
 
 ### _on_dim_input
 `func _on_dim_input(event: InputEvent) -> void` · `Scripts/UI/Overlays/Menu/overlay_accessibility.gd:52`

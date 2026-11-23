@@ -3,7 +3,7 @@ source: Scripts/UI/Shell/Header/header_popup.gd
 class_name: HeaderPopup
 extends: Control
 scene: ""
-systems: ["[[UI Architecture and Refresh]]", "[[Economy and Wallet]]"]
+systems: ["[[UI Architecture and Refresh]]", "[[Economy and Wallet]]", "[[UI Motion and Feedback]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -46,7 +46,7 @@ Stores the hall.
 
 **Returns:** nothing.
 
-**Called by:** [[hall_header#setup]] (`hall_header.gd:123` gold, `:124` standing). **Calls:** none.
+**Called by:** [[hall_header#setup]] (`hall_header.gd:127` gold, `:128` standing). **Calls:** none.
 
 ### open
 `func open(anchor: Control) -> void` · `Scripts/UI/Shell/Header/header_popup.gd:69`
@@ -56,13 +56,13 @@ Drops the card from `anchor` and fills it in.
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `anchor` | `Control` | The counter box the card hangs under | `anchor` bound in [[hall_header#setup]] (`%GoldValueBox` / `%StandingValueBox`), passed at `hall_header.gd:189` |
+| `anchor` | `Control` | The counter box the card hangs under | `anchor` bound in [[hall_header#setup]] (`%GoldValueBox` / `%StandingValueBox`), passed at `hall_header.gd:193` |
 
 **Returns:** nothing.
 
 **Side effects:** sets `_anchor`, shows the popup, calls `refresh()` and `_place()`; unless Reduced Motion, [[hall_fx#fade_in]] on the popup and [[hall_fx#slide_in]] on the card.
 
-**Called by:** [[hall_header#_on_counter_input]] (`hall_header.gd:189`).
+**Called by:** [[hall_header#_on_counter_input]] (`hall_header.gd:193`).
 
 **Calls:** [[header_popup#refresh]], [[header_popup#_place]], [[hall_fx#fade_in]], [[hall_fx#slide_in]].
 
@@ -71,19 +71,19 @@ Drops the card from `anchor` and fills it in.
 
 Clears the anchor and hides the popup.
 
-**Called by:** [[hall_header#_on_counter_input]] (`hall_header.gd:188`, on the other popup), [[header_popup#_on_catch_input]] (`header_popup.gd:107`). **Calls:** none.
+**Called by:** [[hall_header#_on_counter_input]] (`hall_header.gd:192`, on the other popup), [[header_popup#_on_catch_input]] (`header_popup.gd:107`). **Calls:** none.
 
 ### is_open
 `func is_open() -> bool` · `Scripts/UI/Shell/Header/header_popup.gd:84`
 
-**Returns:** `visible`. Used by [[hall_header#refresh]] (`hall_header.gd:178`) to refresh only open popups. **Calls:** none.
+**Returns:** `visible`. Used by [[hall_header#refresh]] (`hall_header.gd:182`) to refresh only open popups. **Calls:** none.
 
 ### refresh
 `func refresh() -> void` · `Scripts/UI/Shell/Header/header_popup.gd:89`
 
 Fills the card in from the game. Empty here; overridden by [[popup_gold#refresh]] and [[popup_standing#refresh]].
 
-**Called by:** [[header_popup#open]] (`header_popup.gd:72`), [[hall_header#refresh]] (`hall_header.gd:179`, only while open). **Calls:** none.
+**Called by:** [[header_popup#open]] (`header_popup.gd:72`), [[hall_header#refresh]] (`hall_header.gd:183`, only while open). **Calls:** none.
 
 ### _place
 `func _place() -> void` · `Scripts/UI/Shell/Header/header_popup.gd:95`

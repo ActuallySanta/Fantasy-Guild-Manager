@@ -44,7 +44,7 @@ Stores the hall, remembers each button's label, connects each button and sizes t
 
 **Side effects:** sets `hall`, fills `_labels`, connects `pressed` on each `Nav_<id>` button to `hall.open_tab.bind(tab_id)` ([[hall_main#open_tab]]), and calls [[hall_font_scale#set_size]] on each button and its `Badge/Text` label.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`, the `view.setup(self)` loop over `[_header, _nav] + tabs + screens + overlays`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`, the `view.setup(self)` loop over `[_header, _nav] + tabs + screens + overlays`).
 
 **Calls:** [[hall_nav#button]], [[hall_font_scale#set_size]], [[hall_main#open_tab]].
 
@@ -58,11 +58,11 @@ The nav button for a tab id (one of `HallMain.TAB_IDS`).
 |---|---|---|---|
 | `tab_id` | `String` | Tab id (`board`, `guild`, `upgrades`, `shop`) | loop over `HallMain.TAB_IDS` in [[hall_nav#setup]] and [[hall_nav#refresh]]; the `tab_id` argument of [[hall_main#nav_button]] |
 
-**Returns:** the `Button` found with the unique name `%Nav_<tab_id>`. Used by [[hall_main#nav_button]] (`hall_main.gd:1833`), which hands it to the tutorial coach ([[overlay_tutorial]] at `overlay_tutorial.gd:870`).
+**Returns:** the `Button` found with the unique name `%Nav_<tab_id>`. Used by [[hall_main#nav_button]] (`hall_main.gd:1858`), which hands it to the tutorial coach ([[overlay_tutorial]] at `overlay_tutorial.gd:870`).
 
 **Side effects:** none.
 
-**Called by:** [[hall_nav#setup]] (`hall_nav.gd:51`), [[hall_nav#refresh]] (`hall_nav.gd:67`), [[hall_main#nav_button]] (`hall_main.gd:1833`).
+**Called by:** [[hall_nav#setup]] (`hall_nav.gd:51`), [[hall_nav#refresh]] (`hall_nav.gd:67`), [[hall_main#nav_button]] (`hall_main.gd:1858`).
 
 **Calls:** none (`get_node`).
 
@@ -75,7 +75,7 @@ Redraws the bar: highlights the open tab, applies lock changes, and sets and pop
 
 **Side effects:** per tab sets `theme_type_variation` (`NavTabActive` / `NavTab`) and `custom_minimum_size.y`; calls [[hall_style#set_locked]] only when the locked state changed (so a refresh never re-enables a button the tutorial disabled); sets the `Badge` visibility and `Badge/Text`; [[hall_fx#pop]] on a badge whose text changed to a non-empty value.
 
-**Called by:** [[hall_main#refresh]] (`hall_main.gd:1769`, `_nav.refresh()`).
+**Called by:** [[hall_main#refresh]] (`hall_main.gd:1794`, `_nav.refresh()`).
 
 **Calls:** [[hall_nav#button]], [[hall_main#is_tab_locked]], [[hall_style#set_locked]], [[hall_nav#_badge_text_for]], [[hall_fx#pop]].
 

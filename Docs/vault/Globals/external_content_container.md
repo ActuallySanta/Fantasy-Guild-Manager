@@ -3,7 +3,7 @@ source: Globals/external_content_container.gd
 class_name: null
 extends: Node
 scene: null
-systems: []
+systems: ["[[Boot and Autoload Order]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script, autoload]
 ---
@@ -55,7 +55,7 @@ A random name from the list for that gender. Returns `""` for an unknown gender.
 
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `gender` | `GuildCharacter.CharacterGender` | Which list to pick from | the hero's rolled gender in [[character_resource#_init]] (`character_resource.gd:100`) |
+| `gender` | `GuildCharacter.CharacterGender` | Which list to pick from | the hero's rolled gender in [[character_resource#_init]] (`character_resource.gd:106`) |
 
 **Returns:** `String`, the name. Used as the new hero's name.
 
@@ -118,7 +118,7 @@ A random entry (index 0-5, fixed) from `location_names[col_idx]`. A test functio
 
 **Returns:** `String`.
 
-**Called by:** [[quest_resource#generateResults]] (`:364`, `:407`, `:425`, `:456`, `:480`), [[quest_resource#_initMilestoneVars]] (`:939`).
+**Called by:** [[quest_resource#generateResults]] (`:364`, `:407`, `:425`, `:456`, `:480`), [[quest_resource#_initMilestoneVars]] (`:936`).
 
 ### get_Minor_Story_Variables
 `func get_Minor_Story_Variables(quest_idx: int, varNum: int) -> String` · `Globals/external_content_container.gd:171`
@@ -127,7 +127,7 @@ A random entry (index 0-5, fixed) from `location_names[col_idx]`. A test functio
 
 **Returns:** `String`.
 
-**Called by:** [[quest_resource#_initMilestoneVars]] (`quest_resource.gd:936-945`, eight calls).
+**Called by:** [[quest_resource#_initMilestoneVars]] (`quest_resource.gd:933-945`, eight calls).
 
 ### get_character_icon
 `func get_character_icon(_role: GuildCharacter.CharacterRole) -> Texture2D` · `Globals/external_content_container.gd:174`
@@ -140,7 +140,7 @@ A random portrait from the role's icon list. null for an unknown role.
 
 **Returns:** `Texture2D` (or null).
 
-**Called by:** [[character_resource#_init]] (`character_resource.gd:104`), [[hall_rules#make_starting_hero]] (`hall_rules.gd:100`), [[portrait#show_character]] (`portrait.gd:50`).
+**Called by:** [[character_resource#_init]] (`character_resource.gd:110`), [[hall_rules#make_starting_hero]] (`hall_rules.gd:100`), [[portrait#show_character]] (`portrait.gd:50`).
 
 ### get_role_backstory
 `func get_role_backstory(_char: GuildCharacter) -> String`  · `Globals/external_content_container.gd:188`
@@ -153,7 +153,7 @@ Picks a random template for the hero's role, then fills the stand-ins with [[ext
 
 **Returns:** `String`, the finished backstory.
 
-**Called by:** [[character_resource#generate_description]] (`character_resource.gd:176`).
+**Called by:** [[character_resource#generate_description]] (`character_resource.gd:193`).
 
 **Calls:** [[external_content_container#replace_standins]].
 
@@ -168,7 +168,7 @@ Picks a template from `random_backstories` and fills the stand-ins. The comment 
 
 **Returns:** `String`.
 
-**Called by:** [[character_resource#generate_description]] (`character_resource.gd:179`).
+**Called by:** [[character_resource#generate_description]] (`character_resource.gd:196`).
 
 **Calls:** [[external_content_container#replace_standins]].
 

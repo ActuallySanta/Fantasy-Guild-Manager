@@ -3,7 +3,7 @@ source: Scripts/Hall/Save/hall_save.gd
 class_name: HallSave
 extends: null
 scene: null
-systems: ["[[Saving Migration and Backup Codes]]"]
+systems: ["[[Saving Migration and Backup Codes]]", "[[Boot and Autoload Order]]", "[[Day Cycle]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -54,7 +54,7 @@ Write the whole run to `PATH` unless it equals the last write. While the night p
 
 **Side effects:** writes the save file via `write_bytes`; updates `_last_saved_bytes` on success.
 
-**Called by:** [[hall_main#save_now]] (`hall_main.gd:1785`, only when `uses_save_file`, `is_save_enabled`, not `is_debug_run`, in tree).
+**Called by:** [[hall_main#save_now]] (`hall_main.gd:1810`, only when `uses_save_file`, `is_save_enabled`, not `is_debug_run`, in tree).
 
 **Calls:** [[hall_save#build_snapshot]], [[hall_save#write_bytes]].
 
@@ -119,7 +119,7 @@ Forget the saved run (Found a New Guild / Abandon run). Removes `PATH`, `TEMP_PA
 
 **Side effects:** deletes files; clears the write cache.
 
-**Called by:** [[hall_main#start_new_run]] (`hall_main.gd:1678`).
+**Called by:** [[hall_main#start_new_run]] (`hall_main.gd:1703`).
 
 **Calls:** [[hall_save#forget_cache]].
 
@@ -150,7 +150,7 @@ Read the save (`PATH`, or `BACKUP_PATH` if that can't be read) and put it into t
 
 **Side effects:** changes `GameState`, `GuildUpgrades`, `CharacterContainer`, `ItemContainer`, `ItemShop` and `hall` through `apply_snapshot`; refreshes `_last_saved_bytes` from the loaded run.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:455`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:458`).
 
 **Calls:** [[hall_save#_read_file]], [[hall_save#apply_snapshot]], [[hall_save#build_snapshot]].
 
@@ -267,7 +267,7 @@ Web only: asks the browser to keep this site's storage (the save) when space run
 
 **Side effects:** runs JavaScript via `JavaScriptBridge.eval`. Does nothing off the web.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:454`, before `load_run`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:457`, before `load_run`).
 
 **Calls:** nothing in the project.
 

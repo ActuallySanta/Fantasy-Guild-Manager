@@ -94,7 +94,7 @@ Replace the current run with `snapshot`: write it as the save file, turn "Save r
 
 **Side effects:** writes the save file; sets `hall.uses_save_file = false` (so the dying hall's last refresh can't overwrite the import); `HallSave.forget_cache()`; saves `KEY_SAVE_ENABLED = true` in `SECTION_DEV`; `hall.reset_autoloads()`; `change_scene_to_file(HallMain.MAIN_SCENE_PATH)`.
 
-**Called by:** [[hall_main#import_run]] (`hall_main.gd:1700`).
+**Called by:** [[hall_main#import_run]] (`hall_main.gd:1725`).
 
 **Calls:** [[hall_save#write_bytes]], [[hall_save#forget_cache]], [[hall_settings#save_value]], [[hall_main#reset_autoloads]].
 

@@ -3,7 +3,7 @@ source: Scripts/UI/Components/crawl_sections.gd
 class_name: CrawlSections
 extends: VBoxContainer
 scene: "[[crawl_sections (scene)]]"
-systems: ["[[UI Motion and Feedback]]", "[[Run End]]"]
+systems: ["[[UI Motion and Feedback]]", "[[Run End]]", "[[UI Architecture and Refresh]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---

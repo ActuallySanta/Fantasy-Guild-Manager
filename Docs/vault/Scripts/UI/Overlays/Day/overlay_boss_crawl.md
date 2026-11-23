@@ -3,7 +3,7 @@ source: Scripts/UI/Overlays/Day/overlay_boss_crawl.gd
 class_name: ""
 extends: Control
 scene: "[[overlay_boss_crawl (scene)]]"
-systems: ["[[Run End]]", "[[UI Motion and Feedback]]"]
+systems: ["[[Run End]]", "[[UI Motion and Feedback]]", "[[UI Architecture and Refresh]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -39,13 +39,13 @@ Stores the hall, labels and styles Continue (gold), connects it, and creates the
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `main` | `HallMain` | The hall | `self` in [[hall_main#_ready]] (`hall_main.gd:424`, loop over `_all_overlays()`) |
+| `main` | `HallMain` | The hall | `self` in [[hall_main#_ready]] (`hall_main.gd:427`, loop over `_all_overlays()`) |
 
 **Returns:** nothing.
 
 **Side effects:** connects `pressed` on `%ContinueButton` to [[hall_main#close_boss_crawl]]; adds a `CrawlRoll` child.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[hall_style#style_button]], [[crawl_roll#setup]].
 
@@ -58,7 +58,7 @@ Builds the crawl once per new `hall.shown_boss_crawl`. Returns early if it is em
 
 **Side effects:** sets `_bg.color` (`HallStyle.CREDITS_BG` or `DEFEAT_BG`), rebuilds `%Sections`, restarts the roll.
 
-**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1866`) while the overlay is visible.
+**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1891`) while the overlay is visible.
 
 **Calls:** [[crawl_sections#show_title]], [[crawl_sections#clear]], [[crawl_sections#add_fight]], [[crawl_roll#start]].
 

@@ -3,7 +3,7 @@ source: Scripts/Hall/Save/hall_settings.gd
 class_name: HallSettings
 extends: null
 scene: null
-systems: ["[[Saving Migration and Backup Codes]]"]
+systems: ["[[Saving Migration and Backup Codes]]", "[[Boot and Autoload Order]]", "[[UI Motion and Feedback]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -34,11 +34,11 @@ tags: [script]
 
 The saved settings, or the defaults when nothing is saved.
 
-**Returns:** `{color_filter: int (clamped), reduce_motion: bool, text_size: int (clamped), save_enabled: bool}`. [[hall_main#_enter_tree]] reads `.text_size` (`hall_main.gd:405`), [[hall_main#_ready]] reads `.save_enabled` (`hall_main.gd:452`) to decide whether to load a run, and [[hall_main#_load_settings]] copies all four (`hall_main.gd:1373`).
+**Returns:** `{color_filter: int (clamped), reduce_motion: bool, text_size: int (clamped), save_enabled: bool}`. [[hall_main#_enter_tree]] reads `.text_size` (`hall_main.gd:408`), [[hall_main#_ready]] reads `.save_enabled` (`hall_main.gd:455`) to decide whether to load a run, and [[hall_main#_load_settings]] copies all four (`hall_main.gd:1391`).
 
 **Side effects:** reads the config file.
 
-**Called by:** [[hall_main#_enter_tree]] (`hall_main.gd:405`), [[hall_main#_ready]] (`hall_main.gd:452`), [[hall_main#_load_settings]] (`hall_main.gd:1373`).
+**Called by:** [[hall_main#_enter_tree]] (`hall_main.gd:408`), [[hall_main#_ready]] (`hall_main.gd:455`), [[hall_main#_load_settings]] (`hall_main.gd:1391`).
 
 **Calls:** [[hall_settings#clamp_color_filter]], [[hall_settings#clamp_text_size]].
 
@@ -58,7 +58,7 @@ Save one setting, keeping the rest of the file.
 
 **Side effects:** rewrites `user://settings.cfg`.
 
-**Called by:** [[hall_main#set_color_filter]] (`hall_main.gd:1332`), [[hall_main#set_text_size]] (`hall_main.gd:1351`), [[hall_main#set_reduce_motion]] (`hall_main.gd:1359`), [[hall_main#set_save_enabled]] (`hall_main.gd:1368`), [[hall_save_transfer#import_snapshot]] (`hall_save_transfer.gd:95`).
+**Called by:** [[hall_main#set_color_filter]] (`hall_main.gd:1350`), [[hall_main#set_text_size]] (`hall_main.gd:1369`), [[hall_main#set_reduce_motion]] (`hall_main.gd:1377`), [[hall_main#set_save_enabled]] (`hall_main.gd:1386`), [[hall_save_transfer#import_snapshot]] (`hall_save_transfer.gd:95`).
 
 **Calls:** nothing in the project.
 
@@ -76,7 +76,7 @@ Save one setting, keeping the rest of the file.
 
 **Side effects:** none.
 
-**Called by:** [[hall_main#set_color_filter]] (`hall_main.gd:1330`), [[hall_settings#load_settings]] (`hall_settings.gd:54`).
+**Called by:** [[hall_main#set_color_filter]] (`hall_main.gd:1348`), [[hall_settings#load_settings]] (`hall_settings.gd:54`).
 
 **Calls:** nothing.
 
@@ -94,7 +94,7 @@ Save one setting, keeping the rest of the file.
 
 **Side effects:** none.
 
-**Called by:** [[hall_main#set_text_size]] (`hall_main.gd:1349`), [[hall_settings#load_settings]] (`hall_settings.gd:56`), [[hall_settings#text_size_factor]] (`hall_settings.gd:82`).
+**Called by:** [[hall_main#set_text_size]] (`hall_main.gd:1367`), [[hall_settings#load_settings]] (`hall_settings.gd:56`), [[hall_settings#text_size_factor]] (`hall_settings.gd:82`).
 
 **Calls:** nothing.
 
@@ -108,11 +108,11 @@ The font multiplier for the Text size at `size_index` (from `TEXT_SIZE_FACTORS`)
 |---|---|---|---|
 | `size_index` | `int` | Text size index | `text_size` on [[hall_main]] |
 
-**Returns:** `float`, handed to `HallFontScale.init` ([[hall_main#_enter_tree]], `hall_main.gd:406`) and `HallFontScale.set_text_factor` ([[hall_main#set_text_size]], `hall_main.gd:1350`).
+**Returns:** `float`, handed to `HallFontScale.init` ([[hall_main#_enter_tree]], `hall_main.gd:409`) and `HallFontScale.set_text_factor` ([[hall_main#set_text_size]], `hall_main.gd:1368`).
 
 **Side effects:** none.
 
-**Called by:** [[hall_main#_enter_tree]] (`hall_main.gd:406`), [[hall_main#set_text_size]] (`hall_main.gd:1350`).
+**Called by:** [[hall_main#_enter_tree]] (`hall_main.gd:409`), [[hall_main#set_text_size]] (`hall_main.gd:1368`).
 
 **Calls:** [[hall_settings#clamp_text_size]].
 

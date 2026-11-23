@@ -3,8 +3,8 @@ source: Scripts/Character Generator/character_resource.gd
 class_name: GuildCharacter
 extends: Resource
 scene: null
-systems: []
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+systems: ["[[Hiring Characters]]", "[[Success Chance]]", "[[Quest Resolution and Injuries]]", "[[Items and Shop]]"]
+last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
 tags: [script, resource]
 ---
 
@@ -28,6 +28,8 @@ tags: [script, resource]
 | `injury_level`, `injury_count` | var | Current `InjuryLevel`, and how many injuries were taken in total. |
 | `died_on_day`, `died_on_quest` | var | Day (-1 while alive) and quest title of death. Set by [[hall_rules#play_quest]]. |
 | `joined_on_day` | var (int) | The day the hero last joined the guild (default 1). Feeds [[hall_ledger#build_run_records]]. |
+| `MIN_STAT_WEIGHT` | const | 0.0. Lowest weight a stat may be rolled with, in stat points; keeps every stat at 0 or more. |
+| `MAX_WEIGHT_REDRAWS` | const | 20. How many times a below-minimum weight is redrawn before falling back to `MIN_STAT_WEIGHT` (a count of draws). |
 | `stat_deviation` | var (int) | 2. Spread of the stat roll; recruits get a larger one from [[hire_scaling#deviation_for]]. |
 | `stats` | var (`Dictionary[StatType, int]`) | Base stats. Armory bonus is written here by [[guild_upgrades]]; training raises it. |
 | `temp_stats` | var (`Dictionary[StatType, int]`) | Pluck and gear bonus, rebuilt by [[character_resource#reset_temp_stats]]. |
@@ -41,7 +43,7 @@ tags: [script, resource]
 ## Functions
 
 ### _init
-`func _init() -> void` · `Scripts/Character Generator/character_resource.gd:96`
+`func _init() -> void` · `Scripts/Character Generator/character_resource.gd:102`
 
 Constructor. Rolls a random gender and role, a name for the gender ([[external_content_container#get_character_name]]), a random `hometown` from `QuestManager.world_regions`, the role icon, the stat spread and description. Sets `injury_level` HEALTHY, `injury_count` 0, status IDLE, the title, `cost = recruit_cost_for_day(GameState.day)` and the Pluck temp stats.
 
@@ -51,12 +53,12 @@ Constructor. Rolls a random gender and role, a name for the gender ([[external_c
 
 **Side effects:** consumes the global RNG; reads `GameState.day`.
 
-**Called by:** `GuildCharacter.new()` in [[character_container#_add_new_recruits]] (`character_container.gd:69`), [[character_container#generate_new_character]] (`character_container.gd:112`), [[hall_rules#make_starting_hero]] (`hall_rules.gd:96`), the `RefReader` inner class of [[hall_save]] (`hall_save.gd:463`), [[hall_debug#add_hero]] (`hall_debug.gd:64`), [[playtest_scenario#_ready]] (`playtest_scenario.gd:56`, `:61`), [[quest_resource#generatePartyDuo]] (`quest_resource.gd:967`, `:968`).
+**Called by:** `GuildCharacter.new()` in [[character_container#_add_new_recruits]] (`character_container.gd:69`), [[character_container#generate_new_character]] (`character_container.gd:119`), [[hall_rules#make_starting_hero]] (`hall_rules.gd:96`), the `RefReader` inner class of [[hall_save]] (`hall_save.gd:463`), [[hall_debug#add_hero]] (`hall_debug.gd:64`), [[playtest_scenario#_ready]] (`playtest_scenario.gd:56`, `:61`), [[quest_resource#generatePartyDuo]] (`quest_resource.gd:964`, `:965`).
 
 **Calls:** [[external_content_container#get_character_name]], [[external_content_container#get_character_icon]], [[character_resource#generate_stat_spread]], [[character_resource#generate_description]], [[character_resource#recruit_cost_for_day]], [[character_resource#add_pluck_temp_stats]].
 
 ### recruit_cost_for_day
-`static func recruit_cost_for_day(day: int) -> int` · `Scripts/Character Generator/character_resource.gd:124`
+`static func recruit_cost_for_day(day: int) -> int` · `Scripts/Character Generator/character_resource.gd:130`
 
 What a new recruit costs to hire on a given day: 200 from day 5, 100 on days 3-4, free before that.
 
@@ -69,12 +71,12 @@ What a new recruit costs to hire on a given day: 200 from day 5, 100 on days 3-4
 
 **Side effects:** none.
 
-**Called by:** [[character_container#_add_returning_characters]] (`character_container.gd:78`), [[character_resource#_init]] (`character_resource.gd:116`), [[hall_ledger#is_short_of_recruit_gold]] (`hall_ledger.gd:59`), [[hall_wallet#recruit_price]] (`hall_wallet.gd:121`), [[hire_scaling#recruit_cost]] (`hire_scaling.gd:89`), [[hall_header#_refresh_danger_strip]] (`hall_header.gd:208`), [[popup_gold#refresh]] (`popup_gold.gd:85`).
+**Called by:** [[character_container#_add_returning_characters]] (`character_container.gd:78`), [[character_resource#_init]] (`character_resource.gd:122`), [[hall_ledger#is_short_of_recruit_gold]] (`hall_ledger.gd:97`), [[hall_wallet#recruit_price]] (`hall_wallet.gd:121`), [[hire_scaling#recruit_cost]] (`hire_scaling.gd:94`), [[hall_header#_refresh_danger_strip]] (`hall_header.gd:224`), [[popup_gold#refresh]] (`popup_gold.gd:85`).
 
 **Calls:** none.
 
 ### reroll_stats
-`func reroll_stats(points: int, deviation: int) -> void` · `Scripts/Character Generator/character_resource.gd:136`
+`func reroll_stats(points: int, deviation: int) -> void` · `Scripts/Character Generator/character_resource.gd:142`
 
 Rolls this character's stats again from `points` stat points (plus the usual role bonus) with a spread of `deviation`. Used for recruits, whose budget grows with the guild.
 
@@ -92,10 +94,28 @@ Rolls this character's stats again from `points` stat points (plus the usual rol
 
 **Calls:** [[character_resource#generate_stat_spread]], [[character_resource#reset_temp_stats]].
 
-### generate_stat_spread
-`func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int) -> void` · `Scripts/Character Generator/character_resource.gd:146`
+### _draw_stat_weight
+`func _draw_stat_weight(mean: float, deviation: float) -> float` · `Scripts/Character Generator/character_resource.gd:154`
 
-Generates the stats by normalized random sampling: each of the four stats gets `randfn(total / 4, stat_deviation)`, then each is scaled to its share of `_total_points` (truncated to int). Then the role bonus of +3 is added to one stat by `role`: Knight to Defense, Priest to Wisdom, Pathfinder to Sleaziness, Mage to Strength.
+Draws one stat weight from a normal curve (`randfn`), redrawing any result below `MIN_STAT_WEIGHT`, at most `MAX_WEIGHT_REDRAWS` tries, then falls back to `MIN_STAT_WEIGHT`.
+
+| Name | Type | Meaning | Where callers get it |
+|---|---|---|---|
+| `mean` | `float` | Centre of the curve, in stat points | `float(_total_points) / _stats.size()` in [[character_resource#generate_stat_spread]] |
+| `deviation` | `float` | Spread, in stat points | `stat_deviation` |
+
+**Returns:** `float` weight in stat points (>= 0). [[character_resource#generate_stat_spread]] sums the weights and scales them to the point total.
+
+**Side effects:** consumes random numbers.
+
+**Called by:** [[character_resource#generate_stat_spread]] (`character_resource.gd:172`).
+
+**Calls:** none.
+
+### generate_stat_spread
+`func generate_stat_spread(_stats: Dictionary[StatType, int], _total_points: int) -> void` · `Scripts/Character Generator/character_resource.gd:163`
+
+Generates the stats by normalized random sampling: each of the four stats gets a weight from [[character_resource#_draw_stat_weight]] (a normal draw around `total / 4` with `stat_deviation`, never below `MIN_STAT_WEIGHT`), then each is scaled to its share of `_total_points` (truncated to int). Then the role bonus of +3 is added to one stat by `role`: Knight to Defense, Priest to Wisdom, Pathfinder to Sleaziness, Mage to Strength.
 
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
@@ -107,12 +127,12 @@ Generates the stats by normalized random sampling: each of the four stats gets `
 
 **Side effects:** writes `_stats`.
 
-**Called by:** [[character_resource#_init]] (`character_resource.gd:107`), [[character_resource#reroll_stats]] (`character_resource.gd:141`).
+**Called by:** [[character_resource#_init]] (`character_resource.gd:113`), [[character_resource#reroll_stats]] (`character_resource.gd:147`).
 
-**Calls:** none.
+**Calls:** [[character_resource#_draw_stat_weight]].
 
 ### generate_description
-`func generate_description() -> String` · `Scripts/Character Generator/character_resource.gd:175`
+`func generate_description() -> String` · `Scripts/Character Generator/character_resource.gd:192`
 
 Builds the backstory text: the role backstory plus up to `max_rand_backstories` random backstory lines (a line already present is skipped).
 
@@ -122,12 +142,12 @@ Builds the backstory text: the role backstory plus up to `max_rand_backstories` 
 
 **Side effects:** consumes the global RNG.
 
-**Called by:** [[character_resource#_init]] (`character_resource.gd:108`), [[hall_rules#make_starting_hero]] (`hall_rules.gd:105`).
+**Called by:** [[character_resource#_init]] (`character_resource.gd:114`), [[hall_rules#make_starting_hero]] (`hall_rules.gd:105`).
 
 **Calls:** [[external_content_container#get_role_backstory]], [[external_content_container#get_random_backstory]].
 
 ### injure_character
-`func injure_character(can_die: bool = true) -> bool` · `Scripts/Character Generator/character_resource.gd:190`
+`func injure_character(can_die: bool = true) -> bool` · `Scripts/Character Generator/character_resource.gd:207`
 
 Raises the injury level by one. A dead hero is unchanged. With `can_die` false, a hit that would kill stops at Gravely injured: nothing changes (`injury_count` included) and it returns false.
 
@@ -145,7 +165,7 @@ Raises the injury level by one. A dead hero is unchanged. With `can_die` false, 
 **Calls:** none.
 
 ### level_up_random_stat
-`func level_up_random_stat(_points_to_add: int)` · `Scripts/Character Generator/character_resource.gd:208`
+`func level_up_random_stat(_points_to_add: int)` · `Scripts/Character Generator/character_resource.gd:225`
 
 Adds 1 to a random base stat, `_points_to_add` times, and `total_points` with it.
 
@@ -163,7 +183,7 @@ Adds 1 to a random base stat, `_points_to_add` times, and `total_points` with it
 **Calls:** none.
 
 ### increase_temp_stat
-`func increase_temp_stat(_stat: StatType, _points_to_add: int)` · `Scripts/Character Generator/character_resource.gd:215`
+`func increase_temp_stat(_stat: StatType, _points_to_add: int)` · `Scripts/Character Generator/character_resource.gd:232`
 
 Adds `_points_to_add` to one entry of `temp_stats`.
 
@@ -177,12 +197,12 @@ Adds `_points_to_add` to one entry of `temp_stats`.
 
 **Side effects:** writes `temp_stats`.
 
-**Called by:** [[character_resource#add_passive_item_stats]] (`character_resource.gd:240`), [[character_resource#add_pluck_temp_stats]] (`character_resource.gd:246`).
+**Called by:** [[character_resource#add_passive_item_stats]] (`character_resource.gd:257`), [[character_resource#add_pluck_temp_stats]] (`character_resource.gd:263`).
 
 **Calls:** none.
 
 ### reset_temp_stats
-`func reset_temp_stats()` · `Scripts/Character Generator/character_resource.gd:220`
+`func reset_temp_stats()` · `Scripts/Character Generator/character_resource.gd:237`
 
 Zeroes `temp_stats`, then reapplies Pluck and equipped gear. Pluck is worked out from the base stats only, so it doesn't stack on gear.
 
@@ -192,12 +212,12 @@ Zeroes `temp_stats`, then reapplies Pluck and equipped gear. Pluck is worked out
 
 **Side effects:** rewrites `temp_stats`.
 
-**Called by:** [[game_state#_refresh_temp_stats]] (`game_state.gd:54`), [[item_shop#equip]] (`item_shop.gd:149`, `:150`), [[item_shop#unequip]] (`item_shop.gd:161`), [[character_resource#reroll_stats]] (`character_resource.gd:142`), [[hall_debug#heal_everyone]] (`hall_debug.gd:107`), [[hall_save#apply_snapshot]] (`hall_save.gd:346`), [[hall_style#quest_stat_value]] (`hall_style.gd:389`), [[quest_resource#calcSuccessChance]] (`quest_resource.gd:271`).
+**Called by:** [[game_state#_refresh_temp_stats]] (`game_state.gd:54`), [[item_shop#equip]] (`item_shop.gd:149`, `:150`), [[item_shop#unequip]] (`item_shop.gd:161`), [[character_resource#reroll_stats]] (`character_resource.gd:148`), [[hall_debug#heal_everyone]] (`hall_debug.gd:107`), [[hall_save#apply_snapshot]] (`hall_save.gd:346`), [[hall_style#quest_stat_value]] (`hall_style.gd:389`), [[quest_resource#calcSuccessChance]] (`quest_resource.gd:271`).
 
 **Calls:** [[character_resource#add_pluck_temp_stats]], [[character_resource#add_passive_item_stats]].
 
 ### get_quest_stat
-`func get_quest_stat(_stat: StatType) -> int` · `Scripts/Character Generator/character_resource.gd:231`
+`func get_quest_stat(_stat: StatType) -> int` · `Scripts/Character Generator/character_resource.gd:248`
 
 The stat value quests use: base stat plus temp stats (Pluck, gear).
 
@@ -215,7 +235,7 @@ The stat value quests use: base stat plus temp stats (Pluck, gear).
 **Calls:** none.
 
 ### add_passive_item_stats
-`func add_passive_item_stats()` · `Scripts/Character Generator/character_resource.gd:236`
+`func add_passive_item_stats()` · `Scripts/Character Generator/character_resource.gd:253`
 
 Adds every equipped [[passive_item]]'s `stat_amount` to its `affected_stat` in `temp_stats`.
 
@@ -225,12 +245,12 @@ Adds every equipped [[passive_item]]'s `stat_amount` to its `affected_stat` in `
 
 **Side effects:** writes `temp_stats`.
 
-**Called by:** [[character_resource#reset_temp_stats]] (`character_resource.gd:227`).
+**Called by:** [[character_resource#reset_temp_stats]] (`character_resource.gd:244`).
 
 **Calls:** [[character_resource#increase_temp_stat]].
 
 ### add_pluck_temp_stats
-`func add_pluck_temp_stats()` · `Scripts/Character Generator/character_resource.gd:244`
+`func add_pluck_temp_stats()` · `Scripts/Character Generator/character_resource.gd:261`
 
 Gives every stat its Pluck bonus (see [[character_resource#get_pluck_stat_bonus]]) in `temp_stats`.
 
@@ -240,12 +260,12 @@ Gives every stat its Pluck bonus (see [[character_resource#get_pluck_stat_bonus]
 
 **Side effects:** writes `temp_stats`.
 
-**Called by:** [[character_resource#_init]] (`character_resource.gd:118`), [[character_resource#reset_temp_stats]] (`character_resource.gd:226`).
+**Called by:** [[character_resource#_init]] (`character_resource.gd:124`), [[character_resource#reset_temp_stats]] (`character_resource.gd:243`).
 
 **Calls:** [[character_resource#get_pluck_stat_bonus]], [[character_resource#increase_temp_stat]].
 
 ### get_pluck_stat_bonus
-`func get_pluck_stat_bonus(_stat: StatType) -> int` · `Scripts/Character Generator/character_resource.gd:252`
+`func get_pluck_stat_bonus(_stat: StatType) -> int` · `Scripts/Character Generator/character_resource.gd:269`
 
 How much a stat is raised by Pluck: `max(pluck, int(stats[_stat] * pluck / 10.0))`, i.e. 10% of the base stat per level, rounded down, but at least +1 per level.
 
@@ -258,12 +278,12 @@ How much a stat is raised by Pluck: `max(pluck, int(stats[_stat] * pluck / 10.0)
 
 **Side effects:** none.
 
-**Called by:** [[character_resource#add_pluck_temp_stats]] (`character_resource.gd:246`), [[screen_character#_show_stats]] (`screen_character.gd:227`).
+**Called by:** [[character_resource#add_pluck_temp_stats]] (`character_resource.gd:263`), [[screen_character#_show_stats]] (`screen_character.gd:227`).
 
 **Calls:** none.
 
 ### try_add_item
-`func try_add_item(_item: StandardItem) -> bool` · `Scripts/Character Generator/character_resource.gd:257`
+`func try_add_item(_item: StandardItem) -> bool` · `Scripts/Character Generator/character_resource.gd:274`
 
 Appends the item to `equipped_items` when there is room (`size < max_items`).
 
@@ -281,6 +301,6 @@ Appends the item to `equipped_items` when there is room (`size < max_items`).
 **Calls:** none.
 
 ## Suspected issues
-- `character_resource.gd:208` `level_up_random_stat` and `:257` `try_add_item` have no callers.
-- `character_resource.gd:146` `generate_stat_spread` assigns a float into `int` stat slots, truncating, so the stats usually sum to a few points under `_total_points` (before the +3 role bonus).
-- `character_resource.gd:80`: `status` (`CharacterStatus`) is only ever set to `IDLE` in `_init`; nothing in `Globals/`, `Scripts/` or `Scenes/` reads or writes it, so the enum is unused.
+- `character_resource.gd:225` `level_up_random_stat` and `:274` `try_add_item` have no callers.
+- `character_resource.gd:163` `generate_stat_spread` assigns a float into `int` stat slots, truncating, so the stats usually sum to a few points under `_total_points` (before the +3 role bonus).
+- `character_resource.gd:86`: `status` (`CharacterStatus`) is only ever set to `IDLE` in `_init`; nothing in `Globals/`, `Scripts/` or `Scenes/` reads or writes it, so the enum is unused.

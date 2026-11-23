@@ -14,7 +14,7 @@ tags: [scene]
 The Backup save sheet reached from the Menu: export the run as a file or a copied code, or load one back (two taps to replace the guild), and Back. See [[overlay_backup]].
 
 ## Parent scenes
-- **Placed in editor:** [[hall_main (scene)]] at node `OverlayBackup`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1858`).
+- **Placed in editor:** [[hall_main (scene)]] at node `OverlayBackup`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1883`).
 - No runtime parents.
 
 ## Child scenes

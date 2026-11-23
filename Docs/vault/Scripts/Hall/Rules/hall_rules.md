@@ -3,8 +3,8 @@ source: Scripts/Hall/Rules/hall_rules.gd
 class_name: HallRules
 extends: null
 scene: null
-systems: []
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+systems: ["[[Day Cycle]]", "[[Party Drafting and Assignment]]", "[[Success Chance]]", "[[Quest Generation and Difficulty]]", "[[Quest Resolution and Injuries]]", "[[Economy and Wallet]]", "[[Run End]]"]
+last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
 tags: [script]
 ---
 
@@ -51,7 +51,7 @@ A new Uncle John: a Priest with average stats, free (`cost` 0), `joined_on_day` 
 
 **Side effects:** none (creates an object).
 
-**Called by:** [[hall_main#_add_starting_hero]] (`hall_main.gd:490`).
+**Called by:** [[hall_main#_add_starting_hero]] (`hall_main.gd:493`).
 
 **Calls:** [[external_content_container#get_character_icon]], [[character_resource#generate_description]].
 
@@ -70,7 +70,7 @@ A new quest entry: `{quest, state: HallStyle.QUEST_STATE_OPEN, party: [], milest
 
 **Side effects:** none.
 
-**Called by:** [[hall_rules#build_day_quests]] (`hall_rules.gd:159`, `:162`, `:166`), [[hall_rules#_build_boss_entries]] (`hall_rules.gd:184`).
+**Called by:** [[hall_rules#build_day_quests]] (`hall_rules.gd:159`, `:162`, `:167`, `:170`, `:173`, `:177`), [[hall_rules#_build_boss_entries]] (`hall_rules.gd:195`).
 
 **Calls:** none.
 
@@ -90,15 +90,15 @@ Today's quest entries. A boss day returns only the boss entries (but in freeplay
 
 **Side effects:** creates `CreatedQuest` objects (they read `GameState.day`, not the `day` parameter); uses `randf` through [[hall_rules#rand_bell_curve]].
 
-**Called by:** [[hall_main#_generate_quests]] (`hall_main.gd:501`).
+**Called by:** [[hall_main#_generate_quests]] (`hall_main.gd:504`).
 
 **Calls:** [[hall_rules#is_boss_day]], [[hall_rules#_build_boss_entries]], [[hall_rules#standing_rank_for]], [[hall_rules#quests_per_day]], [[hall_rules#rand_bell_curve]], [[hall_rules#_scale_normal_quest]], [[hall_rules#new_entry]], [[quest_resource#_init]].
 
 > [!note] How it works
-> The body also special-cases `GameState.day` (not `day`): on days 2, 4, 7, 9, 12, 15, 22, 24, 26, 28, 32, 33, 34, 36, 38, 39, 42, 45 and 48 the first quest uses the day's written minor story and later quests that day are created with day 5 (`noRepeatQuests`), "to avoid cloning minor quests". On day 18 it returns two quests, built with `GameState.day` and `-GameState.day`.
+> The body also special-cases `GameState.day` (not `day`): on days 2, 4, 7, 9, 12, 15, 23, 26, 32, 34, 43 and 48 the first quest uses the day's written minor story and later quests that day are created with day 5 (`noRepeatQuests`), "to avoid cloning minor quests". On days 18, 28 and 45 it returns two quests, built with `GameState.day` and `-GameState.day`. On day 37 it returns three: `GameState.day`, `-GameState.day` and the special number `3737`. (The same day numbers are the ones `CreatedQuest._init` treats as milestone days; see [[quest_resource#_init]].)
 
 ### _build_boss_entries
-`static func _build_boss_entries(day: int) -> Array` · `Scripts/Hall/Rules/hall_rules.gd:176`
+`static func _build_boss_entries(day: int) -> Array` · `Scripts/Hall/Rules/hall_rules.gd:187`
 
 The boss entries for a boss day: one quest, or two on `BOSS_TWO_DAYS` (the second built with the negative day number). All are milestone entries with `requirement_multiplier = requirement_scale(day, true, is_final)`. The `HallMain.FINAL_DAY` entry is marked `final` (it rolls the credits).
 
@@ -116,7 +116,7 @@ The boss entries for a boss day: one quest, or two on `BOSS_TWO_DAYS` (the secon
 **Calls:** [[hall_rules#new_entry]], [[hall_rules#requirement_scale]], [[quest_resource#_init]].
 
 ### _scale_normal_quest
-`static func _scale_normal_quest(quest: CreatedQuest, day: int, is_freeplay: bool) -> void` · `Scripts/Hall/Rules/hall_rules.gd:192`
+`static func _scale_normal_quest(quest: CreatedQuest, day: int, is_freeplay: bool) -> void` · `Scripts/Hall/Rules/hall_rules.gd:203`
 
 Sets the normal quest's `requirement_multiplier` to `requirement_scale(day, false, false)`, and, when `is_freeplay`, calls [[quest_resource#apply_freeplay_gold]] with `freeplay_scale(day)`.
 
@@ -131,30 +131,30 @@ Sets the normal quest's `requirement_multiplier` to `requirement_scale(day, fals
 
 **Side effects:** changes the quest's `requirement_multiplier` and, in freeplay, its gold.
 
-**Called by:** [[hall_rules#build_day_quests]] (`hall_rules.gd:158`, `:161`, `:165`).
+**Called by:** [[hall_rules#build_day_quests]] (`hall_rules.gd:158`, `:161`, `:166`, `:169`, `:172`, `:176`).
 
 **Calls:** [[hall_rules#requirement_scale]], [[hall_rules#freeplay_scale]], [[quest_resource#apply_freeplay_gold]].
 
 ### freeplay_scale
-`static func freeplay_scale(day: int) -> float` · `Scripts/Hall/Rules/hall_rules.gd:200`
+`static func freeplay_scale(day: int) -> float` · `Scripts/Hall/Rules/hall_rules.gd:211`
 
 `1.0 + FREEPLAY_SCALE_PER_DAY * max(day - HallMain.FINAL_DAY, 0)`: 1.0 on or before the final day, then +2% per day.
 
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `day` | `int` | A day | `GameState.day` in [[hall_main#freeplay_scale]] (`hall_main.gd:506`); the `day` argument in the callers below |
+| `day` | `int` | A day | `GameState.day` in [[hall_main#freeplay_scale]] (`hall_main.gd:509`); the `day` argument in the callers below |
 
 **Returns:** `float` multiplier. [[hall_main#freeplay_scale]] returns it for display; the callers below multiply requirements, gold or recruit budgets by it.
 
 **Side effects:** none.
 
-**Called by:** [[hall_main#freeplay_scale]] (`hall_main.gd:506`), [[hall_rules#_scale_normal_quest]] (`hall_rules.gd:195`), [[hall_rules#requirement_scale]] (`hall_rules.gd:247`), [[hire_scaling#recruit_budget]] (`hire_scaling.gd:67`).
+**Called by:** [[hall_main#freeplay_scale]] (`hall_main.gd:509`), [[hall_rules#_scale_normal_quest]] (`hall_rules.gd:206`), [[hall_rules#requirement_scale]] (`hall_rules.gd:258`), [[hire_scaling#recruit_budget]] (`hire_scaling.gd:72`).
 
 **Calls:** none.
 
 ### is_boss_day
-`static func is_boss_day(day: int) -> bool` · `Scripts/Hall/Rules/hall_rules.gd:205`
+`static func is_boss_day(day: int) -> bool` · `Scripts/Hall/Rules/hall_rules.gd:216`
 
 Whether `day` is in `BOSS_DAYS`.
 
@@ -172,7 +172,7 @@ Whether `day` is in `BOSS_DAYS`.
 **Calls:** none.
 
 ### bosses_before
-`static func bosses_before(day: int) -> int` · `Scripts/Hall/Rules/hall_rules.gd:210`
+`static func bosses_before(day: int) -> int` · `Scripts/Hall/Rules/hall_rules.gd:221`
 
 How many `BOSS_DAYS` come strictly before `day`.
 
@@ -185,12 +185,12 @@ How many `BOSS_DAYS` come strictly before `day`.
 
 **Side effects:** none.
 
-**Called by:** [[hall_rules#difficulty_scale]] (`hall_rules.gd:235`).
+**Called by:** [[hall_rules#difficulty_scale]] (`hall_rules.gd:246`).
 
 **Calls:** none.
 
 ### next_boss_day
-`static func next_boss_day(day: int) -> int` · `Scripts/Hall/Rules/hall_rules.gd:219`
+`static func next_boss_day(day: int) -> int` · `Scripts/Hall/Rules/hall_rules.gd:230`
 
 The first boss day on or after `day`, or -1 when none is left.
 
@@ -203,12 +203,12 @@ The first boss day on or after `day`, or -1 when none is left.
 
 **Side effects:** none.
 
-**Called by:** [[hall_main#days_until_next_boss]] (`hall_main.gd:717`), [[hall_main#next_boss_is_final]] (`hall_main.gd:723`), [[agent_bridge_state#build]] (`agent_bridge_state.gd:29`).
+**Called by:** [[hall_main#days_until_next_boss]] (`hall_main.gd:731`), [[hall_main#next_boss_is_final]] (`hall_main.gd:737`), [[agent_bridge_state#build]] (`agent_bridge_state.gd:29`).
 
 **Calls:** none.
 
 ### difficulty_scale
-`static func difficulty_scale(day: int) -> float` · `Scripts/Hall/Rules/hall_rules.gd:229`
+`static func difficulty_scale(day: int) -> float` · `Scripts/Hall/Rules/hall_rules.gd:240`
 
 The staircase multiplier on quest requirements: 1.0 before `DIFFICULTY_START_DAY`, then `1 + DRIFT * (capped_day - (START - 1)) + STEP * bosses_before(capped_day)`, with the day capped at `HallMain.FINAL_DAY` (frozen from then on; [[hall_rules#freeplay_scale]] takes over).
 
@@ -221,12 +221,12 @@ The staircase multiplier on quest requirements: 1.0 before `DIFFICULTY_START_DAY
 
 **Side effects:** none.
 
-**Called by:** [[hall_rules#requirement_scale]] (`hall_rules.gd:247`).
+**Called by:** [[hall_rules#requirement_scale]] (`hall_rules.gd:258`).
 
 **Calls:** [[hall_rules#bosses_before]].
 
 ### requirement_scale
-`static func requirement_scale(day: int, is_boss: bool, is_final: bool) -> float` · `Scripts/Hall/Rules/hall_rules.gd:241`
+`static func requirement_scale(day: int, is_boss: bool, is_final: bool) -> float` · `Scripts/Hall/Rules/hall_rules.gd:252`
 
 The full multiplier on a quest's stat requirement: `difficulty_scale * spike * freeplay_scale`, where spike is `FINAL_BOSS_SPIKE` for the final battle, `BOSS_SPIKE` for other bosses, else 1.0.
 
@@ -241,12 +241,12 @@ The full multiplier on a quest's stat requirement: `difficulty_scale * spike * f
 
 **Side effects:** none.
 
-**Called by:** [[hall_rules#_build_boss_entries]] (`hall_rules.gd:183`), [[hall_rules#_scale_normal_quest]] (`hall_rules.gd:193`).
+**Called by:** [[hall_rules#_build_boss_entries]] (`hall_rules.gd:194`), [[hall_rules#_scale_normal_quest]] (`hall_rules.gd:204`).
 
 **Calls:** [[hall_rules#difficulty_scale]], [[hall_rules#freeplay_scale]].
 
 ### quests_per_day
-`static func quests_per_day(day: int) -> int` · `Scripts/Hall/Rules/hall_rules.gd:251`
+`static func quests_per_day(day: int) -> int` · `Scripts/Hall/Rules/hall_rules.gd:262`
 
 How many quests the board gets on `day`, from `QUESTS_PER_DAY_BY_DAY` (else `QUESTS_PER_DAY_LATE`).
 
@@ -264,7 +264,7 @@ How many quests the board gets on `day`, from `QUESTS_PER_DAY_BY_DAY` (else `QUE
 **Calls:** none.
 
 ### standing_rank_for
-`static func standing_rank_for(standing: int) -> int` · `Scripts/Hall/Rules/hall_rules.gd:260`
+`static func standing_rank_for(standing: int) -> int` · `Scripts/Hall/Rules/hall_rules.gd:271`
 
 The quest rank (0 = F .. `TOP_STANDING_RANK`) a guild with this standing centers its quests on: `clampi(ceili(standing / STANDING_PER_RANK) - 1, 0, TOP_STANDING_RANK)`.
 
@@ -277,12 +277,12 @@ The quest rank (0 = F .. `TOP_STANDING_RANK`) a guild with this standing centers
 
 **Side effects:** none.
 
-**Called by:** [[hall_rules#build_day_quests]] (`hall_rules.gd:134`), [[hall_wallet#standing_rank_letter]] (`hall_wallet.gd:81`), [[hire_scaling#standing_floor]] (`hire_scaling.gd:57`), [[standard_item#get_rarity]] (`standard_item.gd:96`).
+**Called by:** [[hall_rules#build_day_quests]] (`hall_rules.gd:134`), [[guild_upgrades#nightly_fee]] (`guild_upgrades.gd:360`), [[hall_wallet#standing_rank_letter]] (`hall_wallet.gd:81`), [[hire_scaling#standing_floor]] (`hire_scaling.gd:62`), [[standard_item#get_rarity]] (`standard_item.gd:96`).
 
 **Calls:** none.
 
 ### standing_for_win
-`static func standing_for_win(quest: CreatedQuest) -> int` · `Scripts/Hall/Rules/hall_rules.gd:265`
+`static func standing_for_win(quest: CreatedQuest) -> int` · `Scripts/Hall/Rules/hall_rules.gd:276`
 
 Standing a won quest pays: `quest.difficulty + 1` (F = 1, E = 2, ...).
 
@@ -295,12 +295,12 @@ Standing a won quest pays: `quest.difficulty + 1` (F = 1, E = 2, ...).
 
 **Side effects:** none.
 
-**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:366`), [[agent_bridge_state#_quests]] (`agent_bridge_state.gd:94`), [[screen_assign#_show_quest_card]] (`screen_assign.gd:227`).
+**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:377`), [[agent_bridge_state#_quests]] (`agent_bridge_state.gd:94`), [[screen_assign#_show_quest_card]] (`screen_assign.gd:227`).
 
 **Calls:** none.
 
 ### standing_for_loss
-`static func standing_for_loss(quest: CreatedQuest) -> int` · `Scripts/Hall/Rules/hall_rules.gd:271`
+`static func standing_for_loss(quest: CreatedQuest) -> int` · `Scripts/Hall/Rules/hall_rules.gd:282`
 
 Standing a failed quest costs: `max(ceili((difficulty + 1) / 2.0), 1)`. Rank 0-1 costs 1, 2-3 costs 2, 4-5 costs 3, and the G rank (-1) costs 1.
 
@@ -313,12 +313,12 @@ Standing a failed quest costs: `max(ceili((difficulty + 1) / 2.0), 1)`. Rank 0-1
 
 **Side effects:** none.
 
-**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:371`), [[agent_bridge_state#_quests]] (`agent_bridge_state.gd:95`), [[screen_assign#_show_quest_card]] (`screen_assign.gd:227`).
+**Called by:** [[hall_rules#play_quest]] (`hall_rules.gd:382`), [[agent_bridge_state#_quests]] (`agent_bridge_state.gd:95`), [[screen_assign#_show_quest_card]] (`screen_assign.gd:227`).
 
 **Calls:** none.
 
 ### standing_for_deny
-`static func standing_for_deny(quest: CreatedQuest) -> int` · `Scripts/Hall/Rules/hall_rules.gd:277`
+`static func standing_for_deny(quest: CreatedQuest) -> int` · `Scripts/Hall/Rules/hall_rules.gd:288`
 
 Standing lost for denying a quest: `max(difficulty, 1)`, so even an F quest costs something.
 
@@ -331,12 +331,12 @@ Standing lost for denying a quest: `max(difficulty, 1)`, so even an F quest cost
 
 **Side effects:** none.
 
-**Called by:** [[hall_main#deny_quest]] (`hall_main.gd:1011`), [[screen_assign#_show_footer]] (`screen_assign.gd:436`).
+**Called by:** [[hall_main#deny_quest]] (`hall_main.gd:1025`), [[screen_assign#_show_footer]] (`screen_assign.gd:436`).
 
 **Calls:** none.
 
 ### can_deny
-`static func can_deny(entry: Dictionary) -> bool` · `Scripts/Hall/Rules/hall_rules.gd:285`
+`static func can_deny(entry: Dictionary) -> bool` · `Scripts/Hall/Rules/hall_rules.gd:296`
 
 False only for the final battle: denying it would let day 50 pass with no credits and no defeat, so the run would never end. Bosses and every other quest can be denied.
 
@@ -349,12 +349,12 @@ False only for the final battle: denying it would let day 50 pass with no credit
 
 **Side effects:** none.
 
-**Called by:** [[hall_main#can_deny_quest]] (`hall_main.gd:583`), [[hall_main#deny_quest]] (`hall_main.gd:1006`).
+**Called by:** [[hall_main#can_deny_quest]] (`hall_main.gd:597`), [[hall_main#deny_quest]] (`hall_main.gd:1020`).
 
 **Calls:** none.
 
 ### rand_bell_curve
-`static func rand_bell_curve(mean: float = 0.0, standard_deviation: float = 1.0) -> float` · `Scripts/Hall/Rules/hall_rules.gd:291`
+`static func rand_bell_curve(mean: float = 0.0, standard_deviation: float = 1.0) -> float` · `Scripts/Hall/Rules/hall_rules.gd:302`
 
 A normally distributed random number (Box-Muller transform). A zero `u1` is nudged to 0.0001 to avoid `log(0)`.
 
@@ -373,7 +373,7 @@ A normally distributed random number (Box-Muller transform). A zero `u1` is nudg
 **Calls:** none.
 
 ### pluck_gain_for
-`static func pluck_gain_for(chance: float) -> int` · `Scripts/Hall/Rules/hall_rules.gd:304`
+`static func pluck_gain_for(chance: float) -> int` · `Scripts/Hall/Rules/hall_rules.gd:315`
 
 Pluck each party member gains for winning a quest sent at `chance` percent, from `PLUCK_GAIN_BY_ODDS`. A party with no chance yet (-1) counts as a long shot (gain 4).
 
@@ -386,12 +386,12 @@ Pluck each party member gains for winning a quest sent at `chance` percent, from
 
 **Side effects:** none.
 
-**Called by:** [[hall_main#pluck_gain_for]] (`hall_main.gd:640`), [[hall_rules#play_quest]] (`hall_rules.gd:399`).
+**Called by:** [[hall_main#pluck_gain_for]] (`hall_main.gd:654`), [[hall_rules#play_quest]] (`hall_rules.gd:410`).
 
 **Calls:** none.
 
 ### train_odds_for
-`static func train_odds_for(rank: int) -> int` · `Scripts/Hall/Rules/hall_rules.gd:314`
+`static func train_odds_for(rank: int) -> int` · `Scripts/Hall/Rules/hall_rules.gd:325`
 
 The good-odds threshold for a quest of `rank`: `TRAIN_ODDS_BASE + TRAIN_ODDS_PER_RANK * clampi(rank, 0, TRAIN_ODDS_TOP_RANK)`.
 
@@ -404,12 +404,12 @@ The good-odds threshold for a quest of `rank`: `TRAIN_ODDS_BASE + TRAIN_ODDS_PER
 
 **Side effects:** none.
 
-**Called by:** [[hall_rules#trains_stat]] (`hall_rules.gd:321`).
+**Called by:** [[hall_rules#trains_stat]] (`hall_rules.gd:332`).
 
 **Calls:** none.
 
 ### trains_stat
-`static func trains_stat(chance: float, rank: int) -> bool` · `Scripts/Hall/Rules/hall_rules.gd:320`
+`static func trains_stat(chance: float, rank: int) -> bool` · `Scripts/Hall/Rules/hall_rules.gd:331`
 
 Whether winning a quest of `rank` sent at `chance` percent trains a stat (true) or gives Pluck (false). A party with no chance yet (-1) never trains.
 
@@ -423,12 +423,12 @@ Whether winning a quest of `rank` sent at `chance` percent trains a stat (true) 
 
 **Side effects:** none.
 
-**Called by:** [[hall_main#trains_stat]] (`hall_main.gd:646`), [[hall_rules#play_quest]] (`hall_rules.gd:393`).
+**Called by:** [[hall_main#trains_stat]] (`hall_main.gd:660`), [[hall_rules#play_quest]] (`hall_rules.gd:404`).
 
 **Calls:** [[hall_rules#train_odds_for]].
 
 ### play_quest
-`static func play_quest(entry: Dictionary, day: int) -> Dictionary` · `Scripts/Hall/Rules/hall_rules.gd:341`
+`static func play_quest(entry: Dictionary, day: int) -> Dictionary` · `Scripts/Hall/Rules/hall_rules.gd:352`
 
 Plays out one quest with [[quest_scoring]] and pays its gold and standing into `GameState`. On a win the party trains a stat (good odds, see [[hall_rules#trains_stat]]) or gains Pluck (riskier odds). Found equipment goes into the pack, and the fallen remember where they fell. The run's tallies are left to the caller ([[hall_main#_run_quest]]).
 
@@ -450,7 +450,7 @@ Plays out one quest with [[quest_scoring]] and pays its gold and standing into `
 
 **Side effects:** changes `GameState` gold and standing; appends items to `ItemContainer.owned_items` and emits `ItemShop.gear_changed`; raises `stats` or `pluck` on party members; sets `died_on_day` and `died_on_quest`; the quest generates its story and injuries.
 
-**Called by:** [[hall_main#_run_quest]] (`hall_main.gd:1595`).
+**Called by:** [[hall_main#_run_quest]] (`hall_main.gd:1615`).
 
 **Calls:** [[quest_scoring#get_success_chance]], [[quest_resource#generateResults]], [[quest_scoring#did_succeed]], [[quest_scoring#get_gold_earned]], [[hall_rules#standing_for_win]], [[hall_rules#standing_for_loss]], [[game_state#add_gold]], [[game_state#add_standing]], [[quest_resource#pays_in_items]], [[hall_rules#trains_stat]], [[quest_resource#roll_trained_stat]], [[hall_rules#pluck_gain_for]], [[hall_style#is_dead]].
 
@@ -459,4 +459,4 @@ Plays out one quest with [[quest_scoring]] and pays its gold and standing into `
 
 ## Suspected issues
 - `hall_rules.gd:128` `build_day_quests` takes a `day` parameter, but `CreatedQuest.new(rank, GameState.day)` and the `match(GameState.day)` block (lines 143-156) read the global day instead. They agree in normal play but not if a caller passes another day.
-- `hall_rules.gd:341` the `play_quest` doc comment lists the result keys without `story_quest`, which the code adds.
+- `hall_rules.gd:352` the `play_quest` doc comment lists the result keys without `story_quest`, which the code adds.

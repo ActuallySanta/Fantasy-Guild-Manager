@@ -3,8 +3,8 @@ source: Globals/character_container.gd
 class_name: null
 extends: Node2D
 scene: null
-systems: []
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+systems: ["[[Boot and Autoload Order]]", "[[Day Cycle]]", "[[Hiring Characters]]", "[[Economy and Wallet]]", "[[Night - Training Hospital Revive]]"]
+last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
 tags: [script, autoload]
 ---
 
@@ -24,7 +24,7 @@ Autoload `CharacterContainer`. Holds the guild's roster (`active_characters`), t
 | `max_hireable_characters` | var (`@export`, int) | How many new faces the hiring screen shows. `refresh_hireable_characters` overwrites it by day. |
 | `hireable_characters` | var (`Array[GuildCharacter]`) | Today's For Hire pool. |
 | `released_characters` | var (`Array[GuildCharacter]`) | Living heroes who were released. Hiring one removes them from this list. |
-| `on_hireables_refreshed` | signal | Emitted at the end of `refresh_hireable_characters`. Listened to by [[hall_main#queue_refresh]] (connected at `hall_main.gd:433`). |
+| `on_hireables_refreshed` | signal | Emitted at the end of `refresh_hireable_characters`. Listened to by [[hall_main#queue_refresh]] (connected at `hall_main.gd:436`). |
 | `on_character_added` | signal | Emitted by `add_character_to_guild`. `GuildUpgrades` connects it to `sync_characters` ([[guild_upgrades#_ready]]). |
 | `on_character_removed` | signal | Emitted by `remove_character_from_guild`. |
 
@@ -91,7 +91,7 @@ Empties the roster, For Hire and the released list for a new run, then rolls a f
 
 **Side effects:** clears the three arrays, refills the pool, emits `on_hireables_refreshed`.
 
-**Called by:** [[hall_main#reset_autoloads]] (`hall_main.gd:1694`).
+**Called by:** [[hall_main#reset_autoloads]] (`hall_main.gd:1719`).
 
 **Calls:** [[character_container#refresh_hireable_characters]].
 
@@ -102,21 +102,36 @@ Number of heroes whose `injury_level < InjuryLevel.DEAD`. The dead stay on the r
 
 **Returns:** `int`. Used by [[hall_ledger#is_run_over]] and [[hall_ledger#is_one_death_from_falling]] for the Game Over checks, by [[tab_board#_show_recruits_box]], and by [[tab_guild#_show_section_buttons]] and [[tab_guild#_show_beds]] for bed counts.
 
-**Called by:** [[character_container#has_free_bed]] (line 105), [[hall_ledger#is_run_over]] (`hall_ledger.gd:24`), [[hall_ledger#is_one_death_from_falling]] (`:37`), [[tab_board#_show_recruits_box]] (`tab_board.gd:79`), [[tab_guild#_show_section_buttons]] (`tab_guild.gd:110`), [[tab_guild#_show_beds]] (`tab_guild.gd:129`).
+**Called by:** [[character_container#has_free_bed]] (line 112), [[character_container#hire_price]] (line 107), [[hall_ledger#is_run_over]] (`hall_ledger.gd:24`), [[hall_ledger#is_one_death_from_falling]] (`:37`), [[tab_board#_show_recruits_box]] (`tab_board.gd:79`), [[tab_guild#_show_section_buttons]] (`tab_guild.gd:110`), [[tab_guild#_show_beds]] (`tab_guild.gd:129`).
+
+### hire_price
+`func hire_price(character: GuildCharacter) -> int` · `Globals/character_container.gd:106`
+
+What this recruit costs to hire right now, in gold: the base price (`character.cost`) raised for the current roster size. Every place that shows or charges a hire price uses it.
+
+| Name | Type | Meaning | Where callers get it |
+|---|---|---|---|
+| `character` | `GuildCharacter` | The recruit being priced | a For Hire card ([[hire_card#setup]]), the character screen ([[screen_character#refresh]]), or the pool in [[hall_ledger#can_afford_a_recruit_today]] |
+
+**Returns:** `int` gold. `0` stays free. [[hire_card#setup]] and [[screen_character#refresh]] print it on the Hire button (free text when 0); [[character_container#add_character_to_guild]] charges it; [[hall_ledger#can_afford_a_recruit_today]] compares it with gold.
+
+**Called by:** [[character_container#add_character_to_guild]] (line 130), [[hall_ledger#can_afford_a_recruit_today]] (`hall_ledger.gd:90`), [[hire_card#setup]] (`hire_card.gd:57`, `:58`), [[screen_character#refresh]] (`screen_character.gd:158`, `:159`), the playtest bridge (`agent_bridge_state.gd:73`, not documented here).
+
+**Calls:** [[hire_scaling#roster_price]], [[character_container#living_count]].
 
 ### has_free_bed
-`func has_free_bed() -> bool` · `Globals/character_container.gd:104`
+`func has_free_bed() -> bool` · `Globals/character_container.gd:111`
 
 True when `living_count() < max_characters`.
 
 **Returns:** `bool`. Used by hire/add/revive gates and the debug overlay.
 
-**Called by:** [[character_container#generate_new_character]] (line 109), [[character_container#add_character_to_guild]] (line 119), [[guild_upgrades#revive]] (`guild_upgrades.gd:377`), [[hall_debug#add_hero]] (`hall_debug.gd:62`), [[hall_debug#heal_everyone]] (`:95`), [[hall_main#is_roster_full]] (`hall_main.gd:521`), [[overlay_debug#refresh]] (`overlay_debug.gd:147`).
+**Called by:** [[character_container#generate_new_character]] (line 116), [[character_container#add_character_to_guild]] (line 126), [[guild_upgrades#revive]] (`guild_upgrades.gd:389`), [[hall_debug#add_hero]] (`hall_debug.gd:62`), [[hall_debug#heal_everyone]] (`:95`), [[hall_main#is_roster_full]] (`hall_main.gd:524`), [[overlay_debug#refresh]] (`overlay_debug.gd:147`).
 
 **Calls:** [[character_container#living_count]].
 
 ### generate_new_character
-`func generate_new_character() -> void` · `Globals/character_container.gd:108`
+`func generate_new_character() -> void` · `Globals/character_container.gd:115`
 
 Creates a random `GuildCharacter` straight onto the roster if there is a free bed, and prints its name. No doc comment.
 
@@ -127,14 +142,14 @@ Creates a random `GuildCharacter` straight onto the roster if there is a free be
 **Calls:** [[character_container#has_free_bed]].
 
 ### add_character_to_guild
-`func add_character_to_guild(_character: GuildCharacter) -> bool` · `Globals/character_container.gd:118`
+`func add_character_to_guild(_character: GuildCharacter) -> bool` · `Globals/character_container.gd:125`
 
-Hires a hero. Fails (returns false) when there's no free bed, or when the hero has a price (`cost > 0`) the wallet can't pay. If they cost anything, the price is paid with `GameState.add_gold(-cost)`. Then the hero joins the roster with `joined_on_day = GameState.day` and is erased from `hireable_characters` and `released_characters`.
+Hires a hero. Fails (returns false) when there's no free bed, or when the hero's price (`hire_price(_character)`, base cost plus the roster-size surcharge) is above zero and the wallet can't pay. Otherwise the price is paid with `GameState.add_gold(-price)`. Then the hero joins the roster with `joined_on_day = GameState.day` and is erased from `hireable_characters` and `released_characters`.
 
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `_character` | `GuildCharacter` | The hero to hire | the For Hire pick in [[hall_main#hire]] (`hall_main.gd:1089`), a fresh starting hero in [[hall_main#_add_starting_hero]] (`:490`), a new hero in [[hall_debug#add_hero]] (`hall_debug.gd:67`) |
+| `_character` | `GuildCharacter` | The hero to hire | the For Hire pick in [[hall_main#hire]] (`hall_main.gd:1103`), a fresh starting hero in [[hall_main#_add_starting_hero]] (`:493`), a new hero in [[hall_debug#add_hero]] (`hall_debug.gd:67`) |
 
 **Returns:** `bool`. true when hired. Callers use it to decide whether the hire went through.
 
@@ -142,10 +157,10 @@ Hires a hero. Fails (returns false) when there's no free bed, or when the hero h
 
 **Called by:** [[hall_main#hire]], [[hall_main#_add_starting_hero]], [[hall_debug#add_hero]].
 
-**Calls:** [[character_container#has_free_bed]], [[game_state#add_gold]].
+**Calls:** [[character_container#has_free_bed]], [[character_container#hire_price]], [[game_state#add_gold]].
 
 ### remove_character_from_guild
-`func remove_character_from_guild(_character: GuildCharacter) -> bool` · `Globals/character_container.gd:142`
+`func remove_character_from_guild(_character: GuildCharacter) -> bool` · `Globals/character_container.gd:150`
 
 Takes a hero off the roster for good: all their gear goes back to the pack (`ItemShop.unequip` on a copy of `equipped_items`), and they leave the Training Yard and the Hospital. Living heroes are added to `released_characters`. Leaving a quest party is the hall's job (see [[hall_main#release]]).
 
@@ -158,10 +173,10 @@ Takes a hero off the roster for good: all their gear goes back to the pack (`Ite
 
 **Side effects:** unequips items, ends training and hospital stay, edits arrays, prints, emits `on_character_removed`.
 
-**Called by:** [[hall_main#release]] (`hall_main.gd:1133`).
+**Called by:** [[hall_main#release]] (`hall_main.gd:1147`).
 
 **Calls:** [[item_shop#unequip]], [[guild_upgrades#stop_training]], [[guild_upgrades#discharge]].
 
 ## Suspected issues
-- `Globals/character_container.gd:108` `generate_new_character` has no callers and no doc comment (dead code).
+- `Globals/character_container.gd:115` `generate_new_character` has no callers and no doc comment (dead code).
 - `Globals/character_container.gd:33` the trailing `pass` is redundant.

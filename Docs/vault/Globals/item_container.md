@@ -3,7 +3,7 @@ source: Globals/item_container.gd
 class_name: null
 extends: Node
 scene: null
-systems: []
+systems: ["[[Boot and Autoload Order]]", "[[Items and Shop]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script, autoload]
 ---
