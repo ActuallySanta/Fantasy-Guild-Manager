@@ -34,7 +34,8 @@
 ##   - "bare" steps hide the bubble: just the ring and the arrow, for steps
 ##     that only say "tap this".
 ##   - "free" steps step back: no dim, no button locks and no Pip, so the
-##     player can use the whole hall (e.g. hire on Day 2's Applicants). Only
+##     player can use the whole hall (e.g. hire on Day 2's Applicants, or
+##     scroll Day 1's whole Day Report before starting Day 2). Only
 ##     the ring and arrow stay, marking where to go to carry on.
 ##
 ## HOW IT WORKS
@@ -1031,8 +1032,10 @@ func _day_one() -> Array:
 		{"target": func(): return _u(_report_letter(false), "Beats"),
 			"skip": func(): return not _has_foldable_letter(),
 			"text": "Here's the story, one line per moment. The stamp up top says whether the quest succeeded, and the last line says what they brought home. Tap a letter again to fold it."},
-		{"target": func(): return _u(_report(), "ActionButton"), "on": "new_day",
-			"do": "Tap to start Day 2", "text": "That's the night! Tap [b]Open the Doors[/b] to start Day 2."},
+		# Pip steps back here so the player can scroll the whole report and open
+		# other letters; only the ring on the Day 2 button stays
+		{"target": func(): return _u(_report(), "ActionButton"), "on": "new_day", "free": true,
+			"do": "Read the report, then tap to start Day 2", "text": "That's the night! Tap [b]Open the Doors[/b] to start Day 2."},
 	]
 
 
