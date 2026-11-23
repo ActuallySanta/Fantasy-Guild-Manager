@@ -1,9 +1,6 @@
 ## Shop sub-tab of the Items tab (tab_items.gd): the "Counter" layout, picked
-## by the team from the three Shop mockups.
-##   Keeper   - the shopkeeper behind his counter, with a speech bubble and
-##              the shop's name tag. It sits at the top of the scroll, so it
-##              scrolls away with the goods (it used to stay pinned above them
-##              and left only a small window for the grid)
+## by the team from the three Shop mockups, without the shopkeeper art (the
+## keeper, speech bubble and name tag were removed so only the goods show).
 ##   Goods    - a 3 x 2 grid of today's goods with prices; sold-out items grey out
 ##   Buy bar  - the picked item's name, what it does, and Buy (sits just
 ##              above the nav)
@@ -11,8 +8,6 @@
 ## The goods come from the ItemShop autoload (generated items, new stock every
 ## dawn). Bought items go into the guild's pack, and heroes put them on from
 ## the Pack sub-tab (tab_pack.gd) or their own page (screen_character.gd).
-## The keeper art is two layers in the scene: Sprites/Shop/shopBackground.png
-## (Background) with Sprites/Shop/shopkeeper.png (ShopKeeper) drawn over it.
 ## Which item is picked is view state only, kept here.
 ## Scene: Scenes/Tabs/tab_shop.tscn
 extends VBoxContainer
@@ -24,8 +19,6 @@ const ShopTileScene := preload("uid://b25qy8uoil5du")  # Scenes/Rows/Items/shop_
 const SHOW_PACK_NOTE := false
 
 # ---- TEXT
-const SHOP_NAME := "Grizzle's Goods"
-const KEEPER_LINE := "Fresh stock every dawn!"
 const GOODS_TITLE := "TODAY'S GOODS"
 ## Only shown when the pack holds unworn items (a reminder to equip them).
 const PACK_NOTE := "%s in your pack"
@@ -37,8 +30,6 @@ const SOLD_HINT := "Bought! Equip it from Equipment."
 const TOO_POOR_HINT := " · Not enough gold"
 
 # ---- NODES
-@onready var _bubble_text: Label = %BubbleText
-@onready var _shop_name: Label = %ShopName
 @onready var _scroll: ScrollContainer = %Scroll
 @onready var _goods_title: Label = %GoodsTitle
 @onready var _restock_note: Label = %RestockNote
@@ -57,8 +48,6 @@ var _just_picked := false
 
 func setup(main: HallMain) -> void:
 	hall = main
-	_bubble_text.text = KEEPER_LINE
-	_shop_name.text = SHOP_NAME
 	_goods_title.text = GOODS_TITLE
 	_buy_button.pressed.connect(_on_buy_pressed)
 
@@ -91,9 +80,8 @@ func _show_goods() -> void:
 		var tile: Control = HallStyle.add_row(_grid, ShopTileScene)
 		tile.setup(good, index == _selected, _pick.bind(index))
 		if hall.pending_fx.get("bought", -1) == index:
-			# just bought: the tile stamps down as sold and Grizzle perks up
+			# just bought: the tile stamps down as sold
 			HallFx.stamp_in(tile, 1.4)
-			HallFx.pop(_bubble_text.get_parent(), 1.08, 0.1)
 		elif _just_picked and index == _selected:
 			HallFx.pop(tile, 1.08)
 	_just_picked = false
