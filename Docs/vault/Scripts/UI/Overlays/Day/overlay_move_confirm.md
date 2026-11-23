@@ -3,7 +3,7 @@ source: Scripts/UI/Overlays/Day/overlay_move_confirm.gd
 class_name: ""
 extends: Control
 scene: "[[overlay_move_confirm (scene)]]"
-systems: ["[[Party Drafting and Assignment]]"]
+systems: ["[[Party Drafting and Assignment]]", "[[UI Architecture and Refresh]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---

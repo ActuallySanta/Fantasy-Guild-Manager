@@ -14,7 +14,7 @@ tags: [scene]
 The Menu opened from the header: How to play, Last night's report, Accessibility, Backup save, Debug tools, Abandon run and Close, with the build line under Close. See [[overlay_menu]].
 
 ## Parent scenes
-- **Placed in editor:** [[hall_main (scene)]] at node `OverlayMenu`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1856`).
+- **Placed in editor:** [[hall_main (scene)]] at node `OverlayMenu`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1881`).
 - No runtime parents.
 
 ## Child scenes

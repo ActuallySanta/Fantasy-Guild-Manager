@@ -49,14 +49,14 @@ Stores the hall and connects the folder tabs and the Barracks button.
 
 **Side effects:** `pressed` on `%SegRoster` / `%SegHire` calls [[hall_main#show_guild_section]]; `pressed` on `%BedsButton` calls [[hall_main#open_tab]] (`"upgrades"`, `UPGRADES_SECTION_BUILD`); sets the Barracks button's text and visibility (`SHOW_BARRACKS_LINK`).
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`). **Calls:** [[hall_main#show_guild_section]], [[hall_main#open_tab]].
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`). **Calls:** [[hall_main#show_guild_section]], [[hall_main#open_tab]].
 
 ### scroll_to_top
 `func scroll_to_top() -> void` · `Scripts/UI/Tabs/tab_guild.gd:82`
 
 Sets `%Scroll`'s `scroll_vertical` to 0.
 
-**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1826`). **Calls:** none.
+**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1851`). **Calls:** none.
 
 ### refresh
 `func refresh() -> void` · `Scripts/UI/Tabs/tab_guild.gd:86`
@@ -65,7 +65,7 @@ Redraws the folder tabs and beds line, clears both lists, then fills the roster 
 
 **Side effects:** `HallStyle.clear_children` on `%List` and `%Stack`.
 
-**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1818`).
+**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1843`).
 
 **Calls:** [[tab_guild#_show_section_buttons]], [[tab_guild#_show_beds]], [[hall_style#clear_children]], [[tab_guild#_is_hire_section]], [[tab_guild#_show_for_hire]], [[tab_guild#_show_roster]].
 
@@ -129,10 +129,10 @@ Makes the tapped peeking letter the top one and queues a refresh.
 
 The "Your Guild" folder tab, where hired letters fly to.
 
-**Returns:** `%SegRoster`. Used by [[hall_main#_fly_hired_letter]] (`hall_main.gd:1118`) as the fly target and the pop target.
+**Returns:** `%SegRoster`. Used by [[hall_main#_fly_hired_letter]] (`hall_main.gd:1132`) as the fly target and the pop target.
 
-**Called by:** [[hall_main#_fly_hired_letter]] (`hall_main.gd:1118`). **Calls:** none.
+**Called by:** [[hall_main#_fly_hired_letter]] (`hall_main.gd:1132`). **Calls:** none.
 
 ## Suspected issues
-- The comment above `roster_button` names `hall_main.send_hired_letter`, but the function is `_fly_hired_letter` (`tab_guild.gd:207`, `hall_main.gd:1115`).
+- The comment above `roster_button` names `hall_main.send_hired_letter`, but the function is `_fly_hired_letter` (`tab_guild.gd:207`, `hall_main.gd:1129`).
 - `SHOW_ROSTER_COUNT` and `SHOW_BARRACKS_LINK` are both `false`, so `SECTION_ROSTER`, `BEDS` and the Barracks button are not reachable at runtime.

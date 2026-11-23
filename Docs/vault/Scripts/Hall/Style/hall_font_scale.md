@@ -30,7 +30,7 @@ Grows every font in the Mobile Hall at start-up so the smallest text reads at `M
 | `screen_factor`, `text_factor` | static var | The screen part ([[hall_font_scale#compute_scale]]) and the Text size part (`HallSettings.TEXT_SIZE_FACTORS`). |
 | `_theme_base_sizes` | static var | Theme's authored font sizes saved on the first scale, so rescaling never compounds. |
 
-No signals defined. Externally, `SceneTree.node_added` is connected to [[hall_font_scale#scale_authored_overrides]] (`hall_main.gd:407`) and disconnected at `hall_main.gd:412`.
+No signals defined. Externally, `SceneTree.node_added` is connected to [[hall_font_scale#scale_authored_overrides]] (`hall_main.gd:410`) and disconnected at `hall_main.gd:415`.
 
 ## Functions
 
@@ -48,7 +48,7 @@ No signals defined. Externally, `SceneTree.node_added` is connected to [[hall_fo
 
 **Side effects:** writes the static vars `screen_factor`, `text_factor`, `scale`; rewrites the theme's font sizes.
 
-**Called by:** [[hall_main#_enter_tree]] (`hall_main.gd:406`)
+**Called by:** [[hall_main#_enter_tree]] (`hall_main.gd:409`)
 
 **Calls:** [[hall_font_scale#_cmdline_scale]], [[hall_font_scale#compute_scale]], [[hall_font_scale#pixels_per_point]], [[hall_font_scale#_update_scale]], [[hall_font_scale#scale_theme]]
 
@@ -66,7 +66,7 @@ No signals defined. Externally, `SceneTree.node_added` is connected to [[hall_fo
 
 **Side effects:** writes `text_factor` and `scale`; rewrites the theme and every tagged override under `root`.
 
-**Called by:** [[hall_main#set_text_size]] (`hall_main.gd:1350`)
+**Called by:** [[hall_main#set_text_size]] (`hall_main.gd:1368`)
 
 **Calls:** [[hall_font_scale#_update_scale]], [[hall_font_scale#scale_theme]], [[hall_font_scale#rescale_tree]]
 
@@ -145,14 +145,14 @@ No signals defined. Externally, `SceneTree.node_added` is connected to [[hall_fo
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `base` | `Vector2` | Authored size in design px | Size constants, e.g. `TILE_SIZE` (pack_tile.gd:35, shop_tile.gd:37), `TYPE_SEAL_SIZE` (quest_row.gd:66), `STANDING_BOX_SIZE` (hall_header.gd:171) |
-| `max_factor` | `float` | Most it may grow (0 = no cap) | `SIDE_BOX_MAX_FACTOR` (quest_row.gd:66-67), `STANDING_MAX_FACTOR` (hall_header.gd:171); omitted elsewhere |
+| `base` | `Vector2` | Authored size in design px | Size constants, e.g. `TILE_SIZE` (pack_tile.gd:35, shop_tile.gd:37), `TYPE_SEAL_SIZE` (quest_row.gd:66), `STANDING_BOX_SIZE` (hall_header.gd:175) |
+| `max_factor` | `float` | Most it may grow (0 = no cap) | `SIDE_BOX_MAX_FACTOR` (quest_row.gd:66-67), `STANDING_MAX_FACTOR` (hall_header.gd:175); omitted elsewhere |
 
 **Returns:** `Vector2`, each axis `round(base * factor)`, factor = `scale` capped at `max_factor`. Callers assign it to `custom_minimum_size`.
 
 **Side effects:** none
 
-**Called by:** [[report_entry#setup]] (`report_entry.gd:153`), [[pack_tile#setup]] (`pack_tile.gd:35`), [[shop_tile#setup]] (`shop_tile.gd:37`), [[quest_row#setup]] (`quest_row.gd:66, 67`), [[screen_assign#refresh]] (`screen_assign.gd:191`), [[hall_header#refresh]] (`hall_header.gd:171`), [[hall_header#_update_counter]] (`hall_header.gd:309`)
+**Called by:** [[report_entry#setup]] (`report_entry.gd:153`), [[pack_tile#setup]] (`pack_tile.gd:35`), [[shop_tile#setup]] (`shop_tile.gd:37`), [[quest_row#setup]] (`quest_row.gd:66, 67`), [[screen_assign#refresh]] (`screen_assign.gd:191`), [[hall_header#refresh]] (`hall_header.gd:175`), [[hall_header#_update_counter]] (`hall_header.gd:325`)
 
 **Calls:** none.
 
@@ -188,7 +188,7 @@ No signals defined. Externally, `SceneTree.node_added` is connected to [[hall_fo
 
 **Side effects:** adds a theme font-size override on `control`; sets meta `_font_base_<name>` and, if `max_factor` > 0, `font_max_factor`.
 
-**Called by:** [[hall_fx#float_text]] (`hall_fx.gd:285`), [[hall_fx#_make_stamp]] (`hall_fx.gd:397`), [[hall_style#style_button]] (`hall_style.gd:599`), [[crawl_sections#make_line]] (`crawl_sections.gd:95`), [[crawl_sections#_make_story]] (`crawl_sections.gd:128, 129`), [[stat_tile#setup]] (`stat_tile.gd:20`), [[overlay_intro#_show_text]] (`overlay_intro.gd:119`), [[overlay_report#_update_scroll_arrow]] (`overlay_report.gd:141`), [[overlay_tutorial#_build]] (`overlay_tutorial.gd:715, 732, 738, 748, 749, 760, 794`), [[overlay_welcome#_build_row]] (`overlay_welcome.gd:210, 215`), [[overlay_menu#setup]] (`overlay_menu.gd:54`), [[report_entry#_add_fold_hint]] (`report_entry.gd:231, 249`), [[party_slot#setup]] (`party_slot.gd:54`), [[hall_nav#setup]] (`hall_nav.gd:54, 55`)
+**Called by:** [[hall_fx#float_text]] (`hall_fx.gd:285`), [[hall_fx#_make_stamp]] (`hall_fx.gd:397`), [[hall_style#style_button]] (`hall_style.gd:599`), [[crawl_sections#make_line]] (`crawl_sections.gd:95`), [[crawl_sections#_make_story]] (`crawl_sections.gd:128, 129`), [[stat_tile#setup]] (`stat_tile.gd:20`), [[overlay_intro#_show_text]] (`overlay_intro.gd:116`), [[overlay_report#_update_scroll_arrow]] (`overlay_report.gd:144`), [[overlay_tutorial#_build]] (`overlay_tutorial.gd:715, 732, 738, 748, 749, 760, 794`), [[overlay_welcome#_build_row]] (`overlay_welcome.gd:210, 215`), [[overlay_menu#setup]] (`overlay_menu.gd:54`), [[report_entry#_add_fold_hint]] (`report_entry.gd:231, 249`), [[party_slot#setup]] (`party_slot.gd:54`), [[hall_nav#setup]] (`hall_nav.gd:54, 55`)
 
 **Calls:** [[hall_font_scale#px_capped]], [[hall_font_scale#_max_factor_of]]
 

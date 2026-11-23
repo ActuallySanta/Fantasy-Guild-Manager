@@ -39,7 +39,7 @@ Stores the hall, sets up both sub-tabs, and connects the folder buttons.
 
 **Side effects:** [[tab_pack#setup]] and [[tab_shop#setup]]; `pressed` on `%SegPack` / `%SegShop` calls [[hall_main#show_items_section]] with `ITEMS_SECTION_PACK` / `ITEMS_SECTION_SHOP`.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[tab_pack#setup]], [[tab_shop#setup]], [[hall_main#show_items_section]].
 
@@ -64,7 +64,7 @@ The Pack sub-tab. **Returns:** `%TabPack`.
 
 Scrolls both sub-tabs back to the top.
 
-**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1826`, when the view key changes). **Calls:** [[tab_pack#scroll_to_top]], [[tab_shop#scroll_to_top]].
+**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1851`, when the view key changes). **Calls:** [[tab_pack#scroll_to_top]], [[tab_shop#scroll_to_top]].
 
 ### refresh
 `func refresh() -> void` · `Scripts/UI/Tabs/tab_items.gd:60`
@@ -73,7 +73,7 @@ Shows the open section, styles the folder tabs (`FolderTabActive` / `FolderTab`,
 
 **Side effects:** with `SHOW_TAB_COUNTS` the Pack button shows `ItemContainer.owned_items.size()` and the Shop button the unsold count.
 
-**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1818`).
+**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1843`).
 
 **Calls:** [[tab_items#_unsold_count]], [[tab_pack#refresh]], [[tab_shop#refresh]].
 

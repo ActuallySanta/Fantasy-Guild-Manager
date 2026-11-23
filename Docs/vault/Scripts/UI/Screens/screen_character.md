@@ -4,7 +4,7 @@ class_name: ""
 extends: VBoxContainer
 scene: "[[screen_character (scene)]]"
 systems: ["[[Hiring Characters]]", "[[Items and Shop]]", "[[UI Architecture and Refresh]]"]
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
 tags: [script]
 ---
 
@@ -45,23 +45,23 @@ Stores the hall, connects the buttons, sets the button texts and styles them.
 
 **Side effects:** `pressed` on `%BackButton` calls [[hall_main#close_screen]]; `%HireButton` → [[screen_character#_on_hire_pressed]]; `%ReleaseButton` → [[screen_character#_on_release_pressed]]; `%ReleaseCancelButton` → [[screen_character#_on_release_cancelled]]; `%ReleaseConfirmButton` → [[screen_character#_on_release_confirmed]]; `gui_input` on `%ReleaseDim` → [[screen_character#_on_release_dim_input]]. Styles the buttons with [[hall_style#style_button]].
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`). **Calls:** [[hall_style#style_button]].
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`). **Calls:** [[hall_style#style_button]].
 
 ### scroll_to_top
 `func scroll_to_top() -> void` · `Scripts/UI/Screens/screen_character.gd:134`
 
-Sets `%Scroll`'s `scroll_vertical` to 0. **Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1826`). **Calls:** none.
+Sets `%Scroll`'s `scroll_vertical` to 0. **Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1851`). **Calls:** none.
 
 ### refresh
 `func refresh() -> void` · `Scripts/UI/Screens/screen_character.gd:138`
 
-Redraws the whole screen for the shown hero: portrait, name, role, health chip, injuries, task, stats, gear, backstory, and the Hire / Release buttons (Hire shows only for recruits, disabled when the roster is full, with "Hire · free" or "Hire · Ng"; Release shows for everyone else).
+Redraws the whole screen for the shown hero: portrait, name, role, health chip, injuries, task, stats, gear, backstory, and the Hire / Release buttons (Hire shows only for recruits, disabled when the roster is full, with "Hire · free" or the price from [[character_container#hire_price]]; Release shows for everyone else).
 
 **Side effects:** none besides view nodes.
 
-**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1818`, while the Character screen is active).
+**Called by:** [[hall_main#_refresh_content]] (`hall_main.gd:1843`, while the Character screen is active).
 
-**Calls:** [[screen_character#_shown_character]], [[portrait#show_character]], [[hall_style#role_name]], [[chip#set_health]], [[hall_style#count_text]], [[screen_character#_show_task]], [[screen_character#_show_stats]], [[screen_character#_show_gear]], [[hall_style#clean_backstory]], [[hall_main#is_roster_full]], [[screen_character#_show_release_confirm]].
+**Calls:** [[screen_character#_shown_character]], [[portrait#show_character]], [[hall_style#role_name]], [[chip#set_health]], [[hall_style#count_text]], [[screen_character#_show_task]], [[screen_character#_show_stats]], [[screen_character#_show_gear]], [[hall_style#clean_backstory]], [[hall_main#is_roster_full]], [[character_container#hire_price]], [[screen_character#_show_release_confirm]].
 
 ### _shown_character
 `func _shown_character() -> GuildCharacter` · `Scripts/UI/Screens/screen_character.gd:167`
@@ -187,5 +187,5 @@ Tapping the dimmed background cancels, like the End Day sheet (any pressed `Inpu
 **Called by:** `gui_input` on `%ReleaseDim` (`screen_character.gd:119`). **Calls:** [[screen_character#_on_release_cancelled]].
 
 ## Suspected issues
-- `GuildCharacter.get_pluck_stat_bonus(_stat)` names its parameter with a leading underscore although it uses it (style only, `character_resource.gd:250`).
+- `GuildCharacter.get_pluck_stat_bonus(_stat)` names its parameter with a leading underscore although it uses it (style only, `character_resource.gd:267`).
 - `_show_gear` sets `_gear_note.visible = not is_recruit` at the top, then overwrites it at `screen_character.gd:301` (harmless: recruits return early and the note stays hidden).

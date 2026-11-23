@@ -3,7 +3,7 @@ source: Scripts/UI/Overlays/Menu/overlay_update_confirm.gd
 class_name: ""
 extends: Control
 scene: "[[overlay_update_confirm (scene)]]"
-systems: ["[[Saving Migration and Backup Codes]]"]
+systems: ["[[Saving Migration and Backup Codes]]", "[[UI Architecture and Refresh]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---

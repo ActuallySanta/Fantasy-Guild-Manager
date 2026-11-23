@@ -3,7 +3,7 @@ source: Scripts/Item System/passive_item.gd
 class_name: PassiveItem
 extends: StandardItem
 scene: null
-systems: []
+systems: ["[[Items and Shop]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script, resource]
 ---

@@ -3,7 +3,7 @@ source: Scripts/UI/Components/odds_bar.gd
 class_name: ""
 extends: TextureProgressBar
 scene: "[[odds_bar (scene)]]"
-systems: ["[[Success Chance]]", "[[UI Motion and Feedback]]"]
+systems: ["[[Success Chance]]", "[[UI Motion and Feedback]]", "[[UI Architecture and Refresh]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---

@@ -3,7 +3,7 @@ source: Scripts/UI/Shell/hall_toast.gd
 class_name: HallToast
 extends: PanelContainer
 scene: "[[hall_toast (scene)]]"
-systems: ["[[UI Motion and Feedback]]"]
+systems: ["[[UI Motion and Feedback]]", "[[UI Architecture and Refresh]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -31,13 +31,13 @@ Shows `message`, replacing any toast already up, then fades it out.
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `message` | `String` | Text to show | the `message` argument of [[hall_main#show_toast]] (`hall_main.gd:1877`), which overlays, [[hall_web_update]] and the playtest scenario call |
+| `message` | `String` | Text to show | the `message` argument of [[hall_main#show_toast]] (`hall_main.gd:1902`), which overlays, [[hall_web_update]] and the playtest scenario call |
 
 **Returns:** nothing.
 
 **Side effects:** sets the label text, makes the toast visible at full alpha, runs [[hall_fx#appear]], kills any running tween, then tweens an interval of `SHOW_SECONDS`, a fade of `modulate:a` to 0 over `FADE_SECONDS`, and finally `hide`.
 
-**Called by:** [[hall_main#show_toast]] (`hall_main.gd:1877`).
+**Called by:** [[hall_main#show_toast]] (`hall_main.gd:1902`).
 
 **Calls:** [[hall_fx#appear]].
 

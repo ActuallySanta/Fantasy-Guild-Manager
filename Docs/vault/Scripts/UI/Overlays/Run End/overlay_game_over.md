@@ -3,7 +3,7 @@ source: Scripts/UI/Overlays/Run End/overlay_game_over.gd
 class_name: ""
 extends: Control
 scene: "[[overlay_game_over (scene)]]"
-systems: ["[[Run End]]"]
+systems: ["[[Run End]]", "[[UI Architecture and Refresh]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -36,11 +36,11 @@ Stores the hall, connects `pressed` on `%NewRunButton` to [[hall_main#start_new_
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `main` | `HallMain` | The hall | `self` in `view.setup(self)` ([[hall_main#_ready]], `hall_main.gd:424`) |
+| `main` | `HallMain` | The hall | `self` in `view.setup(self)` ([[hall_main#_ready]], `hall_main.gd:427`) |
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[hall_style#style_button]].
 
@@ -51,7 +51,7 @@ Builds the ledger from `hall.run_over_stats`. Does nothing if the stats are empt
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1866`) while visible (the overlay is shown when `run_over_stats` is non-empty and no credits are open, `hall_main.gd:1851-1852`).
+**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1891`) while visible (the overlay is shown when `run_over_stats` is non-empty and no credits are open, `hall_main.gd:1876-1852`).
 
 **Calls:** [[overlay_game_over#_show_tiles]], [[overlay_game_over#_show_roll_call]].
 

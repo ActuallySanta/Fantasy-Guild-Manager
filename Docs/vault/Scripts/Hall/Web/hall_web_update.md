@@ -3,7 +3,7 @@ source: Scripts/Hall/Web/hall_web_update.gd
 class_name: HallWebUpdate
 extends: RefCounted
 scene: null
-systems: []
+systems: ["[[Saving Migration and Backup Codes]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -34,11 +34,11 @@ Signals listened to: `JavaScriptBridge.pwa_update_available` is connected once (
 
 If a newer deploy is already waiting, switch to it now (the page reloads).
 
-**Returns:** `bool`, true when an update was started. [[hall_main#_ready]] stops setting up when it's true (`hall_main.gd:419`). False off the web or if none waits.
+**Returns:** `bool`, true when an update was started. [[hall_main#_ready]] stops setting up when it's true (`hall_main.gd:422`). False off the web or if none waits.
 
 **Side effects:** `JavaScriptBridge.pwa_update()` (page reload).
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:419`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:422`).
 
 **Calls:** nothing in the project.
 
@@ -56,7 +56,7 @@ Listen for a newer deploy turning up while the game is open: connects `pwa_updat
 
 **Side effects:** connects a signal on the `JavaScriptBridge` singleton (it can outlive this hall; `_on_update_available` ignores a hall that's gone). Does nothing off the web.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:478`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:481`).
 
 **Calls:** [[hall_web_update#_on_update_available]].
 

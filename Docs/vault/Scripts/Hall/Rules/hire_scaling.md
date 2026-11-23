@@ -3,8 +3,8 @@ source: Scripts/Hall/Rules/hire_scaling.gd
 class_name: HireScaling
 extends: null
 scene: null
-systems: []
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+systems: ["[[Hiring Characters]]", "[[Quest Generation and Difficulty]]"]
+last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
 tags: [script]
 ---
 
@@ -23,11 +23,13 @@ How strong (and how pricey) today's recruits are. Each morning's For Hire pool r
 | `STANDOUT_BONUS` | const | 1.25. A standout's budget is multiplied by this. |
 | `PRICE_PER_POINT` | const | 10 gold per stat point above the standing floor. Only on days that already have a price (days 1-2 stay free). |
 | `DEVIATION_PER_POINT` | const | `2.0 / 17.0`. Spread of a recruit's stats per budget point: 2 at the old 17 points. |
+| `HIRE_PRICE_PER_HERO` | const | 0.15. Fraction (0-1+) added to a recruit's price for each living hero above `HIRE_PRICE_FREE_HEROES`. |
+| `HIRE_PRICE_FREE_HEROES` | const | 3. Living heroes the guild can have before recruits cost extra. |
 
 ## Functions
 
 ### guild_power
-`static func guild_power(roster: Array) -> float` · `Scripts/Hall/Rules/hire_scaling.gd:40`
+`static func guild_power(roster: Array) -> float` · `Scripts/Hall/Rules/hire_scaling.gd:45`
 
 The guild's average power: the mean base stat total of living heroes. Doesn't count the Armory bonus (subtracted per stat with [[guild_upgrades#get_stat_bonus]]), gear or Pluck.
 
@@ -40,12 +42,12 @@ The guild's average power: the mean base stat total of living heroes. Doesn't co
 
 **Side effects:** none.
 
-**Called by:** [[hire_scaling#recruit_budget]] (`hire_scaling.gd:66`).
+**Called by:** [[hire_scaling#recruit_budget]] (`hire_scaling.gd:71`).
 
 **Calls:** [[guild_upgrades#get_stat_bonus]].
 
 ### standing_floor
-`static func standing_floor(standing: int) -> int` · `Scripts/Hall/Rules/hire_scaling.gd:56`
+`static func standing_floor(standing: int) -> int` · `Scripts/Hall/Rules/hire_scaling.gd:61`
 
 The least stat points a recruit gets at this standing: `BASE_POINTS + POINTS_PER_RANK * rank`.
 
@@ -58,12 +60,12 @@ The least stat points a recruit gets at this standing: `BASE_POINTS + POINTS_PER
 
 **Side effects:** none.
 
-**Called by:** [[hire_scaling#recruit_budget]] (`hire_scaling.gd:66`), [[hire_scaling#recruit_cost]] (`hire_scaling.gd:92`).
+**Called by:** [[hire_scaling#recruit_budget]] (`hire_scaling.gd:71`), [[hire_scaling#recruit_cost]] (`hire_scaling.gd:97`).
 
 **Calls:** [[hall_rules#standing_rank_for]].
 
 ### recruit_budget
-`static func recruit_budget(day: int, standing: int, roster: Array) -> int` · `Scripts/Hall/Rules/hire_scaling.gd:65`
+`static func recruit_budget(day: int, standing: int, roster: Array) -> int` · `Scripts/Hall/Rules/hire_scaling.gd:70`
 
 Stat points for an ordinary recruit today: `max(standing_floor, guild_power * POWER_FRACTION)`, times [[hall_rules#freeplay_scale]] (1.0 until freeplay), rounded.
 
@@ -83,7 +85,7 @@ Stat points for an ordinary recruit today: `max(standing_floor, guild_power * PO
 **Calls:** [[hire_scaling#standing_floor]], [[hire_scaling#guild_power]], [[hall_rules#freeplay_scale]].
 
 ### standout_budget
-`static func standout_budget(budget: int) -> int` · `Scripts/Hall/Rules/hire_scaling.gd:71`
+`static func standout_budget(budget: int) -> int` · `Scripts/Hall/Rules/hire_scaling.gd:76`
 
 A standout's stat points: `roundi(budget * STANDOUT_BONUS)`.
 
@@ -101,7 +103,7 @@ A standout's stat points: `roundi(budget * STANDOUT_BONUS)`.
 **Calls:** none.
 
 ### deviation_for
-`static func deviation_for(points: int) -> int` · `Scripts/Hall/Rules/hire_scaling.gd:77`
+`static func deviation_for(points: int) -> int` · `Scripts/Hall/Rules/hire_scaling.gd:82`
 
 How spread out a recruit's stats are for this budget (`GuildCharacter.stat_deviation`): `max(2, roundi(points * DEVIATION_PER_POINT))`.
 
@@ -119,7 +121,7 @@ How spread out a recruit's stats are for this budget (`GuildCharacter.stat_devia
 **Calls:** none.
 
 ### recruit_cost
-`static func recruit_cost(day: int, standing: int, points: int) -> int` · `Scripts/Hall/Rules/hire_scaling.gd:88`
+`static func recruit_cost(day: int, standing: int, points: int) -> int` · `Scripts/Hall/Rules/hire_scaling.gd:93`
 
 The day's price ([[character_resource#recruit_cost_for_day]]) plus `PRICE_PER_POINT` for each point over the standing floor. Free days stay free (returns 0). The day's price is still the cheapest a recruit can be, so the Game Over check ([[hall_ledger#is_short_of_recruit_gold]]) can keep using `recruit_cost_for_day` alone.
 
@@ -137,6 +139,24 @@ The day's price ([[character_resource#recruit_cost_for_day]]) plus `PRICE_PER_PO
 **Called by:** [[character_container#_add_new_recruits]] (`character_container.gd:71`).
 
 **Calls:** [[character_resource#recruit_cost_for_day]], [[hire_scaling#standing_floor]].
+
+### roster_price
+`static func roster_price(base_cost: int, living_heroes: int) -> int` · `Scripts/Hall/Rules/hire_scaling.gd:105`
+
+What a recruit costs the guild right now: `round(base_cost * (1 + HIRE_PRICE_PER_HERO * max(0, living_heroes - HIRE_PRICE_FREE_HEROES)))`. A free recruit (base 0) stays free.
+
+| Name | Type | Meaning | Where callers get it |
+|---|---|---|---|
+| `base_cost` | `int` | The recruit's saved price, in gold | `character.cost` in [[character_container#hire_price]] |
+| `living_heroes` | `int` | Heroes not dead | [[character_container#living_count]] |
+
+**Returns:** `int` gold. [[character_container#hire_price]] returns it to every place that shows or charges a hire price.
+
+**Side effects:** none.
+
+**Called by:** [[character_container#hire_price]] (`character_container.gd:107`).
+
+**Calls:** none.
 
 ## Suspected issues
 None found.

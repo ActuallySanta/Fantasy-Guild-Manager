@@ -35,13 +35,13 @@ Stores the hall, connects the buttons to hall actions, builds the build-info lab
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `main` | `HallMain` | The hall | `self` in `view.setup(self)` ([[hall_main#_ready]], `hall_main.gd:424`) |
+| `main` | `HallMain` | The hall | `self` in `view.setup(self)` ([[hall_main#_ready]], `hall_main.gd:427`) |
 
 **Returns:** nothing.
 
 **Side effects:** connects `pressed` on `%HowButton` to [[hall_main#open_welcome]], `%ReportButton` to [[hall_main#open_previous_report]], `%AccessibilityButton` to [[hall_main#open_accessibility]], `%BackupButton` to [[hall_main#open_backup]], `%DebugButton` to [[hall_main#open_debug]], `%CloseButton` to [[hall_main#close_menu]], `%AbandonButton` to [[overlay_menu#_on_abandon_pressed]], `gui_input` on `%Dim` to [[overlay_menu#_on_dim_input]]; `visibility_changed` clears `_is_abandon_armed`. Adds `BuildLabel` next to Close.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[hall_font_scale#set_size]], [[hall_build_info#label]], [[hall_style#style_button]].
 
@@ -52,7 +52,7 @@ Disables the report button until `hall.previous_report` is non-empty, shows the 
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1866`) while visible; [[overlay_menu#_on_abandon_pressed]].
+**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1891`) while visible; [[overlay_menu#_on_abandon_pressed]].
 
 ### _on_abandon_pressed
 `func _on_abandon_pressed() -> void` · `Scripts/UI/Overlays/Menu/overlay_menu.gd:87`

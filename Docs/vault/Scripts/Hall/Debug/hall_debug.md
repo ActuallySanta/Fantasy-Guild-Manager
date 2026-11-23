@@ -3,7 +3,7 @@ source: Scripts/Hall/Debug/hall_debug.gd
 class_name: HallDebug
 extends: RefCounted
 scene: null
-systems: []
+systems: ["[[Day Cycle]]", "[[Hiring Characters]]", "[[Night - Training Hospital Revive]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script]
 ---
@@ -50,11 +50,11 @@ Skip to the next dawn: tonight's training and healing still run (`GuildUpgrades.
 |---|---|---|---|
 | `hall` | `HallMain` | The main hall script | `self` in [[hall_main#debug_skip_day]]; `hall` in `jump_to_day` |
 
-**Returns:** `bool`, false if the day can't be skipped now. [[hall_main#debug_skip_day]] shows a toast on false (`hall_main.gd:1408`); `jump_to_day` stops looping on false.
+**Returns:** `bool`, false if the day can't be skipped now. [[hall_main#debug_skip_day]] shows a toast on false (`hall_main.gd:1426`); `jump_to_day` stops looping on false.
 
 **Side effects:** runs the night, calls `hall.start_new_day()`.
 
-**Called by:** [[hall_main#debug_skip_day]] (`hall_main.gd:1408`), [[hall_debug#jump_to_day]] (`hall_debug.gd:54`).
+**Called by:** [[hall_main#debug_skip_day]] (`hall_main.gd:1426`), [[hall_debug#jump_to_day]] (`hall_debug.gd:54`).
 
 **Calls:** [[hall_debug#can_skip_day]], [[guild_upgrades#run_night]], [[hall_main#start_new_day]].
 
@@ -88,11 +88,11 @@ Run `skip_day` repeatedly until `GameState.day` reaches `day`, stopping early if
 | `hall` | `HallMain` | The main hall script | `self` in [[hall_main#debug_jump_to_day]] |
 | `day` | `int` | Day to land on | `day` bound to the Jump button in `overlay_debug.gd:104` |
 
-**Returns:** `int`, days skipped. [[hall_main#debug_jump_to_day]] treats 0 as "couldn't jump" (`hall_main.gd:1415`).
+**Returns:** `int`, days skipped. [[hall_main#debug_jump_to_day]] treats 0 as "couldn't jump" (`hall_main.gd:1433`).
 
 **Side effects:** as `skip_day`, per day.
 
-**Called by:** [[hall_main#debug_jump_to_day]] (`hall_main.gd:1415`).
+**Called by:** [[hall_main#debug_jump_to_day]] (`hall_main.gd:1433`).
 
 **Calls:** [[hall_debug#skip_day]].
 
@@ -101,11 +101,11 @@ Run `skip_day` repeatedly until `GameState.day` reaches `day`, stopping early if
 
 Put a random hero on the roster for free (needs a free bed): a new `GuildCharacter` with `cost = 0`, added with `CharacterContainer.add_character_to_guild`.
 
-**Returns:** the new `GuildCharacter`, or null when the Barracks is full. [[hall_main#debug_add_hero]] toasts accordingly (`hall_main.gd:1434`).
+**Returns:** the new `GuildCharacter`, or null when the Barracks is full. [[hall_main#debug_add_hero]] toasts accordingly (`hall_main.gd:1452`).
 
 **Side effects:** adds to `CharacterContainer.active_characters`.
 
-**Called by:** [[hall_main#debug_add_hero]] (`hall_main.gd:1434`).
+**Called by:** [[hall_main#debug_add_hero]] (`hall_main.gd:1452`).
 
 **Calls:** [[character_container#has_free_bed]], [[character_container#add_character_to_guild]].
 
@@ -114,11 +114,11 @@ Put a random hero on the roster for free (needs a free bed): a new `GuildCharact
 
 A random piece of gear (random role, usual rarity roll) put in the Pack for free. Sets `item.role` again as `ItemShop._make_item` does, since equipping is role-locked.
 
-**Returns:** the new `StandardItem`. [[hall_main#debug_add_item]] uses it for the toast (`hall_main.gd:1441`).
+**Returns:** the new `StandardItem`. [[hall_main#debug_add_item]] uses it for the toast (`hall_main.gd:1459`).
 
 **Side effects:** appends to `ItemContainer.owned_items`.
 
-**Called by:** [[hall_main#debug_add_item]] (`hall_main.gd:1441`).
+**Called by:** [[hall_main#debug_add_item]] (`hall_main.gd:1459`).
 
 **Calls:** nothing else in the project (`PassiveItem.new`).
 
@@ -127,11 +127,11 @@ A random piece of gear (random role, usual rarity roll) put in the Pack for free
 
 Every living hero back to Healthy and out of the Hospital; the dead come back Healthy while there's a free bed (doesn't use up Hospital revives). Clears `died_on_day`, `died_on_quest`, the `GuildUpgrades.RECOVERY_META` metadata, removes from `GuildUpgrades.patients`, and rebuilds `temp_stats`.
 
-**Returns:** `{"healed": int (living heroes healed), "revived": int, "left_dead": int (dead with no bed)}`. [[hall_main#debug_heal_everyone]] builds its toast from it (`hall_main.gd:1448`).
+**Returns:** `{"healed": int (living heroes healed), "revived": int, "left_dead": int (dead with no bed)}`. [[hall_main#debug_heal_everyone]] builds its toast from it (`hall_main.gd:1466`).
 
 **Side effects:** changes heroes; emits `GuildUpgrades.home_changed`.
 
-**Called by:** [[hall_main#debug_heal_everyone]] (`hall_main.gd:1448`).
+**Called by:** [[hall_main#debug_heal_everyone]] (`hall_main.gd:1466`).
 
 **Calls:** [[character_container#has_free_bed]], [[character_resource#reset_temp_stats]].
 
@@ -144,7 +144,7 @@ Every building to its top level for free.
 
 **Side effects:** changes `GuildUpgrades.levels`.
 
-**Called by:** [[hall_main#debug_max_buildings]] (`hall_main.gd:1458`).
+**Called by:** [[hall_main#debug_max_buildings]] (`hall_main.gd:1476`).
 
 **Calls:** [[guild_upgrades#max_all_buildings]].
 
@@ -157,7 +157,7 @@ A fresh For Hire pool for today without moving the day on. Today's quests are re
 
 **Side effects:** replaces `CharacterContainer.hireable_characters`.
 
-**Called by:** [[hall_main#debug_reroll_today]] (`hall_main.gd:1466`).
+**Called by:** [[hall_main#debug_reroll_today]] (`hall_main.gd:1484`).
 
 **Calls:** [[character_container#refresh_hireable_characters]].
 

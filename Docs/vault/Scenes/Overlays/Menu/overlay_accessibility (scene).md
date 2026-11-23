@@ -14,7 +14,7 @@ tags: [scene]
 The Accessibility sheet reached from the Menu: buttons for Text size, Colorblind filter and Reduced motion, each stepping to the next choice, and Back. See [[overlay_accessibility]].
 
 ## Parent scenes
-- **Placed in editor:** [[hall_main (scene)]] at node `OverlayAccessibility`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1857`).
+- **Placed in editor:** [[hall_main (scene)]] at node `OverlayAccessibility`. Shown by [[hall_main#_refresh_overlays]] (`hall_main.gd:1882`).
 - No runtime parents.
 
 ## Child scenes

@@ -15,7 +15,7 @@ One quest in the Day Report, drawn as a letter home: head with type seal, title 
 
 ## Parent scenes
 - **Placed in editor:** none.
-- **Instanced at runtime:** by [[overlay_report#_show_entries]] (`overlay_report.gd:268`), which hands the preloaded scene to `HallStyle.add_row`. The parent scene is [[overlay_report (scene)]].
+- **Instanced at runtime:** by [[overlay_report#_show_entries]] (`overlay_report.gd:286`), which hands the preloaded scene to `HallStyle.add_row`. The parent scene is [[overlay_report (scene)]].
 
 ## Child scenes
 - **Placed in editor:** [[divider (scene)]] at `Col/Divider` and `Col/Divider2`.

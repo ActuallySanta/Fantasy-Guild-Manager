@@ -4,7 +4,7 @@ class_name: ""
 extends: PanelContainer
 scene: "[[home_row (scene)]]"
 systems: ["[[Night - Training Hospital Revive]]", "[[UI Architecture and Refresh]]"]
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
 tags: [script]
 ---
 
@@ -19,7 +19,7 @@ One hero in a Training Yard or Hospital card (Upgrades > Facilities, see [[home_
 | `FADED_OPACITY` | const | Rows for heroes who can't do anything here fade back (0.6). |
 | `TRAINING_CARD_BG`, `HOSPITAL_CARD_BG`, `HOSPITAL_BORDER` | const | Card colours for heroes in a slot / bed. |
 | `SHOW_FREE_TASK` | const | SIMPLIFIED: the "Free today" chip (false; no chip already means free). |
-| `TEXT_*`, `BUTTON_*` | const | UI strings (gain line, task chips, nights, revive notes, Remove / Add / Move here / Full / Discharge / Admit / Pull & admit / Revive). |
+| `TEXT_*`, `BUTTON_*` | const | UI strings (gain line, task chips, nights, revive notes, Remove / Add / Move here / Full / Discharge / Admit / Pull & admit / Revive). `TEXT_NIGHTS_IN_BED`, `BUTTON_ADMIT` and `BUTTON_PULL_ADMIT` carry the bed fee (gold per night) as a format argument. |
 | `_portrait`, `_name`, `_role`, `_health_chip`, `_task_chip`, `_note`, `_side_button`, `_main_button`, `_stat_picker` | onready | `%Portrait` ([[portrait]]), `%Name`, `%Role`, `%HealthChip`, `%TaskChip` ([[chip]]), `%Note`, `%SideButton`, `%MainButton`, `%StatPicker`. |
 | `hall` | var | The `HallMain`, set in [[home_row#_fill]]. |
 | `character` | var | The hero shown, set in [[home_row#_fill]]. |
@@ -41,7 +41,7 @@ Common part of every `show_*`: stores `hall` and `character`, fills portrait, na
 
 **Side effects:** sets `hall`, `character`; may defer [[home_row#_pop_in]].
 
-**Called by:** [[home_row#show_training_slot]], [[home_row#show_can_train]], [[home_row#show_cant_train]], [[home_row#show_patient]], [[home_row#show_needs_care]], [[home_row#show_fallen]] (`home_row.gd:121`, `154`, `170`, `180`, `189`, `198`).
+**Called by:** [[home_row#show_training_slot]], [[home_row#show_can_train]], [[home_row#show_cant_train]], [[home_row#show_patient]], [[home_row#show_needs_care]], [[home_row#show_fallen]] (`home_row.gd:121`, `154`, `170`, `180`, `189`, `201`).
 
 **Calls:** [[portrait#show_character]], [[hall_style#role_name]], [[chip#set_health]], [[home_row#_show_task_chip]], [[hall_style#style_panel]], [[home_row#_pop_in]].
 
@@ -185,7 +185,7 @@ A hero who can't train: faded, with "In a Hospital bed" or "Too hurt to train".
 ### show_patient
 `func show_patient(main: HallMain, hero: GuildCharacter) -> void` · `Scripts/UI/Rows/Buildings/home_row.gd:179`
 
-A hero in a Hospital bed: "Healthy in N nights", orange paper, Discharge button (`hall.discharge`, [[hall_main#discharge]]).
+A hero in a Hospital bed: "Healthy in N nights · G gold/night" (G is [[guild_upgrades#nightly_fee]]), orange paper, Discharge button (`hall.discharge`, [[hall_main#discharge]]).
 
 **Parameters:** `main`, `hero` as above; `hero` from `patients` in [[home_section#_show_hospital]].
 
@@ -193,12 +193,12 @@ A hero in a Hospital bed: "Healthy in N nights", orange paper, Discharge button 
 
 **Called by:** [[home_section#_show_hospital]] (`home_section.gd:147`).
 
-**Calls:** [[home_row#_fill]], [[guild_upgrades#get_nights_until_healthy]], [[home_row#_set_note]], [[home_row#_nights_text]], [[home_row#_set_button]], [[hall_style#style_panel]].
+**Calls:** [[home_row#_fill]], [[guild_upgrades#get_nights_until_healthy]], [[guild_upgrades#nightly_fee]], [[home_row#_set_note]], [[home_row#_nights_text]], [[home_row#_set_button]], [[hall_style#style_panel]].
 
 ### show_needs_care
 `func show_needs_care(main: HallMain, hero: GuildCharacter) -> void` · `Scripts/UI/Rows/Buildings/home_row.gd:188`
 
-A hurt hero not in a bed: nights to heal at home vs in a bed, and Admit (`hall.admit`, [[hall_main#admit]]). If they're in a quest's party or training the button reads "Pull & admit" in paper style.
+A hurt hero not in a bed: nights to heal at home vs in a bed, and Admit (`hall.admit`, [[hall_main#admit]]). The button text is "Admit · G gold/night" (G is [[guild_upgrades#nightly_fee]]); if they're in a quest's party or training it reads "Pull & admit · G gold/night" in paper style. The button is disabled when `GameState.gold` is below the fee.
 
 **Parameters:** `main`, `hero` as above; `hero` from `waiting` in [[home_section#_show_hospital]].
 
@@ -206,12 +206,12 @@ A hurt hero not in a bed: nights to heal at home vs in a bed, and Admit (`hall.a
 
 **Called by:** [[home_section#_show_hospital]] (`home_section.gd:151`).
 
-**Calls:** [[home_row#_fill]], [[guild_upgrades#get_nights_until_healthy]], [[home_row#_set_note]], [[home_row#_nights_text]], [[hall_main#quest_index_of]], [[guild_upgrades#is_training]], [[home_row#_set_button]].
+**Calls:** [[home_row#_fill]], [[guild_upgrades#get_nights_until_healthy]], [[home_row#_set_note]], [[home_row#_nights_text]], [[hall_main#quest_index_of]], [[guild_upgrades#is_training]], [[guild_upgrades#nightly_fee]], [[home_row#_set_button]].
 
 ### show_fallen
-`func show_fallen(main: HallMain, hero: GuildCharacter) -> void` · `Scripts/UI/Rows/Buildings/home_row.gd:197`
+`func show_fallen(main: HallMain, hero: GuildCharacter) -> void` · `Scripts/UI/Rows/Buildings/home_row.gd:200`
 
-A fallen hero. Revive button (`hall.revive`, [[hall_main#revive]]) when `GuildUpgrades.can_revive()` and the roster isn't full; otherwise a faded row with the reason (no free bed, revive used up, or "Revive at Hospital Lv N").
+A fallen hero. Revive button (`hall.revive`, [[hall_main#revive]]) when `GuildUpgrades.can_revive()` and the roster isn't full (the button is disabled while gold is below `GuildUpgrades.nightly_fee()`, since the revived hero takes a bed); otherwise a faded row with the reason (no free bed, revive used up, or "Revive at Hospital Lv N").
 
 **Parameters:** `main`, `hero` as above; `hero` from `fallen` in [[home_section#_show_hospital]].
 
@@ -219,7 +219,7 @@ A fallen hero. Revive button (`hall.revive`, [[hall_main#revive]]) when `GuildUp
 
 **Called by:** [[home_section#_show_hospital]] (`home_section.gd:155`).
 
-**Calls:** [[home_row#_fill]], [[guild_upgrades#can_revive]], [[hall_main#is_roster_full]], [[home_row#_set_note]], [[home_row#_set_button]], [[hall_style#style_panel]], [[guild_upgrades#get_level]].
+**Calls:** [[home_row#_fill]], [[guild_upgrades#can_revive]], [[hall_main#is_roster_full]], [[home_row#_set_note]], [[home_row#_set_button]], [[hall_style#style_panel]], [[guild_upgrades#get_level]], [[guild_upgrades#nightly_fee]].
 
 ## Suspected issues
 - The file's header comment block says stat picker buttons are "Str / Def / Wis / Slz"; the scene's buttons are named `Pow`, `Def`, `Wis`, `Slz` (the labels come from `HallStyle.STATS[i].short`, so the header may be out of date).

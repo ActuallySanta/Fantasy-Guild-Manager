@@ -14,7 +14,7 @@ tags: [scene]
 The intro story crawl shown once per save at the start of a new run, in gold ink on black; Begin ('Open the Doors') hands over to Pip's Day 1 tutorial. See [[overlay_intro]].
 
 ## Parent scenes
-- **Placed in editor:** [[hall_main (scene)]] at node `OverlayIntro`. Shown or hidden by [[hall_main#_refresh_overlays]] (`hall_main.gd:1845`).
+- **Placed in editor:** [[hall_main (scene)]] at node `OverlayIntro`. Shown or hidden by [[hall_main#_refresh_overlays]] (`hall_main.gd:1870`).
 - No runtime parents.
 
 ## Child scenes

@@ -4,7 +4,7 @@ class_name: OverlayTutorial
 extends: Control
 scene: ""
 systems: ["[[UI Architecture and Refresh]]"]
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
 tags: [script]
 ---
 
@@ -62,13 +62,13 @@ Stores the hall, fills the screen, builds the nodes, hides itself, and listens t
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `main` | `Control` | The hall | `self` in [[hall_main#_ready]] (`hall_main.gd:459`, after `add_child(tutorial)`) |
+| `main` | `Control` | The hall | `self` in [[hall_main#_ready]] (`hall_main.gd:462`, after `add_child(tutorial)`) |
 
 **Returns:** nothing.
 
 **Side effects:** connects `hall.tutorial_event` to [[overlay_tutorial#_on_event]]; may set `hall.is_welcome_open = false`; defers [[overlay_tutorial#start]] (1).
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:459`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:462`).
 
 **Calls:** [[overlay_tutorial#_build]], [[hall_main#is_intro_open]], [[overlay_tutorial#start]].
 
@@ -79,7 +79,7 @@ After a saved run loads (or the intro closes): if today has a tutorial script no
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:472`, resumed run); [[hall_main#close_intro]] (`hall_main.gd:915`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:475`, resumed run); [[hall_main#close_intro]] (`hall_main.gd:929`).
 
 **Calls:** [[overlay_tutorial#_is_tutorial_day]], [[overlay_tutorial#_script_for_day]], [[overlay_tutorial#is_running]], [[hall_main#is_intro_open]], [[overlay_tutorial#start]] (deferred).
 
@@ -91,11 +91,11 @@ True while the tutorial holds `feature` back: enabled, not skipped, the feature 
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `feature` | `String` | A `FEATURE_*` id | [[hall_main#is_locked]] (`hall_main.gd:685`), whose callers pass `OverlayTutorial.FEATURE_*` (e.g. `tab_board.gd:76`, `screen_assign.gd:384`, `member_card.gd:54`) |
+| `feature` | `String` | A `FEATURE_*` id | [[hall_main#is_locked]] (`hall_main.gd:699`), whose callers pass `OverlayTutorial.FEATURE_*` (e.g. `tab_board.gd:76`, `screen_assign.gd:384`, `member_card.gd:54`) |
 
 **Returns:** `bool`. Used by `hall_main.is_locked` to grey out Applicants, hero pages and Deny.
 
-**Called by:** [[hall_main#is_locked]] (`hall_main.gd:685`).
+**Called by:** [[hall_main#is_locked]] (`hall_main.gd:699`).
 
 ### _is_tutorial_day
 `func _is_tutorial_day(day: int) -> bool` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:271`
@@ -132,7 +132,7 @@ True while a script is active (`_index >= 0`).
 
 **Returns:** `bool`. Used by hall_main to skip the tutorial when a run ends and by the Debug overlay to enable its buttons.
 
-**Called by:** [[hall_main#debug_skip_tutorial]] (`hall_main.gd:1475`); [[hall_main#_show_final_credits]] (`hall_main.gd:1581`); [[hall_main#_check_run_over]] (`hall_main.gd:1665`); [[overlay_debug#refresh]] (`overlay_debug.gd:148`, `:150`, which enables its tutorial and intro buttons); [[overlay_tutorial#resume_today]], [[overlay_tutorial#_on_event]], [[overlay_tutorial#_process]].
+**Called by:** [[hall_main#debug_skip_tutorial]] (`hall_main.gd:1493`); [[hall_main#_show_final_credits]] (`hall_main.gd:1601`); [[hall_main#_check_run_over]] (`hall_main.gd:1690`); [[overlay_debug#refresh]] (`overlay_debug.gd:148`, `:150`, which enables its tutorial and intro buttons); [[overlay_tutorial#resume_today]], [[overlay_tutorial#_on_event]], [[overlay_tutorial#_process]].
 
 ### start
 `func start(day: int, script: int = day) -> void` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:288`
@@ -211,7 +211,7 @@ Sets `is_skipped` (which also lifts the feature locks) and finishes the running 
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#debug_skip_tutorial]] (`hall_main.gd:1476`); [[hall_main#_show_final_credits]] (`hall_main.gd:1582`); [[hall_main#_check_run_over]] (`hall_main.gd:1666`); signal `pressed` on the "Skip tutorial" button (`_skip_button`).
+**Called by:** [[hall_main#debug_skip_tutorial]] (`hall_main.gd:1494`); [[hall_main#_show_final_credits]] (`hall_main.gd:1602`); [[hall_main#_check_run_over]] (`hall_main.gd:1691`); signal `pressed` on the "Skip tutorial" button (`_skip_button`).
 
 **Calls:** [[overlay_tutorial#_finish]].
 
@@ -223,7 +223,7 @@ Handles every `tutorial_event`. Records it in `_seen`; remembers a bought item; 
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `event` | `String` | Event name | first arg of `hall.tutorial_event.emit(...)` in [[hall_main]] (e.g. `hall_main.gd:761`, `:787`, `:1501`, `:1649`, `:1716`, `:1723`) |
+| `event` | `String` | Event name | first arg of `hall.tutorial_event.emit(...)` in [[hall_main]] (e.g. `hall_main.gd:775`, `:801`, `:1519`, `:1674`, `:1741`, `:1748`) |
 | `data` | `Variant` | Event payload (tab dict, quest index, hero, item, day...) | second arg of the same emit |
 
 **Returns:** nothing.
@@ -650,7 +650,7 @@ Day 1's party is ready with two heroes, or fewer if the quest or roster is small
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `entry` | `Dictionary` | The quest entry from the `pick` event | `d` in the `when` lambda of the Day 1 pick step (payload of `hall_main.gd:973`) |
+| `entry` | `Dictionary` | The quest entry from the `pick` event | `d` in the `when` lambda of the Day 1 pick step (payload of `hall_main.gd:987`) |
 
 **Returns:** `bool`. Decides whether the `pick` event finishes the step.
 
@@ -741,7 +741,7 @@ True if `character` is a `GuildCharacter` whose role matches the bought item's r
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `character` | `Variant` | Event payload or roster hero | `d` of the `character` event (`hall_main.gd:797`); roster heroes in `_someone_fits_bought` |
+| `character` | `Variant` | Event payload or roster hero | `d` of the `character` event (`hall_main.gd:811`); roster heroes in `_someone_fits_bought` |
 
 **Returns:** `bool`. Decides whether the `character` event finishes the Day 5 step.
 
@@ -801,13 +801,13 @@ Day 2 script: open a hero's page and its stats, Back, Applicants (a `free` step 
 ### _day_three
 `func _day_three() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1066`
 
-The Guild-tab script (key `GUILD_SCRIPT`, runs on `GuildUpgrades.UNLOCK_DAY`; the name is historical): Guild tab, Build section, building an upgrade, Facilities, Training Yard (add a hero, pick a stat) and Hospital (admit).
+The Guild-tab script (key `GUILD_SCRIPT`, runs on `GuildUpgrades.UNLOCK_DAY`; the name is historical): Guild tab, Build section, building an upgrade, Facilities, Training Yard (add a hero, pick a stat) and Hospital (admit). The Admit step is skipped when nobody is hurt and waiting, or when the guild can't pay tonight's bed fee (`GameState.gold < GuildUpgrades.nightly_fee()`).
 
 **Returns:** `Array` of steps.
 
 **Called by:** [[overlay_tutorial#_steps_for]].
 
-**Calls:** [[overlay_tutorial#_nav]], [[overlay_tutorial#_u]], [[overlay_tutorial#_tab]], [[overlay_tutorial#_row]], [[overlay_tutorial#_is_enabled]], [[overlay_tutorial#_training_section]], [[overlay_tutorial#_hospital_section]], [[overlay_tutorial#_tonight_text]], [[overlay_tutorial#_anyone_can_train]], [[hall_main#affordable_buildings]], [[hall_main#hurt_waiting_count]], [[guild_upgrades#has_free_training_slot]].
+**Calls:** [[overlay_tutorial#_nav]], [[overlay_tutorial#_u]], [[overlay_tutorial#_tab]], [[overlay_tutorial#_row]], [[overlay_tutorial#_is_enabled]], [[overlay_tutorial#_training_section]], [[overlay_tutorial#_hospital_section]], [[overlay_tutorial#_tonight_text]], [[overlay_tutorial#_anyone_can_train]], [[hall_main#affordable_buildings]], [[hall_main#hurt_waiting_count]], [[guild_upgrades#has_free_training_slot]], [[guild_upgrades#nightly_fee]].
 
 ### _day_five
 `func _day_five() -> Array` · `Scripts/UI/Overlays/Day/overlay_tutorial.gd:1095`
@@ -830,6 +830,6 @@ The single freeplay card shown after the final battle is won.
 **Called by:** [[overlay_tutorial#_steps_for]].
 
 ## Suspected issues
-- `overlay_tutorial.gd:169`: the comment says "untyped: hall_main preloads this file", but hall_main now reaches it by `class_name` (`OverlayTutorial.new()`, `hall_main.gd:446`).
+- `overlay_tutorial.gd:169`: the comment says "untyped: hall_main preloads this file", but hall_main now reaches it by `class_name` (`OverlayTutorial.new()`, `hall_main.gd:449`).
 - `overlay_tutorial.gd:1066`: `_day_three` is the Guild-tab script (key 3 = `GUILD_SCRIPT`, day 10), a leftover name from when it ran on Day 3.
-- The header says "Days 1, 2, 5 and ... (10)" and `_freeplay` is documented in the header, but the `game_over` event is emitted by hall_main (`hall_main.gd:1669`) and not handled here (only `run_logger.gd` and `_seen` see it).
+- The header says "Days 1, 2, 5 and ... (10)" and `_freeplay` is documented in the header, but the `game_over` event is emitted by hall_main (`hall_main.gd:1694`) and not handled here (only `run_logger.gd` and `_seen` see it).

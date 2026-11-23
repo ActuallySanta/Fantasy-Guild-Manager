@@ -3,7 +3,7 @@ source: Globals/item_shop.gd
 class_name: null
 extends: Node
 scene: null
-systems: []
+systems: ["[[Boot and Autoload Order]]", "[[Day Cycle]]", "[[Success Chance]]", "[[Items and Shop]]", "[[Economy and Wallet]]"]
 last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
 tags: [script, autoload]
 ---
@@ -62,7 +62,7 @@ Fresh goods on the counter (yesterday's unsold goods are gone): clears `stock` a
 
 **Side effects:** rewrites `stock`, emits `stock_changed`.
 
-**Called by:** [[item_shop#_first_restock]] (line 47), [[item_shop#_on_day_started]] (line 51), [[hall_main#reset_autoloads]] (`hall_main.gd:1692`).
+**Called by:** [[item_shop#_first_restock]] (line 47), [[item_shop#_on_day_started]] (line 51), [[hall_main#reset_autoloads]] (`hall_main.gd:1717`).
 
 **Calls:** [[item_shop#_make_item]].
 
@@ -86,7 +86,7 @@ The item at that stock slot, or null when `index` is out of range.
 
 **Returns:** `StandardItem` or null.
 
-**Called by:** [[item_shop#can_buy]] (line 88), [[item_shop#buy]] (line 95), [[hall_main#buy_item]] (`hall_main.gd:1169`), [[hall_wallet#cheapest_gear_price]] (`hall_wallet.gd:135`), [[agent_bridge_actions#_buy]] (`:135`), [[agent_bridge_state#_shop]] (`:107`), [[tab_shop#_show_goods]] (`tab_shop.gd:81`), [[tab_shop#_show_buy_bar]] (`:110`).
+**Called by:** [[item_shop#can_buy]] (line 88), [[item_shop#buy]] (line 95), [[hall_main#buy_item]] (`hall_main.gd:1183`), [[hall_wallet#cheapest_gear_price]] (`hall_wallet.gd:135`), [[agent_bridge_actions#_buy]] (`:135`), [[agent_bridge_state#_shop]] (`:107`), [[tab_shop#_show_goods]] (`tab_shop.gd:81`), [[tab_shop#_show_buy_bar]] (`:110`).
 
 ### is_sold
 `func is_sold(index: int) -> bool` · `Globals/item_shop.gd:79`
@@ -99,7 +99,7 @@ True when the slot exists and its `sold` flag is set. Out-of-range counts as not
 
 **Returns:** `bool`. Callers hide or grey out sold cards.
 
-**Called by:** [[item_shop#can_buy]] (line 89), [[hall_main#buy_item]] (`hall_main.gd:1170`), [[hall_wallet#cheapest_gear_price]] (`:133`), [[agent_bridge_actions#_buy]] (`:137`, `:140`), [[agent_bridge_state#_shop]] (`:115`), [[tab_items#_unsold_count]] (`tab_items.gd:85`), [[tab_shop#_show_goods]] (`tab_shop.gd:89`), [[tab_shop#_show_buy_bar]] (`:117`).
+**Called by:** [[item_shop#can_buy]] (line 89), [[hall_main#buy_item]] (`hall_main.gd:1184`), [[hall_wallet#cheapest_gear_price]] (`:133`), [[agent_bridge_actions#_buy]] (`:137`, `:140`), [[agent_bridge_state#_shop]] (`:115`), [[tab_items#_unsold_count]] (`tab_items.gd:85`), [[tab_shop#_show_goods]] (`tab_shop.gd:89`), [[tab_shop#_show_buy_bar]] (`:117`).
 
 ### can_afford
 `func can_afford(item: StandardItem) -> bool` · `Globals/item_shop.gd:83`
@@ -138,7 +138,7 @@ Buys a stock item: takes `item.cost` gold, appends the item to `ItemContainer.ow
 
 **Side effects:** `GuildUpgrades.add_gold(-cost)` (which emits `resources_changed`), changes `owned_items`, `stock`, emits `stock_changed`.
 
-**Called by:** [[hall_main#buy_item]] (`hall_main.gd:1173`).
+**Called by:** [[hall_main#buy_item]] (`hall_main.gd:1187`).
 
 **Calls:** [[item_shop#can_buy]], [[item_shop#get_item]], [[guild_upgrades#add_gold]].
 
@@ -192,7 +192,7 @@ Equips if `can_equip` is `OK`. If the item is on another hero, its bonus metadat
 
 **Side effects:** changes `equipped_items`, `curr_user`, item metadata, both heroes' `temp_stats`, emits `gear_changed`.
 
-**Called by:** [[hall_main#equip_item]] (`hall_main.gd:1189`), [[hall_main#swap_gear]] (`:1224`, `:1225`).
+**Called by:** [[hall_main#equip_item]] (`hall_main.gd:1203`), [[hall_main#swap_gear]] (`:1238`, `:1239`).
 
 **Calls:** [[item_shop#can_equip]], [[item_shop#_remove_bonus]], [[item_container#give_item_to_character]], [[item_shop#_apply_bonus]], [[character_resource#reset_temp_stats]].
 
@@ -207,7 +207,7 @@ Takes the item off its wearer (does nothing if nobody wears it), drops its bonus
 
 **Side effects:** emits `gear_changed`.
 
-**Called by:** [[character_container#remove_character_from_guild]] (`character_container.gd:148`), [[hall_main#unequip_item]] (`hall_main.gd:1209`), [[hall_main#swap_gear]] (`:1223`).
+**Called by:** [[character_container#remove_character_from_guild]] (`character_container.gd:156`), [[hall_main#unequip_item]] (`hall_main.gd:1223`), [[hall_main#swap_gear]] (`:1237`).
 
 **Calls:** [[item_shop#_remove_bonus]], [[item_container#remove_item_from_character]], [[character_resource#reset_temp_stats]].
 

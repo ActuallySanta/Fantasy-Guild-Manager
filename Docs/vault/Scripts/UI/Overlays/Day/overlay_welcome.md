@@ -42,13 +42,13 @@ Builds the whole UI in code: wraps the scene's rows into a Basics page inside a 
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
-| `main` | `HallMain` | The hall | `self` in [[hall_main#_ready]] (`hall_main.gd:424`) |
+| `main` | `HallMain` | The hall | `self` in [[hall_main#_ready]] (`hall_main.gd:427`) |
 
 **Returns:** nothing.
 
 **Side effects:** connects `pressed` on `%StartButton` to [[overlay_welcome#_on_close]]; Back `pressed` to `_show(-1)`; `visibility_changed` to [[overlay_welcome#_on_shown]]; reparents the scene's rows.
 
-**Called by:** [[hall_main#_ready]] (`hall_main.gd:424`).
+**Called by:** [[hall_main#_ready]] (`hall_main.gd:427`).
 
 **Calls:** [[overlay_welcome#_new_page]], [[overlay_welcome#_add_topic_button]], [[overlay_welcome#_build_row]], [[overlay_welcome#_on_shown]], [[hall_style#style_button]].
 
@@ -59,7 +59,7 @@ Does nothing; nothing changes while it is open (hall_main calls it on every visi
 
 **Returns:** nothing.
 
-**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1866`).
+**Called by:** [[hall_main#_refresh_overlays]] (`hall_main.gd:1891`).
 
 ### _on_shown
 `func _on_shown() -> void` · `Scripts/UI/Overlays/Day/overlay_welcome.gd:138`

@@ -14,7 +14,7 @@ tags: [scene]
 The text crawl of the night's boss fights (days 10, 20, 30, 40) that rolls up the screen before the Day Report; Continue opens the report. See [[overlay_boss_crawl]].
 
 ## Parent scenes
-- **Placed in editor:** [[hall_main (scene)]] at node `OverlayBossCrawl`. Shown or hidden by [[hall_main#_refresh_overlays]] (`hall_main.gd:1845`).
+- **Placed in editor:** [[hall_main (scene)]] at node `OverlayBossCrawl`. Shown or hidden by [[hall_main#_refresh_overlays]] (`hall_main.gd:1870`).
 - No runtime parents.
 
 ## Child scenes
