@@ -61,8 +61,8 @@ func setup(hall: HallMain, entry: Dictionary, character: GuildCharacter,
 	_portrait.show_character(character)
 	_name.text = character.name
 	_role.text = TEXT_ROLE % HallStyle.role_name(character)
-	_stats.show_health(character)
-	_stats.show_stats(character, HallStyle.favored_stat_index(entry.quest), false)
+	_stats.show_health(character, true)
+	_stats.show_stats(character, HallStyle.favored_stat_indexes(entry.quest), false)
 	_show_elsewhere(hall, entry, character)
 	_show_pick_state(hall, entry, character)
 

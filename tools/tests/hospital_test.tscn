@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c8h2p5r7y3kd"]
+
+[ext_resource type="Script" uid="uid://c0grxtoss4kpl" path="res://tools/tests/hospital_test.gd" id="1_hospital"]
+
+[node name="hospital_test" type="Node"]
+script = ExtResource("1_hospital")

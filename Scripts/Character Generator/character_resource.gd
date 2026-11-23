@@ -200,9 +200,17 @@ func generate_description() -> String:
 	return _description
 
 
-func injure_character() -> bool:
+## Raises the injury level by one.
+## [param can_die]: when false, a hit that would kill stops at Gravely injured
+## instead (nothing changes, injury_count included) and returns false.
+## Returns true when this hit killed the hero.
+func injure_character(can_die: bool = true) -> bool:
 	# already dead: nothing more can happen to them
 	if (injury_level >= InjuryLevel.DEAD):
+		return false
+
+	# protected from dying: the hit stops at Gravely injured
+	if (not can_die and injury_level + 1 >= InjuryLevel.DEAD):
 		return false
 
 	injury_count += 1

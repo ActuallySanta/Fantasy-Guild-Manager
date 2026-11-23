@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://dhp1r1c3t3sc1"]
+
+[ext_resource type="Script" uid="uid://dhp1r1c3t3st1" path="res://tools/tests/hire_price_test.gd" id="1_hp"]
+
+[node name="hire_price_test" type="Node"]
+script = ExtResource("1_hp")

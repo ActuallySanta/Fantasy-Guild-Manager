@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://b4crwlsect0n2"]
+
+[ext_resource type="Script" uid="uid://c3crwlsect0n1" path="res://Scripts/UI/Components/crawl_sections.gd" id="1_sections"]
+
+[node name="CrawlSections" type="VBoxContainer"]
+theme_override_constants/separation = 30
+script = ExtResource("1_sections")
+
+[node name="Title" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"HeadingLight"
+theme_override_font_sizes/font_size = 66
+text = "Title"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Sub" type="Label" parent="."]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_type_variation = &"ItalicLight"
+theme_override_font_sizes/font_size = 30
+text = "Subtitle"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Fights" type="VBoxContainer" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 30

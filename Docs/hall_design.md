@@ -47,7 +47,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 ## Layout
 
 ```
-┌ header ─ Day · Bone Drake countdown (BOSS seal + days left) · gold · standing · menu ┐
+┌ header ─ Day · next-boss countdown (BOSS seal, or FINAL before day 50, plus days left; hidden after day 50) · gold · standing · menu ┐
 │ warning strip ─ "Last hero standing" (only when one death from falling) │
 │ content ─ Board | Guild | Upgrades | Items  (or a screen over them) │
 └ nav ─ Quests (undecided) · Members (new recruits) · Guild (affordable) · Items ┘
@@ -56,7 +56,7 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | Screen | What's on it |
 |---|---|
 | Board (tab, "Quests" in the nav) | Today checklist (Recruits / Decided Quests / Upgrades, each tappable), then all quests, then the **End Day** button. Rows show *Pick a party*, *Sent* or *Denied* with odds and mini portraits |
-| Assign Party | Quest strip; quest card; party seats (filled ones stack beside the odds, empty ones share one row under them across the card; tap a filled one to remove them, an empty one to scroll down to the picker) with live odds; picker sorted best fit first, in three groups: free adventurers, then those already in another quest's party (greyed out, saying "Picked for / Sent on #N"; tapping one opens a Move popup that asks before taking them off that quest), then those who can't go (hospital bed, training) at the very bottom. Pinning anyone sends the quest (SENT is stamped on it); a saved run from before this rule sends any quest with a party on load. Footer: Deny / Back to Quests (open), Recall / Back to Quests (sent; Recall unpins everyone), or Quests / Reconsider (denied) |
+| Assign Party | Quest strip; quest card; party seats (filled ones stack beside the odds, empty ones share one row under them across the card; tap a filled one to remove them, an empty one to scroll down to the picker) with live odds; picker sorted best fit first, in three groups: free adventurers, then those already in another quest's party (greyed out, saying "Picked for / Sent on #N"; tapping one opens a Move popup that asks before taking them off that quest), then those who can't go (hospital bed, training) at the very bottom. Pinning anyone sends the quest (SENT is stamped on it); a saved run from before this rule sends any quest with a party on load. Footer: Deny / Back to Quests (open; the day-50 final has no Deny, since `HallRules.can_deny` refuses it: a denied final would leave the run with no ending, and the AI bridge rejects it too), Recall / Back to Quests (sent; Recall unpins everyone), or Quests / Reconsider (denied) |
 | Guild (tab, "Members" in the nav) | A folder with two tabs: Your Guild (roster with health, two strongest stats and a status on the right: On quest #N, Idle, Training <stat>, In hospital or Fallen) / Applicants (a stack of letters of introduction; tap one peeking out to read it, Hire on the top one, with the applicant's whole backstory under the Hire button; applicants have no Details page). Bed count links to the Barracks |
 | Upgrades (tab, "Guild" in the nav) | A folder with two tabs. **Facilities**: the Training Yard plan (heroes in a slot with a Pow / Def / Wis / Slz picker and Remove; "+ Add a hero" opens who can train, with Add or Move here) and the Hospital plan (heroes in a bed with nights left and Discharge; hurt heroes with nights at home vs in a bed and Admit; fallen heroes, Revive at level 5). Badge = hurt heroes not in a bed. **Build**: the treasury ledger, a plan per building (affordable first) with level diamonds, now/next effect, cost or what's missing, and "coming soon" buildings as rolled-up scrolls. Badge = upgrades you can afford |
 | Items (tab, id "shop") | Locked until Day 5 (`ItemShop.UNLOCK_DAY`) in every run, tutorial or not. A folder with two tabs; the first visit each day opens on the Shop. **Inventory** (the "pack" section in code): every item the guild owns as goods tags (grouped by role), with a Hide equipped box and role filters. A worn item has its hero's round portrait on the corner and an "ON GWEN" ribbon; the item bar shows Take off (asks first, with the stat it drops) or Equip on… (a sheet of heroes of the right role: Equip, or Swap… for full slots, which asks which item comes off). **Shop**: Grizzle behind his counter under a striped awning, with a speech bubble and a hanging sign; today's goods as price tags (3 x 2, sold-out ones stamped); a torn-paper Buy bar just above the nav |
@@ -64,10 +64,37 @@ boxes in code; they only pick a look or tint white art with an ink colour.
 | End Day check | Parties going out with odds, denied quests, affordable upgrades with buy buttons |
 | Day Report | Totals (succeeded, gold, injuries), an "At home" line (training, healing), one letter per quest with its story. Everyday letters start folded with a down caret and "Tap to read the letter"; tapping opens the story and flips the caret up. Story quests never fold. While letters run below the bottom of the screen, a gold arrow bobs and flashes there until you scroll down (it holds still with Reduce motion). On Day 1 Pip walks through it: the totals, then opening a letter (that step waits until one is opened), then its story lines |
 | Intro crawl | A new run only, before the tutorial. The story of how you inherited the guild rolls up a black screen, then **Open the Doors** (see "Intro crawl") |
+| Boss crawl | Days 10, 20, 30 and 40 (every boss day but the final), after End Day and before that night's Day Report. The same text crawl as the credits (`CrawlSections` and `CrawlRoll`, shared with them), without the ledger, records, roll call or team credits: the day, then each boss fight in board order with its quest title, the story line by line, the party (skull or "survived") and "Victory!" or "Defeated...". Each fight takes its own ink (warm for a win, cold for a loss); the backdrop and roll speed are the victory ones only if every fight was won. **Continue** (`HallMain.close_boss_crawl`) opens the Day Report. It is presentation only: `shown_boss_crawl` is never saved, and `night_save` keeps the report as already showing, so closing the game mid-crawl reopens straight on the Day Report |
 | Final Battle credits | Day 50 only. **Victory**: on a warm, dark backdrop the night's story rolls up the screen line by line, then who fought, a parchment ledger (final stats without the Bone Drake, run records, roll call), the team credits, and **Begin Freeplay**. **Defeat**: the same roll in cold colours with an epitaph, and **Found a New Guild** |
 | Game Over | The guild ledger: days survived, a 2 x 3 grid (gold earned, quests won, heroes hired, fallen, final standing, Bone Drake), a roll call of every hero and their fate, and Found a New Guild |
 | Menu | How to play, last night's report, Accessibility, reset upgrades (debug), abandon run |
 | Accessibility | Text size (Small / Normal / Large, applied live by `HallFontScale.set_text_factor`), colorblind filter (Off / Red-weak / Green-weak / Blue-yellow), reduced motion; each button taps to the next choice, saved to `user://settings.cfg` |
+
+## Failed quests cost standing
+
+A win pays `HallRules.standing_for_win` (rank + 1). A failed quest costs half of that,
+rounded up (`HallRules.standing_for_loss`: ranks F and D cost 1, C and B cost 2, A and S
+cost 3; G costs 1). The loss never sinks standing below `GuildUpgrades.MINIMUM_STANDING`:
+`play_quest` clamps it, so the Day Report shows only what was actually lost. Assign Party's
+standing chip reads "Win +N · Fail −M standing", and a failed quest's letter in the Day
+Report gets a red "−M standing" tag.
+
+## Injuries, the retreat and deaths
+
+Fight injuries follow the quest's odds, not its rank (`QuestInjuries`, `Scripts/Quest Creator/quest_injuries.gd`).
+Each combat encounter hurts someone with chance `target(odds) x party size / the rank's average encounter
+count`, so the average fight injuries **per hero** match `INJURIES_BY_ODDS`: 0.1 at 130% or more, 0.2 at 100%,
+0.35 at 90%, 0.5 at 80%, 0.7 at 70%, 0.9 at 60%, 1.2 at 50% or less (linear between). A solo hero is no likelier to
+be hurt than each member of a party. The encounter counts (`EXPECTED_COMBATS_BY_RANK`) are measured from
+`generateResults`' loops, so re-measure them if those loops change. The story matches: a fight says "INJURED" only
+when `injure_character` actually ran, and the two `_search` failure lines no longer claim an injury.
+
+- **The retreat:** on a failed quest every living hero takes one more injury after the fights
+  ("The party was beaten back and everyone was INJURED in the retreat").
+- **Deaths:** `generateResults` rolls win or loss before the fights. A hero who set out Healthy or Sore can't die
+  on a won quest: `injure_character(false)` stops them at Gravely hurt. On a lost quest, or for a hero who set out
+  Hurt or worse, four injuries in total still kill. Assign Party's picker tags a hero who is Hurt or worse with a red
+  "At risk" chip next to their health chip.
 
 ## Game Over
 
@@ -86,6 +113,12 @@ from falling (`HallMain.is_one_death_from_falling`). That means one hero is aliv
 in today's For Hire is affordable, and either tomorrow's recruit price is more than your
 gold or standing is within `DANGER_STANDING_MARGIN` of the floor. The Welcome card's
 "Don't run out of heroes" row explains the rule.
+
+A milder gold **Guild in trouble** strip uses the same spot when the red one isn't showing
+(`HallMain.trouble_reason`, rules in `HallLedger.trouble_reason`). It shows when
+`TROUBLE_FAILURES` (2) or more quests were lost over the last `TROUBLE_WINDOW_DAYS` (2) played
+days, or half or more of the living roster is Hurt or worse. The failure count is kept in
+`run_stats.failed_by_day` (read with `.get`, so old saves just show no strip).
 
 Tapping the gold coin or the standing shield in the header drops a parchment card
 from it (`HeaderPopup`; tap anywhere else to close it). The **gold** card shows what
@@ -186,9 +219,16 @@ both open with the Guild tab on Day 10 (`GuildUpgrades.UNLOCK_DAY`); before that
   pulls a hero out of a quest party and into a slot.
 - **Healing:** at home injuries heal one level at a time, each taking
   `HOME_HEAL_NIGHTS` (Sore 2, Hurt 4, Gravely 6). In a Hospital bed a hero heals
-  `HOSPITAL_STAGES_PER_NIGHT` stages every night (level 1: one stage, level 2: two,
-  level 3+: all three). Heroes in a bed can't go on quests, and they go home on their
-  own once they're Healthy.
+  `HOSPITAL_STAGES_PER_NIGHT` stages every night (levels 1-2: one stage, level 3+: two,
+  so Gravely hurt takes two nights). Heroes in a bed can't go on quests, and they go
+  home on their own once they're Healthy.
+- **Bed fee:** every patient costs `GuildUpgrades.nightly_fee()` gold a night, which is
+  `HOSPITAL_FEE_PER_NIGHT` (20) × (standing rank + 1), so 120 at rank S. It is charged at
+  End Day, before healing. Discharging a hero before then stops the charge. Beds are paid
+  in the order heroes were admitted; when gold runs out, that patient and every later one
+  go home to heal there, and gold never goes below 0. The Admit button reads
+  "Admit · N gold/night" (disabled without the gold), a bed row shows the rate, and the Day
+  Report lists "Hospital: −N gold" and who "went home: no gold for a bed". Revive needs the fee too.
 - **Revive:** Hospital level 5 brings one fallen hero back per run, Gravely hurt and in a bed.
 - The Day Report's header has an "At home" line with who trained and who healed.
 
@@ -207,6 +247,11 @@ Each morning's new applicants keep up with the guild (`HireScaling`, tuning at t
 - **Price:** the day's price (`GuildCharacter.recruit_cost_for_day`) plus `PRICE_PER_POINT`
   (10g) per point over the standing floor. Days 1-2 stay free. The day's price is the
   cheapest a recruit can be, so the Game Over check still uses it.
+- **Roster surcharge:** each living hero above `HIRE_PRICE_FREE_HEROES` (3) adds
+  `HIRE_PRICE_PER_HERO` (15%) to a recruit's price (`HireScaling.roster_price`, read through
+  `CharacterContainer.hire_price`). The hire card, the hero screen and the charge all use that
+  one number, taken at the moment of the tap. Free recruits stay free. The saved `cost` is
+  still the base price.
 - Released heroes who come back keep their own stats and their 2× price.
 
 ## Quest growth
@@ -231,6 +276,31 @@ Looks come from the theme, not from overrides: a label is `TitleLabel`, `CapsLab
 `PaperCard`, `PlanCard`, `TornPaper`... and a button is `GoldButton`, `WoodButton`,
 `PaperButton` or `SealButton`. Pick one in the inspector (*Theme > Type Variation*) rather
 than overriding colours or styles on the node, so a reskin reaches it.
+
+## Bosses
+
+`HallRules.BOSS_DAYS` (10, 20, 30, 40, 50) are boss days: the board shows only the day's boss quests
+(`HallRules._build_boss_entries`), all `milestone` entries, built from the written stories in
+`External Content/Quest Stuff (Test)/Milestone Story Parts.txt` by `CreatedQuest._initMilestoneVars`.
+Every boss has the boss requirement spike (`requirement_scale`) and pays 300 + 150 x rank gold.
+
+| Day | Boss | Seats | Rank | Favored stat | Region |
+|---|---|---|---|---|---|
+| 10 | Bone Drake | 3 | C | Defense | Boglands |
+| 20 | Resurrected Bone Drake, and the Necromancer | 3 and 3 | B | Power / Wisdom | Ashen Wastes / Glass Mountains |
+| 30 | Demon General at the Blood Moon Cult's portal | 5 | B | Sleaze | Ashen Wastes |
+| 40 | King Bernard and King Alastair, two Demon Generals | 4 and 5 | A | Power and Defense / Wisdom and Sleaze | Boglands / Glass Mountains |
+| 50 | THE DEMON KING (the final battle, `final`) | 8 | S | Pluck | Windswept Meadows |
+
+Bigger parties need more: the requirement scales with seats / 2. The Assign screen lists empty seats in a
+flow container (they wrap) and seated heroes in a column, so eight seats fit at 720 wide. The Demon King's
+last story line ends the main story with a victory. Only day 10's result feeds the Game Over "Bone Drake" stat.
+
+## Difficulty
+
+Quest requirements climb on a staircase (`HallRules.difficulty_scale`). Before day 5 they are at base. From day 5 they drift up 1.5% a day, and each boss passed (days 10, 20, 30, 40, 50) adds a 15% step, so day 11 asks 1.255x and day 49 asks 2.275x. The scale freezes at day 50; freeplay then keeps climbing through `freeplay_scale`. Boss quests get a further spike on top (1.35x, or 1.15x for the final battle). Gold rewards do not scale with the staircase, only the stats a quest asks for, and the player sees the effect as lower odds on Assign Party. Freeplay is the exception: `freeplay_scale` still scales gold as well as requirements.
+
+Building upgrades are gated by standing (`GuildUpgrades.UPGRADE_STANDING_REQ`): levels 2 to 5 need standing 5, 15, 30 and 50.
 
 ## Gear rarity
 
@@ -359,12 +429,12 @@ in `Scripts/UI/X/`.
 - `Scripts/Hall/Save/`: `hall_save.gd`, `hall_save_transfer.gd`, `hall_settings.gd`, `hall_web_files.gd`: the saved run, backup codes, saved settings, moving a code on and off the device
 - `Scripts/Hall/Style/`: `hall_style.gd` (ink colours, stat / injury / odds tables, quest-type, building and item-icon tables, icon table, text helpers, restyles), `hall_fx.gd` (animations), `hall_font_scale.gd`
 - `Scripts/Hall/Web/`: web update checks and the Menu's build line. `Scripts/Hall/Debug/`: the Debug tools and the run logger
-- `Scenes/Shell/`: nav and toast; `Shell/Header/`: the header (day, Bone Drake countdown, counters, danger strip) and its gold and standing popups
+- `Scenes/Shell/`: nav and toast; `Shell/Header/`: the header (day, next-boss countdown, counters, danger strip) and its gold and standing popups
 - `Scenes/Tabs/`: Board, Guild, Upgrades, Shop
 - `Scenes/Screens/`: Assign Party, Character
-- `Scenes/Overlays/`: `Day/` (End Day check, Day Report, Welcome, the Assign Party move popup; the tutorial coach is script-only), `Run End/` (Game Over, Final Battle credits), `Menu/` (Menu, Accessibility, Backup save, Debug, update prompt), `Items/` (equip picker, take-off confirm)
+- `Scenes/Overlays/`: `Day/` (End Day check, Day Report, Boss crawl, Welcome, the Assign Party move popup; the tutorial coach is script-only), `Run End/` (Game Over, Final Battle credits), `Menu/` (Menu, Accessibility, Backup save, Debug, update prompt), `Items/` (equip picker, take-off confirm)
 - `Scenes/Rows/`: list rows. `Quests/` (quest row, Today note, quest tab, party seat, picker row), `Heroes/` (roster and hire cards, applicant peek), `Buildings/` (Training / Hospital card, row and heading, upgrade card), `Items/` (pack and shop tiles, equip picker row, gear row), `Day End/` (report entry, story line, plan row, upgrade suggestion, roll call)
-- `Scenes/Components/`: chip, portrait, stat strip, odds bar, divider, seal button, rolled-up scroll tag
+- `Scenes/Components/`: chip, portrait, stat strip, odds bar, divider, seal button, rolled-up scroll tag, crawl sections
 - `Scenes/Playtest/` + `Scripts/Playtest/`: scenes that start a run partway in
 - `Data/credits.tres`: the team credits for the credits roll (see Adding your team credits)
 - `Sprites/` (`Hall Icons/`, `UI Textures/`) and `Fonts/`: every image, icon and font (placeholders; see `Sprites/README.md`)

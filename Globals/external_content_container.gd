@@ -118,9 +118,11 @@ func _ready() -> void:
 	for i in range(16):
 		quest_story.append(MultiColumnLoader._load_info_from_rows(quest_story_test_path, i))
 
+	# one row per boss story (days 10, 20 x2, 30, 40 x2, 50)
 	for i in range(7):
 		milestone_story.append(MultiColumnLoader._load_info_from_rows(milestone_story_path, i))
 		
+	# 22 rows: the day 1-18 minor quests (0-8) and the lead-up quests (9-21)
 	for i in range(22):
 		minor_story.append(MultiColumnLoader._load_info_from_rows(minor_story_path, i))
 

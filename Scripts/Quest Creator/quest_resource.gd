@@ -40,6 +40,7 @@ enum FavoredStat {
 	DefenseAndWisdom = 12,
 	DefenseAndSleaze = 13,
 	WisdomAndSleaze = 23,
+	PowerAndPluck = 40,
 }
 
 enum QuestStyle {
@@ -53,6 +54,10 @@ enum QuestStyle {
 ## Sleaze, Ashen Wastes -> Power, Glass Mountains -> Wisdom. calcSuccessChance
 ## counts it twice, and a good-odds win can train it (roll_trained_stat).
 const REGION_FAVORED_STAT := [1, 3, 0, 2]
+
+## The favored-stat component that means Pluck (not a StatType, so it's never
+## read with get_quest_stat or trained).
+const PLUCK_COMPONENT := 4
 
 #enum for modifiers if we ever choose to do them
 
@@ -85,6 +90,15 @@ var questNum: int:
 		return questNum
 
 var dead_adventurers : Array[GuildCharacter]
+
+## Whether this run of generateResults fails the quest. Rolled once at the
+## start (same odds as the old end-of-quest roll) so the fights know whether a
+## hero can die. Not saved: it only matters while the story is generated.
+var _will_fail: bool = false
+
+## Each hero's injury_level when generateResults began (hero -> level). A hero
+## who set out Hurt (LIGHTLY_INJURED) or worse can die even on a won quest.
+var _starting_levels: Dictionary = {}
 
 ## Freeplay scaling on the stat total this quest asks for (1.0 = none).
 ## Set by apply_freeplay_scaling; calcSuccessChance multiplies statHitNum by it.
@@ -130,7 +144,7 @@ var trained_stat_quest_chance: float = 50.0
 
 func _init(diff := 0, dayNum := 0) -> void:
 	match(dayNum):
-		1, 2, 4, 7, 9, 10, 12, 15, 18, -18, 20, -20, 23, 26, 28, -28, 30, 32, 34, 37, -37, 3737, 40, -40, 43, 45, -45, 48, 50:
+		1, 2, 4, 7, 9, 10, 12, 15, 18, -18, 20, -20, 30, 40, -40, 50, 23, 26, 28, -28, 32, 34, 37, -37, 3737, 43, 45, -45, 48:
 			_initMilestoneVars(dayNum)
 			return
 
@@ -233,22 +247,21 @@ func _init(diff := 0, dayNum := 0) -> void:
 ## half again the gold (see HallRules.FREEPLAY_SCALE_PER_DAY).
 func apply_freeplay_scaling(multiplier: float) -> void:
 	requirement_multiplier = multiplier
+	apply_freeplay_gold(multiplier)
+
+
+## Scales only the gold reward (goldReward and startingGoldReward), leaving the
+## stat requirement alone. multiplier: 1.0 = unchanged.
+func apply_freeplay_gold(multiplier: float) -> void:
 	goldReward = roundi(goldReward * multiplier)
+	startingGoldReward = roundi(startingGoldReward * multiplier)
 
 
 func calcSuccessChance(_questingAdventurers: Array) -> int:
-	var statHitNum = 75.0 + (25 * difficulty)
-	if (difficulty >= 2):
-		statHitNum += (10 * difficulty - 1)
-	if (difficulty >= 4):
-		statHitNum += (15 * difficulty - 3)
-		
-	if (maxAdventurers == 1):
-		statHitNum = (statHitNum / 2)
-	elif(maxAdventurers == 3):
-		statHitNum *= 1.5
-	elif(maxAdventurers > 3):
-		statHitNum *= 2
+	var statHitNum = 60.0 + (20 * difficulty)
+	# The requirement scales with party size, 2 slots being the baseline
+	# (1 slot x0.5, 3 slots x1.5, 5 slots x2.5, 8 slots x4).
+	statHitNum *= QuestScoring.get_slot_count(self) / 2.0
 	statHitNum *= requirement_multiplier
 	var statTotal = 0.0
 
@@ -261,36 +274,13 @@ func calcSuccessChance(_questingAdventurers: Array) -> int:
 		# the region's favored stat counts twice
 		statTotal += adventurer.get_quest_stat(region_favored_stat())
 
-		match favStat:
-			0:
-				statTotal += adventurer.get_quest_stat(0)
-			1:
-				statTotal += adventurer.get_quest_stat(1)
-			2:
-				statTotal += adventurer.get_quest_stat(2)
-			3:
-				statTotal += adventurer.get_quest_stat(3)
-			10:
-				statTotal += adventurer.get_quest_stat(0)
-				statTotal += adventurer.get_quest_stat(1)
-			20:
-				statTotal += adventurer.get_quest_stat(0)
-				statTotal += adventurer.get_quest_stat(2)
-			30:
-				statTotal += adventurer.get_quest_stat(0)
-				statTotal += adventurer.get_quest_stat(3)
-			12:
-				statTotal += adventurer.get_quest_stat(1)
-				statTotal += adventurer.get_quest_stat(2)
-			13:
-				statTotal += adventurer.get_quest_stat(1)
-				statTotal += adventurer.get_quest_stat(3)
-			23:
-				statTotal += adventurer.get_quest_stat(2)
-				statTotal += adventurer.get_quest_stat(3)
-			4:
-				statTotal += adventurer.get_quest_stat(4)
-				statTotal += adventurer.get_quest_stat(4)
+		# the favored stat's components count once each (Pluck alone counts twice,
+		# like a single stat); a Pluck component counts the hero's pluck value
+		for component in favored_components():
+			if component == PLUCK_COMPONENT:
+				statTotal += adventurer.pluck * (2 if int(favStat) == PLUCK_COMPONENT else 1)
+			else:
+				statTotal += adventurer.get_quest_stat(component)
 
 	return (snapped((statTotal / statHitNum), 0.01) * 100)
 
@@ -301,23 +291,45 @@ func region_favored_stat() -> int:
 	return REGION_FAVORED_STAT[regionNum]
 
 
+## The favored stat's components. A value under 10 is one component (a
+## GuildCharacter.StatType index 0-3, or PLUCK_COMPONENT); a two-digit value is
+## a combo of its two digits, e.g. 12 = Defense + Wisdom, 40 = Pluck + Power.
+## Returns an Array[int] (PLUCK_COMPONENT = Pluck, which is not a StatType).
+func favored_components() -> Array[int]:
+	var value := int(favStat)
+	var components: Array[int] = []
+	if value < 10:
+		components.append(value)
+	else:
+		components.append(value / 10)
+		components.append(value % 10)
+	return components
+
+
 ## The one or two stats a good-odds win on this quest can train: the quest's
-## favored stat, then the region's. Only one when they're the same stat.
-## Returns an Array of GuildCharacter.StatType indexes.
+## favored stat's trainable components (GuildCharacter.StatType 0-3; Pluck isn't
+## a stat, so it's dropped), then the region's. Falls back to just the region's
+## stat when nothing trainable is left. Returns an Array of StatType indexes.
 func trained_stat_options() -> Array[int]:
-	var options: Array[int] = [int(favStat)]
-	if region_favored_stat() != int(favStat):
+	var options: Array[int] = []
+	for component in favored_components():
+		if component != PLUCK_COMPONENT and not options.has(component):
+			options.append(component)
+	if not options.has(region_favored_stat()):
 		options.append(region_favored_stat())
 	return options
 
 
-## Pick the stat a good-odds win trains: the quest's favored stat
-## trained_stat_quest_chance percent of the time, otherwise the region's.
-## Returns a GuildCharacter.StatType index (the same one either way when the
-## quest and region favor the same stat).
+## Pick the stat a good-odds win trains: one of the quest's trainable favored
+## stats trained_stat_quest_chance percent of the time (when it has any),
+## otherwise the region's. Returns a GuildCharacter.StatType index (0-3).
 func roll_trained_stat() -> int:
-	if randf_range(0.0, 100.0) < trained_stat_quest_chance:
-		return int(favStat)
+	var favored: Array[int] = []
+	for component in favored_components():
+		if component != PLUCK_COMPONENT:
+			favored.append(component)
+	if not favored.is_empty() and randf_range(0.0, 100.0) < trained_stat_quest_chance:
+		return favored.pick_random()
 	return region_favored_stat()
 
 
@@ -327,6 +339,13 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	var returnString = ""
 
 	numAdventurers = _questingAdventurers.size()
+
+	# roll the outcome up front (same probability as the old end-of-quest roll)
+	# so the fights know whether a hero is allowed to die
+	_will_fail = randi_range(0, 100) >= _successChance
+	_starting_levels.clear()
+	for hero in _questingAdventurers:
+		_starting_levels[hero] = hero.injury_level
 
 	var data = { "location": location }
 	returnString = str(returnString, "[b]", _questingAdventurers[0].name,)
@@ -420,9 +439,8 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					returnString = str(returnString, _search(_questingAdventurers, _successChance))
 			loopbreaker = loopbreaker - 1
 
-	var successDetermination = randi_range(0, 100)
 	match true:
-		_ when successDetermination >= _successChance:
+		_ when _will_fail:
 				returnString = str(returnString, "[b]", _questingAdventurers[0].name,)
 				for i in range(numAdventurers - 2):
 					returnString = str( returnString, ", ", _questingAdventurers[i + 1].name,)
@@ -439,6 +457,7 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 					2:
 						returnString = str(returnString, ExternalContentContainer.get_Milestone_story(questNum, 4).c_unescape().format(data),)
 
+				returnString = str(returnString, _retreat(_questingAdventurers))
 				returnString = str(returnString, "[b]Summary[/b]: The quest was [color=red][b]NOT SUCCESSFUL[/b][/color]. Your guild failed to obtain the reward.\n")
 				questSummary = str(questSummary, "[b]Summary[/b]: The quest was NOT SUCCESSFUL. Your guild failed to obtain the reward.\n")
 
@@ -493,6 +512,49 @@ func generateResults(_questingAdventurers: Array[GuildCharacter], _successChance
 	#once the loop moves on we are done here
 	return returnString
 
+## Whether a hero may die from the next hit: on a failed quest, or when they
+## set out Hurt (LIGHTLY_INJURED) or worse. Heroes who set out Healthy or Sore
+## on a won quest stop at Gravely injured.
+func _can_die(hero: GuildCharacter) -> bool:
+	return _will_fail or _starting_levels.get(hero, 0) >= GuildCharacter.InjuryLevel.LIGHTLY_INJURED
+
+
+## Heroes the next fight hit could still change: alive, and not already at the
+## Gravely cap while protected from dying.
+func _hittable_heroes(party: Array[GuildCharacter]) -> Array[GuildCharacter]:
+	var hittable: Array[GuildCharacter] = []
+	for hero in party:
+		if hero.injury_level >= GuildCharacter.InjuryLevel.DEAD:
+			continue
+		if not _can_die(hero) and hero.injury_level >= GuildCharacter.InjuryLevel.GRAVELY_INJURED:
+			continue
+		hittable.append(hero)
+	return hittable
+
+
+## Injures a hero from a fight and records a death.
+func _injure_in_fight(hero: GuildCharacter) -> void:
+	var died: bool = hero.injure_character(_can_die(hero))
+	if died and not dead_adventurers.has(hero):
+		dead_adventurers.append(hero)
+
+
+## Every hero takes one more injury after a failed quest's fights (can die).
+## Returns the story line for it, or "" when nobody could be hurt further.
+func _retreat(party: Array[GuildCharacter]) -> String:
+	var anyone_hurt := false
+	for hero in party:
+		if hero.injury_level >= GuildCharacter.InjuryLevel.DEAD:
+			continue
+		anyone_hurt = true
+		var died: bool = hero.injure_character(true)
+		if died and not dead_adventurers.has(hero):
+			dead_adventurers.append(hero)
+	if not anyone_hurt:
+		return ""
+	return "[b]The party was beaten back[/b] and everyone was [color=FD0000][b]INJURED[/b][/color] in the retreat.\n"
+
+
 func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
 	var combatChance = _successChance / 100.0
 	combatChance *= combatChance
@@ -503,7 +565,7 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 
 	var returnString = ""
 	var successDetermination = randi_range(0, 100)
-	
+
 	var monster = QuestManager.world_regions[regionNum].returnMonster()
 	if(styleOfQuest == 1):
 		match(questNum):
@@ -516,110 +578,63 @@ func _combatEncounter(_questingAdventurers: Array[GuildCharacter], _successChanc
 			1, 2:
 				monster = QuestManager._returnQuestMonster(2)
 
-	if combatChance >= successDetermination:
-		var succComDet = randi_range(1, 100)
-		match(difficulty):
-			-1:
-				succComDet -= 9
-			0:
-				succComDet -= 5
-			1:
-				succComDet -= 2
-		
-		if(succComDet < 1):
-			succComDet = 1
-			
-		if(1 <= succComDet && succComDet <= 25):
-				returnString = str(
-					"[b]The Party[/b] was ATTACKED by a group of ",
-					monster,
-					"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n"
-				)
-		elif (26 <= succComDet && succComDet <= 50):
-				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
-				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
-					monster,
-					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
-					)
-		elif (51 <= succComDet && succComDet <= 75):
-				returnString = str(
-					"[b]The Party[/b] was ATTACKED by a group of ",
-					monster,
-					"s. They defeated them [color=green][b]without sustaining any injuries[/b][/color].\n"
-					)
-		elif (76 <= succComDet && succComDet <= 90):
-				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
-				var extraGold = randi_range(11, 29)
-				goldReward += extraGold
-				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
-					monster,
-					", and defeated it, finding [color=FFE700][b] ", extraGold," gold [/b][/color]on its corpse.\n"
-					)
-		elif (91 <= succComDet && succComDet <= 100):
-				var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
-				var extraGold = randi_range(11, 29)
-				goldReward += extraGold
-				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
-					monster, ", and defeated it, finding [color=FFE700][b] ", extraGold, 
-					" gold [/b][/color]on its corpse. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
-					)
-				var died : bool = attackedAdventurer.injure_character()
-				
-				if(died and not dead_adventurers.has(attackedAdventurer)):
-					dead_adventurers.append(attackedAdventurer)
-		successfulChecks += 1
-	else:
-		var attackedAdventurer: GuildCharacter = _questingAdventurers.pick_random()
-		var succComDet = randi_range(1, 100)
-		match(difficulty):
-			-1:
-				succComDet += 50
-			0:
-				succComDet += 35
-			1:
-				succComDet += 15
-			2:
-				succComDet += 5
-		
-		if(succComDet > 100):
-			succComDet = 100
-		
-		if(1 <= succComDet && succComDet <= 25):
-			returnString = str(
-			"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ", monster,
-			". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
-			)
-		elif (26 <= succComDet && succComDet <= 50):
-			returnString = str(
-					"[b]The Party[/b] was ATTACKED by a group of ", monster,
-					"s. They managed to defeat them, but not before [color=FD0000][b]", attackedAdventurer.name, " was INJURED[/b][/color] in the process.\n"
-					)
-		elif (51 <= succComDet && succComDet <= 75):
-			returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ", monster,
-					", and defeated it. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n"
-					)
-		elif (76 <= succComDet && succComDet <= 90):
-			returnString = str(
-					"[b]The Party[/b] was ATTACKED by a group of ",
-					monster,
-					"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n"
-				)
-		elif (91 <= succComDet && succComDet <= 100):
-				returnString = str(
-					"[b]", attackedAdventurer.name, "[/b] was ATTACKED by a(n) ",
-					monster,
-					", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n"
-					)
-		
-		if(succComDet <=75):
-			var died : bool = attackedAdventurer.injure_character()
+	# whether the fight hurts someone is set by the quest's odds, not by who
+	# won the fight, so the average wear per hero matches the injury table
+	var hurt_hero: GuildCharacter = null
+	var hittable := _hittable_heroes(_questingAdventurers)
+	var injury_chance := QuestInjuries.injury_chance_per_encounter(
+		_successChance, difficulty, _questingAdventurers.size())
+	if not hittable.is_empty() and randf() < injury_chance:
+		hurt_hero = hittable.pick_random()
 
-			if(died and not dead_adventurers.has(attackedAdventurer)):
-				dead_adventurers.append(attackedAdventurer)
+	var won_fight: bool = combatChance >= successDetermination
+	# a won fight sometimes turns up gold on the monster's corpse
+	var corpse_gold := 0
+	if won_fight and randi_range(1, 100) > 75:
+		corpse_gold = randi_range(11, 29)
+		goldReward += corpse_gold
+	var gold_text := str("[color=FFE700][b] ", corpse_gold, " gold [/b][/color]")
+	var any_hero: GuildCharacter = _questingAdventurers.pick_random()
+	var variant := randi_range(1, 3)
+
+	if hurt_hero != null:
+		var hurt_name: String = hurt_hero.name
+		if corpse_gold > 0:
+			returnString = str(
+				"[b]", hurt_name, "[/b] was ATTACKED by a(n) ", monster, ", and defeated it, finding ",
+				gold_text, "on its corpse. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n")
+		elif variant == 1:
+			returnString = str(
+				"[b]", hurt_name, "[/b] was ATTACKED by a(n) ", monster,
+				". They managed to fight the monster off but were [color=FD0000][b]INJURED[/b][/color] in the process.\n")
+		elif variant == 2:
+			returnString = str(
+				"[b]The Party[/b] was ATTACKED by a group of ", monster,
+				"s. They managed to defeat them, but not before [color=FD0000][b]", hurt_name, " was INJURED[/b][/color] in the process.\n")
+		else:
+			returnString = str(
+				"[b]", hurt_name, "[/b] was ATTACKED by a(n) ", monster,
+				", and defeated it. However, they were [color=FD0000][b]INJURED[/b][/color] in the process.\n")
+		_injure_in_fight(hurt_hero)
+	elif corpse_gold > 0:
+		returnString = str(
+			"[b]", any_hero.name, "[/b] was ATTACKED by a(n) ", monster,
+			", and defeated it, finding ", gold_text, "on its corpse.\n")
+	elif variant == 1:
+		returnString = str(
+			"[b]The Party[/b] was ATTACKED by a group of ", monster,
+			"s, but defeated them [color=green][b]without sustaining any injuries[/b][/color].\n")
+	elif variant == 2:
+		returnString = str(
+			"[b]", any_hero.name, "[/b] was ATTACKED by a(n) ", monster,
+			", but defeated it [color=green][b]without sustaining any injuries[/b][/color].\n")
+	else:
+		returnString = str(
+			"[b]The Party[/b] was ATTACKED by a group of ", monster,
+			"s. They defeated them [color=green][b]without sustaining any injuries[/b][/color].\n")
+
+	if won_fight:
+		successfulChecks += 1
 	return returnString
 
 func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float) -> String:
@@ -670,30 +685,19 @@ func _search(_questingAdventurers: Array[GuildCharacter], _successChance: float)
 		successfulChecks += 1
 	else:
 		var succSearDet = randi_range(1, 100)
-		match(difficulty):
-			-1:
-				succSearDet += 30
-			0:
-				succSearDet += 15
-			1:
-				succSearDet += 5
-		
-		if(succSearDet > 100):
-			succSearDet = 100
-		
 		if(1 <= succSearDet && succSearDet <= 15):
-			returnString = str(returnString, "[b]", searchingAdventurer.name, "[/b] tripped on a rock and gained [color=FD0000][b]1 INJURY[/b][/color].\n")
-		elif(31 <= succSearDet && succSearDet <= 60):
+			returnString = str(returnString, "[b]", searchingAdventurer.name, "[/b] tripped on a rock and came back [color=FD0000][b]empty-handed and bruised in spirit[/b][/color].\n")
+		elif(16 <= succSearDet && succSearDet <= 45):
 			returnString = str(returnString, "[b]The Party[/b] discovered a hidden room containing multiple chests, but [color=FD0000][b]NOTHING OF VALUE[/b][/color] was inside.\n")
-		elif(61 <= succSearDet && succSearDet <= 90):
+		elif(46 <= succSearDet && succSearDet <= 75):
 			returnString = str(returnString, "[b]", searchingAdventurer.name, 
 			"[/b] went off alone to search for treasure, but returned with [color=FD0000][b]NOTHING[/b][/color].\n")
-		elif(16 <= succSearDet && succSearDet <= 30):
+		elif(76 <= succSearDet && succSearDet <= 90):
 			var extraGold = randi_range(3, 15)
 			goldReward += extraGold
 			returnString = str(returnString, "[b]", searchingAdventurer.name, 
 			"[/b] found an old chest containing [color=FFE700][b]", extraGold, " gold[/b][/color]. However, the chest was trapped and [b]", searchingAdventurer.name,
-			"[/b] was [color=FD0000][b]INJURED 1 TIME[/b][/color].\n")
+			"[/b] [color=FD0000][b]barely got away with the coins[/b][/color].\n")
 		elif(91 <= succSearDet && succSearDet <= 100):
 			goldReward += 1
 			returnString = str(returnString, "[b]The Party[/b] unearthed a lockbox that contained [color=FFE700][b]1 gold[/b][/color].\n")
@@ -805,6 +809,25 @@ func _get_reward_item_names() -> PackedStringArray:
 	return reward_names
 
 
+## Fills in a boss quest read from the Milestone Story Parts rows (the days
+## 30, 40 and 50 bosses). Gold is the same 300 + 150 per rank as the others.
+## rank: difficulty; slots: maxAdventurers; story_row: row of Milestone Story
+## Parts.txt; region: index into QuestManager.world_regions; favored: the
+## FavoredStat; title: the quest's title on the board.
+func _init_boss_vars(rank: int, slots: int, story_row: int, region: int, favored: FavoredStat, title: String) -> void:
+	difficulty = rank
+	maxAdventurers = slots
+	questNum = story_row
+	type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
+	regionNum = region
+	location = QuestManager.world_regions[regionNum].returnName(type)
+	goldReward = 300 + (150 * difficulty)
+	startingGoldReward = 300 + (150 * difficulty)
+	favStat = favored
+	questTitle = title
+	styleOfQuest = 2
+
+
 func _initMilestoneVars(dayNum: int):
 	match dayNum:
 		10:
@@ -844,53 +867,21 @@ func _initMilestoneVars(dayNum: int):
 			questTitle = str("Pursue a NECROMANCER and defeat him!")
 			styleOfQuest = 2
 		30:
-			difficulty = 4
-			maxAdventurers = 5
-			questNum = 3
-			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
-			regionNum = 2
-			location = QuestManager.world_regions[regionNum].returnName(type)
-			goldReward = 300 + (150 * difficulty)
-			startingGoldReward = 300 + (150 * difficulty)
-			favStat = FavoredStat.Pluck
-			questTitle = str("Defeat a DEMON GENERAL!")
-			styleOfQuest = 2
+			# Blood Moon Cult's portal, the first Demon General
+			_init_boss_vars(3, 5, 3, 2, FavoredStat.Sleaze, # region 2 = Ashen Wastes
+					"Close the Blood Moon Cult's portal and defeat the DEMON GENERAL!")
 		40:
-			difficulty = 5
-			maxAdventurers = 4
-			questNum = 4
-			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
-			regionNum = 0
-			location = QuestManager.world_regions[regionNum].returnName(type)
-			goldReward = 300 + (150 * difficulty)
-			startingGoldReward = 300 + (150 * difficulty)
-			favStat = FavoredStat.PowerAndDefense
-			questTitle = str("Defeat the second DEMON GENERAL!")
-			styleOfQuest = 2
+			# King Bernard, the Power and Defense general
+			_init_boss_vars(4, 4, 4, 1, FavoredStat.PowerAndDefense, # region 1 = Boglands
+					"Unmask and defeat the DEMON GENERAL KING BERNARD!")
 		-40:
-			difficulty = 5
-			maxAdventurers = 5
-			questNum = 5
-			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
-			regionNum = 3
-			location = QuestManager.world_regions[regionNum].returnName(type)
-			goldReward = 300 + (150 * difficulty)
-			startingGoldReward = 300 + (150 * difficulty)
-			favStat = FavoredStat.WisdomAndSleaze
-			questTitle = str("Defeat the third DEMON GENERAL!")
-			styleOfQuest = 2
+			# King Alastair, the Wisdom and Sleaze general
+			_init_boss_vars(4, 5, 5, 3, FavoredStat.WisdomAndSleaze, # region 3 = Glass Mountains
+					"Unmask and defeat the DEMON GENERAL KING ALASTAIR!")
 		50:
-			difficulty = 6
-			maxAdventurers = 8
-			questNum = 6
-			type = ExternalContentContainer.get_Milestone_story(questNum, 0).to_int()
-			regionNum = 1
-			location = QuestManager.world_regions[regionNum].returnName(type)
-			goldReward = 300 + (150 * difficulty)
-			startingGoldReward = 300 + (150 * difficulty)
-			favStat = FavoredStat.Pluck
-			questTitle = str("Stand against the DEMON KING!")
-			styleOfQuest = 2
+			# THE DEMON KING, the final battle
+			_init_boss_vars(5, 8, 6, 0, FavoredStat.Pluck, # region 0 = Windswept Meadows
+					"Face THE DEMON KING!")
 		_:
 			var storyNum = 0
 			match dayNum:
@@ -914,7 +905,7 @@ func _initMilestoneVars(dayNum: int):
 					storyNum = 8
 				23:
 					storyNum = 9
-				-26:
+				26:
 					storyNum = 10
 				28:
 					storyNum = 11

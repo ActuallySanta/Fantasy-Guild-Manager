@@ -46,10 +46,48 @@ static func last_living_hero(roster: Array) -> GuildCharacter:
 	return living[0] if living.size() == 1 else null
 
 
+## Quests lost in the last TROUBLE_WINDOW_DAYS reported days that count as trouble.
+const TROUBLE_FAILURES := 2
+## How many days back (not counting today, which isn't played yet) failures are summed.
+const TROUBLE_WINDOW_DAYS := 2
+## Share (0-1) of the living roster that is Hurt or worse that counts as trouble.
+const TROUBLE_INJURED_SHARE := 0.5
+
+
+## Why the guild is in trouble: "failures" (TROUBLE_FAILURES or more quests lost
+## over the last TROUBLE_WINDOW_DAYS days), "injuries" (half or more of the living
+## heroes are Hurt or worse), or "" when it isn't. Failures are checked first.
+## run_stats: HallMain.run_stats (its failed_by_day may be missing in old saves);
+## roster: CharacterContainer.active_characters; day: GameState.day (today).
+static func trouble_reason(run_stats: Dictionary, roster: Array, day: int) -> String:
+	if recent_failures(run_stats, day) >= TROUBLE_FAILURES:
+		return "failures"
+	var living := 0
+	var hurt := 0
+	for character in roster:
+		if character == null or HallStyle.is_dead(character):
+			continue
+		living += 1
+		if character.injury_level >= GuildCharacter.InjuryLevel.LIGHTLY_INJURED:
+			hurt += 1
+	if living > 0 and hurt >= living * TROUBLE_INJURED_SHARE:
+		return "injuries"
+	return ""
+
+
+## The number of quests lost in the trouble window, for the strip's text.
+static func recent_failures(run_stats: Dictionary, day: int) -> int:
+	var failed_by_day: Dictionary = run_stats.get("failed_by_day", {})
+	var failures := 0
+	for days_back in range(1, TROUBLE_WINDOW_DAYS + 1):
+		failures += int(failed_by_day.get(day - days_back, 0))
+	return failures
+
+
 ## Someone in today's For Hire costs no more than the gold in hand.
 static func can_afford_a_recruit_today() -> bool:
 	for character in CharacterContainer.hireable_characters:
-		if character.cost <= GameState.gold:
+		if CharacterContainer.hire_price(character) <= GameState.gold:
 			return true
 	return false
 

@@ -37,8 +37,8 @@ const OFFICE_HIGHEST_RANK := ["D", "C", "B", "A", "S"]
 const TRAINING_SLOTS := [1, 2, 3, 4, 5]
 const TRAINING_STAT_GAIN := [1, 1, 2, 2, 3]
 ## Injury stages (Sore, Hurt, Gravely hurt) a patient heals each night.
-## There are only 3 stages, so level 3+ heals anyone in one night.
-const HOSPITAL_STAGES_PER_NIGHT := [1, 2, 3, 3, 3]
+## Level 3+ heals 2 stages a night, so Gravely hurt takes 2 nights.
+const HOSPITAL_STAGES_PER_NIGHT := [1, 1, 2, 2, 2]
 ## x = STRENGTH (ATK) bonus, y = DEFENSE bonus
 const ARMORY_BONUS := [Vector2i(1, 1), Vector2i(2, 1), Vector2i(2, 2), Vector2i(3, 2), Vector2i(3, 3)]
 const BARRACKS_MAX_HEROES := [4, 6, 8, 10, 12]
@@ -51,19 +51,30 @@ const BARRACKS_MAX_HEROES := [4, 6, 8, 10, 12]
 const UNLOCK_DAY := 10
 ## Gold to reach level N is UPGRADE_GOLD_COST[N - 1]. Level 1 is free (owned at start).
 ## Tuned so an average run maxes every implemented building (4 of them; the
-## Office isn't yet) around Day 40: ~11,300 gold per building, ~45,000 in all.
+## Office isn't yet) around Day 40, and flawless play no sooner than about
+## Day 30: 25,000 gold per building, 100,000 in all.
+## Why gold sets the earliest day: the board holds at most 5 quests a day
+## (HallRules.QUESTS_PER_DAY_LATE) and pay tops out at rank S, so income has a
+## ceiling. Winning every quest on the board from Day 1 earns ~100k by the
+## start of Day 30 (before hiring), so nobody can buy everything sooner.
 ## Income compounds: wins raise standing by their rank + 1, standing raises the
-## quest rank (HallRules.standing_rank_for), and rank raises the gold. That
-## growth flattens once standing reaches the top rank (HallRules.TOP_STANDING_RANK),
-## around Day 20-25 for a solid run, so late income is high but steady. From the
-## run log (Guild Manager Run Log sheet, Nov 2026): ~150-550 gold a day through
-## Day 10; modelled on from there, an average run banks ~40-55k for buildings
-## by Day 40 after hiring and gear. Each level costs ~1.6-2x the last to match.
-## If the Office gets implemented, the total rises by a quarter: retune.
-const UPGRADE_GOLD_COST := [0, 900, 1900, 3300, 5200]
-## Standing needed to buy level N. Spread out so the top levels also wait on
-## a strong reputation, not just a full purse (level 5 = rank-B quests territory).
-const UPGRADE_STANDING_REQ := [0, 8, 18, 30, 45]
+## quest rank (HallRules.standing_rank_for), and rank raises the gold. A lost
+## quest pays no standing and only its bonus gold, so the win rate matters twice.
+## Modelled (Nov 2026) for an average player who denies ~15% of quests and
+## wins 80-85% of the rest: ~100-106k earned by Day 40 after ~150 gold a day on
+## hires and gear, maxing out on Day 40-42. The old 45k total was maxed by
+## Day 25-27 in the AI playtests (Docs/playtests/2026-11-20-run.md).
+## Each level costs ~1.7-2x the last. If the Office gets implemented, the
+## total rises by a quarter: retune.
+const UPGRADE_GOLD_COST := [0, 2000, 4000, 7000, 12000]
+## Standing needed to buy level N. Gold (about 100k in all) sets the pace; these
+## gates must never be what holds an average run back. They were [0, 10, 40, 100,
+## 200], but failures and denials now cost standing, and in playtest round 1
+## (Docs/playtests, seed 4417) average and cautious players peaked at only 45-133
+## standing, so buildings stalled at level 2-3 and the Barracks cap of 6 made the
+## 8-slot Demon King impossible to field. Now low enough that a steady run clears
+## each gate as soon as it can pay for the level.
+const UPGRADE_STANDING_REQ := [0, 5, 15, 30, 50]
 
 # ---- Economy: the wallet a new run starts with, and the standing floor for recruits ----
 const STARTING_GOLD := 0
@@ -83,6 +94,10 @@ const TRAINING_MAX_INJURY := GuildCharacter.InjuryLevel.SORE
 ## Hospital level that unlocks reviving, and how many revives a run gets.
 const REVIVE_LEVEL := 5
 const REVIVES_PER_RUN := 1
+## Gold a Hospital bed costs per night, multiplied by the guild's standing rank
+## plus one (so 20 at rank F, 120 at rank S). Charged for every patient at End
+## Day; discharging a hero beforehand stops the charge.
+const HOSPITAL_FEE_PER_NIGHT := 20
 ## Character metadata: Vector2i(injury level, nights spent healing it).
 const RECOVERY_META := "recovery_nights"
 
@@ -339,8 +354,16 @@ func get_nights_until_healthy(character: GuildCharacter, in_hospital: bool) -> i
 	return maxi(total - _recovery_progress(character), 1)
 
 
+## Gold one Hospital bed costs tonight, per patient: HOSPITAL_FEE_PER_NIGHT
+## times (standing rank + 1).
+func nightly_fee() -> int:
+	return HOSPITAL_FEE_PER_NIGHT * (HallRules.standing_rank_for(standing) + 1)
+
+
+## Puts a hurt hero in a bed. Returns false if they don't need care, are
+## already a patient, or the guild couldn't pay tonight's fee.
 func admit(character: GuildCharacter) -> bool:
-	if not needs_care(character) or is_patient(character):
+	if not needs_care(character) or is_patient(character) or gold < nightly_fee():
 		return false
 	patients.append(character)
 	training.erase(character)
@@ -365,6 +388,9 @@ func revive(character: GuildCharacter) -> bool:
 	# the dead don't take a bed, so coming back needs a free one
 	if not CharacterContainer.has_free_bed():
 		return false
+	# the revived hero takes a bed, which is paid for tonight like any other
+	if gold < nightly_fee():
+		return false
 	character.injury_level = GuildCharacter.InjuryLevel.GRAVELY_INJURED
 	character.died_on_day = -1
 	character.died_on_quest = ""
@@ -381,9 +407,25 @@ func revive(character: GuildCharacter) -> bool:
 ## Call once when the day ends, before the quests are played out (so nobody
 ## heals the same night they get hurt). Returns what happened, for the report:
 ##   {trained: [{character, stat, gain}],
-##    healed:  [{character, from, to, in_hospital}]}
+##    healed:  [{character, from, to, in_hospital}],
+##    hospital_bill: gold paid for beds tonight,
+##    sent_home_unpaid: [GuildCharacter] patients sent home because gold ran out}
+## Beds are paid in the order patients were admitted; once gold can't cover
+## another bed, that patient and everyone admitted after them go home to heal
+## there (gold never goes negative).
 func run_night() -> Dictionary:
 	_forget_missing_heroes()
+
+	var hospital_bill := 0
+	var sent_home_unpaid: Array[GuildCharacter] = []
+	var fee := nightly_fee()
+	for character in patients.duplicate():
+		if gold >= fee:
+			add_gold(-fee)
+			hospital_bill += fee
+		else:
+			patients.erase(character)
+			sent_home_unpaid.append(character)
 
 	var trained := []
 	var gain := get_training_gain()
@@ -418,7 +460,12 @@ func run_night() -> Dictionary:
 			patients.erase(character)
 
 	home_changed.emit()
-	return {"trained": trained, "healed": healed}
+	return {
+		"trained": trained,
+		"healed": healed,
+		"hospital_bill": hospital_bill,
+		"sent_home_unpaid": sent_home_unpaid,
+	}
 
 
 ## Nights already spent healing the hero's current level. Stored with the

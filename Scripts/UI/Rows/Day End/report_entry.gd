@@ -87,6 +87,8 @@ const TEXT_FROM := "From %s · sent at %d%%"
 const TEXT_INJURED := "Hurt: %s"
 const TEXT_DIED := "Died: %s"
 const TEXT_FOUND := "Found: %s"
+## Standing a failed quest cost (the number is positive).
+const TEXT_STANDING_LOST := "−%d standing"
 const TEXT_WON := "It is done, master. The reward is ours: %d gold. — %s."
 const TEXT_WON_PLUCK := "It is done, master. The reward is ours: %d gold, and we're bolder for it (+%d Pluck). — %s."
 ## Item quests: the reward is the items' names (plus any bonus gold found).
@@ -119,6 +121,8 @@ const TEXT_TAP_TO_FOLD := "Tap to fold the letter"
 @onready var _died_text: Label = %DiedText
 @onready var _found_tag: Control = %FoundTag
 @onready var _found_text: Label = %FoundText
+@onready var _standing_tag: Control = %StandingTag
+@onready var _standing_text: Label = %StandingText
 # Story and sign-off
 @onready var _beat_list: VBoxContainer = %Beats
 @onready var _closing_line: Label = %Closing
@@ -173,6 +177,12 @@ func setup(result: Dictionary, start_folded: bool = true) -> void:
 		found_item_names.append(found_item.name)
 	_found_tag.visible = not found_items.is_empty()
 	_found_text.text = TEXT_FOUND % ", ".join(found_item_names)
+
+	# a failed quest costs standing (result.standing is negative; 0 at the floor)
+	var standing_change: int = result.get("standing", 0)
+	_standing_tag.visible = standing_change < 0
+	_standing_text.text = TEXT_STANDING_LOST % -standing_change
+	HallStyle.set_font_color(_standing_text, HallStyle.RED)
 
 	var story_lines := HallStyle.story_lines(result) if is_story else PackedStringArray()
 	_build_story_beats(result.story, story_lines)

@@ -49,13 +49,29 @@ const TRAIN_ODDS_PER_RANK := 5
 const TRAIN_ODDS_TOP_RANK := CreatedQuest.QuestDifficulty.S
 ## Stat points each party member gains in the trained stat on a good-odds win.
 const TRAIN_STAT_GAIN := 1
-## Rank of the placeholder final quest (a CreatedQuest.QuestDifficulty), until
-## the real final quest is written (see build_day_quests).
-const FINAL_QUEST_RANK := CreatedQuest.QuestDifficulty.S
 ## Freeplay difficulty climb: each day past HallMain.FINAL_DAY adds this share
 ## to every new quest's stat requirement and gold reward (0.02 = +2% a day, so
 ## Day 75 quests ask for and pay 1.5x). Linear and without a cap.
 const FREEPLAY_SCALE_PER_DAY := 0.02
+
+## Days that end in a boss quest (the last is HallMain.FINAL_DAY).
+const BOSS_DAYS := [10, 20, 30, 40, 50]
+## The BOSS_DAYS with two bosses to fight (the second uses the negative day number).
+const BOSS_TWO_DAYS := [20, 40]
+## The first day the difficulty staircase starts climbing; before it every
+## quest asks for its base stats (scale 1.0).
+const DIFFICULTY_START_DAY := 5
+## Requirement growth for each day from DIFFICULTY_START_DAY on (0.015 = +1.5% a
+## day). Raised from 0.01 after playtest round 1 (seed 4417): mid-game odds sat
+## at 80-200% for typical players and 85-135% for the min-maxer, above the
+## 85-95% target.
+const DIFFICULTY_DRIFT_PER_DAY := 0.015
+## Requirement growth added for each boss already past (0.15 = +15% per boss).
+const DIFFICULTY_STEP_PER_BOSS := 0.15
+## Extra requirement multiplier on a boss quest, on top of the day's scale.
+const BOSS_SPIKE := 1.35
+## Extra requirement multiplier on the final battle, on top of the day's scale.
+const FINAL_BOSS_SPIKE := 1.15
 
 
 # ============================================================ STARTING HERO
@@ -110,26 +126,10 @@ static func new_entry(quest: CreatedQuest, is_milestone: bool) -> Dictionary:
 ## is_freeplay: GameState.is_freeplay.
 ## Returns an Array of new_entry() Dictionaries, in board order.
 static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Array:
-	if (day == 10 || day == 30 || day == 50):
-		return [new_entry(CreatedQuest.new(2, day), true)]
-
-	if day == HallMain.FINAL_DAY and not is_freeplay:
-		# ==== FINAL QUEST CONTENT ===========================================
-		# PLACEHOLDER: the final battle is a random quest at FINAL_QUEST_RANK
-		# for now. To give it its own content, replace the quest built below
-		# with the real one, the same way the Bone Drake does it:
-		#   1. In quest_resource.gd, add a FINAL_DAY (50) case to _init that
-		#      calls a new _initFinalVars() (like _initMilestoneVars: difficulty,
-		#      maxAdventurers, questNum, location, goldReward, favStat, questTitle).
-		#   2. Add its story rows to External Content and a reader for them in
-		#      ExternalContentContainer (like get_Milestone_story).
-		#   3. Build it here with CreatedQuest.new(<rank>, HallMain.FINAL_DAY).
-		#   4. Play its story out in play_quest (see FINAL QUEST STORY there).
-		# Keep `final_entry.final = true`: it's what rolls the credits.
-		var final_entry := new_entry(CreatedQuest.new(FINAL_QUEST_RANK, HallMain.FINAL_DAY), false)
-		final_entry.final = true
-		return [final_entry]
-		# ==== END FINAL QUEST CONTENT =======================================
+	# boss days: only the day's boss entries (not in freeplay, which only
+	# repeats the final day's number as a normal day)
+	if is_boss_day(day) and not (is_freeplay and day == HallMain.FINAL_DAY):
+		return _build_boss_entries(day)
 
 	var standing_rank := standing_rank_for(standing)
 	# the highest rank a quest can roll: S, or S++ once freeplay has begun
@@ -153,31 +153,109 @@ static func build_day_quests(day: int, standing: int, is_freeplay: bool) -> Arra
 		match(GameState.day): #set the boolean
 			2, 4, 7, 9, 12, 15, 23, 26, 32, 34, 43, 48:
 				noRepeatQuests = true
-			18, 20, 28, 40, 45:
+			18, 28, 45:
 				quest = CreatedQuest.new(rank, GameState.day)
+				_scale_normal_quest(quest, day, is_freeplay)
 				entries.append(new_entry(quest, false))
 				quest = CreatedQuest.new(rank, -1 * GameState.day)
+				_scale_normal_quest(quest, day, is_freeplay)
 				entries.append(new_entry(quest, false))
 				return entries
 			37:
 				quest = CreatedQuest.new(rank, GameState.day)
+				_scale_normal_quest(quest, day, is_freeplay)
 				entries.append(new_entry(quest, false))
 				quest = CreatedQuest.new(rank, -1 * GameState.day)
+				_scale_normal_quest(quest, day, is_freeplay)
 				entries.append(new_entry(quest, false))
 				quest = CreatedQuest.new(rank, 3737)
+				_scale_normal_quest(quest, day, is_freeplay)
 				entries.append(new_entry(quest, false))
 				return entries
-				
-		if is_freeplay:
-			quest.apply_freeplay_scaling(freeplay_scale(day))
+
+		_scale_normal_quest(quest, day, is_freeplay)
 		entries.append(new_entry(quest, false))
 	return entries
+
+
+## The boss entries for a boss day (see BOSS_DAYS): one or two quests built from
+## the written boss stories (CreatedQuest._initMilestoneVars), all milestone
+## entries, with the day's boss requirement scale. HallMain.FINAL_DAY's entry
+## is also marked final (it rolls the credits).
+## day: a BOSS_DAYS day (GameState.day should equal it, quests read it).
+## Returns an Array of new_entry() Dictionaries.
+static func _build_boss_entries(day: int) -> Array:
+	var entries := []
+	# the second boss of a two-boss day uses the negative day number
+	var variants: Array = [day, -day] if BOSS_TWO_DAYS.has(day) else [day]
+	for variant in variants:
+		var quest := CreatedQuest.new(0, variant)
+		var is_final := day == HallMain.FINAL_DAY
+		quest.requirement_multiplier = requirement_scale(day, true, is_final)
+		var entry := new_entry(quest, true)
+		entry.final = is_final
+		entries.append(entry)
+	return entries
+
+
+## Applies the day's requirement scale to a normal (non-boss) quest, and
+## freeplay's gold scaling when `is_freeplay`.
+static func _scale_normal_quest(quest: CreatedQuest, day: int, is_freeplay: bool) -> void:
+	quest.requirement_multiplier = requirement_scale(day, false, false)
+	if is_freeplay:
+		quest.apply_freeplay_gold(freeplay_scale(day))
 
 
 ## Freeplay's multiplier on quest requirements and rewards on `day`: 1.0 on
 ## HallMain.FINAL_DAY, then FREEPLAY_SCALE_PER_DAY more for each day after it.
 static func freeplay_scale(day: int) -> float:
 	return 1.0 + FREEPLAY_SCALE_PER_DAY * maxi(day - HallMain.FINAL_DAY, 0)
+
+
+## Whether `day` is one of BOSS_DAYS.
+static func is_boss_day(day: int) -> bool:
+	return BOSS_DAYS.has(day)
+
+
+## How many BOSS_DAYS come before `day` (strictly less than it).
+static func bosses_before(day: int) -> int:
+	var count := 0
+	for boss_day: int in BOSS_DAYS:
+		if boss_day < day:
+			count += 1
+	return count
+
+
+## The first boss day on or after `day`, or -1 when none is left.
+static func next_boss_day(day: int) -> int:
+	for boss_day: int in BOSS_DAYS:
+		if boss_day >= day:
+			return boss_day
+	return -1
+
+
+## The staircase multiplier on quest requirements on `day`: 1.0 before
+## DIFFICULTY_START_DAY, then a steady drift per day plus a step per boss
+## passed. Frozen from HallMain.FINAL_DAY on (freeplay_scale takes over).
+static func difficulty_scale(day: int) -> float:
+	if day < DIFFICULTY_START_DAY:
+		return 1.0
+	var capped_day := mini(day, HallMain.FINAL_DAY)
+	return (1.0
+			+ DIFFICULTY_DRIFT_PER_DAY * (capped_day - (DIFFICULTY_START_DAY - 1))
+			+ DIFFICULTY_STEP_PER_BOSS * bosses_before(capped_day))
+
+
+## The full multiplier on a quest's stat requirement on `day`: the staircase,
+## times the boss spike (BOSS_SPIKE, or FINAL_BOSS_SPIKE for the final battle),
+## times freeplay's climb.
+static func requirement_scale(day: int, is_boss: bool, is_final: bool) -> float:
+	var spike := 1.0
+	if is_final:
+		spike = FINAL_BOSS_SPIKE
+	elif is_boss:
+		spike = BOSS_SPIKE
+	return difficulty_scale(day) * spike * freeplay_scale(day)
 
 
 ## How many quests the board gets on `day` (see QUESTS_PER_DAY_BY_DAY).
@@ -199,10 +277,24 @@ static func standing_for_win(quest: CreatedQuest) -> int:
 	return quest.difficulty + 1
 
 
+## Standing a failed quest costs: half a win's, rounded up (rank 0-1 = 1,
+## 2-3 = 2, 4-5 = 3). Never less than 1, so the G rank (-1) costs 1 too.
+static func standing_for_loss(quest: CreatedQuest) -> int:
+	return maxi(ceili((quest.difficulty + 1) / 2.0), 1)
+
+
 ## Standing lost for denying a quest: its rank, but never less than 1, so
 ## even an F-Rank quest costs something to turn down.
 static func standing_for_deny(quest: CreatedQuest) -> int:
 	return maxi(quest.difficulty, 1)
+
+
+## Whether a quest entry may be denied. The final battle never can: denying
+## it would let day 50 pass with no credits and no defeat, so the run would
+## never end. Bosses and every other quest can be denied.
+## entry: a new_entry() Dictionary. Returns false only for the final.
+static func can_deny(entry: Dictionary) -> bool:
+	return not entry.get("final", false)
 
 
 ## A normally distributed random number (Box-Muller transform).
@@ -249,7 +341,7 @@ static func trains_stat(chance: float, rank: int) -> bool:
 ## (hall_main.gd _tally_quest).
 ## entry: a quest entry (see new_entry); day: GameState.day.
 ## Returns one result for the Day Report:
-##   {quest, party, story, succeeded, chance, gold, standing, pluck, trained_stat, stat_gain, injured, died, items, reward_items, milestone, final}
+##   {quest, party, story, succeeded, chance, gold, standing (negative on a loss), pluck, trained_stat, stat_gain, injured, died, items, reward_items, milestone, final}
 ## (pluck = what each party member gained, 0 on a failure or a trained win;
 ## trained_stat = the GuildCharacter.StatType index the party trained, -1 if
 ## none; stat_gain = how much each party member gained in it)
@@ -280,7 +372,14 @@ static func play_quest(entry: Dictionary, day: int) -> Dictionary:
 	story = entry.quest.generateResults(party, chance)
 	var succeeded: bool = QuestScoring.did_succeed(story)
 	var gold_earned: int = QuestScoring.get_gold_earned(entry.quest, succeeded)
-	var standing_earned: int = standing_for_win(entry.quest) if succeeded else 0
+	var standing_earned: int = 0
+	if succeeded:
+		standing_earned = standing_for_win(entry.quest)
+	else:
+		# a loss costs standing, but never sinks the guild past its floor
+		# (GuildUpgrades.add_standing doesn't clamp, so the clamp lives here)
+		var room_above_floor := maxi(GameState.standing - GuildUpgrades.MINIMUM_STANDING, 0)
+		standing_earned = -mini(standing_for_loss(entry.quest), room_above_floor)
 	GameState.add_gold(gold_earned)
 	GameState.add_standing(standing_earned)
 

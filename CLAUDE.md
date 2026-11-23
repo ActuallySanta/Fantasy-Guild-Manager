@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-"Fantasy Guild Manager", a Godot **4.7** GDScript game (GL Compatibility, portrait 720x1280, phone-first). You run a guild: hire heroes, send parties on daily quests, buy gear and building upgrades. A Bone Drake milestone quest comes on day 10, and the main story ends with a final battle on day 50 (a credits roll, then endless freeplay with an S++ rank; see `Docs/hall_design.md`).
+"Fantasy Guild Manager", a Godot **4.7** GDScript game (GL Compatibility, portrait 720x1280, phone-first). You run a guild: hire heroes, send parties on daily quests, buy gear and building upgrades. Boss quests come on days 10 (Bone Drake), 20 (Necromancer), 30 and 40 (Demon Generals), and the main story ends with the Demon King on day 50 (a credits roll, then endless freeplay with an S++ rank; see `Docs/hall_design.md`).
 
 ## Running and testing
 
@@ -17,6 +17,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 - **Run the game:** the main scene is `Scenes/hall_main.tscn`.
 - **Playtest scenarios:** run `Scenes/Playtest/scenario_*.tscn`, which start the hall from a preset day, gold, standing, and roster (`Scripts/Playtest/playtest_scenario.gd`).
 - **AI playtesters:** `/playtest` (`.claude/skills/playtest/`) runs persona agents (small by default: 2 personas, 1 run, rules runs capped at 25 days; anything bigger needs cited evidence and Santi's yes) through the bridge scene in `tools/playtest/` and writes `Docs/playtests/` reports. The bridge scene and scripts are excluded from exports.
+- **Repeatable headless tests:** `bash tools/tests/run_test.sh <name>` runs `tools/tests/<name>_test.tscn` (a script that `extends TestCase`, which has `check`, `check_near` and `finish`) in a scratch copy and prints `TEST` lines (exit 0 on pass). A scratch copy takes minutes on first run; set `TEST_SCRATCH=<dir>` to reuse one. `tools/` is excluded from exports.
 - **Headless behavior tests:** write a throwaway `extends Node` script plus a `.tscn` and run it with `--headless --path <project> res://that_test.tscn`. Running a scene loads the autoloads.
   - Do this in a scratch copy of the project, so `--import` and `.uid` churn don't land in the repo.
   - Don't trust `--check-only --script`: it doesn't load autoloads, so every script reports false "Identifier not found: GameState/ExternalContentContainer/…" errors.
@@ -56,7 +57,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
   - `hall_ledger.gd` (`HallLedger`): static functions for whether the run is over, the danger checks, the Game Over numbers, and the final battle's credits (`build_credits`, `build_run_records`). They take `run_stats` and the roster as parameters.
   - `hall_settings.gd` (`HallSettings`): loading and saving the accessibility settings.
   - `hall_save.gd` (`HallSave`): the run's save file (`user://run_save.dat`, IndexedDB on the web). `hall_main` saves after every refresh and loads in `_ready`. New run state has to be added to `build_snapshot`/`apply_snapshot` (or the `*_FIELDS` lists for heroes, items and quests). Old saves are brought up to date by `HallSave.migrate` (see "Save compatibility" below). `hall_save_transfer.gd` (`HallSaveTransfer`) turns a run into a backup code and back, and `hall_web_files.gd` (`HallWebFiles`) moves it on and off the device (share sheet, clipboard, file picker; JavaScript on the web), for the Menu's Backup save sheet. See `Docs/hall_design.md` "Saving and offline play".
-  - The shell pieces are scenes in `Scenes/Shell/`: `hall_header` (the day tile, Bone Drake countdown, gold/standing counters and their motion, danger strip), `hall_nav`, and `hall_toast`.
+  - The shell pieces are scenes in `Scenes/Shell/`: `hall_header` (the day tile, next-boss countdown, gold/standing counters and their motion, danger strip), `hall_nav`, and `hall_toast`.
   - `hall_main` keeps one-line query wrappers (`is_run_over()`, `build_run_over_stats()`, …) so views still only talk to `hall`.
 - Tabs, screens, overlays, shell pieces, and rows get `setup(hall)`, then read queries and call actions on `hall`. They never change game state themselves. After a change, `hall_main` calls `refresh()` on whatever is showing.
 - Every widget is an authored scene. Each script has a header naming its scene, a `TEXT` section of string constants, and a `NODES` section of `@onready var _x = %X` unique names.
@@ -70,7 +71,7 @@ There's no build step, linter CLI, or test framework. Godot 4.7 is the Steam cop
 - Comment new code thoroughly. Tunables get `##` doc comments with units, functions get doc comments covering their params and return value, and non-obvious logic gets `#` comments. This matches the style of the newer files (`item_shop.gd`, `guild_upgrades.gd`, the hall and UI scripts).
 - Tuning numbers go in named, documented variables or constants at the top of the file that owns them, not inline.
 - Keep each script to one job, so no new "master script" grows the way `hall_main.gd` once did (1,900 lines).
-  - Soft limit: about 800 lines per script. Past that, find a piece to pull out before adding more. `hall_main.gd` is already about 1,830, so new hall code goes in another file and `hall_main` just calls it.
+  - Soft limit: about 800 lines per script. Past that, find a piece to pull out before adding more. `hall_main.gd` is already about 1,890, so new hall code goes in another file and `hall_main` just calls it.
   - Game rules that don't touch nodes (quest generation, payouts, run-over checks) go in a script of static functions with a `class_name`, like `HallRules` and `HallLedger`. They take what they need as parameters.
   - A part of the screen with its own nodes and refresh code becomes its own authored scene with `setup(hall)` and `refresh()`, like the tabs, overlays, and `Scenes/Shell/` pieces. Don't add inline nodes to `hall_main.tscn` for `hall_main.gd` to draw.
   - `hall_main.gd` keeps only the day's state, the actions that change it, thin query wrappers, and refresh orchestration.

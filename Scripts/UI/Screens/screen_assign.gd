@@ -52,7 +52,7 @@ const HIDE_BUSY_OPTION := false
 # Quest writ
 const TEXT_TYPE := "%s · Rank %s"
 const TEXT_GOLD := "%d gold"
-const TEXT_STANDING := "+%d standing"
+const TEXT_STANDING := "Win +%d · Fail −%d standing"
 const TEXT_PARTY_SIZE := "Up to %d"
 const TEXT_PARTY_SIZE_SOLO := "Solo"
 const TEXT_FAVORED := "Favors %s"
@@ -224,11 +224,11 @@ func _show_quest_card(entry: Dictionary) -> void:
 
 	# chips: reward (gold, standing on a win), party size, favored stat
 	_gold_chip.set_chip(TEXT_GOLD % quest.goldReward, HallStyle.GOLD_BG, HallStyle.TEXT_MAIN, "coins")
-	_standing_chip.set_chip(TEXT_STANDING % HallRules.standing_for_win(quest), HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "shield")
+	_standing_chip.set_chip(TEXT_STANDING % [HallRules.standing_for_win(quest), HallRules.standing_for_loss(quest)], HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "shield")
 	var size_text := TEXT_PARTY_SIZE_SOLO if size_limit == 1 else TEXT_PARTY_SIZE % size_limit
 	_party_size_chip.set_chip(size_text, HallStyle.BLUE_BG, HallStyle.TEXT_MAIN, "person")
-	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_stat_index(quest)]
-	_favored_chip.set_chip(TEXT_FAVORED % favored_stat.name, favored_stat.bg, favored_stat.color, "", true)
+	var favored_stat: Dictionary = HallStyle.STATS[HallStyle.favored_components(quest)[0]]
+	_favored_chip.set_chip(TEXT_FAVORED % HallStyle.favored_label(quest), favored_stat.bg, favored_stat.color, "", true)
 
 
 # ---- party
@@ -406,13 +406,15 @@ func _pick_group(entry: Dictionary, character: GuildCharacter) -> int:
 
 ## Left / right footer buttons depend on the quest's state (pinning anyone
 ## sends an open quest, so there's no Send button):
-##   open   -> Deny [shield -N] | Back to Quests
+##   open   -> Deny [shield -N] | Back to Quests (the final has no Deny)
 ##   sent   -> Recall (unpins everyone) | Back to Quests
 ##   denied -> Quests | Reconsider
 ## The left button is always wood; the right one is gold.
 func _show_footer(entry: Dictionary) -> void:
 	_left_button.icon = null
 	_deny_cost.visible = false
+	# the final battle can't be denied (HallRules.can_deny): no Deny button on it
+	_left_button.visible = entry.state != HallStyle.QUEST_STATE_OPEN or hall.can_deny_quest(entry)
 	_left_button.custom_minimum_size.x = LEFT_BUTTON_MIN_WIDTH
 	match entry.state:
 		HallStyle.QUEST_STATE_SENT:

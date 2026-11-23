@@ -17,6 +17,14 @@ layout_mode = 2
 [node name="Text" parent="Health/Row" index="1"]
 theme_override_font_sizes/font_size = 28
 
+[node name="AtRisk" parent="." instance=ExtResource("2_d5pfk")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+
+[node name="Text" parent="AtRisk/Row" index="1"]
+theme_override_font_sizes/font_size = 28
+
 [node name="Stat0" parent="." instance=ExtResource("2_d5pfk")]
 layout_mode = 2
 

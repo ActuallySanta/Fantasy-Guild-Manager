@@ -1,4 +1,4 @@
-## Header: the DAY tile, the Bone Drake countdown, the gold and standing
+## Header: the DAY tile, the next-boss countdown, the gold and standing
 ## counters, the Menu button, and the red "last hero standing" strip under it.
 ## Also owns the counters' motion: numbers roll to new values, coins fly to
 ## what you paid for, and the night's earnings land at dawn. Tapping the coin
@@ -12,9 +12,9 @@ extends VBoxContainer
 
 # ============================================================ SETTINGS
 
-## The Bone Drake countdown turns red when this many days (or fewer) are left.
+## The next-boss countdown turns red when this many days (or fewer) are left.
 const DRAKE_WARNING_DAYS := 2
-## Times the Bone Drake note pulses on a morning inside DRAKE_WARNING_DAYS.
+## Times the next-boss note pulses on a morning inside DRAKE_WARNING_DAYS.
 const DRAKE_PULSES := 3
 ## Padding inside the Bone Drake note's torn paper (design px), left/right and
 ## top/bottom. Kept small so the note hugs its seal and number (the shared
@@ -62,12 +62,13 @@ const HEADER_DAY := "%d"
 const HEADER_DRAKE_DAYS := "%d"
 const HEADER_DRAKE_UNIT_ONE := "day"
 const HEADER_DRAKE_UNIT_MANY := "days"
-## On the Bone Drake's day: "!" over "today".
+## On a boss day: "!" over "today". Once no boss is left the note hides.
 const HEADER_DRAKE_TODAY := "!"
 const HEADER_DRAKE_TODAY_UNIT := "today"
-## After the Bone Drake's day: a dash over "passed".
-const HEADER_DRAKE_GONE := "-"
-const HEADER_DRAKE_GONE_UNIT := "passed"
+## The milder gold strip: shown only when the red one isn't (see HallLedger.trouble_reason).
+const TROUBLE_TITLE := "Guild in trouble"
+const TROUBLE_FAILURES_TEXT := "%d quests lost in %d days. Pick safer quests for a while."
+const TROUBLE_INJURIES_TEXT := "Half the guild is hurt. Rest or heal before sending more."
 ## The warning strip under the header (see HallLedger.is_one_death_from_falling).
 ## DANGER_GOLD when gold is the problem, DANGER_STANDING when standing is.
 const DANGER_TITLE := "Last hero standing"
@@ -143,28 +144,29 @@ func _trim_drake_note_padding() -> void:
 	_drake_note.add_theme_stylebox_override("panel", box)
 
 
-## The Bone Drake countdown: the boss quest's seal (the same one its quest
-## card wears), then the days left over a "days" label. The number is always
+## The countdown to the next boss day: that boss quest's seal (BOSS, or FINAL
+## for the last battle; the same one its quest card wears), then the days left
+## over a "days" label. The number is always
 ## red ink; the label joins it once DRAKE_WARNING_DAYS or fewer are left.
 func _refresh_drake_countdown() -> void:
-	var boss_type: Dictionary = HallStyle.QUEST_TYPES[HallStyle.MILESTONE_TYPE_ID]
+	var days_left := hall.days_until_next_boss()
+	# no boss left (freeplay): the whole note hides
+	_drake_note.visible = days_left >= 0
+	if days_left < 0:
+		return
+	var seal_id := HallStyle.FINAL_TYPE_ID if hall.next_boss_is_final() else HallStyle.MILESTONE_TYPE_ID
+	var boss_type: Dictionary = HallStyle.QUEST_TYPES[seal_id]
 	HallStyle.style_icon_tag(_drake_seal, _drake_tag, _drake_icon, boss_type.tag,
 			boss_type.get("icon", ""), boss_type.color)
 
-	var days_left := hall.days_until_drake()
 	if days_left > 0:
 		_drake_days.text = HEADER_DRAKE_DAYS % days_left
 		_drake_days_label.text = HallStyle.pick_plural(days_left, HEADER_DRAKE_UNIT_ONE, HEADER_DRAKE_UNIT_MANY)
-	elif days_left == 0:
+	else:
 		_drake_days.text = HEADER_DRAKE_TODAY
 		_drake_days_label.text = HEADER_DRAKE_TODAY_UNIT
-	else:
-		_drake_days.text = HEADER_DRAKE_GONE
-		_drake_days_label.text = HEADER_DRAKE_GONE_UNIT
-	var is_drake_close := days_left >= 0 and days_left <= DRAKE_WARNING_DAYS
-	var is_drake_gone := days_left < 0
-	HallStyle.set_font_color(_drake_days, HallStyle.TEXT_SOFT if is_drake_gone else HallStyle.RED)
-	HallStyle.set_font_color(_drake_days_label, HallStyle.RED if is_drake_close else HallStyle.TEXT_SOFT)
+	HallStyle.set_font_color(_drake_days, HallStyle.RED)
+	HallStyle.set_font_color(_drake_days_label, HallStyle.RED if days_left <= DRAKE_WARNING_DAYS else HallStyle.TEXT_SOFT)
 
 
 ## Redraw the day, the countdown, the counters and the danger strip.
@@ -197,11 +199,23 @@ func _on_counter_input(event: InputEvent, popup: HeaderPopup, anchor: Control) -
 func _refresh_danger_strip() -> void:
 	var hero := hall.last_living_hero()
 	var was_shown := _danger_strip.visible
-	_danger_strip.visible = hall.run_over_stats.is_empty() and hero != null and hall.is_one_death_from_falling()
+	var is_danger: bool = hall.run_over_stats.is_empty() and hero != null and hall.is_one_death_from_falling()
+	var trouble: String = "" if (is_danger or not hall.run_over_stats.is_empty()) else hall.trouble_reason()
+	_danger_strip.visible = is_danger or trouble != ""
 	if not _danger_strip.visible:
 		return
 	if not was_shown:
 		Sfx.play(&"danger_warning")
+	if not is_danger:
+		HallStyle.style_panel(_danger_strip, HallStyle.GOLD_BG)
+		_danger_icon.modulate = HallStyle.GOLD
+		_danger_title.text = TROUBLE_TITLE
+		HallStyle.set_font_color(_danger_title, HallStyle.GOLD_TEXT)
+		if trouble == "failures":
+			_danger_text.text = TROUBLE_FAILURES_TEXT % [hall.recent_failures(), HallLedger.TROUBLE_WINDOW_DAYS]
+		else:
+			_danger_text.text = TROUBLE_INJURIES_TEXT
+		return
 	HallStyle.style_panel(_danger_strip, HallStyle.RED_BG)
 	_danger_icon.modulate = HallStyle.RED
 	_danger_title.text = DANGER_TITLE
@@ -226,7 +240,7 @@ func _refresh_day_tile() -> void:
 		_day_value.text = HEADER_DAY % day
 		return
 	HallFx.flip(_day_tile, HallMain.DUSK_OUT_SECONDS * 0.5, func() -> void: _day_value.text = HEADER_DAY % day)
-	var days_left := hall.days_until_drake()
+	var days_left := hall.days_until_next_boss()
 	if days_left >= 0 and days_left <= DRAKE_WARNING_DAYS:
 		HallFx.pulse(_drake_note, DRAKE_PULSES, 1.08, HallMain.DUSK_OUT_SECONDS)
 

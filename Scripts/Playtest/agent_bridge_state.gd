@@ -26,7 +26,9 @@ static func build(hall: HallMain) -> Dictionary:
 	return {
 		"day": GameState.day,
 		"days_until_drake": hall.days_until_drake(),
+		"next_boss_day": HallRules.next_boss_day(GameState.day),
 		"gold": GameState.gold,
+		"hospital_fee": GuildUpgrades.nightly_fee(),
 		"standing": GameState.standing,
 		"run_over": AgentBridgeActions.is_run_over(hall),
 		"locked": _locked(hall),
@@ -68,7 +70,7 @@ static func _hire(character: GuildCharacter) -> Dictionary:
 		"id": id_of(character),
 		"name": character.name,
 		"role": GuildCharacter.CharacterRole.keys()[character.role],
-		"cost": character.cost,
+		"cost": CharacterContainer.hire_price(character),
 		"stats": _stats(character.stats),
 	}
 
@@ -90,13 +92,16 @@ static func _quests(hall: HallMain) -> Array:
 			"slots": hall.party_size_limit(entry),
 			"party": entry.party.map(func(character): return id_of(character)),
 			"chance": hall.success_chance(entry, entry.party),
+			"standing_win": HallRules.standing_for_win(entry.quest),
+			"standing_fail": HallRules.standing_for_loss(entry.quest),
 			"decided": entry.state != HallStyle.QUEST_STATE_OPEN,
 			"denied": entry.state == HallStyle.QUEST_STATE_DENIED,
 		})
 	return quests
 
 
-## Today's Shop stock, by stock index (what ItemShop.buy takes).
+## Today's Shop stock, by stock index (what ItemShop.buy takes). `role` is who
+## can wear each item.
 static func _shop() -> Array:
 	var shop := []
 	for index in ItemShop.stock.size():
@@ -104,6 +109,7 @@ static func _shop() -> Array:
 		shop.append({
 			"index": index,
 			"name": item.name,
+			"role": _item_role(item),
 			"rarity": StandardItem.Rarity.keys()[StandardItem.Rarity.values().find(item.rarity)],
 			"cost": item.cost,
 			"stat_bonus": _stat_bonus(item),
@@ -112,13 +118,21 @@ static func _shop() -> Array:
 	return shop
 
 
-## One owned item. `worn_by` is the wearer's id, or "" when it is in the pack.
+## One owned item. `role` is who can wear it (a CharacterRole name). `worn_by`
+## is the wearer's id, or "" when it is in the pack.
 static func _owned_item(item: StandardItem) -> Dictionary:
 	return {
 		"id": id_of(item),
 		"name": item.name,
+		"role": _item_role(item),
 		"worn_by": id_of(item.curr_user) if item.curr_user != null else "",
 	}
+
+
+## The CharacterRole name of the heroes who can wear `item` (gear is
+## role-locked). The game shows the same thing as "Knights only".
+static func _item_role(item: StandardItem) -> String:
+	return GuildCharacter.CharacterRole.keys()[item.role]
 
 
 ## One building. `upgrade_cost` is the next level's gold cost (0 at max level).

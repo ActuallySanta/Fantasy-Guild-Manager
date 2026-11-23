@@ -3,7 +3,7 @@
 ## Scene: Scenes/hall_main.tscn
 ##
 ## Shell, top to bottom:
-##   header      - day, Bone Drake countdown, gold, standing, menu button
+##   header      - day, next-boss countdown, gold, standing, menu button
 ##   content     - one of four tabs (Board, Members, Guild, Items), or a screen
 ##                 over them (Assign Party, Character)
 ##   nav         - Board / Members / Guild / Items with badges, always visible
@@ -136,6 +136,8 @@ const TOAST_RECALLED := "Party recalled"
 const TOAST_RECONSIDER := "Back on the quest list: %s"
 const TOAST_MOVED := "%s moved from %s"
 const TOAST_PARTY_FULL := "Party is full"
+## Shown when Deny is tried on the final battle (HallRules.can_deny).
+const TOAST_FINAL_NOT_DENIABLE := "The final battle cannot be denied"
 const TOAST_DEAD := "%s can't go on quests anymore."
 const TOAST_HIRED := "%s joined the guild!"
 const TOAST_ROSTER_FULL := "No free beds. Upgrade the Barracks."
@@ -224,6 +226,12 @@ var active_screen := {}
 ##    home: Dictionary (see GuildUpgrades.run_night), released: Array (see released_today)}
 ## starts_next_day is true right after End Day: closing it starts the next day.
 var shown_report := {}
+## The boss crawl being shown after End Day on a boss day (not the final), or {}
+## when hidden: {day: int, results: Array (the boss fights' _run_quest results)}.
+## Its Continue button (close_boss_crawl) opens the Day Report, kept in
+## _pending_report meanwhile. Never saved: night_save holds the report as
+## already showing, so a reload during the crawl skips straight to the report.
+var shown_boss_crawl := {}
 ## Heroes released today, for the Day Report. Each entry is a Dictionary:
 ##   {character: GuildCharacter, standing: int (standing it cost), fallen: bool}
 ## Cleared when the next day starts.
@@ -276,6 +284,8 @@ var final_battle_lost := false
 ##   items_found:  equipment brought back from quests, found or rewarded (int)
 ##   final_result: FINAL_RESULT_NONE | _WON | _LOST
 ##   final_party:  the GuildCharacters sent to the final battle (Array)
+##   failed_by_day: day -> quests lost that day (Dictionary of int to int; old saves
+##                 don't have it, so read it with .get, see HallLedger.trouble_reason)
 var run_stats := {
 	"gold_earned": 0,
 	"quests_sent": 0,
@@ -287,6 +297,7 @@ var run_stats := {
 	"items_found": 0,
 	"final_result": FINAL_RESULT_NONE,
 	"final_party": [],
+	"failed_by_day": {},
 }
 
 # ---- player choices
@@ -327,6 +338,8 @@ var is_resumed_run := false
 ## "previous_report": Dictionary}. HallSave saves them as already showing, so
 ## closing the game mid-dusk can't replay the night. {} the rest of the time.
 var night_save := {}
+## The night's Day Report, waiting behind the boss crawl until Continue.
+var _pending_report := {}
 
 # ---- motion
 
@@ -378,6 +391,7 @@ var tutorial: Control
 @onready var _debug_overlay: Control = %OverlayDebug
 @onready var _game_over_overlay: Control = %OverlayGameOver
 @onready var _credits_overlay: Control = %OverlayCredits
+@onready var _boss_crawl_overlay: Control = %OverlayBossCrawl
 @onready var _intro_overlay: Control = %OverlayIntro
 
 # ---- colorblind filter
@@ -544,6 +558,17 @@ func is_one_death_from_falling() -> bool:
 	return HallLedger.is_one_death_from_falling()
 
 
+## Why the guild is "in trouble" ("failures", "injuries"), or "" when it isn't
+## (see HallLedger.trouble_reason). Drives the header's second warning strip.
+func trouble_reason() -> String:
+	return HallLedger.trouble_reason(run_stats, roster(), GameState.day)
+
+
+## Quests lost over the last HallLedger.TROUBLE_WINDOW_DAYS days.
+func recent_failures() -> int:
+	return HallLedger.recent_failures(run_stats, GameState.day)
+
+
 ## The one living member of the guild, or null if there isn't exactly one.
 func last_living_hero() -> GuildCharacter:
 	return HallLedger.last_living_hero(roster())
@@ -565,6 +590,11 @@ func build_credits(result: Dictionary) -> Dictionary:
 	return HallLedger.build_credits(result, run_stats, roster())
 
 # ---- quests
+
+
+## True when `entry` may be denied (false for the final battle).
+func can_deny_quest(entry: Dictionary) -> bool:
+	return HallRules.can_deny(entry)
 
 
 ## Quests still needing Send or Deny.
@@ -696,9 +726,20 @@ func affordable_buildings() -> Array:
 		return GuildUpgrades.get_upgrade_status(building) == GuildUpgrades.UpgradeStatus.READY)
 
 
-## Days left before the Bone Drake (0 = today, negative = already happened).
+## Days left before the next boss day (0 = today, -1 = no boss is left).
+func days_until_next_boss() -> int:
+	var boss_day := HallRules.next_boss_day(GameState.day)
+	return boss_day - GameState.day if boss_day >= 0 else -1
+
+
+## True when the next boss day is the final battle (HallMain.FINAL_DAY).
+func next_boss_is_final() -> bool:
+	return HallRules.next_boss_day(GameState.day) == FINAL_DAY
+
+
+## Older name for days_until_next_boss(), kept for the playtest bridge.
 func days_until_drake() -> int:
-	return MILESTONE_DAY - GameState.day
+	return days_until_next_boss()
 
 
 # ============================================================ ACTIONS
@@ -976,6 +1017,9 @@ func deny_quest() -> void:
 	var entry := current_quest_entry()
 	if entry.is_empty():
 		return
+	if not HallRules.can_deny(entry):
+		show_error_toast(TOAST_FINAL_NOT_DENIABLE)
+		return
 	entry.party.clear()
 	entry.state = HallStyle.QUEST_STATE_DENIED
 	var standing_cost := HallRules.standing_for_deny(entry.quest)
@@ -1243,6 +1287,10 @@ func stop_training(character: GuildCharacter) -> void:
 
 ## Put a hurt hero in a Hospital bed (they leave any party or training slot).
 func admit(character: GuildCharacter) -> void:
+	# a guild that can't pay the bed fee keeps the hero where they are
+	if GameState.gold < GuildUpgrades.nightly_fee():
+		queue_refresh()
+		return
 	_leave_quest(character)
 	if GuildUpgrades.admit(character):
 		pending_fx.home_row = character
@@ -1489,7 +1537,9 @@ func end_day() -> void:
 	Sfx.play(&"night_fall")
 	_header.hold_counters()
 	# training and healing happen first, so nobody heals the night they're hurt
+	var gold_before_night: int = GameState.gold
 	var home := GuildUpgrades.run_night()
+	_count_spent(gold_before_night) # the Hospital bill counts as gold spent
 	var results := []
 	for entry in sent_entries():
 		results.append(_run_quest(entry))
@@ -1506,13 +1556,22 @@ func end_day() -> void:
 	night_save = {"shown_report": report}
 	save_now()
 
+	# a boss night (not the final) plays the boss crawl first; Continue opens the report
+	var boss_results := results.filter(func(result): return result.milestone and not result.final)
 	var show_report := func() -> void:
 		is_night_falling = false
 		is_end_check_open = false
 		training_picker_open = false
 		active_screen = {}
-		shown_report = report
-		night_save = {}
+		if boss_results.is_empty():
+			shown_report = report
+			night_save = {}
+		else:
+			# night_save stays until Continue, so a save during the crawl holds the report
+			_pending_report = report
+			shown_boss_crawl = {"day": GameState.day, "results": boss_results}
+			var is_all_won := boss_results.all(func(result): return result.succeeded)
+			Sfx.play(&"victory" if is_all_won else &"defeat")
 		queue_refresh()
 		tutorial_event.emit("end_day", results)
 	HallFx.curtain(fx_layer, DUSK_INK, show_report, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
@@ -1559,13 +1618,31 @@ func _run_quest(entry: Dictionary) -> Dictionary:
 	run_stats.gold_earned += result.gold
 	if result.succeeded:
 		run_stats.quests_won += 1
-	if entry.milestone:
+	else:
+		# old saves have no failed_by_day, so make it before counting
+		var failed_by_day: Dictionary = run_stats.get("failed_by_day", {})
+		failed_by_day[GameState.day] = failed_by_day.get(GameState.day, 0) + 1
+		run_stats["failed_by_day"] = failed_by_day
+	# only the Bone Drake counts here (the later bosses are milestone entries too)
+	if entry.milestone and GameState.day == MILESTONE_DAY:
 		run_stats.drake_result = DRAKE_RESULT_SLAIN if result.succeeded else DRAKE_RESULT_LOST
 	if entry.final:
 		run_stats.final_result = FINAL_RESULT_WON if result.succeeded else FINAL_RESULT_LOST
 		run_stats.final_party = entry.party.duplicate()
 	run_stats.items_found += result.items.size() + result.reward_items.size()
 	return result
+
+
+## The boss crawl's Continue button: closes the crawl and opens the night's Day Report.
+func close_boss_crawl() -> void:
+	if shown_boss_crawl.is_empty():
+		return
+	shown_boss_crawl = {}
+	shown_report = _pending_report
+	_pending_report = {}
+	night_save = {}
+	Sfx.play(&"page_close")
+	queue_refresh()
 
 
 ## The Day Report's "New Day" button. Keeps tonight's report for the Menu and opens on the Board.
@@ -1793,10 +1870,13 @@ func end_day_button() -> Button:
 func _refresh_overlays() -> void:
 	var is_credits_open := not shown_credits.is_empty()
 	_credits_overlay.visible = is_credits_open
+	# the boss crawl hides the report and the other overlays like the credits do
+	var is_crawl_open := not shown_boss_crawl.is_empty() and not is_credits_open
+	_boss_crawl_overlay.visible = is_crawl_open
 	var is_game_over := not run_over_stats.is_empty() and not is_credits_open
 	_game_over_overlay.visible = is_game_over
-	var is_report_open := not shown_report.is_empty() or is_game_over or is_credits_open
-	_report_overlay.visible = not shown_report.is_empty() and not is_game_over and not is_credits_open
+	var is_report_open := not shown_report.is_empty() or is_game_over or is_credits_open or is_crawl_open
+	_report_overlay.visible = not shown_report.is_empty() and not is_game_over and not is_credits_open and not is_crawl_open
 	_end_check_overlay.visible = not is_report_open and is_end_check_open
 	_menu_overlay.visible = not is_report_open and is_menu_open
 	_accessibility_overlay.visible = not is_report_open and is_accessibility_open
@@ -1812,7 +1892,7 @@ func _refresh_overlays() -> void:
 
 
 func _all_overlays() -> Array:
-	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _backup_overlay, _debug_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay, _intro_overlay]
+	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _backup_overlay, _debug_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay, _boss_crawl_overlay, _intro_overlay]
 
 
 # ============================================================ TOAST

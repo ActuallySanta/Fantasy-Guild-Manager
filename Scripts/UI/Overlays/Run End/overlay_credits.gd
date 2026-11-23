@@ -4,7 +4,7 @@
 ##   - defeat:  a cold, slower roll with an epitaph that ends the run, then the
 ##     "Found a New Guild" button (HallMain.start_new_run)
 ## Top to bottom: title, the quest's story one line at a time, the final
-## battle's party, a parchment ledger (final stats, run records, roll call),
+## battle's party (those three are a CrawlSections), a parchment ledger (final stats, run records, roll call),
 ## the team credits (Data/credits.tres, see CreditsList), and a
 ## closing line.
 ##
@@ -34,17 +34,13 @@ const TOP_SPACE_SHARE := 0.85
 const BOTTOM_SPACE := 520.0
 
 # ---- LOOK
-## Font sizes: story lines, party names, team names, contributions.
-const STORY_FONT_SIZE := 30
-const PARTY_FONT_SIZE := 32
+## Font sizes: team names, contributions. (The story and party lines are sized by CrawlSections.)
 const TEAM_NAME_FONT_SIZE := 38
 const TEAM_ROLE_FONT_SIZE := 26
 ## Section headings on the dark roll (party, team sections).
 const HEADING_FONT_SIZE := 28
 ## Font size of the number on the big Days tile.
 const DAYS_FONT_SIZE := 110
-## The skull beside a fallen party member (pixels).
-const PARTY_ICON_SIZE := 34.0
 
 # ---- TEXT
 const TEXT_TITLE := "The Final Battle"
@@ -62,10 +58,7 @@ const TEXT_DEFEAT_END_SUB := "May the songs remember them."
 const TEXT_STORY_HEADING := "The Battle"
 const TEXT_PARTY_HEADING := "Who Stood at the End"
 const TEXT_DEFEAT_PARTY_HEADING := "The Fallen and the Few"
-const TEXT_PARTY_LINE := "%s · %s"
 const TEXT_FELL := "fell in the final battle"
-const TEXT_SURVIVED := "survived"
-const TEXT_NOBODY_WENT := "Nobody answered the call."
 const TEXT_TEAM_HEADING := "Made By"
 const TEXT_DAYS_CAPTION := "days of the guild"
 const TEXT_GOLD_CAPTION := "gold earned"
@@ -87,12 +80,7 @@ const BUTTON_NEW_RUN := "Found a New Guild"
 @onready var _bg: ColorRect = %Bg
 @onready var _scroll: ScrollContainer = %Scroll
 @onready var _top_space: Control = %TopSpace
-@onready var _title: Label = %Title
-@onready var _sub: Label = %Sub
-@onready var _story_heading: Label = %StoryHeading
-@onready var _story: VBoxContainer = %Story
-@onready var _party_heading: Label = %PartyHeading
-@onready var _party: VBoxContainer = %Party
+@onready var _sections: CrawlSections = %Sections
 # the parchment ledger (dark ink, so it keeps the scene's colours)
 @onready var _days_tile = %DaysTile          # stat_tile.gd
 @onready var _gold_tile = %GoldTile          # stat_tile.gd
@@ -146,8 +134,7 @@ func refresh() -> void:
 	_bg.color = HallStyle.CREDITS_BG if is_won else HallStyle.DEFEAT_BG
 
 	_show_titles(credits)
-	_show_story(credits.result.story)
-	_show_party(credits.result)
+	_show_fight(credits)
 	_show_stats(credits.stats)
 	_show_records(credits.records)
 	_show_roll_call(credits.stats.roll_call, credits.stats.released)
@@ -179,67 +166,22 @@ func _start_roll() -> void:
 ## Title, subtitle and the closing words, in the mood's wording and ink.
 func _show_titles(credits: Dictionary) -> void:
 	var is_won: bool = credits.won
-	_title.text = TEXT_TITLE if is_won else TEXT_DEFEAT_TITLE
-	_sub.text = (TEXT_SUB if is_won else TEXT_DEFEAT_SUB) % credits.day
+	_sections.show_title(TEXT_TITLE if is_won else TEXT_DEFEAT_TITLE,
+			(TEXT_SUB if is_won else TEXT_DEFEAT_SUB) % credits.day, _ink, _ink_soft)
 	_end.text = TEXT_END if is_won else TEXT_DEFEAT_END
 	_end_sub.text = TEXT_END_SUB if is_won else TEXT_DEFEAT_END_SUB
-	_story_heading.text = TEXT_STORY_HEADING
-	_party_heading.text = TEXT_PARTY_HEADING if is_won else TEXT_DEFEAT_PARTY_HEADING
 	_team_heading.text = TEXT_TEAM_HEADING
-	for label in [_title, _end]:
-		HallStyle.set_font_color(label, _ink)
-	for label in [_sub, _end_sub, _story_heading, _party_heading, _team_heading]:
+	HallStyle.set_font_color(_end, _ink)
+	for label in [_end_sub, _team_heading]:
 		HallStyle.set_font_color(label, _ink_soft)
 
 
-## The night's story, one centred line per beat. Its colours are the bright
-## ones meant for dark backgrounds, so they're used as they are.
-func _show_story(story: String) -> void:
-	HallStyle.clear_children(_story)
-	for line in story.split("\n"):
-		var beat := line.strip_edges()
-		if beat.is_empty():
-			continue
-		var label := RichTextLabel.new()
-		label.bbcode_enabled = true
-		label.fit_content = true
-		label.scroll_active = false
-		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		HallFontScale.set_size(label, "normal_font_size", STORY_FONT_SIZE)
-		HallFontScale.set_size(label, "bold_font_size", STORY_FONT_SIZE)
-		HallStyle.set_font_color(label, _ink)
-		label.text = "[center]%s[/center]" % beat
-		_story.add_child(label)
-
-
-## Everyone who went to the final battle: name and role, then whether they
-## fell (with a skull) or survived.
-func _show_party(result: Dictionary) -> void:
-	HallStyle.clear_children(_party)
-	var died: Array = result.get("died", [])
-	if result.party.is_empty():
-		_party.add_child(_make_line(TEXT_NOBODY_WENT, _ink_soft, PARTY_FONT_SIZE))
-	for character in result.party:
-		var has_fallen := died.has(character) or HallStyle.is_dead(character)
-		var row := HBoxContainer.new()
-		row.alignment = BoxContainer.ALIGNMENT_CENTER
-		row.add_theme_constant_override("separation", 12)
-		if has_fallen:
-			var skull := TextureRect.new()
-			skull.texture = HallStyle.icon_texture("skull")
-			skull.custom_minimum_size = Vector2(PARTY_ICON_SIZE, PARTY_ICON_SIZE)
-			skull.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-			skull.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-			HallStyle.tint_art(skull, _ink_soft)
-			row.add_child(skull)
-		var name_text := TEXT_PARTY_LINE % [character.name, HallStyle.role_name(character)]
-		var name_label := _make_line(name_text, _ink, PARTY_FONT_SIZE)
-		# beside the skull the name sizes itself (a wrapping label would shrink to nothing)
-		name_label.autowrap_mode = TextServer.AUTOWRAP_OFF
-		row.add_child(name_label)
-		_party.add_child(row)
-		_party.add_child(_make_line(TEXT_FELL if has_fallen else TEXT_SURVIVED, _ink_soft, TEAM_ROLE_FONT_SIZE, &"ItalicLight"))
+## The final battle's story and party, as the one fight of the roll's sections.
+func _show_fight(credits: Dictionary) -> void:
+	var is_won: bool = credits.won
+	_sections.clear()
+	_sections.add_fight(TEXT_STORY_HEADING, credits.result.story, credits.result, is_won, _ink, _ink_soft,
+			TEXT_PARTY_HEADING if is_won else TEXT_DEFEAT_PARTY_HEADING, TEXT_FELL)
 
 
 ## The Days tile and the grid of the run's numbers (the Game Over ledger's,
@@ -301,14 +243,6 @@ func _show_team() -> void:
 		_team.add_child(gap)
 
 
-## A centred, wrapping label in `ink`. look = a hall_theme.tres label variation.
+## A centred, wrapping label in `ink` (see CrawlSections.make_line).
 func _make_line(text: String, ink: Color, font_size: int, look: StringName = &"LabelLight") -> Label:
-	var label := Label.new()
-	label.text = text
-	label.theme_type_variation = look
-	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.custom_minimum_size.x = 40
-	HallFontScale.set_size(label, "font_size", font_size)
-	HallStyle.set_font_color(label, ink)
-	return label
+	return CrawlSections.make_line(text, ink, font_size, look)

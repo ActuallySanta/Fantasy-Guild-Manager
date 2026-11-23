@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c8n4p1r5y7qz"]
+
+[ext_resource type="Script" uid="uid://cvf6ndh62nayl" path="res://tools/tests/countdown_test.gd" id="1_countdown"]
+
+[node name="countdown_test" type="Node"]
+script = ExtResource("1_countdown")
