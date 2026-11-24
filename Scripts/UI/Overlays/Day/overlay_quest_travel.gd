@@ -1,5 +1,5 @@
 ## The "Going on a quest" screen: after End Day, while the party is out, a
-## dusk-coloured screen with a walker (Santi's boots or swords art), cycling
+## dark screen (the intro crawl's HallStyle.INTRO_BG for now) with a walker (Santi's boots or swords art), cycling
 ## dots on the title and the quest_travel ambience. After a random
 ## TRAVEL_MIN_SECONDS..TRAVEL_MAX_SECONDS a "View quest report" button fades
 ## in. Nothing before it can be tapped, so the wait can't be skipped. Pressing
@@ -45,6 +45,7 @@ const TEXT_CONTINUE := "View quest report"
 const TEXT_DOT := "."
 
 # ---- NODES
+@onready var _bg: ColorRect = %Bg
 @onready var _walker: AnimatedSprite2D = %Walker
 @onready var _title: Label = %Title
 @onready var _continue_button: Button = %ContinueButton
@@ -68,6 +69,7 @@ var _fade_tween: Tween
 
 func setup(main: HallMain) -> void:
 	hall = main
+	_bg.color = HallStyle.INTRO_BG
 	_continue_button.text = TEXT_CONTINUE
 	HallStyle.style_button(_continue_button, "gold", BUTTON_FONT_SIZE)
 	_continue_button.pressed.connect(_on_continue_pressed)
