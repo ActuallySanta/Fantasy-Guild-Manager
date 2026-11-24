@@ -76,6 +76,7 @@ const SOUNDS := {
 	&"standing_land": {"volume_db": -6.0, "pitch_jitter": 0.08},
 	# ---- the night and the Day Report
 	&"night_fall": {"volume_db": 0.0, "pitch_jitter": 0.0},
+	&"quest_travel": {"volume_db": -4.0, "pitch_jitter": 0.0},
 	&"letter_success": {"volume_db": -2.0, "pitch_jitter": 0.03},
 	&"letter_fail": {"volume_db": -2.0, "pitch_jitter": 0.03},
 	&"hero_hurt": {"volume_db": -3.0, "pitch_jitter": 0.05},
@@ -96,6 +97,9 @@ const SOUNDS := {
 var _streams := {}
 ## The player pool, and which one plays next.
 var _voices: Array[AudioStreamPlayer] = []
+## The sound name each voice last played (same index as _voices), so stop()
+## can find a sound's voices. &"" = never used.
+var _voice_sounds: Array[StringName] = []
 var _next_voice := 0
 ## The frame (Engine.get_process_frames) of the last button press, and of the
 ## last sound played by name. A press's "ui_tap" is dropped when an action
@@ -114,6 +118,7 @@ func _ready() -> void:
 		voice.bus = BUS
 		add_child(voice)
 		_voices.append(voice)
+		_voice_sounds.append(&"")
 	_load_sounds()
 	get_tree().node_added.connect(_on_node_added)
 
@@ -144,6 +149,16 @@ func play_after(sound_name: StringName, seconds: float) -> void:
 ## the player skips ahead to the next day).
 func cancel_scheduled() -> void:
 	_schedule_batch += 1
+
+
+## Stop every voice currently playing `sound_name` (e.g. an ambience when its
+## screen closes). Does nothing when none is.
+## sound_name: a key of SOUNDS.
+func stop(sound_name: StringName) -> void:
+	for voice_index in _voices.size():
+		var voice := _voices[voice_index]
+		if voice.playing and _voice_sounds[voice_index] == sound_name:
+			voice.stop()
 
 
 ## True when at least one file was found for this sound.
@@ -194,6 +209,7 @@ func _play_now(sound_name: StringName) -> void:
 	voice.volume_db = tuning.get("volume_db", 0.0)
 	var jitter: float = tuning.get("pitch_jitter", 0.0)
 	voice.pitch_scale = 1.0 + randf_range(-jitter, jitter)
+	_voice_sounds[_voices.find(voice)] = sound_name
 	voice.play()
 
 

@@ -91,6 +91,7 @@ has its own sound, the tap is skipped, so one press never plays two sounds at on
 | File name | When it plays | Suggested sound |
 |---|---|---|
 | `night_fall` | End Day: dusk falls over the screen | Owl hoot, crickets, or a low gong |
+| `quest_travel` | The "Going on a quest" screen after End Day, until View quest report is pressed | Marching boots, distant clashes, wind on the road (2-4 s or longer; set Loop on import to fill a long wait) |
 | `letter_success` | A report letter's SUCCESS stamp lands | Bright stamp plus a short fanfare |
 | `letter_fail` | A report letter's FAILED stamp lands | Stamp plus a descending "wah" |
 | `hero_hurt` | A letter's "Hurt" tag stamps in | Grunt or "oof" |
