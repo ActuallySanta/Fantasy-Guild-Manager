@@ -4,7 +4,7 @@ class_name: null
 extends: Node
 scene: null
 systems: ["[[Boot and Autoload Order]]", "[[UI Motion and Feedback]]"]
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+last_verified: 42bbb8f33545f8af5fb02766713031b11eecd919
 tags: [script, autoload]
 ---
 
@@ -22,9 +22,10 @@ Autoload `Sfx`. Plays the game's sound effects from a drop-in folder: put a file
 | `VOICE_COUNT` | const | Players in the pool (12): how many sounds can play at once. The oldest is cut off when all are busy. |
 | `BUS` | const | Audio bus (`Master`). |
 | `TAP_SOUND` | const | The sound every pressed button plays (`ui_tap`) unless its action played its own that frame. |
-| `SOUNDS` | const | Every sound name with `volume_db` (dB, 0 = as recorded) and `pitch_jitter` (fraction, 0.05 = +-5%). Groups: interface, quests, guild, items, upgrades, gold and standing, the night and Day Report, endings, tutorial (`pip_talk`). |
+| `SOUNDS` | const | Every sound name with `volume_db` (dB, 0 = as recorded) and `pitch_jitter` (fraction, 0.05 = +-5%). Groups: interface, quests, guild, items, upgrades, gold and standing, the night and Day Report (incl. `quest_travel`, the travel screen's ambience), endings, tutorial (`pip_talk`). |
 | `_streams` | var (Dictionary) | Sound name -> array of loaded `AudioStream`s (empty = no file). |
 | `_voices` | var (`Array[AudioStreamPlayer]`) | The player pool. |
+| `_voice_sounds` | var (`Array[StringName]`) | The sound name each voice last played (same index as `_voices`), so [[sound_effects#stop]] can find a sound's voices. `&""` = never used. Filled in [[sound_effects#_ready]], updated in [[sound_effects#_play_now]]. |
 | `_next_voice` | var (int) | Which voice is tried next. |
 | `_tap_frame` | var (int) | `Engine.get_process_frames()` of the last button press (-1 = never). |
 | `_action_sound_frame` | var (int) | Frame of the last non-tap sound played with `play` (-1 = never). |
@@ -33,14 +34,14 @@ Autoload `Sfx`. Plays the game's sound effects from a drop-in folder: put a file
 ## Functions
 
 ### _ready
-`func _ready() -> void` · `Globals/sound_effects.gd:109`
+`func _ready() -> void` · `Globals/sound_effects.gd:113`
 
 Engine callback. Sets `process_mode` to always (sounds keep playing while the tree is paused), creates `VOICE_COUNT` `AudioStreamPlayer`s on `BUS`, loads the sound files, and connects `get_tree().node_added` to `_on_node_added`.
 
 **Calls:** [[sound_effects#_load_sounds]], [[sound_effects#_on_node_added]] (as a connection).
 
 ### play
-`func play(sound_name: StringName) -> void` · `Globals/sound_effects.gd:124`
+`func play(sound_name: StringName) -> void` · `Globals/sound_effects.gd:129`
 
 Plays a sound now. Unknown names warn (in `_play_now`), and names with no file play nothing. Any sound other than `ui_tap` records the current frame in `_action_sound_frame` so the press's tap is skipped.
 
@@ -55,7 +56,7 @@ Plays a sound now. Unknown names warn (in `_play_now`), and names with no file p
 **Calls:** [[sound_effects#_play_now]].
 
 ### play_after
-`func play_after(sound_name: StringName, seconds: float) -> void` · `Globals/sound_effects.gd:133`
+`func play_after(sound_name: StringName, seconds: float) -> void` · `Globals/sound_effects.gd:138`
 
 Plays a sound `seconds` from now, to line up with an animation. With `seconds <= 0` it just calls `play`. Otherwise a timer is started that plays through `_play_now`, but only if no `cancel_scheduled()` happened since it was queued. Note that the delayed play doesn't mark `_action_sound_frame`.
 
@@ -69,21 +70,36 @@ Plays a sound `seconds` from now, to line up with an animation. With `seconds <=
 **Calls:** [[sound_effects#play]], [[sound_effects#_play_now]].
 
 ### cancel_scheduled
-`func cancel_scheduled() -> void` · `Globals/sound_effects.gd:145`
+`func cancel_scheduled() -> void` · `Globals/sound_effects.gd:150`
 
 Drops every sound still waiting in `play_after` (for example the Day Report's reveal when the player skips ahead) by bumping `_schedule_batch`.
 
 **Called by:** [[hall_main#start_new_day]] (`hall_main.gd:1661`), [[hall_main#close_report]] (`hall_main.gd:1759`).
 
+### stop
+`func stop(sound_name: StringName) -> void` · `Globals/sound_effects.gd:157`
+
+Stops every voice currently playing `sound_name` (for example an ambience when its screen closes). Does nothing when none is.
+
+| Name | Type | Meaning | Where callers get it |
+|---|---|---|---|
+| `sound_name` | `StringName` | A key of `SOUNDS` | `&"quest_travel"` in [[overlay_quest_travel#_end_trip]] (`overlay_quest_travel.gd:163`) |
+
+**Returns:** nothing.
+
+**Side effects:** calls `AudioStreamPlayer.stop()` on each matching playing voice.
+
+**Called by:** [[overlay_quest_travel#_end_trip]] (`overlay_quest_travel.gd:163`).
+
 ### has_sound
-`func has_sound(sound_name: StringName) -> bool` · `Globals/sound_effects.gd:150`
+`func has_sound(sound_name: StringName) -> bool` · `Globals/sound_effects.gd:165`
 
 True when at least one file was found for this sound.
 
 **Called by:** nothing found.
 
 ### _load_sounds
-`func _load_sounds() -> void` · `Globals/sound_effects.gd:159`
+`func _load_sounds() -> void` · `Globals/sound_effects.gd:174`
 
 For every name in `SOUNDS`, looks for the base file and the variants `name_2` to `name_MAX_VARIANTS` in `SOUND_FOLDER` and stores what it finds in `_streams`. It uses `ResourceLoader.exists`, which also finds imported files in an exported build where the folder only holds `.import` remaps.
 
@@ -92,7 +108,7 @@ For every name in `SOUNDS`, looks for the base file and the variants `name_2` to
 **Calls:** [[sound_effects#_find_stream]].
 
 ### _find_stream
-`func _find_stream(base_name: String) -> AudioStream` · `Globals/sound_effects.gd:173`
+`func _find_stream(base_name: String) -> AudioStream` · `Globals/sound_effects.gd:188`
 
 The first file named `base_name` with one of `EXTENSIONS`, or null.
 
@@ -105,16 +121,16 @@ The first file named `base_name` with one of `EXTENSIONS`, or null.
 **Called by:** [[sound_effects#_load_sounds]] (lines 162, 166).
 
 ### _play_now
-`func _play_now(sound_name: StringName) -> void` · `Globals/sound_effects.gd:184`
+`func _play_now(sound_name: StringName) -> void` · `Globals/sound_effects.gd:199`
 
-Plays one of the sound's files on a free voice. Unknown names `push_warning`. A sound with no files returns silently. Volume is `volume_db`, and pitch is `1.0 + randf_range(-jitter, jitter)`.
+Plays one of the sound's files on a free voice. Unknown names `push_warning`. A sound with no files returns silently. Volume is `volume_db`, and pitch is `1.0 + randf_range(-jitter, jitter)`. Records the name in `_voice_sounds` for the chosen voice before playing.
 
 **Called by:** [[sound_effects#play]] (128), [[sound_effects#play_after]] (140), [[sound_effects#_play_waiting_tap]] (238).
 
 **Calls:** [[sound_effects#_free_voice]].
 
 ### _free_voice
-`func _free_voice() -> AudioStreamPlayer` · `Globals/sound_effects.gd:201`
+`func _free_voice() -> AudioStreamPlayer` · `Globals/sound_effects.gd:217`
 
 A voice that isn't playing, or the next one round the pool when all are busy (cuts it off).
 
@@ -123,7 +139,7 @@ A voice that isn't playing, or the next one round the pool when all are busy (cu
 **Called by:** [[sound_effects#_play_now]] (192).
 
 ### _on_node_added
-`func _on_node_added(node: Node) -> void` · `Globals/sound_effects.gd:216`
+`func _on_node_added(node: Node) -> void` · `Globals/sound_effects.gd:232`
 
 Gives every `Control` that has a `pressed` signal (buttons and `TapPanel`) the tap sound by connecting `pressed` to `_on_any_press`, once (a node can enter the tree more than once, for example when `HallFx.detach` reparents rows).
 
@@ -134,7 +150,7 @@ Gives every `Control` that has a `pressed` signal (buttons and `TapPanel`) the t
 **Called by:** signal `node_added` on the `SceneTree` (connected at line 118).
 
 ### _on_any_press
-`func _on_any_press() -> void` · `Globals/sound_effects.gd:228`
+`func _on_any_press() -> void` · `Globals/sound_effects.gd:244`
 
 A press: queues the tap for the end of the frame, once per frame. If the press's action played a sound of its own in this frame (before or after this handler), `_play_waiting_tap` drops the tap.
 
@@ -143,7 +159,7 @@ A press: queues the tap for the end of the frame, once per frame. If the press's
 **Calls:** [[sound_effects#_play_waiting_tap]] (deferred).
 
 ### _play_waiting_tap
-`func _play_waiting_tap() -> void` · `Globals/sound_effects.gd:235`
+`func _play_waiting_tap() -> void` · `Globals/sound_effects.gd:251`
 
 Plays `ui_tap` unless `_action_sound_frame == _tap_frame`.
 

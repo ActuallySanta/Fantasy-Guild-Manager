@@ -232,6 +232,15 @@ var shown_report := {}
 ## _pending_report meanwhile. Never saved: night_save holds the report as
 ## already showing, so a reload during the crawl skips straight to the report.
 var shown_boss_crawl := {}
+## True while the "Going on a quest" screen shows after End Day (the night is
+## already rolled and saved). Its button (close_quest_travel) runs the curtain
+## stored in _after_quest_travel. Never saved.
+var is_quest_travel_open := false
+## Set by the rules playtest bridge and headless tests so End Day goes
+## straight to the dusk curtain, with no travel screen or wait.
+var skip_quest_travel := false
+## The curtain End Day runs once the travel screen's button is pressed.
+var _after_quest_travel: Callable
 ## Heroes released today, for the Day Report. Each entry is a Dictionary:
 ##   {character: GuildCharacter, standing: int (standing it cost), fallen: bool}
 ## Cleared when the next day starts.
@@ -392,6 +401,7 @@ var tutorial: Control
 @onready var _game_over_overlay: Control = %OverlayGameOver
 @onready var _credits_overlay: Control = %OverlayCredits
 @onready var _boss_crawl_overlay: Control = %OverlayBossCrawl
+@onready var _quest_travel_overlay: Control = %OverlayQuestTravel
 @onready var _intro_overlay: Control = %OverlayIntro
 
 # ---- colorblind filter
@@ -1560,6 +1570,7 @@ func end_day() -> void:
 	var boss_results := results.filter(func(result): return result.milestone and not result.final)
 	var show_report := func() -> void:
 		is_night_falling = false
+		is_quest_travel_open = false
 		is_end_check_open = false
 		training_picker_open = false
 		active_screen = {}
@@ -1574,7 +1585,8 @@ func end_day() -> void:
 			Sfx.play(&"victory" if is_all_won else &"defeat")
 		queue_refresh()
 		tutorial_event.emit("end_day", results)
-	HallFx.curtain(fx_layer, DUSK_INK, show_report, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
+	_go_on_quest(func() -> void:
+		HallFx.curtain(fx_layer, DUSK_INK, show_report, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS))
 
 
 ## End Day on FINAL_DAY: freeze the run's numbers into shown_credits and open
@@ -1591,6 +1603,7 @@ func _show_final_credits(result: Dictionary, report: Dictionary) -> void:
 	save_now()
 	var show_credits := func() -> void:
 		is_night_falling = false
+		is_quest_travel_open = false
 		is_end_check_open = false
 		is_menu_open = false
 		training_picker_open = false
@@ -1603,10 +1616,32 @@ func _show_final_credits(result: Dictionary, report: Dictionary) -> void:
 		Sfx.play(&"victory" if credits.won else &"defeat")
 		queue_refresh()
 		tutorial_event.emit("end_day", report.results)
-	if credits.won:
-		HallFx.curtain(fx_layer, DUSK_INK, show_credits, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
-	else:
-		HallFx.curtain(fx_layer, DUSK_INK, show_credits, 1.0, DEFEAT_DUSK_IN_SECONDS, DEFEAT_DUSK_OUT_SECONDS)
+	_go_on_quest(func() -> void:
+		if credits.won:
+			HallFx.curtain(fx_layer, DUSK_INK, show_credits, 0.92, DUSK_IN_SECONDS, DUSK_OUT_SECONDS)
+		else:
+			HallFx.curtain(fx_layer, DUSK_INK, show_credits, 1.0, DEFEAT_DUSK_IN_SECONDS, DEFEAT_DUSK_OUT_SECONDS))
+
+
+## Shows the "Going on a quest" screen; its button runs `then` (the night's
+## curtain). With skip_quest_travel set, runs `then` straight away.
+func _go_on_quest(then: Callable) -> void:
+	if skip_quest_travel:
+		then.call()
+		return
+	_after_quest_travel = then
+	is_quest_travel_open = true
+	queue_refresh()
+
+
+## The travel screen's "View quest report" button: runs the stored curtain
+## once (a second press finds it cleared). The curtain's peak closes the screen.
+func close_quest_travel() -> void:
+	if not _after_quest_travel.is_valid():
+		return
+	var then := _after_quest_travel
+	_after_quest_travel = Callable()
+	then.call()
 
 
 ## Play out one quest (HallRules.play_quest pays its gold and standing) and
@@ -1875,7 +1910,10 @@ func _refresh_overlays() -> void:
 	_boss_crawl_overlay.visible = is_crawl_open
 	var is_game_over := not run_over_stats.is_empty() and not is_credits_open
 	_game_over_overlay.visible = is_game_over
-	var is_report_open := not shown_report.is_empty() or is_game_over or is_credits_open or is_crawl_open
+	# the travel screen (after End Day) hides the sheets and Menu like the report does
+	_quest_travel_overlay.visible = is_quest_travel_open and not is_credits_open
+	var is_report_open := not shown_report.is_empty() or is_game_over or is_credits_open or is_crawl_open \
+			or is_quest_travel_open
 	_report_overlay.visible = not shown_report.is_empty() and not is_game_over and not is_credits_open and not is_crawl_open
 	_end_check_overlay.visible = not is_report_open and is_end_check_open
 	_menu_overlay.visible = not is_report_open and is_menu_open
@@ -1892,7 +1930,7 @@ func _refresh_overlays() -> void:
 
 
 func _all_overlays() -> Array:
-	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _backup_overlay, _debug_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay, _boss_crawl_overlay, _intro_overlay]
+	return [_report_overlay, _end_check_overlay, _menu_overlay, _accessibility_overlay, _backup_overlay, _debug_overlay, _welcome_overlay, _game_over_overlay, _credits_overlay, _boss_crawl_overlay, _quest_travel_overlay, _intro_overlay]
 
 
 # ============================================================ TOAST

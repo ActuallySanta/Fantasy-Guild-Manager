@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://c5fxst0ptst1q"]
+
+[ext_resource type="Script" uid="uid://b5fxst0ptgd1q" path="res://tools/tests/sfx_stop_test.gd" id="1_sfx"]
+
+[node name="sfx_stop_test" type="Node"]
+script = ExtResource("1_sfx")

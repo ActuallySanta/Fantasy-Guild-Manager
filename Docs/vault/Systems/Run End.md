@@ -1,14 +1,14 @@
 ---
-systems_scripts: ["[[hall_ledger]]", "[[hall_main]]", "[[hall_rules]]", "[[hall_header]]", "[[overlay_game_over]]", "[[overlay_credits]]", "[[overlay_boss_crawl]]", "[[crawl_roll]]", "[[crawl_sections]]", "[[roll_call_row]]", "[[playtest_scenario]]"]
-scenes: ["[[overlay_game_over (scene)]]", "[[overlay_credits (scene)]]", "[[overlay_boss_crawl (scene)]]", "[[hall_header (scene)]]", "[[scenario_game_over (scene)]]", "[[scenario_final_battle (scene)]]", "[[scenario_low_standing (scene)]]"]
-last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
+systems_scripts: ["[[hall_ledger]]", "[[hall_main]]", "[[hall_rules]]", "[[hall_header]]", "[[overlay_game_over]]", "[[overlay_credits]]", "[[overlay_boss_crawl]]", "[[overlay_quest_travel]]", "[[crawl_roll]]", "[[crawl_sections]]", "[[roll_call_row]]", "[[playtest_scenario]]"]
+scenes: ["[[overlay_game_over (scene)]]", "[[overlay_credits (scene)]]", "[[overlay_boss_crawl (scene)]]", "[[overlay_quest_travel (scene)]]", "[[hall_header (scene)]]", "[[scenario_game_over (scene)]]", "[[scenario_final_battle (scene)]]", "[[scenario_low_standing (scene)]]"]
+last_verified: 42bbb8f33545f8af5fb02766713031b11eecd919
 tags: [system]
 ---
 
 # Run End
 
 ## Purpose
-How a run ends, and how the game warns about it first. The header shows a gold "Guild in trouble" strip and a red "last hero standing" strip ([[hall_ledger]] checks). When nobody is left alive and no recruit can ever be afforded, the Game Over ledger opens. On day 50 (`HallMain.FINAL_DAY`) the final battle replaces the Day Report with a credits roll: a win offers "Begin Freeplay" (days continue, quests climb to the S++ rank), a loss ends the run. The ledger and the credits can only be left through "Found a New Guild" or, after a win, "Begin Freeplay". Boss crawls (days 10 to 40) are the milder cousin: a text roll before the Day Report.
+How a run ends, and how the game warns about it first. The header shows a gold "Guild in trouble" strip and a red "last hero standing" strip ([[hall_ledger]] checks). When nobody is left alive and no recruit can ever be afforded, the Game Over ledger opens. On day 50 (`HallMain.FINAL_DAY`) the final battle replaces the Day Report with a credits roll: a win offers "Begin Freeplay" (days continue, quests climb to the S++ rank), a loss ends the run. The ledger and the credits can only be left through "Found a New Guild" or, after a win, "Begin Freeplay". Boss crawls (days 10 to 40) are the milder cousin: a text roll before the Day Report. Every night, the final battle included, first shows the "Going on a quest" screen ([[overlay_quest_travel]]); its button runs the dusk curtain into the credits, boss crawl or Day Report.
 
 ## Entry points
 - Every refresh: `hall_header.refresh` calls [[hall_header#_refresh_danger_strip]], which reads the hall's wrappers [[hall_main#is_one_death_from_falling]], [[hall_main#trouble_reason]], [[hall_main#recent_failures]] and [[hall_main#last_living_hero]].
@@ -144,6 +144,7 @@ flowchart TD
 - [[hall_main#_check_run_over]] does nothing while `shown_credits` is set: a lost final battle ends with the defeat credits, not the ledger, but `final_battle_lost` still makes [[hall_main#is_run_over]] true.
 - The final battle can't be denied ([[hall_rules#can_deny]]), otherwise day 50 would pass with no ending.
 - The credits and the ledger are frozen when built (`run_over_stats`, `shown_credits`), so they survive a reload; both are in the save ([[Saving Migration and Backup Codes]]) and the credits are saved as already showing before the dusk curtain.
+- On day 50, [[hall_main#_show_final_credits]] saves the credits as already showing, then calls [[hall_main#_go_on_quest]]; the travel screen's button ([[hall_main#close_quest_travel]]) runs the win or defeat curtain, whose peak clears `is_quest_travel_open` and sets `shown_credits`. A reload during the travel screen opens straight on the credits.
 - A win keeps the night's report in `previous_report` for the Menu's "Last night's report"; there is no Day Report on day 50.
 - In freeplay the day counter keeps going, the next-boss note hides (`days_until_next_boss` returns -1), quests can roll rank S++ ([[hall_style#rank_letter]]), and recruits scale too ([[hire_scaling#recruit_budget]], [[Hiring Characters]]).
 - `HallMain.build_run_records` and `HallMain.freeplay_scale` have no caller; the static versions are called directly.

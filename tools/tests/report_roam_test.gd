@@ -24,6 +24,7 @@ func _ready() -> void:
 func _run() -> void:
 	var hall: Node = load("uid://dtw7iu2s1gibm").instantiate()  # Scenes/hall_main.tscn
 	add_child(hall)
+	hall.skip_quest_travel = true  # no "Going on a quest" wait (quest_travel_test covers it)
 	await _settle()
 	var tutorial: OverlayTutorial = hall.tutorial
 	check(tutorial != null and tutorial.is_running(), "Pip's Day 1 walkthrough started")

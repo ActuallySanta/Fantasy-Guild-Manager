@@ -4,7 +4,7 @@ class_name: ""
 extends: TapPanel
 scene: "[[member_card (scene)]]"
 systems: ["[[UI Architecture and Refresh]]"]
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+last_verified: 42bbb8f33545f8af5fb02766713031b11eecd919
 tags: [script]
 ---
 
@@ -52,7 +52,7 @@ Fills the card and makes a tap open the hero's page. The chevron is hidden while
 
 **Called by:** [[tab_guild#_show_roster]] (`tab_guild.gd:151` for the living, `tab_guild.gd:164` for the fallen, which then get `modulate` faded).
 
-**Calls:** [[hall_main#open_character]], [[hall_main#is_locked]], [[portrait#show_character]], [[hall_style#role_name]], [[stat_strip#show_health]], [[stat_strip#show_stats]], [[member_card#_show_task]], [[member_card#_show_status]].
+**Calls:** [[hall_main#open_character]], [[hall_main#is_locked]], [[portrait#show_character]], [[hall_style#role_name]], [[stat_strip#show_health]], [[stat_strip#show_stats]] (the empty highlight list is now passed as a typed `[] as Array[int]`, `member_card.gd:59`), [[member_card#_show_task]], [[member_card#_show_status]].
 
 ### _show_status
 `func _show_status(hall: HallMain, character: GuildCharacter) -> void` · `Scripts/UI/Rows/Heroes/member_card.gd:68`

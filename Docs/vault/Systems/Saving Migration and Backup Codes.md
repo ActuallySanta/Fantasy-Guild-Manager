@@ -1,7 +1,7 @@
 ---
 systems_scripts: ["[[hall_save]]", "[[hall_save_transfer]]", "[[hall_web_files]]", "[[hall_settings]]", "[[hall_main]]", "[[overlay_backup]]", "[[overlay_update_confirm]]", "[[overlay_debug]]", "[[hall_web_update]]"]
 scenes: ["[[overlay_backup (scene)]]", "[[overlay_update_confirm (scene)]]", "[[overlay_debug (scene)]]"]
-last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
+last_verified: 42bbb8f33545f8af5fb02766713031b11eecd919
 tags: [system]
 ---
 
@@ -151,6 +151,7 @@ flowchart TD
 - `_migration_steps()` is empty and `SAVE_VERSION` is 1: no migration has ever been needed. A save from a newer version is ignored (`NEWER_VERSION` for a code, `{}` for the file, which then tries the backup).
 - Safe changes: a new saved field, building or run-state value (read with `.get(key, default)` in [[hall_save#apply_snapshot]]). Breaking: renaming or removing a saved field, changing a value's meaning or units, reordering a saved enum, or changing the `REF_*` or item `kind` handling. A breaking change needs `SAVE_VERSION` bumped and a `_migrate_N_to_N+1` step.
 - Quests leave out their tuning numbers, so retuning reaches saved quests. `temp_stats` is not saved ([[character_resource#reset_temp_stats]] rebuilds it).
+- The "Going on a quest" screen state (`is_quest_travel_open`, `skip_quest_travel`, `_after_quest_travel`) is never saved: the night is rolled and saved (`night_save`) before the screen opens, so a reload during it opens straight on the report or credits ([[overlay_quest_travel]], [[hall_main#close_quest_travel]]).
 - While the night plays out, `hall.night_save` holds the report or credits about to show; they are saved as already showing, so closing during the dusk can't replay the night with new dice ([[Day Cycle]], [[Run End]]).
 - Playtest scenarios and the bridge (the hall is not the scene root, `uses_save_file` is false), a run with "Save runs" off, and a debug run (`is_debug_run`) never write the save ([[Playtest Bridge]]).
 - Import turns "Save runs" on and sets `uses_save_file = false` on the dying hall so its last refresh can't overwrite the import.

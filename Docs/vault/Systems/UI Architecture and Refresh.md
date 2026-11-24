@@ -1,7 +1,7 @@
 ---
-systems_scripts: ["[[hall_main]]", "[[hall_style]]", "[[hall_header]]", "[[hall_nav]]", "[[tab_board]]", "[[tab_guild]]", "[[tab_upgrades]]", "[[tab_items]]", "[[screen_assign]]", "[[screen_character]]", "[[quest_row]]", "[[overlay_tutorial]]", "[[drag_scroll]]", "[[tap_panel]]"]
+systems_scripts: ["[[hall_main]]", "[[hall_style]]", "[[hall_header]]", "[[hall_nav]]", "[[tab_board]]", "[[tab_guild]]", "[[tab_upgrades]]", "[[tab_items]]", "[[screen_assign]]", "[[screen_character]]", "[[quest_row]]", "[[overlay_tutorial]]", "[[overlay_quest_travel]]", "[[drag_scroll]]", "[[tap_panel]]"]
 scenes: ["[[hall_main (scene)]]", "[[tab_board (scene)]]", "[[tab_guild (scene)]]", "[[tab_upgrades (scene)]]", "[[tab_items (scene)]]", "[[screen_assign (scene)]]", "[[quest_row (scene)]]", "[[hall_nav (scene)]]"]
-last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
+last_verified: 42bbb8f33545f8af5fb02766713031b11eecd919
 tags: [system]
 ---
 
@@ -74,7 +74,7 @@ flowchart TD
 | 12 | A view builds a control | [[hall_main#is_locked]] | `feature`: a tab id or an `OverlayTutorial.FEATURE_*` id | `bool` → step 16 | Called by [[hall_nav#_badge_text_for]], [[tab_board#_show_recruits_box]], [[tab_guild#refresh]] and others |
 | 13 | In step 12, for a tab | [[hall_main#is_tab_locked]] | `tab_id` | `bool` → step 12 | Compares `GameState.day` with [[hall_main#tab_unlock_day]] |
 | 14 | In step 12, for a feature | [[overlay_tutorial#is_locked]] | `feature` | `bool` → step 12 | none |
-| 15 | While a Pip step runs | [[overlay_tutorial#_apply_locks]] | the step and its target control | nothing | Disables every button outside the spotlight; [[overlay_tutorial#_release_locks]] restores them |
+| 15 | While a Pip step runs | [[overlay_tutorial#_apply_locks]] | the step and its target control | nothing | Disables every button outside the spotlight; [[overlay_tutorial#_release_locks]] restores them. While `hall.is_quest_travel_open` is true, [[overlay_tutorial#_process]] hides Pip and releases the locks so the travel screen's button works |
 | 16 | After step 12 | [[hall_style#set_locked]] (from [[hall_nav#refresh]]) or an early return in an action | `bool` from step 12 | nothing | The control is greyed and disabled, hidden, or the action does nothing |
 
 ## Branches
@@ -84,7 +84,9 @@ flowchart TD
   A -- yes --> B["credits only"]
   A -- no --> C{"shown_boss_crawl set?"}
   C -- yes --> D["boss crawl, hides report and the sheets"]
-  C -- no --> E{"run_over_stats set?"}
+  C -- no --> Q{"is_quest_travel_open?"}
+  Q -- yes --> R["Going on a quest screen, hides report and the sheets"]
+  Q -- no --> E{"run_over_stats set?"}
   E -- yes --> F["Game Over ledger"]
   E -- no --> G{"shown_report set?"}
   G -- yes --> H["Day Report, hides the sheets"]

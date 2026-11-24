@@ -1,7 +1,7 @@
 ---
-systems_scripts: ["[[hall_fx]]", "[[hall_header]]", "[[header_popup]]", "[[hall_toast]]", "[[crawl_roll]]", "[[crawl_sections]]", "[[tap_panel]]", "[[drag_scroll]]", "[[hall_font_scale]]", "[[hall_settings]]", "[[sound_effects]]", "[[hall_main]]", "[[overlay_accessibility]]", "[[overlay_report]]", "[[report_entry]]", "[[odds_bar]]"]
+systems_scripts: ["[[hall_fx]]", "[[hall_header]]", "[[header_popup]]", "[[hall_toast]]", "[[crawl_roll]]", "[[crawl_sections]]", "[[tap_panel]]", "[[drag_scroll]]", "[[hall_font_scale]]", "[[hall_settings]]", "[[sound_effects]]", "[[overlay_quest_travel]]", "[[hall_main]]", "[[overlay_accessibility]]", "[[overlay_report]]", "[[report_entry]]", "[[odds_bar]]"]
 scenes: ["[[hall_header (scene)]]", "[[hall_toast (scene)]]", "[[crawl_sections (scene)]]", "[[overlay_accessibility (scene)]]", "[[overlay_report (scene)]]", "[[odds_bar (scene)]]"]
-last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
+last_verified: 42bbb8f33545f8af5fb02766713031b11eecd919
 tags: [system]
 ---
 
@@ -18,6 +18,7 @@ Everything that tells the player "that did something": numbers that roll, coins 
 - Accessibility sheet: `pressed` on its three buttons calls [[hall_main#cycle_text_size]], [[hall_main#cycle_color_filter]] and [[hall_main#toggle_reduce_motion]] ([[overlay_accessibility#setup]]).
 - Start-up: [[hall_main#_enter_tree]] calls [[hall_font_scale#init]]; [[hall_main#_load_settings]] sets `HallFx.reduce_motion`.
 - Crawl overlays ([[overlay_credits]], [[overlay_boss_crawl]], [[overlay_intro]]): `refresh` calls [[crawl_roll#start]].
+- Travel screen: [[overlay_quest_travel#refresh]] starts a trip (the `quest_travel` ambience via [[sound_effects#play]], a bobbing walker, cycling title dots, a button that fades in after 2 to 4 s); its button calls [[overlay_quest_travel#_end_trip]], which calls [[sound_effects#stop]]. Reduced Motion keeps the wait but drops the bob, the dot cycle and the fade.
 - Every refresh ends with [[drag_scroll#fix_tree]] ([[hall_main#refresh]]).
 
 ## Flow
@@ -94,7 +95,7 @@ sequenceDiagram
 | 7 | In step 6 | [[hall_fx#count]], [[hall_fx#pop]], [[hall_fx#flash_text]], [[hall_fx#float_text]] | label, old and new value from `_shown_counters` and [[hall_header#_counter_value]] | nothing | Number rolls over `COUNTER_ROLL_SECONDS`; green or red flash; floating "+40" or "-2" on `fx_layer` |
 | 8 | Player taps End Day | [[hall_main#end_day]] | nothing | nothing; calls steps 9 and 10 | Plays `night_fall` |
 | 9 | In step 8 | [[hall_header#hold_counters]] | nothing | nothing | `_held_counters` set for gold and standing |
-| 10 | In step 8, after the quests are played | [[hall_fx#curtain]] | `fx_layer`, `DUSK_INK`, the `show_report` callable, peak alpha 0.92, `DUSK_IN_SECONDS`, `DUSK_OUT_SECONDS` | nothing; runs the callback at the peak | Dusk wash over the End Day sheet and report ([[Day Cycle]]) |
+| 10 | In step 8, after the quests are played and the travel screen's button is pressed ([[hall_main#_go_on_quest]], [[hall_main#close_quest_travel]]) | [[hall_fx#curtain]] | `fx_layer`, `DUSK_INK`, the `show_report` callable, peak alpha 0.92, `DUSK_IN_SECONDS`, `DUSK_OUT_SECONDS` | nothing; runs the callback at the peak | Dusk wash over the travel screen and report ([[Day Cycle]]); the travel screen's sound stops when its button is pressed ([[sound_effects#stop]]) |
 | 11 | Dawn, in [[hall_main#start_new_day]] | [[hall_header#land_earnings]] | nothing | nothing | Flying coins or shields; the last landing calls step 12 |
 | 12 | Last coin lands | [[hall_header#_release_counter]] | `kind` bound in step 11 | nothing; calls step 6 | Clears the held flag, then the counter rolls to the real value |
 | 13 | End of step 4 | [[drag_scroll#fix_tree]] | `self` (the hall) | nothing | Stop-filter controls inside scroll lists set to Pass, buttons cancel a press once the finger moves past `TapPanel.TAP_MOVE_LIMIT` |

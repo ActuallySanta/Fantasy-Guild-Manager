@@ -1,18 +1,19 @@
 ---
-systems_scripts: ["[[hall_main]]", "[[guild_upgrades]]", "[[game_state]]", "[[hall_rules]]", "[[item_shop]]", "[[character_container]]", "[[hall_header]]", "[[overlay_end_day]]", "[[overlay_report]]", "[[hall_save]]"]
-scenes: ["[[overlay_end_day (scene)]]", "[[overlay_report (scene)]]", "[[overlay_boss_crawl (scene)]]", "[[tab_board (scene)]]"]
-last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
+systems_scripts: ["[[hall_main]]", "[[guild_upgrades]]", "[[game_state]]", "[[hall_rules]]", "[[item_shop]]", "[[character_container]]", "[[hall_header]]", "[[overlay_end_day]]", "[[overlay_report]]", "[[overlay_quest_travel]]", "[[hall_save]]"]
+scenes: ["[[overlay_end_day (scene)]]", "[[overlay_report (scene)]]", "[[overlay_boss_crawl (scene)]]", "[[overlay_quest_travel (scene)]]", "[[tab_board (scene)]]"]
+last_verified: 42bbb8f33545f8af5fb02766713031b11eecd919
 tags: [system]
 ---
 
 # Day Cycle
 
 ## Purpose
-One day, start to finish. The player drafts parties, taps End Day, and the night plays out: training and healing, every sent quest, the Day Report. Tapping the report's button starts the next day: the day counter goes up, the For Hire pool and shop restock, and new quests are built.
+One day, start to finish. The player drafts parties, taps End Day, and the night plays out: training and healing, every sent quest, then a short "Going on a quest" screen ([[overlay_quest_travel]]) and the Day Report. Tapping the report's button starts the next day: the day counter goes up, the For Hire pool and shop restock, and new quests are built.
 
 ## Entry points
 - **End Day** on the Board: `pressed` on `_end_day_button` ([[tab_board#setup]]) calls [[hall_main#open_end_check]], which opens the check ([[overlay_end_day]]).
 - **End the day** in the check: `pressed` on `_end_button` ([[overlay_end_day#setup]]) calls [[hall_main#end_day]].
+- **View quest report** on the travel screen: `pressed` on `%ContinueButton` ([[overlay_quest_travel#_on_continue_pressed]]) calls [[hall_main#close_quest_travel]], which runs the dusk curtain.
 - **New Day** in the report: `pressed` on `_action_button` ([[overlay_report#setup]]) calls [[hall_main#close_report]].
 - Signal `GameState.day_started`: [[item_shop#_on_day_started]] and [[hall_main#_on_day_started]].
 - Debug shortcut: [[hall_debug#skip_day]] runs the night and the new day without quests.
@@ -35,7 +36,10 @@ sequenceDiagram
   end
   HM->>HM: "report = {starts_next_day, day, results, home, released}"
   HM->>HM: "save_now()"
-  HM->>HM: "dusk curtain, then shown_report = report (or boss crawl first)"
+  HM->>HM: "_go_on_quest(then): is_quest_travel_open = true"
+  Note over HM: "travel screen waits 2-4 s, then its button"
+  HM->>HM: "close_quest_travel() runs the dusk curtain"
+  HM->>HM: "curtain peak: shown_report = report (or boss crawl first)"
 ```
 
 ### 2. The dawn
@@ -65,7 +69,8 @@ sequenceDiagram
 | 3 | In step 1, per sent quest | [[hall_main#_run_quest]] | `entry` from [[hall_main#sent_entries]] | result `Dictionary` → step 5 (`results`) | Run tallies updated (`quests_sent`, `gold_earned`, `quests_won`, `failed_by_day`) |
 | 4 | In step 3 | [[hall_rules#play_quest]] | `entry`, `GameState.day` | result `Dictionary` → step 3 | Pays gold and standing, Pluck or training, injuries, found items |
 | 5 | After the quests | report built in [[hall_main#end_day]] | `home` (step 2), `results` (step 3), `released_today` | report `Dictionary` → step 6 | `night_save` set, [[hall_main#save_now]] |
-| 6 | Dusk curtain peak | the `show_report` callback in [[hall_main#end_day]] | `report` from step 5 | `shown_report` (read by [[overlay_report]]), or `_pending_report` plus `shown_boss_crawl` after a non-final boss → step 7 | Clears `is_night_falling` and open sheets; plays `victory` or `defeat` on a boss night; emits `tutorial_event("end_day", results)` |
+| 5b | After step 5 | [[hall_main#_go_on_quest]] (`then` = the dusk curtain call), then [[overlay_quest_travel]] shows; its button calls [[hall_main#close_quest_travel]] | the curtain callable from [[hall_main#end_day]] | stores `_after_quest_travel`; the button runs it → step 6 | `is_quest_travel_open = true`, `queue_refresh()`. Never saved (the night was saved in step 5, so a reload here opens on the report). Skipped when `skip_quest_travel` is set (rules playtests) |
+| 6 | Dusk curtain peak | the `show_report` callback in [[hall_main#end_day]] | `report` from step 5, run by step 5b | `shown_report` (read by [[overlay_report]]), or `_pending_report` plus `shown_boss_crawl` after a non-final boss → step 7 | Clears `is_night_falling`, `is_quest_travel_open` and open sheets; plays `victory` or `defeat` on a boss night; emits `tutorial_event("end_day", results)` |
 | 6b | Final battle (day 50) | [[hall_main#_show_final_credits]] | `final_results[0]`, `report` from step 5 | `shown_credits` (see [[Run End]]) | Replaces the Day Report |
 | 7 | Boss night only | [[hall_main#close_boss_crawl]] | `_pending_report` from step 6 | `shown_report` → step 8 | Plays `page_close` |
 | 8 | Player taps New Day | [[hall_main#close_report]] | `shown_report.starts_next_day` (true for a night report) from step 6 or 7 | nothing; calls step 9 | Dusk curtain |
@@ -81,7 +86,8 @@ Listeners of `day_started` (Grep `day_started.connect`): `item_shop.gd:37` and `
 ## Branches
 ```mermaid
 flowchart TD
-  A{"results contain final?"} -- yes --> B["_show_final_credits (credits roll, no Day Report)"]
+  Q["travel screen (all nights)"] --> A{"results contain final?"}
+  A -- yes --> B["_show_final_credits (credits roll, no Day Report)"]
   A -- no --> C{"results contain a milestone boss?"}
   C -- yes --> D["boss crawl first, Continue opens the report"]
   C -- no --> E["Day Report opens under the dusk curtain"]
@@ -96,12 +102,14 @@ flowchart TD
 | Constant | Where | Effect |
 |---|---|---|
 | `DUSK_IN_SECONDS`, `DUSK_OUT_SECONDS`, `DUSK_INK` | [[hall_main]] | The dusk wash over the night |
+| `TRAVEL_MIN_SECONDS`, `TRAVEL_MAX_SECONDS` | [[overlay_quest_travel]] | Random length (2 to 4 s) of the travel screen before its button shows |
 | `MILESTONE_DAY`, `FINAL_DAY` | [[hall_main]] | Which dawns get the story toast |
 | `MINIMUM_STANDING` | [[guild_upgrades]] | Recruits only come above it ([[Hiring Characters]]) |
 
 ## Gotchas
 - The night's training and healing run **before** the quests are played, so nobody heals the night they are hurt.
 - The save is written right after the dice are rolled (`night_save` holds the report as already showing), so quitting mid-dusk can't replay the night.
+- The travel screen holds the night's curtain until its button is pressed; the dice are already rolled and saved, and the counters still hold. Its Reduced Motion form keeps the wait. The tutorial stands aside while it is up ([[overlay_tutorial#_process]]).
 - The gold and standing counters stay still ([[hall_header#hold_counters]]) until dawn, when [[hall_header#land_earnings]] runs.
 - A skipped day ([[hall_debug#skip_day]]) has no report, so `start_new_day` keeps last night's `previous_report`.
 - `GameState.start_new_day` refreshes the hire pool and temp stats **before** it emits `day_started`, so listeners see both already updated.
