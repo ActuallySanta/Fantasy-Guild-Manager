@@ -1,7 +1,7 @@
 ---
 systems_scripts: ["[[agent_bridge]]", "[[agent_bridge_actions]]", "[[agent_bridge_eyes]]", "[[agent_bridge_state]]", "[[playtest_scenario]]", "[[run_logger]]", "[[hall_main]]"]
 scenes: ["[[agent_bridge (scene)]]", "[[scenario_final_battle (scene)]]", "[[scenario_game_over (scene)]]", "[[scenario_low_standing (scene)]]", "[[scenario_milestone_day (scene)]]"]
-last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
+last_verified: 42bbb8f33545f8af5fb02766713031b11eecd919
 tags: [system]
 ---
 
@@ -43,7 +43,7 @@ sequenceDiagram
 | 5 | In step 4 | [[agent_bridge#_dispatch]] | `command`, `args` from step 4 | `Dictionary` response → step 4 | Refuses the action commands once the run is over; in eyes mode only the allowed commands pass |
 | 6 | In step 5, rules mode | [[agent_bridge_actions#plan]] | `args` (hire, release, buy, equip, train, upgrade, assign, deny lists of ids from step 7) | `Dictionary` result → step 5 | Every change goes through `HallMain`'s public actions |
 | 7 | In step 6 and step 5 (`state`) | [[agent_bridge_state#build]] | the hall | `Dictionary` state (ids are `get_instance_id()` strings) → steps 5, 6 and 9 | none; reads queries and autoloads |
-| 8 | In step 5, rules mode | [[agent_bridge_actions#end_day]] | the hall | `{ok, report, state, run_over, run_over_reason}` → step 5 | Calls [[hall_main#end_day]], waits for the night to settle, [[hall_main#close_boss_crawl]] after a boss night, [[hall_main#start_new_day]] unless credits are showing |
+| 8 | In step 5, rules mode | [[agent_bridge_actions#end_day]] | the hall | `{ok, report, state, run_over, run_over_reason}` → step 5 | Sets `hall.skip_quest_travel` (so the "Going on a quest" screen, which needs a button press, never shows in rules runs), calls [[hall_main#end_day]], waits for the night to settle, [[hall_main#close_boss_crawl]] after a boss night, [[hall_main#start_new_day]] unless credits are showing |
 | 9 | In step 5, eyes mode | [[agent_bridge_eyes#screenshot]], [[agent_bridge_eyes#tap]], [[agent_bridge_eyes#swipe]], [[agent_bridge_eyes#wait]] | pixel coordinates or seconds from `args` | screenshot info → step 5 (via [[agent_bridge#_take_screenshot]]) | Synthesized input events on the real UI |
 | 10 | End of step 4 | [[agent_bridge#_write_json]] | the response with `id` and `resp_id` | nothing | Written to a temp file, then renamed to `resp.json` |
 | 11 | `quit` command | [[agent_bridge#_flush_logger]] | `options` | nothing | Waits (up to `QUIT_FLUSH_SECONDS`) for [[run_logger]] rows to post |
@@ -69,6 +69,7 @@ flowchart TD
 - Scenario scenes: final battle (day 50, 2000 gold, standing 60), game over (day 6, 50 gold, standing 3, no living hero, two fallen), low standing (day 8, standing -10), milestone day (day 10). They start the hall close to [[Run End]] and [[Quest Generation and Difficulty]] cases.
 - Day, gold and standing are set in `_enter_tree` but the roster in `_ready`: `GuildCharacter.new()` needs the autoloads ready ([[Boot and Autoload Order]]). The hall's own `_check_run_over` is deferred so a scenario that starts already stuck still shows Game Over.
 - The bridge and scenarios are excluded from exports. The hall under them has `uses_save_file = false`.
+- Rules mode sets `HallMain.skip_quest_travel` in [[agent_bridge_actions#end_day]] (`agent_bridge_actions.gd:244`); in eyes mode the travel screen is real and its "View quest report" button must be tapped ([[overlay_quest_travel]]).
 - Rules mode forces Reduced Motion on ([[UI Motion and Feedback]]) so a night settles quickly.
 - Ids in commands are `get_instance_id()` as strings (ids can exceed 2^53, which JSON can't hold).
 - The run logger ([[run_logger]]) records a row per day for balancing; the bridge points it at its own CSV and "AI Raw" sheet tab.

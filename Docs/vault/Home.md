@@ -46,6 +46,7 @@ flowchart TD
   overlay_game_over["overlay_game_over (scene)"]
   overlay_intro["overlay_intro (scene)"]
   overlay_menu["overlay_menu (scene)"]
+  overlay_quest_travel["overlay_quest_travel (scene)"]
   overlay_report["overlay_report (scene)"]
   overlay_welcome["overlay_welcome (scene)"]
   screen_assign["screen_assign (scene)"]
@@ -66,6 +67,7 @@ flowchart TD
   hall_main --> overlay_game_over
   hall_main --> overlay_intro
   hall_main --> overlay_menu
+  hall_main --> overlay_quest_travel
   hall_main --> overlay_report
   hall_main --> overlay_welcome
   hall_main --> screen_assign
@@ -216,6 +218,7 @@ flowchart TD
   overlay_boss_crawl["overlay_boss_crawl (scene)"]
   overlay_end_day["overlay_end_day (scene)"]
   overlay_intro["overlay_intro (scene)"]
+  overlay_quest_travel["overlay_quest_travel (scene)"]
   overlay_report["overlay_report (scene)"]
   overlay_welcome["overlay_welcome (scene)"]
   plan_row["plan_row (scene)"]
@@ -224,6 +227,7 @@ flowchart TD
   hall_main --> overlay_end_day
   hall_main --> overlay_report
   hall_main --> overlay_boss_crawl
+  hall_main --> overlay_quest_travel
   hall_main --> overlay_intro
   hall_main --> overlay_welcome
   overlay_end_day -.-> plan_row
@@ -299,7 +303,7 @@ flowchart TD
 - **Scripts/Playtest**: [[agent_bridge]], [[agent_bridge_actions]], [[agent_bridge_eyes]], [[agent_bridge_state]], [[playtest_scenario]]
 - **Scripts/Quest Creator**: [[quest_Manager]], [[quest_injuries]], [[quest_resource]], [[quest_scoring]], [[region_resource]]
 - **Scripts/UI/Components**: [[chip]], [[crawl_roll]], [[crawl_sections]], [[drag_scroll]], [[odds_bar]], [[pixel_icon]], [[portrait]], [[stat_strip]], [[stat_tile]], [[tap_panel]]
-- **Scripts/UI/Overlays/Day**: [[overlay_boss_crawl]], [[overlay_end_day]], [[overlay_intro]], [[overlay_move_confirm]], [[overlay_report]], [[overlay_tutorial]], [[overlay_welcome]]
+- **Scripts/UI/Overlays/Day**: [[overlay_boss_crawl]], [[overlay_end_day]], [[overlay_intro]], [[overlay_move_confirm]], [[overlay_quest_travel]], [[overlay_report]], [[overlay_tutorial]], [[overlay_welcome]]
 - **Scripts/UI/Overlays/Items**: [[overlay_equip_picker]], [[overlay_gear_confirm]]
 - **Scripts/UI/Overlays/Menu**: [[overlay_accessibility]], [[overlay_backup]], [[overlay_debug]], [[overlay_menu]], [[overlay_update_confirm]]
 - **Scripts/UI/Overlays/Run End**: [[overlay_credits]], [[overlay_game_over]]
@@ -317,7 +321,7 @@ flowchart TD
 ## Scenes by folder
 - **Scenes**: [[hall_main (scene)]]
 - **Scenes/Components**: [[chip (scene)]], [[crawl_sections (scene)]], [[divider (scene)]], [[odds_bar (scene)]], [[portrait (scene)]], [[rolled_tag (scene)]], [[seal_button (scene)]], [[stat_strip (scene)]], [[stat_tile (scene)]]
-- **Scenes/Overlays/Day**: [[overlay_boss_crawl (scene)]], [[overlay_end_day (scene)]], [[overlay_intro (scene)]], [[overlay_move_confirm (scene)]], [[overlay_report (scene)]], [[overlay_welcome (scene)]]
+- **Scenes/Overlays/Day**: [[overlay_boss_crawl (scene)]], [[overlay_end_day (scene)]], [[overlay_intro (scene)]], [[overlay_move_confirm (scene)]], [[overlay_quest_travel (scene)]], [[overlay_report (scene)]], [[overlay_welcome (scene)]]
 - **Scenes/Overlays/Items**: [[overlay_equip_picker (scene)]], [[overlay_gear_confirm (scene)]]
 - **Scenes/Overlays/Menu**: [[overlay_accessibility (scene)]], [[overlay_backup (scene)]], [[overlay_debug (scene)]], [[overlay_menu (scene)]], [[overlay_update_confirm (scene)]]
 - **Scenes/Overlays/Run End**: [[overlay_credits (scene)]], [[overlay_game_over (scene)]]

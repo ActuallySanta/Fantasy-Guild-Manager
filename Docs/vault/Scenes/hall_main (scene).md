@@ -4,7 +4,7 @@ uid: uid://dtw7iu2s1gibm
 root_type: Control
 script: "[[hall_main]]"
 systems: []
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+last_verified: 42bbb8f33545f8af5fb02766713031b11eecd919
 tags: [scene]
 ---
 
@@ -39,7 +39,8 @@ The game's main scene (root node `MobileHall`, a `Control`). It is the whole Mob
   - `OverlayGameOver`: [[overlay_game_over (scene)]] (180)
   - `OverlayCredits`: [[overlay_credits (scene)]] (189)
   - `OverlayBossCrawl`: [[overlay_boss_crawl (scene)]] (195)
-  - `OverlayIntro`: [[overlay_intro (scene)]] (201)
+  - `OverlayQuestTravel`: [[overlay_quest_travel (scene)]] (202)
+  - `OverlayIntro`: [[overlay_intro (scene)]] (208)
 - **Instanced at runtime:** none by the index. The script adds two nodes in code in [[hall_main#_ready]]: `FxLayer` (a plain `Control`) and `OverlayTutorial` (Pip, built with `OverlayTutorial.new()`, no scene), plus a `RunLogger` node.
 
 ```mermaid
@@ -50,7 +51,7 @@ flowchart TD
   T --> N["hall_nav (scene)"]
   T --> TB["tab_board / tab_guild / tab_upgrades / tab_items"]
   T --> SC["screen_assign / screen_character"]
-  T --> O["11 overlay scenes"]
+  T --> O["12 overlay scenes"]
   T --> TO["hall_toast (scene)"]
 ```
 
@@ -65,7 +66,7 @@ flowchart TD
       - `%ScreenAssign`, `%ScreenCharacter`: the screens over the tabs, kept in `_screens`
     - `%Nav` (`Layout/Nav`): [[hall_nav (scene)]], stored as `_nav`
   - `%Toast`: the fading message, stored as `_toast`
-  - `%OverlayEndDay`, `%OverlayMenu`, `%OverlayAccessibility`, `%OverlayBackup`, `%OverlayDebug`, `%OverlayReport`, `%OverlayWelcome`, `%OverlayGameOver`, `%OverlayCredits`, `%OverlayBossCrawl`, `%OverlayIntro`: overlays, shown or hidden by [[hall_main#_refresh_overlays]]
+  - `%OverlayEndDay`, `%OverlayMenu`, `%OverlayAccessibility`, `%OverlayBackup`, `%OverlayDebug`, `%OverlayReport`, `%OverlayWelcome`, `%OverlayGameOver`, `%OverlayCredits`, `%OverlayBossCrawl`, `%OverlayQuestTravel` ([[overlay_quest_travel (scene)]], the "Going on a quest" screen after End Day), `%OverlayIntro`: overlays, shown or hidden by [[hall_main#_refresh_overlays]]
   - `ColorFilterLayer` (CanvasLayer): above everything
     - `%ColorFilter` (ColorRect): uses `colorblind_filter.gdshader`, set by [[hall_main#_apply_color_filter]]
   - Added at runtime: `FxLayer` (z 15), `OverlayTutorial`, `RunLogger`

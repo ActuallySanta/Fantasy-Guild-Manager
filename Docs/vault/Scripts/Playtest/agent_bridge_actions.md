@@ -4,7 +4,7 @@ class_name: AgentBridgeActions
 extends: RefCounted
 scene: ""
 systems: ["[[Playtest Bridge]]"]
-last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
+last_verified: 42bbb8f33545f8af5fb02766713031b11eecd919
 tags: [script]
 ---
 
@@ -143,7 +143,7 @@ Denies a quest by Board index. **Returns:** "" or "locked" / "no such quest" / "
 ### end_day
 `static func end_day(hall: HallMain, tree: SceneTree) -> Dictionary` · `Scripts/Playtest/agent_bridge_actions.gd:233`
 
-Coroutine. Plays the night out and, unless the run ended, starts the next day. Refuses with `{ok: false, error, undecided}` when quests are still open, and with an error when the night is already falling. Waits (frame by frame, up to `MAX_SETTLE_SECONDS`) until the report, credits or boss crawl shows; a boss crawl is closed with `close_boss_crawl`. The report comes from `shown_report`, or `previous_report` for credits.
+Coroutine. Plays the night out and, unless the run ended, starts the next day. Refuses with `{ok: false, error, undecided}` when quests are still open, and with an error when the night is already falling. Sets `hall.skip_quest_travel = true` (`agent_bridge_actions.gd:244`) after `use_rules_motion`, so rules runs skip the "Going on a quest" screen (there is no button to press). Waits (frame by frame, up to `MAX_SETTLE_SECONDS`) until the report, credits or boss crawl shows; a boss crawl is closed with `close_boss_crawl`. The report comes from `shown_report`, or `previous_report` for credits.
 
 | Name | Type | Meaning | Where callers get it |
 |---|---|---|---|
@@ -152,43 +152,43 @@ Coroutine. Plays the night out and, unless the run ended, starts the next day. R
 
 **Returns:** `{ok, report: {results, home}, run_over, run_over_reason, state?}` (`state` only if the next day began), or `{ok: false, error}` ("night did not settle in 20 seconds" on timeout). Sent to the client by [[agent_bridge#_dispatch]] (`agent_bridge.gd:207`).
 
-**Side effects:** runs the whole night, starts the next day (emits `day_started`).
+**Side effects:** sets `hall.skip_quest_travel` (stays true for the rest of the run); runs the whole night, starts the next day (emits `day_started`).
 
 **Called by:** [[agent_bridge#_dispatch]] (`agent_bridge.gd:207`), command `end_day`.
 
-**Calls:** [[hall_main#undecided_count]], [[agent_bridge_actions#use_rules_motion]], [[hall_main#end_day]], [[agent_bridge_actions#_is_settled]], [[hall_main#close_boss_crawl]], [[agent_bridge_actions#_report]], [[hall_main#start_new_day]], [[agent_bridge_state#build]], [[agent_bridge_actions#is_run_over]], [[agent_bridge_actions#run_over_reason]].
+**Calls:** [[hall_main#undecided_count]], [[agent_bridge_actions#use_rules_motion]], [[hall_main#skip_quest_travel]], [[hall_main#end_day]], [[agent_bridge_actions#_is_settled]], [[hall_main#close_boss_crawl]], [[agent_bridge_actions#_report]], [[hall_main#start_new_day]], [[agent_bridge_state#build]], [[agent_bridge_actions#is_run_over]], [[agent_bridge_actions#run_over_reason]].
 
 ### _is_settled
-`static func _is_settled(hall: HallMain) -> bool` · `Scripts/Playtest/agent_bridge_actions.gd:264`
+`static func _is_settled(hall: HallMain) -> bool` · `Scripts/Playtest/agent_bridge_actions.gd:266`
 
 True once the night has played out (not `is_night_falling`, and the report, credits or boss crawl is showing). Called by [[agent_bridge_actions#end_day]] (`:245`).
 
 ### _report
-`static func _report(raw: Dictionary) -> Dictionary` · `Scripts/Playtest/agent_bridge_actions.gd:272`
+`static func _report(raw: Dictionary) -> Dictionary` · `Scripts/Playtest/agent_bridge_actions.gd:274`
 
 Makes the Day Report JSON-ready: per result `{quest, succeeded, gold, injuries, deaths, story_text}` (BBCode stripped) plus `home`. `raw` is the hall's report dictionary (`shown_report` or `previous_report`). Called by [[agent_bridge_actions#end_day]] (`:254`).
 
 **Calls:** [[agent_bridge_actions#strip_bbcode]], [[agent_bridge_actions#_home]]; `_named_hero` is passed as a `map` callable.
 
 ### _named_hero
-`static func _named_hero(hero: GuildCharacter) -> Dictionary` · `Scripts/Playtest/agent_bridge_actions.gd:287`
+`static func _named_hero(hero: GuildCharacter) -> Dictionary` · `Scripts/Playtest/agent_bridge_actions.gd:289`
 
 `{id, name, injury}` for a hero in a result. Used as a Callable in [[agent_bridge_actions#_report]] (`:279`, `:280`).
 
 **Calls:** [[agent_bridge_state#id_of]].
 
 ### _home
-`static func _home(raw: Dictionary) -> Dictionary` · `Scripts/Playtest/agent_bridge_actions.gd:296`
+`static func _home(raw: Dictionary) -> Dictionary` · `Scripts/Playtest/agent_bridge_actions.gd:298`
 
 Converts `GuildUpgrades.run_night`'s `{trained, healed, hospital_bill, sent_home_unpaid}` so heroes and stats appear as names. Called by [[agent_bridge_actions#_report]] (`:283`).
 
 ### strip_bbcode
-`static func strip_bbcode(text: String) -> String` · `Scripts/Playtest/agent_bridge_actions.gd:320`
+`static func strip_bbcode(text: String) -> String` · `Scripts/Playtest/agent_bridge_actions.gd:322`
 
 Removes BBCode tags matching `BBCODE_TAG_PATTERN`. `text`: the quest story BBCode. **Returns:** plain text. Called by [[agent_bridge_actions#_report]] (`:281`).
 
 ### debug
-`static func debug(hall: HallMain, call_args: Dictionary) -> Dictionary` · `Scripts/Playtest/agent_bridge_actions.gd:331`
+`static func debug(hall: HallMain, call_args: Dictionary) -> Dictionary` · `Scripts/Playtest/agent_bridge_actions.gd:333`
 
 Test hook. Calls one of the hall's `debug_*` methods by name with `args`. **Returns:** `{ok, state}` or `{ok: false, error: "not a debug_ action: X"}`. Called by [[agent_bridge#_dispatch]] (`agent_bridge.gd:221`) only with `--test-hooks`.
 
@@ -199,7 +199,7 @@ Test hook. Calls one of the hall's `debug_*` methods by name with `args`. **Retu
 **Calls:** [[agent_bridge_state#build]].
 
 ### kill_all
-`static func kill_all(hall: HallMain) -> Dictionary` · `Scripts/Playtest/agent_bridge_actions.gd:342`
+`static func kill_all(hall: HallMain) -> Dictionary` · `Scripts/Playtest/agent_bridge_actions.gd:344`
 
 Test hook. Sets every roster hero's `injury_level` to DEAD. **Returns:** `{ok, killed}`. Called by [[agent_bridge#_dispatch]] (`agent_bridge.gd:220`) only with `--test-hooks`.
 
