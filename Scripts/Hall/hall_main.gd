@@ -1912,7 +1912,8 @@ func _refresh_overlays() -> void:
 	_game_over_overlay.visible = is_game_over
 	# the travel screen (after End Day) hides the sheets and Menu like the report does
 	_quest_travel_overlay.visible = is_quest_travel_open and not is_credits_open
-	var is_report_open := not shown_report.is_empty() or is_game_over or is_credits_open or is_crawl_open 			or is_quest_travel_open
+	var is_report_open := not shown_report.is_empty() or is_game_over or is_credits_open or is_crawl_open \
+			or is_quest_travel_open
 	_report_overlay.visible = not shown_report.is_empty() and not is_game_over and not is_credits_open and not is_crawl_open
 	_end_check_overlay.visible = not is_report_open and is_end_check_open
 	_menu_overlay.visible = not is_report_open and is_menu_open

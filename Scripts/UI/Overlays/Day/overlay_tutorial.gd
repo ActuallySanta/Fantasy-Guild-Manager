@@ -403,6 +403,14 @@ func _on_event(event: String, data: Variant = null) -> void:
 func _process(delta: float) -> void:
 	if not is_running():
 		return
+	# the "Going on a quest" screen after End Day: Pip stands aside (no dim,
+	# no locks) so its button can be pressed, and picks up on the report
+	var is_travel_up: bool = hall.get(&"is_quest_travel_open") == true
+	if visible == is_travel_up:
+		visible = not is_travel_up
+	if is_travel_up:
+		_release_locks()
+		return
 	_time += delta
 	var step: Dictionary = _steps[_index]
 
