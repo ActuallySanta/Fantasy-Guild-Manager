@@ -240,6 +240,8 @@ static func end_day(hall: HallMain, tree: SceneTree) -> Dictionary:
 	if hall.is_night_falling:
 		return {"ok": false, "error": "the night is already falling"}
 	use_rules_motion(hall)
+	# rules runs skip the "Going on a quest" wait (no button to press here)
+	hall.skip_quest_travel = true
 	hall.end_day()
 	var deadline := Time.get_ticks_msec() + MAX_SETTLE_SECONDS * 1000
 	while not _is_settled(hall):

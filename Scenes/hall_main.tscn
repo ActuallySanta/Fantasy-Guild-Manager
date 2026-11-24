@@ -22,6 +22,7 @@
 [ext_resource type="PackedScene" uid="uid://0a18grxohlrg" path="res://Scenes/Overlays/Run End/overlay_credits.tscn" id="40_credits"]
 [ext_resource type="PackedScene" uid="uid://dintr0scene7k" path="res://Scenes/Overlays/Day/overlay_intro.tscn" id="41_intro"]
 [ext_resource type="PackedScene" uid="uid://b5bossc0rawl3" path="res://Scenes/Overlays/Day/overlay_boss_crawl.tscn" id="42_bosscrawl"]
+[ext_resource type="PackedScene" uid="uid://b7qtr4velscn1" path="res://Scenes/Overlays/Day/overlay_quest_travel.tscn" id="43_questtravel"]
 [ext_resource type="PackedScene" uid="uid://ctiyuxdww3u5j" path="res://Scenes/Shell/Header/hall_header.tscn" id="50_header"]
 [ext_resource type="PackedScene" uid="uid://ca70e6ixyakqm" path="res://Scenes/Shell/hall_nav.tscn" id="50_nav"]
 [ext_resource type="PackedScene" uid="uid://7rh1kia6seff" path="res://Scenes/Shell/hall_toast.tscn" id="50_toast"]
@@ -193,6 +194,12 @@ z_index = 10
 layout_mode = 1
 
 [node name="OverlayBossCrawl" parent="." unique_id=1730466130 instance=ExtResource("42_bosscrawl")]
+unique_name_in_owner = true
+visible = false
+z_index = 10
+layout_mode = 1
+
+[node name="OverlayQuestTravel" parent="." unique_id=1730466131 instance=ExtResource("43_questtravel")]
 unique_name_in_owner = true
 visible = false
 z_index = 10

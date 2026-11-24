@@ -37,6 +37,7 @@ func _make_hall(day: int) -> Node:
 	GuildUpgrades.sync_characters()
 	var hall: Node = load("uid://dtw7iu2s1gibm").instantiate()  # Scenes/hall_main.tscn
 	add_child(hall)
+	hall.skip_quest_travel = true  # no "Going on a quest" wait (quest_travel_test covers it)
 	hall.is_welcome_open = false
 	if hall.tutorial and hall.tutorial.is_running():
 		hall.tutorial.skip_tutorial()
