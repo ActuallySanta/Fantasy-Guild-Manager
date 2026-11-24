@@ -4,19 +4,19 @@ class_name: TapPanel
 extends: PanelContainer
 scene: ""
 systems: ["[[UI Motion and Feedback]]", "[[UI Architecture and Refresh]]"]
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+last_verified: 2fae2e0b444f59e9c76be8bda1b39c0f01fc4ea2
 tags: [script]
 ---
 
 # tap_panel.gd
 
 ## Purpose
-A panel you can tap that still lets its ScrollContainer scroll when you drag across it. Rows that open something extend this script and connect to `pressed`. Subclasses: [[quest_row]], [[pick_row]], [[party_slot]], [[member_card]], [[today_item]], [[report_entry]]; the [[hire_peek (scene)]] uses it directly. No scene of its own. See also [[drag_scroll]] for plain controls in scroll lists.
+A panel you can tap that still lets its ScrollContainer scroll when you drag across it. Rows that open something extend this script and connect to `pressed`. Subclasses: [[quest_row]], [[pick_row]], [[party_slot]], [[member_card]], [[report_entry]]; the [[hire_peek (scene)]] uses it directly. No scene of its own. See also [[drag_scroll]] for plain controls in scroll lists.
 
 ## State
 | Name | Kind | Meaning (units) |
 |---|---|---|
-| `pressed` | signal | A tap: press and release without moving more than `TAP_MOVE_LIMIT`. Listeners: each subclass `setup`, e.g. `pressed.connect(hall.open_assign.bind(...))` in [[quest_row#setup]] (`quest_row.gd:65`); [[pick_row#setup]] (`pick_row.gd:56`, `58`); [[party_slot#setup]] (`party_slot.gd:43`, `60`); [[member_card#setup]] (`member_card.gd:53`); [[report_entry#setup]] (`report_entry.gd:195`); on the Board's today notes [[tab_board#setup]] (`tab_board.gd:45`, `46`, `47`); on `hire_peek` instances [[tab_guild#_show_for_hire]] (`tab_guild.gd:199`). |
+| `pressed` | signal | A tap: press and release without moving more than `TAP_MOVE_LIMIT`. Listeners: each subclass `setup`, e.g. `pressed.connect(hall.open_assign.bind(...))` in [[quest_row#setup]] (`quest_row.gd:65`); [[pick_row#setup]] (`pick_row.gd:56`, `58`); [[party_slot#setup]] (`party_slot.gd:43`, `60`); [[member_card#setup]] (`member_card.gd:53`); [[report_entry#setup]] (`report_entry.gd:195`); on `hire_peek` instances [[tab_guild#_show_for_hire]] (`tab_guild.gd:199`). |
 | `TAP_MOVE_LIMIT` | const | A press that moves further than this (24 px) is a scroll, not a tap. Also read by [[drag_scroll#_on_button_input]]. |
 | `_is_pressing` | var | True between a left press on this panel and its release. |
 | `_press_position` | var | Where that press started (global coordinates). |

@@ -4,7 +4,7 @@ class_name: ""
 extends: TapPanel
 scene: "[[member_card (scene)]]"
 systems: ["[[UI Architecture and Refresh]]"]
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+last_verified: 2fae2e0b444f59e9c76be8bda1b39c0f01fc4ea2
 tags: [script]
 ---
 

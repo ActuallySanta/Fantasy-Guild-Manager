@@ -40,10 +40,10 @@ border width, open the matching `Themes/Styles/*.tres` and change its *Texture M
 | `strip_tab.png` | Little scrolls in Assign Party's quest strip | 26 left / right | `quest_tab.tres` |
 | `stamp.png` | "Success" / "Failed" stamp (white, tinted in code) | 16 | `stamp.tres` |
 | `odds_track.png`, `odds_fill.png`, `odds_over.png` | Success-chance bar: track, hatched fill (white, tinted by odds), border + ticks on top | 6 | `Scenes/Components/odds_bar.tscn` |
-| `speech_bubble.png` | The shopkeeper's speech bubble (the tail sits in the bottom-left corner) | 96 left, 30 top / right, 40 bottom | `speech_bubble.tres` |
-| `shop_sign.png` | The shop's hanging name sign (the ropes sit in the top corners) | 56 left / right, 44 top, 14 bottom | `shop_sign.tres` |
+| `speech_bubble.png` | The shopkeeper's speech bubble (the tail sits in the bottom-left corner). Unused since the Shop tab dropped the keeper | 96 left, 30 top / right, 40 bottom | `speech_bubble.tres` |
+| `shop_sign.png` | The shop's hanging name sign (the ropes sit in the top corners). Unused since the Shop tab dropped the keeper | 56 left / right, 44 top, 14 bottom | `shop_sign.tres` |
 | `goods_tag.png`, `goods_tag_selected.png` | Shop goods as price tags (normal / picked) | 34 | `goods_tag*.tres` |
-| `awning.png` | Striped awning over the shopkeeper (tiles sideways) | none | set on `Awning` in `tab_shop.tscn` |
+| `awning.png` | Striped awning over the shopkeeper (tiles sideways). Unused since the Shop tab dropped the keeper | none | none |
 
 ### Ornaments (drawn as-is, any size): `UI Textures`
 
@@ -62,7 +62,7 @@ border width, open the matching `Themes/Styles/*.tres` and change its *Texture M
 | `dash.png` | Dashed underlines (tiles) |
 | `box_on.png`, `box_off.png` | "Show busy" checkbox |
 | `tag_hole.png` | The string hole at the top of each shop price tag |
-| `Shop/shopBackground.png`, `Shop/shopkeeper.png` | Grizzle on the Shop tab: the shop behind him (`Background` in `tab_shop.tscn`) and Grizzle on top (`ShopKeeper`) |
+| `Shop/shopBackground.png`, `Shop/shopkeeper.png` | Grizzle and the shop behind him. Unused since the Shop tab dropped the keeper |
 | `Pip.png` (in `Sprites/` itself) | Pip, the tutorial coach, in the round portrait frame on the coach's bubble. Same 2160 x 1620 canvas as the character icons; `PIP_ART_ANCHORS` in `overlay_tutorial.gd` sets how much of it the circle shows |
 
 ### Icons: `Hall Icons`

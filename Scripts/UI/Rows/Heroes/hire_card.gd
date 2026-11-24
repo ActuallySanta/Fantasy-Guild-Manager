@@ -11,11 +11,12 @@ extends PanelContainer
 const TEXT_HIRE := "Hire · %dg"
 const TEXT_HIRE_FREE := "Hire · free"
 const TEXT_NO_BEDS := "No beds left"
+## The applicant's title line, like GuildCharacter.title: "Juan the Priest".
+const TEXT_TITLE := "%s the %s"
 
 # ---- NODES
 @onready var _portrait = %Portrait            # portrait.gd
-@onready var _name: Label = %Name
-@onready var _role: Label = %Role
+@onready var _title: Label = %Name
 @onready var _stat_columns: HBoxContainer = %Stats
 @onready var _total: Label = %Total
 @onready var _drop_cap: Label = %DropCap
@@ -37,8 +38,7 @@ func setup(hall: HallMain, recruit: GuildCharacter, _letter_index: int = 0) -> v
 
 	# who they are
 	_portrait.show_character(recruit)
-	_name.text = recruit.name
-	_role.text = HallStyle.role_name(recruit)
+	_title.text = TEXT_TITLE % [recruit.name, HallStyle.role_name(recruit)]
 	for stat_index in HallStyle.STAT_COUNT:
 		var column := _stat_columns.get_child(stat_index)
 		column.get_node("Caps").text = HallStyle.STATS[stat_index].short

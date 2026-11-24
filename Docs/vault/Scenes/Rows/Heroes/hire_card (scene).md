@@ -4,14 +4,14 @@ uid: uid://cy6d8ep8exxlt
 root_type: PanelContainer
 script: "[[hire_card]]"
 systems: ["[[Hiring Characters]]", "[[UI Architecture and Refresh]]"]
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+last_verified: 2fae2e0b444f59e9c76be8bda1b39c0f01fc4ea2
 tags: [scene]
 ---
 
 # hire_card.tscn
 
 ## Purpose
-One For Hire applicant, drawn as a letter of introduction: portrait, name, role, five stat boxes with a total, a wax-sealed Hire button, and the full backstory with a drop cap. Belongs to [[Hiring Characters]].
+One For Hire applicant, drawn as a letter of introduction: portrait, one title line (name and role, "Juan the Priest"), five stat boxes with a total, a wax-sealed Hire button, and the full backstory with a drop cap. Belongs to [[Hiring Characters]].
 
 ## Parent scenes
 - **Placed in editor:** none.
@@ -31,7 +31,7 @@ flowchart TD
 ## Node tree
 - `HireCard` (PanelContainer), script [[hire_card]]
   - `Col` (VBoxContainer): layout
-    - `Top`: `%Portrait` ([[portrait]]) and `Fields` with `%Name`, `%Role` plus dash art
+    - `Top`: `%Portrait` ([[portrait]]) and `Fields` with `%Name` (the name-and-role title label)
     - `%Stats` (HBoxContainer): one `StatTemplate` column (`Caps` label, `Box/Value`), duplicated at runtime to 5
     - `TotalRow`: `TotalStack/Total` is `%Total` (Label) on the ink circle
     - `Buttons/%HireButton` ([[seal_button (scene)]]): `pressed` goes to [[hire_card#_on_hire_pressed]]

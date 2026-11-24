@@ -12,7 +12,7 @@ Gear: where it comes from, what it costs, and how a hero wears it. Every dawn th
 
 ## Entry points
 - Signal `GameState.day_started` (and boot): [[item_shop#_on_day_started]] and [[item_shop#_first_restock]] call [[item_shop#restock]] ([[Day Cycle]]).
-- **Buy** in the Shop tab: `_on_buy_pressed` ([[tab_shop#_on_buy_pressed]], `tab_shop.gd:140`) calls [[hall_main#buy_item]].
+- **Buy** in the Shop tab: `_on_buy_pressed` ([[tab_shop#_on_buy_pressed]], `tab_shop.gd:127`) calls [[hall_main#buy_item]].
 - **Equip on...** in the Pack: [[tab_pack#_on_action_pressed]] opens [[overlay_equip_picker#open]]. A hero with a free slot emits `equip_chosen` ([[tab_pack#_on_equip_chosen]], `tab_pack.gd:239`: [[hall_main#equip_item]]); a hero with full slots emits `swap_chosen` ([[tab_pack#_on_swap_chosen]]), which opens [[overlay_gear_confirm#open_swap]], and `swap_confirmed` ends in [[tab_pack#_on_swap_confirmed]] (`tab_pack.gd:255`: [[hall_main#swap_gear]]).
 - **Take off**: [[overlay_gear_confirm#open_take_off]], then [[tab_pack#_on_take_off_confirmed]] (`tab_pack.gd:250`: [[hall_main#unequip_item]]); also the worn-item row on the hero page (`screen_character.gd:269`).
 - Hero page gear picker: [[screen_character#_on_gear_picked]] (`screen_character.gd:315`) calls [[hall_main#equip_item]].

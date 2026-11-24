@@ -1,6 +1,6 @@
 ## A panel you can tap, that still lets its ScrollContainer scroll when you
 ## drag across it. Rows that open something extend this script and connect
-## to `pressed` (quest_row, pick_row, party_slot, member_card, today_item).
+## to `pressed` (quest_row, pick_row, party_slot, member_card).
 class_name TapPanel
 extends PanelContainer
 
