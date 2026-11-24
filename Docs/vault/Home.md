@@ -107,10 +107,8 @@ flowchart TD
   stat_strip["stat_strip (scene)"]
   tab_board["tab_board (scene)"]
   tab_guild["tab_guild (scene)"]
-  today_item["today_item (scene)"]
   hall_main --> tab_board
   hall_main --> tab_guild
-  tab_board --> today_item
   tab_board -.-> quest_row
   quest_row --> chip
   quest_row -.-> portrait
@@ -307,7 +305,7 @@ flowchart TD
 - **Scripts/UI/Rows/Day End**: [[beat_row]], [[plan_row]], [[report_entry]], [[roll_call_row]], [[suggest_row]]
 - **Scripts/UI/Rows/Heroes**: [[hire_card]], [[member_card]]
 - **Scripts/UI/Rows/Items**: [[equip_pick_row]], [[gear_row]], [[pack_tile]], [[shop_tile]]
-- **Scripts/UI/Rows/Quests**: [[party_slot]], [[pick_row]], [[quest_row]], [[quest_tab]], [[today_item]]
+- **Scripts/UI/Rows/Quests**: [[party_slot]], [[pick_row]], [[quest_row]], [[quest_tab]]
 - **Scripts/UI/Screens**: [[screen_assign]], [[screen_character]]
 - **Scripts/UI/Shell**: [[hall_nav]], [[hall_toast]]
 - **Scripts/UI/Shell/Header**: [[hall_header]], [[header_popup]], [[popup_gold]], [[popup_standing]]
@@ -326,7 +324,7 @@ flowchart TD
 - **Scenes/Rows/Day End**: [[beat_row (scene)]], [[plan_row (scene)]], [[report_entry (scene)]], [[roll_call_row (scene)]], [[suggest_row (scene)]]
 - **Scenes/Rows/Heroes**: [[hire_card (scene)]], [[hire_peek (scene)]], [[member_card (scene)]]
 - **Scenes/Rows/Items**: [[equip_pick_row (scene)]], [[gear_row (scene)]], [[pack_tile (scene)]], [[shop_tile (scene)]]
-- **Scenes/Rows/Quests**: [[party_slot (scene)]], [[pick_row (scene)]], [[quest_row (scene)]], [[quest_tab (scene)]], [[today_item (scene)]]
+- **Scenes/Rows/Quests**: [[party_slot (scene)]], [[pick_row (scene)]], [[quest_row (scene)]], [[quest_tab (scene)]]
 - **Scenes/Screens**: [[screen_assign (scene)]], [[screen_character (scene)]]
 - **Scenes/Shell**: [[hall_nav (scene)]], [[hall_toast (scene)]]
 - **Scenes/Shell/Header**: [[hall_header (scene)]], [[popup_gold (scene)]], [[popup_standing (scene)]]

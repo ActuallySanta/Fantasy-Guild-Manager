@@ -4,7 +4,7 @@ class_name: OverlayTutorial
 extends: Control
 scene: ""
 systems: ["[[UI Architecture and Refresh]]"]
-last_verified: 09fb5be52b944b5c58c0af1ab3e1c06c0e747443
+last_verified: 2fae2e0b444f59e9c76be8bda1b39c0f01fc4ea2
 tags: [script]
 ---
 

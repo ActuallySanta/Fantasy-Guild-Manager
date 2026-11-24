@@ -4,7 +4,7 @@ class_name: ""
 extends: PanelContainer
 scene: "[[hire_card (scene)]]"
 systems: ["[[Hiring Characters]]", "[[UI Architecture and Refresh]]"]
-last_verified: 624dc5db52f5a4818a2f9bd32b1900ff30c299b2
+last_verified: 2fae2e0b444f59e9c76be8bda1b39c0f01fc4ea2
 tags: [script]
 ---
 
@@ -19,7 +19,8 @@ One applicant on the Guild tab, written as a letter of introduction: who they ar
 | `TEXT_HIRE` | const | "Hire · %dg": hiring costs the recruit's price in gold ([[character_container#hire_price]]: the base `GuildCharacter.cost` plus the roster-size surcharge). |
 | `TEXT_HIRE_FREE` | const | Shown when cost is 0 (free on the first days). |
 | `TEXT_NO_BEDS` | const | Shown, with the button disabled, when the roster is full. |
-| `_portrait`, `_name`, `_role`, `_stat_columns`, `_total`, `_drop_cap`, `_blurb`, `_hire_button` | onready | Scene nodes `%Portrait` ([[portrait]]), `%Name`, `%Role`, `%Stats`, `%Total`, `%DropCap`, `%Blurb`, `%HireButton` ([[seal_button (scene)]]). |
+| `TEXT_TITLE` | const | `"%s the %s"`, the title line ("Juan the Priest"), like `GuildCharacter.title`. |
+| `_portrait`, `_title`, `_stat_columns`, `_total`, `_drop_cap`, `_blurb`, `_hire_button` | onready | Scene nodes `%Portrait` ([[portrait]]), `%Name` (name and role in one label), `%Stats`, `%Total`, `%DropCap`, `%Blurb`, `%HireButton` ([[seal_button (scene)]]). |
 
 ## Functions
 
@@ -35,7 +36,7 @@ The scene has one stat column (`StatTemplate`); this duplicates it `HallStyle.ST
 ### setup
 `func setup(hall: HallMain, recruit: GuildCharacter, _letter_index: int = 0) -> void` · `Scripts/UI/Rows/Heroes/hire_card.gd:35`
 
-Writes the letter: portrait, name, role, the five stat boxes and their quest-stat total, the backstory with a red drop cap, and the Hire button (price, "free", or "No beds left" and disabled when `hall.is_roster_full()`).
+Writes the letter: portrait, one title line (`TEXT_TITLE % [recruit.name, role]`), the five stat boxes and their quest-stat total, the backstory with a red drop cap, and the Hire button (price, "free", or "No beds left" and disabled when `hall.is_roster_full()`).
 
 **Parameters**
 | Name | Type | Meaning | Where callers get it |
@@ -67,7 +68,7 @@ Hire, and if they joined, this letter flies off to the roster.
 
 **Side effects:** [[hall_main#hire]] changes the roster and gold; on success [[hall_main#send_hired_letter]] animates the card away.
 
-**Called by:** signal `pressed` on `%HireButton` (connected at `hire_card.gd:36`).
+**Called by:** signal `pressed` on `%HireButton` (connected at `hire_card.gd:37`).
 
 **Calls:** [[hall_main#hire]], [[hall_main#send_hired_letter]].
 

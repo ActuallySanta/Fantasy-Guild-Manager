@@ -11,7 +11,7 @@ tags: [script]
 # tab_items.gd
 
 ## Purpose
-The Items tab, split in two folder tabs: Equipment (internally "pack", [[tab_pack]]: everything the guild owns and who wears what) and Shop ([[tab_shop]]: Grizzle's counter, today's goods). Which one is open is `hall.items_section` (`HallMain.ITEMS_SECTION_*`). The nav button and `HallMain.TAB_SHOP` keep the id `shop` so the tutorial's unlock day and old saves line up. Scene: [[tab_items (scene)]]. [[hall_main]] reaches it as `_tabs.shop`.
+The Items tab, split in two folder tabs: Equipment (internally "pack", [[tab_pack]]: everything the guild owns and who wears what) and Shop ([[tab_shop]]: today's goods). Which one is open is `hall.items_section` (`HallMain.ITEMS_SECTION_*`). The nav button and `HallMain.TAB_SHOP` keep the id `shop` so the tutorial's unlock day and old saves line up. Scene: [[tab_items (scene)]]. [[hall_main]] reaches it as `_tabs.shop`.
 
 ## State
 | Name | Kind | Meaning (units) |

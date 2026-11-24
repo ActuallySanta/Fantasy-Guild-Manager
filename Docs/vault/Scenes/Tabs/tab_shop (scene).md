@@ -4,14 +4,14 @@ uid: uid://crrj07shkvbrv
 root_type: VBoxContainer
 script: "[[tab_shop]]"
 systems: ["[[Items and Shop]]", "[[UI Architecture and Refresh]]"]
-last_verified: 5c8482e595c5dc23b21af42f0b1551f05e444767
+last_verified: 2fae2e0b444f59e9c76be8bda1b39c0f01fc4ea2
 tags: [scene]
 ---
 
 # tab_shop.tscn
 
 ## Purpose
-The Shop sub-tab of the Items tab: Grizzle behind his counter with a speech bubble, today's goods in a grid, and a buy bar above the nav. Part of [[Items and Shop]].
+The Shop sub-tab of the Items tab: today's goods in a grid, and a buy bar above the nav. Part of [[Items and Shop]].
 
 ## Parent scenes
 - **Placed in editor:** [[tab_items (scene)]] at node `TabShop`
@@ -20,7 +20,7 @@ The Shop sub-tab of the Items tab: Grizzle behind his counter with a speech bubb
 
 ## Child scenes
 - **Placed in editor:** none
-- **Instanced at runtime:** [[shop_tile (scene)]], created by [[tab_shop#_show_goods]] (`tab_shop.gd:91`) through `HallStyle.add_row`
+- **Instanced at runtime:** [[shop_tile (scene)]], created by [[tab_shop#_show_goods]] (`tab_shop.gd:80`) through `HallStyle.add_row`
 
 ```mermaid
 flowchart TD
@@ -31,7 +31,6 @@ flowchart TD
 ## Node tree
 - `TabShop` (VBoxContainer), script [[tab_shop]]
   - `%Scroll` (ScrollContainer) → `Body`
-    - `Keeper`: the shopkeeper art; `Bubble/%BubbleText` (Label), `NameTag/%ShopName` (Label)
     - `Margin/Goods`: `Head/%GoodsTitle`, `Head/%RestockNote` (Label); `%Grid` (GridContainer, runtime tiles)
   - `BuyBar/Banner/Row`: `Text/%ItemName`, `Text/%ItemEffect` (Label); `%BuyButton` (Button, `pressed` → [[tab_shop#_on_buy_pressed]])
 
@@ -39,4 +38,4 @@ flowchart TD
 - Root: [[tab_shop]]. `setup(hall)` is called by [[tab_items#setup]]; `refresh()` by [[tab_items#refresh]].
 
 ## Resources used
-- `Sprites/Shop/shopBackground.png`, `Sprites/Shop/shopkeeper.png`, `Sprites/UI Textures/awning.png`, `Sprites/Hall Icons/coins.tres`, `Themes/Styles/action_bar.tres`.
+- `Sprites/Hall Icons/coins.tres`, `Themes/Styles/action_bar.tres`.
